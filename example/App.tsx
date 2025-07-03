@@ -1,5 +1,4 @@
 import Slider from "@react-native-community/slider";
-import { getThumbnailAsync } from "expo-video-thumbnails";
 import {
   VLCPlayerView,
   VLCPlayerViewRef,
@@ -8,6 +7,7 @@ import {
   type Error,
   type Warn,
 } from "expo-libvlc-player";
+import { getThumbnailAsync } from "expo-video-thumbnails";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -50,8 +50,8 @@ type RepeatMode = boolean | "once";
 
 export default function App() {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
-  const [position, setPosition] = useState<number>(0);
-  const [duration, setDuration] = useState<number | null>(null);
+  const [position, setPosition] = useState<number>(-1);
+  const [duration, setDuration] = useState<number>(-1);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
   const [muted, setMuted] = useState<boolean>(false);
   const [repeat, setRepeat] = useState<RepeatMode>(false);
@@ -128,7 +128,7 @@ export default function App() {
 
     bufferingTimeoutRef.current = setTimeout(
       () => setIsBuffering(false),
-      BUFFERING_INTERVAL
+      BUFFERING_INTERVAL,
     );
   };
 
@@ -159,7 +159,7 @@ export default function App() {
   };
 
   const handlePositionChanged = ({ position }: PositionChanged) =>
-    setPosition(position);
+    setPosition(position !== -1 ? position : 0);
 
   const handleLoad = ({ duration, seekable }: VideoInfo) => {
     setDuration(duration !== -1 ? duration : 0);
@@ -200,6 +200,7 @@ export default function App() {
                   width: "100%",
                   height: "100%",
                   ...StyleSheet.absoluteFillObject,
+                  borderRadius: 5,
                   zIndex: 10,
                 }}
                 source={{ uri: thumbnail }}
@@ -207,7 +208,7 @@ export default function App() {
             )}
             <VLCPlayerView
               ref={playerRef}
-              style={{ height: "100%" }}
+              style={{ height: "100%", borderRadius: 5 }}
               uri={DEFAULT_PLAYER_URI}
               volume={volume}
               mute={muted}
@@ -227,12 +228,20 @@ export default function App() {
         </Group>
         <Group name="Controls">
           <View style={styles.duration}>
-            <Text>{msToMinutesSeconds(position * (duration ?? 0))}</Text>
-            {duration !== null ? (
-              <Text>{msToMinutesSeconds(duration)}</Text>
-            ) : (
-              <ActivityIndicator color="black" size="small" />
-            )}
+            <Text>
+              {position >= 0 && duration > 0
+                ? msToMinutesSeconds(position * duration)
+                : "N/A"}
+            </Text>
+            <Text>
+              {duration > 0 ? (
+                msToMinutesSeconds(duration)
+              ) : duration === -1 ? (
+                <ActivityIndicator color="black" size="small" />
+              ) : (
+                "N/A"
+              )}
+            </Text>
           </View>
           <Slider
             value={position}
@@ -259,6 +268,7 @@ export default function App() {
                     : "Repeat"
               }
               onPress={handleRepeatChange}
+              disabled={duration <= 0}
             />
           </View>
           <View style={styles.row}>
