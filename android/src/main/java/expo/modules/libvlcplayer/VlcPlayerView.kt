@@ -46,6 +46,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
     private var previousVolume: Int = MAX_PLAYER_VOLUME
     private var repeat: Boolean = false
     private var autoplay: Boolean = true
+    internal var hasLoaded: Boolean = false
 
     private val onBuffering by EventDispatcher()
     private val onPlaying by EventDispatcher()
@@ -78,52 +79,56 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                     Event.Buffering -> {
                         onBuffering(mapOf())
 
-                        val audioTracks = Arguments.createArray()
+                        if (!hasLoaded) {
+                            val audioTracks = Arguments.createArray()
 
-                        if (player.getAudioTracksCount() > 0) {
-                            val audios = player.getAudioTracks()
+                            if (player.getAudioTracksCount() > 0) {
+                                val audios = player.getAudioTracks()
 
-                            audios.forEach { track ->
-                                if (track.id == -1) return@forEach
-                                val trackMap = Arguments.createMap()
-                                trackMap.putInt("id", track.id)
-                                trackMap.putString("name", track.name)
-                                audioTracks.pushMap(trackMap)
+                                audios.forEach { track ->
+                                    if (track.id == -1) return@forEach
+                                    val trackMap = Arguments.createMap()
+                                    trackMap.putInt("id", track.id)
+                                    trackMap.putString("name", track.name)
+                                    audioTracks.pushMap(trackMap)
+                                }
                             }
-                        }
 
-                        val subtitleTracks = Arguments.createArray()
+                            val subtitleTracks = Arguments.createArray()
 
-                        if (player.getSpuTracksCount() > 0) {
-                            val subtitles = player.getSpuTracks()
+                            if (player.getSpuTracksCount() > 0) {
+                                val subtitles = player.getSpuTracks()
 
-                            subtitles.forEach { track ->
-                                val trackMap = Arguments.createMap()
-                                trackMap.putInt("id", track.id)
-                                trackMap.putString("name", track.name)
-                                subtitleTracks.pushMap(trackMap)
+                                subtitles.forEach { track ->
+                                    val trackMap = Arguments.createMap()
+                                    trackMap.putInt("id", track.id)
+                                    trackMap.putString("name", track.name)
+                                    subtitleTracks.pushMap(trackMap)
+                                }
                             }
-                        }
 
-                        val video = player.getCurrentVideoTrack()
-                        val ratio = player.getAspectRatio()
-                        val length = player.getLength()
-                        val tracks = Arguments.createMap().apply {
-                            putArray("audio", audioTracks)
-                            putArray("subtitle", subtitleTracks)
-                        }
-                        val seekable = player.isSeekable()
+                            val video = player.getCurrentVideoTrack()
+                            val ratio = player.getAspectRatio()
+                            val length = player.getLength()
+                            val tracks = Arguments.createMap().apply {
+                                putArray("audio", audioTracks)
+                                putArray("subtitle", subtitleTracks)
+                            }
+                            val seekable = player.isSeekable()
 
-                        val videoInfo = Arguments.createMap().apply {
-                            putInt("width", video?.width ?: 0)
-                            putInt("height", video?.height ?: 0)
-                            putString("aspectRatio", ratio)
-                            putDouble("duration", length.toDouble())
-                            putMap("tracks", tracks)
-                            putBoolean("seekable", seekable)
-                        }
+                            val videoInfo = Arguments.createMap().apply {
+                                putInt("width", video?.width ?: 0)
+                                putInt("height", video?.height ?: 0)
+                                putString("aspectRatio", ratio)
+                                putDouble("duration", length.toDouble())
+                                putMap("tracks", tracks)
+                                putBoolean("seekable", seekable)
+                            }
 
-                        onLoad(videoInfo)
+                            onLoad(videoInfo)
+
+                            hasLoaded = true
+                        }
                     }
 
                     Event.Playing -> {

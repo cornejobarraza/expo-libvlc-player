@@ -20,6 +20,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     var audioMixingMode: AudioMixingMode = .auto
     var playInBackground: Bool = false
     private var autoplay: Bool = true
+    var hasLoaded: Bool = false
 
     private let onBuffering = EventDispatcher()
     private let onPlaying = EventDispatcher()
@@ -50,58 +51,62 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         case .buffering:
             onBuffering([:])
 
-            var audioTracks: [[String: Any]] = []
+            if !hasLoaded {
+                var audioTracks: [[String: Any]] = []
 
-            if let audios = player.audioTrackNames as? [String] {
-                if let audioIndexes = player.audioTrackIndexes as? [NSNumber] {
-                    for (index, name) in audios.enumerated() {
-                        let trackId = audioIndexes[index].intValue
-                        if trackId != -1 && name != "Disable" {
-                            audioTracks.append([
+                if let audios = player.audioTrackNames as? [String] {
+                    if let audioIndexes = player.audioTrackIndexes as? [NSNumber] {
+                        for (index, name) in audios.enumerated() {
+                            let trackId = audioIndexes[index].intValue
+                            if trackId != -1 && name != "Disable" {
+                                audioTracks.append([
+                                    "id": trackId,
+                                    "name": name,
+                                ])
+                            }
+                        }
+                    }
+                }
+
+                var subtitleTracks: [[String: Any]] = []
+
+                if let subtitles = player.videoSubTitlesNames as? [String] {
+                    if let subtitleIndexes = player.videoSubTitlesIndexes as? [NSNumber] {
+                        for (index, name) in subtitles.enumerated() {
+                            let trackId = subtitleIndexes[index].intValue
+                            subtitleTracks.append([
                                 "id": trackId,
                                 "name": name,
                             ])
                         }
                     }
                 }
-            }
 
-            var subtitleTracks: [[String: Any]] = []
-
-            if let subtitles = player.videoSubTitlesNames as? [String] {
-                if let subtitleIndexes = player.videoSubTitlesIndexes as? [NSNumber] {
-                    for (index, name) in subtitles.enumerated() {
-                        let trackId = subtitleIndexes[index].intValue
-                        subtitleTracks.append([
-                            "id": trackId,
-                            "name": name,
-                        ])
-                    }
+                let video = player.videoSize
+                let ratio = player.videoAspectRatio
+                var length = 0
+                if let media = player.media {
+                    length = Int(media.length.intValue)
                 }
+                let tracks = [
+                    "audio": audioTracks,
+                    "subtitle": subtitleTracks,
+                ]
+                let seekable = player.isSeekable
+
+                let videoInfo: [String: Any] = [
+                    "width": Int(video.width),
+                    "height": Int(video.height),
+                    "aspectRatio": ratio,
+                    "duration": Double(length),
+                    "tracks": tracks,
+                    "seekable": seekable,
+                ]
+
+                onLoad(videoInfo)
+
+                hasLoaded = true
             }
-
-            let video = player.videoSize
-            let ratio = player.videoAspectRatio
-            var length = 0
-            if let media = player.media {
-                length = Int(media.length.intValue)
-            }
-            let tracks = [
-                "audio": audioTracks,
-                "subtitle": subtitleTracks,
-            ]
-            let seekable = player.isSeekable
-
-            let videoInfo: [String: Any] = [
-                "width": Int(video.width),
-                "height": Int(video.height),
-                "aspectRatio": ratio,
-                "duration": Double(length),
-                "tracks": tracks,
-                "seekable": seekable,
-            ]
-
-            onLoad(videoInfo)
         case .playing:
             onPlaying([:])
             VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
