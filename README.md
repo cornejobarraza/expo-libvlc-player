@@ -43,16 +43,16 @@ See the [example app](example/App.tsx) for additional usage.
 
 ### Player methods
 
-| Prop                     | Description                           | Params                                 |
-| ------------------------ | ------------------------------------- | -------------------------------------- |
-| `play()`                 | Starts playback of the current player |                                        |
-| `pause()`                | Pauses playback of the current player |                                        |
-| `stop()`                 | Stops playback of the current player  |                                        |
-| `seek(position: number)` | Sets position of the current player   | Must be a float number between 0 and 1 |
+| Method    | Description                           | Params                                              |
+| --------- | ------------------------------------- | --------------------------------------------------- |
+| `play()`  | Starts playback of the current player |                                                     |
+| `pause()` | Pauses playback of the current player |                                                     |
+| `stop()`  | Stops playback of the current player  |                                                     |
+| `seek()`  | Sets position of the current player   | `position` - Must be a float number between 0 and 1 |
 
 ### Player props
 
-The `VLCPlayerView` extends React Native `ViewProps` and implements it's own props:
+The `VLCPlayerView` extends React Native `ViewProps` and implements it's own:
 
 | Prop               | Description                                                                               | Default  |
 | ------------------ | ----------------------------------------------------------------------------------------- | -------- |
@@ -77,11 +77,11 @@ The `VLCPlayerView` extends React Native `ViewProps` and implements it's own pro
 | `onPlaying`         | Called after the `Playing` player event          |                                                                                                               |
 | `onPaused`          | Called after the `Paused` player event           |                                                                                                               |
 | `onStopped`         | Called after the `Stopped` player event          |                                                                                                               |
+| `onPositionChanged` | Called after the `PositionChanged` player event  | `{ position: number }`                                                                                        |
 | `onEnded`           | Called after the `EndReached` player event       |                                                                                                               |
 | `onRepeat`          | Called after the player repeats the media        |                                                                                                               |
 | `onWarn`            | Called after the player encounters a conflict    | `{ warn: string }`                                                                                            |
 | `onError`           | Called after the `EncounteredError` player event | `{ error: string }`                                                                                           |
-| `onPositionChanged` | Called after the `PositionChanged` player event  | `{ position: number }`                                                                                        |
 | `onLoad`            | Called after the `Buffering` player event        | `{ width: number, height: number, aspectRatio: string, duration: number, tracks: object, seekable: boolean }` |
 | `onBackground`      | Called after the player enters the background    |                                                                                                               |
 
