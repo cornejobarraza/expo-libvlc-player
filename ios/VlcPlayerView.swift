@@ -12,17 +12,15 @@ private let enableSubtitles = true
 
 class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     var mediaPlayer: VLCMediaPlayer?
+    var shouldCreate: Bool = false
 
     private var uri: String = ""
     private var options: [String] = []
-    private var previousVolume: Int = maxPlayerVolume
+    private var userVolume: Int = maxPlayerVolume
     private var shouldRepeat: Bool = false
     var audioMixingMode: AudioMixingMode = .auto
     var playInBackground: Bool = false
     private var autoplay: Bool = true
-
-    var shouldCreate: Bool = false
-    var hasLoaded: Bool = false
 
     private let onBuffering = EventDispatcher()
     private let onPlaying = EventDispatcher()
@@ -80,7 +78,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         case .buffering:
             onBuffering([:])
 
-            if !hasLoaded {
+            if player.position == 0.0 {
                 var audioTracks: [[String: Any]] = []
 
                 if let audios = player.audioTrackNames as? [String] {
@@ -133,8 +131,6 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
                 ]
 
                 onLoad(videoInfo)
-
-                hasLoaded = true
             }
         case .playing:
             onPlaying([:])
@@ -216,7 +212,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         guard let player = mediaPlayer else { return }
 
         let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
-        previousVolume = newVolume
+        userVolume = newVolume
 
         player.audio?.volume = Int32(newVolume)
         VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
@@ -226,7 +222,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         guard let player = mediaPlayer else { return }
 
         let newVolume = !mute ?
-            max(playerVolumeStep, min(maxPlayerVolume, previousVolume)) :
+            max(playerVolumeStep, min(maxPlayerVolume, userVolume)) :
             minPlayerVolume
 
         player.audio?.volume = Int32(newVolume)

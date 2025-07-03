@@ -42,13 +42,11 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
 
     private var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
+    internal var shouldCreate: Boolean = false
 
-    private var previousVolume: Int = MAX_PLAYER_VOLUME
+    private var userVolume: Int = MAX_PLAYER_VOLUME
     private var repeat: Boolean = false
     private var autoplay: Boolean = true
-
-    internal var shouldCreate: Boolean = false
-    internal var hasLoaded: Boolean = false
 
     private val onBuffering by EventDispatcher()
     private val onPlaying by EventDispatcher()
@@ -83,7 +81,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                     Event.Buffering -> {
                         onBuffering(mapOf())
 
-                        if (!hasLoaded) {
+                        if (player.getPosition() == 0f) {
                             val audioTracks = Arguments.createArray()
 
                             if (player.getAudioTracksCount() > 0) {
@@ -130,8 +128,6 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                             }
 
                             onLoad(videoInfo)
-
-                            hasLoaded = true
                         }
                     }
 
@@ -153,6 +149,11 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                         onPositionChanged(mapOf("position" to position))
                     }
 
+                    Event.PositionChanged -> {
+                        val position = mapOf("position" to event.positionChanged)
+                        onPositionChanged(position)
+                    }
+
                     Event.EndReached -> {
                         onEnded(mapOf())
 
@@ -168,11 +169,6 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                     Event.EncounteredError -> {
                         val error = mapOf("error" to "Player encountered an error")
                         onError(error)
-                    }
-
-                    Event.PositionChanged -> {
-                        val position = mapOf("position" to event.positionChanged)
-                        onPositionChanged(position)
                     }
                 }
             })
@@ -238,7 +234,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
 
     fun setVolume(volume: Int) {
         val newVolume = volume.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
-        previousVolume = newVolume
+        userVolume = newVolume
 
         mediaPlayer?.setVolume(newVolume)
         audioFocusManager.updateAudioFocus()
@@ -246,7 +242,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
 
     fun setMute(mute: Boolean) {
         val newVolume = if (!mute) {
-            previousVolume.coerceIn(PLAYER_VOLUME_STEP, MAX_PLAYER_VOLUME)
+            userVolume.coerceIn(PLAYER_VOLUME_STEP, MAX_PLAYER_VOLUME)
         } else {
             MIN_PLAYER_VOLUME
         }

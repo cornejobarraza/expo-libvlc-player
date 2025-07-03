@@ -38,7 +38,7 @@ class AudioFocusManager(
             } ?: false
         }
 
-    private var previousVolume: Int = MAX_PLAYER_VOLUME
+    private var userVolume: Int = MAX_PLAYER_VOLUME
 
     private fun playerRequiresFocus(player: MediaPlayer?): Boolean {
         val mPlayer = player ?: return false
@@ -193,7 +193,7 @@ class AudioFocusManager(
             appContext.mainQueue.launch {
                 val volume = weakPlayer.getVolume() / 20
                 weakPlayer.setVolume(volume)
-                previousVolume = volume
+                userVolume = volume
             }
         }
     }
@@ -202,7 +202,7 @@ class AudioFocusManager(
         player?.let { weakPlayer ->
             if (weakPlayer.getVolume() > MIN_PLAYER_VOLUME) {
                 appContext.mainQueue.launch {
-                    weakPlayer.setVolume(previousVolume)
+                    weakPlayer.setVolume(userVolume)
                 }
             }
         }
