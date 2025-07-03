@@ -20,6 +20,8 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     var audioMixingMode: AudioMixingMode = .auto
     var playInBackground: Bool = false
     private var autoplay: Bool = true
+
+    var shouldCreate: Bool = false
     var hasLoaded: Bool = false
 
     private let onBuffering = EventDispatcher()
@@ -42,6 +44,33 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         VlcPlayerManager.shared.registerView(view: self)
 
         clipsToBounds = true
+    }
+
+    func createPlayer() {
+        if !shouldCreate { return }
+
+        destroyPlayer()
+
+        mediaPlayer = VLCMediaPlayer(options: options)
+
+        if let player = mediaPlayer {
+            player.delegate = self
+            player.drawable = self
+
+            guard let url = URL(string: uri) else {
+                let error = ["error": "Invalid URI, media could not be set"]
+                onError(error)
+                return
+            }
+
+            player.media = VLCMedia(url: url)
+
+            if autoplay {
+                player.play()
+            }
+        }
+
+        shouldCreate = false
     }
 
     func mediaPlayerStateChanged(_: Notification) {
@@ -144,29 +173,6 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         onPositionChanged(position)
     }
 
-    func createPlayer() {
-        destroyPlayer()
-
-        mediaPlayer = VLCMediaPlayer(options: options)
-
-        if let player = mediaPlayer {
-            player.delegate = self
-            player.drawable = self
-
-            guard let url = URL(string: uri) else {
-                let error = ["error": "Invalid URI, media could not be set"]
-                onError(error)
-                return
-            }
-
-            player.media = VLCMedia(url: url)
-
-            if autoplay {
-                player.play()
-            }
-        }
-    }
-
     func destroyPlayer() {
         if let player = mediaPlayer {
             player.stop()
@@ -178,9 +184,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         let old = self.uri
         self.uri = uri
 
-        if uri != old {
-            createPlayer()
-        }
+        shouldCreate = uri != old
     }
 
     func setSubtitle(_ subtitle: [String: Any]?) {
@@ -205,9 +209,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         let old = self.options
         self.options = options
 
-        if options != old {
-            createPlayer()
-        }
+        shouldCreate = options != old
     }
 
     func setVolume(_ volume: Int) {

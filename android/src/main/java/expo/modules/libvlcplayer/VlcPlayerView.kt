@@ -46,6 +46,8 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
     private var previousVolume: Int = MAX_PLAYER_VOLUME
     private var repeat: Boolean = false
     private var autoplay: Boolean = true
+
+    internal var shouldCreate: Boolean = false
     internal var hasLoaded: Boolean = false
 
     private val onBuffering by EventDispatcher()
@@ -68,6 +70,8 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
     }
 
     fun createPlayer() {
+        if (!shouldCreate) return
+
         destroyPlayer()
 
         libVLC = LibVLC(context, options)
@@ -187,6 +191,8 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                 player.play()
             }
         }
+
+        shouldCreate = false
     }
 
     fun destroyPlayer() {
@@ -203,9 +209,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
             val old = field
             field = value
 
-            if (value != old) {
-                createPlayer()
-            }
+            shouldCreate = value != old
         }
 
     fun setSubtitle(subtitle: ReadableMap?) {
@@ -229,9 +233,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
             val old = field
             field = value
 
-            if (value != old) {
-                createPlayer()
-            }
+            shouldCreate = value != old
         }
 
     fun setVolume(volume: Int) {

@@ -86,6 +86,10 @@ public class VlcPlayerModule: Module {
                 view.setAutoplay(autoplay ?? true)
             }
 
+            OnViewDidUpdateProps { (view: VlcPlayerView) in
+                view.createPlayer()
+            }
+
             AsyncFunction("play") { (view: VlcPlayerView) in
                 view.play()
             }
