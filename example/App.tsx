@@ -233,15 +233,7 @@ export default function App() {
                 ? msToMinutesSeconds(position * duration)
                 : "N/A"}
             </Text>
-            <Text>
-              {duration > 0 ? (
-                msToMinutesSeconds(duration)
-              ) : duration === -1 ? (
-                <ActivityIndicator color="black" size="small" />
-              ) : (
-                "N/A"
-              )}
-            </Text>
+            <Text>{duration > 0 ? msToMinutesSeconds(duration) : "N/A"}</Text>
           </View>
           <Slider
             value={position}
