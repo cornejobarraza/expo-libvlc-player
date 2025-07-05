@@ -17,6 +17,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     private var uri: String = ""
     private var options: [String] = []
     private var userVolume: Int = maxPlayerVolume
+    private var time: VLCTime?
     private var shouldRepeat: Bool = false
     var audioMixingMode: AudioMixingMode = .auto
     var playInBackground: Bool = false
@@ -135,6 +136,11 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         case .playing:
             onPlaying([:])
             VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+
+            if let timestamp = time {
+                player.time = timestamp / 1000 // Time is managed in seconds
+                time = nil
+            }
         case .paused:
             onPaused([:])
             VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
@@ -245,6 +251,12 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
 
         player.currentAudioTrackIndex = Int32(audioTrack)
         player.currentVideoSubTitleIndex = Int32(subtitleTrack)
+    }
+
+    func setTimestamp(_ timestamp: Int?) {
+        if self.timestamp == nil, let time = timestamp {
+            self.timestamp = VLCTime(int: time)
+        }
     }
 
     func setRepeat(_ shouldRepeat: Bool) {

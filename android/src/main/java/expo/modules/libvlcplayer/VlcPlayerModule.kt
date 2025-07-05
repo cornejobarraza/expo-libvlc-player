@@ -57,7 +57,7 @@ class VlcPlayerModule : Module() {
             }
 
             Prop("options") { view: VlcPlayerView, options: ArrayList<String>? ->
-                view.options = options ?: ArrayList<String>()
+                view.options = options
             }
 
             Prop("volume") { view: VlcPlayerView, volume: Int? ->
@@ -76,6 +76,10 @@ class VlcPlayerModule : Module() {
                 view.setTracks(tracks)
             }
 
+            Prop("time") { view: VlcPlayerView, time: Int? ->
+                view.time = time?.toLong()
+            }
+
             Prop("repeat") { view: VlcPlayerView, repeat: Boolean? ->
                 view.setRepeat(repeat ?: false)
             }
@@ -84,12 +88,12 @@ class VlcPlayerModule : Module() {
                 view.setAspectRatio(aspectRatio)
             }
 
-            Prop("audioMixingMode") { view: VlcPlayerView, audioMixingMode: AudioMixingMode ->
+            Prop("audioMixingMode") { view: VlcPlayerView, audioMixingMode: AudioMixingMode? ->
                 view.audioMixingMode = audioMixingMode
             }
 
             Prop("playInBackground") { view: VlcPlayerView, playInBackground: Boolean? ->
-                view.playInBackground = playInBackground ?: false
+                view.playInBackground = playInBackground
             }
 
             Prop("autoplay") { view: VlcPlayerView, autoplay: Boolean? ->

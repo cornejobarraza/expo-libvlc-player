@@ -59,12 +59,13 @@ The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
 | `uri`              | Sets the URI of the media to be played                                                    |          |
 | `subtitle`         | Sets subtitle URI and enabled state                                                       |          |
 | `options`          | Sets the VLC options to initialize the player with                                        | `[]`     |
-| `volume`           | Controls the player volume, must be an integer number between `0` and `100`               | `100`    |
+| `volume`           | Controls the player volume. Must be an integer number between `0` and `100`               | `100`    |
 | `mute`             | Sets the player volume to `0`                                                             | `false`  |
-| `rate`             | Controls the player rate, must be a float number between `0` and `1`                      | `1`      |
+| `rate`             | Controls the player rate. Must be a float number between `0` and `1`                      | `1`      |
 | `tracks`           | Sets the player audio and subtitle tracks                                                 |          |
+| `time`             | Controls the player time once created. Must be an integer number in milliseconds          | `0`      |
 | `repeat`           | Repeats the media once playback is ended                                                  | `false`  |
-| `aspectRatio`      | Sets the player aspect ratio, must be a valid `string`                                    |          |
+| `aspectRatio`      | Sets the player aspect ratio. Must be a valid `string`                                    |          |
 | `audioMixingMode`  | Determines how the player will interact with other audio playing in the system            | `"auto"` |
 | `playInBackground` | Determines whether the player should continue playing after the app enters the background | `false`  |
 | `autoplay`         | Autoplays media once player is created                                                    | `true`   |

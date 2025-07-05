@@ -70,7 +70,7 @@ object VlcPlayerManager {
                 playerView.onBackground(mapOf())
 
                 playerView.mediaPlayer?.let { player ->
-                    if (!playerView.playInBackground && player.isPlaying()) {
+                    if (playerView.playInBackground != true && player.isPlaying()) {
                         player.pause()
                     }
 

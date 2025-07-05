@@ -134,6 +134,13 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                     Event.Playing -> {
                         onPlaying(mapOf())
                         audioFocusManager.updateAudioFocus()
+
+                        val timestamp = time
+
+                        if (timestamp != null) {
+                            player.setTime(timestamp)
+                            time = null
+                        }
                     }
 
                     Event.Paused -> {
@@ -157,7 +164,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                     Event.EndReached -> {
                         onEnded(mapOf())
 
-                        val manualRepeat = !options.hasRepeatOptions() && repeat
+                        val manualRepeat = options?.hasRepeatOptions() == false && repeat
 
                         if (manualRepeat) {
                             player.stop()
@@ -224,7 +231,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
         }
     }
 
-    var options: ArrayList<String> = ArrayList<String>()
+    var options: ArrayList<String>? = ArrayList<String>()
         set(value) {
             val old = field
             field = value
@@ -265,8 +272,13 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
         }
     }
 
+    var time: Long? = null
+        set(value) {
+            field = value
+        }
+
     fun setRepeat(repeat: Boolean) {
-        if (repeat && options.hasRepeatOptions()) {
+        if (repeat && options?.hasRepeatOptions() == true) {
             val warn = mapOf("warn" to "Repeat already enabled in options")
             return onWarn(warn)
         }
@@ -278,13 +290,13 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
         mediaPlayer?.setAspectRatio(aspectRatio)
     }
 
-    var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO
+    var audioMixingMode: AudioMixingMode? = AudioMixingMode.AUTO
         set(value) {
             field = value
             audioFocusManager.updateAudioFocus()
         }
 
-    var playInBackground: Boolean = false
+    var playInBackground: Boolean? = false
         set(value) {
             field = value
             audioFocusManager.updateAudioFocus()

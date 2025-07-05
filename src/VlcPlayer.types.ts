@@ -5,19 +5,19 @@ export interface VLCPlayerViewRef {
   /**
    * Starts playback for the current player
    *
-   * @returns void
+   * @returns A promise which resolves to `void`
    */
   readonly play: () => Promise<void>;
   /**
    * Pauses playback for the current player
    *
-   * @returns void
+   * @returns A promise which resolves to `void`
    */
   readonly pause: () => Promise<void>;
   /**
    * Stops playback for the current player
    *
-   * @returns void
+   * @returns A promise which resolves to `void`
    */
   readonly stop: () => Promise<void>;
   /**
@@ -129,6 +129,7 @@ export interface VlcPlayerViewNativeProps {
   mute?: boolean;
   rate?: number;
   tracks?: TracksOptions;
+  time?: number;
   repeat?: boolean;
   aspectRatio?: string;
   audioMixingMode?: AudioMixingMode;
@@ -184,7 +185,7 @@ export interface VlcPlayerViewProps extends ViewProps {
    */
   options?: string[];
   /**
-   * Controls the player volume, must be an integer number between `0` and `100`
+   * Controls the player volume. Must be an integer number between `0` and `100`
    *
    * @default 100
    *
@@ -192,10 +193,13 @@ export interface VlcPlayerViewProps extends ViewProps {
   volume?: number;
   /**
    * Sets the player volume to `0`
+   *
+   * @default false
+   *
    */
   mute?: boolean;
   /**
-   * Controls the player rate, must be a float number
+   * Controls the player rate. Must be a float number
    *
    * @default 1
    *
@@ -216,11 +220,21 @@ export interface VlcPlayerViewProps extends ViewProps {
    */
   tracks?: TracksOptions;
   /**
+   * Controls the player time once created. Must be an integer number in milliseconds
+   *
+   * @default 0
+   *
+   */
+  time?: number;
+  /**
    * Repeats media once playback is ended
+   *
+   * @default false
+   *
    */
   repeat?: boolean;
   /**
-   * Sets the player aspect ratio, must be a valid string
+   * Sets the player aspect ratio. Must be a valid string
    *
    * @example "16:9"
    */
@@ -228,7 +242,7 @@ export interface VlcPlayerViewProps extends ViewProps {
   /**
    * Determines how the player will interact with other audio playing in the system
    *
-   * @default 'auto'
+   * @default "auto"
    */
   audioMixingMode?: AudioMixingMode;
   /**
