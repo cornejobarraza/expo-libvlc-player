@@ -195,7 +195,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         }
     }
 
-    func mediaPlayerPositionChanged(_: Notification) {
+    func mediaPlayerTimeChanged(_: Notification) {
         guard let player = mediaPlayer else { return }
 
         let position = ["position": player.position]
