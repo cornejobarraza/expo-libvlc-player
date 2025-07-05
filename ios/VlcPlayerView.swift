@@ -16,6 +16,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     private var shouldInit: Bool = true
     private var shouldCreate: Bool = true
     private var hasLoaded: Bool = false
+    var isBackgrounded: Bool = false
 
     private var uri: String = ""
     private var options: [String] = []
@@ -95,7 +96,9 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
 
         switch player.state {
         case .buffering:
-            onBuffering([:])
+            if !isBackgrounded {
+                onBuffering([:])
+            }
 
             let video = player.videoSize
 
@@ -309,6 +312,9 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     }
 
     func play() {
+        isBackgrounded = false
+        let background = ["background": isBackgrounded]
+        onBackground(background)
         mediaPlayer?.play()
     }
 

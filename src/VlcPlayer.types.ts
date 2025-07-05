@@ -86,7 +86,9 @@ export type LoadListener = (event: { nativeEvent: VideoInfo }) => void;
 /**
  * @hidden
  */
-export type BackgroundListener = () => void;
+export type BackgroundListener = (event: { nativeEvent: Background }) => void;
+
+export type Background = { background: boolean };
 
 export interface Track {
   id: number;
@@ -301,5 +303,5 @@ export interface VlcPlayerViewProps extends ViewProps {
   /**
    * Event that fires when player enters the background
    */
-  onBackground?: () => void;
+  onBackground?: (event: Background) => void;
 }

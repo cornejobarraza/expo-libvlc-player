@@ -6,6 +6,7 @@ import {
   type VideoInfo,
   type Error,
   type Warn,
+  type Background,
 } from "expo-libvlc-player";
 import { getThumbnailAsync } from "expo-video-thumbnails";
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -98,7 +99,6 @@ export default function App() {
   const handlePlayPause = () => {
     if (!isPlaying) {
       playerRef.current?.play();
-      setIsBackgrounded(false);
     } else {
       playerRef.current?.pause();
     }
@@ -177,7 +177,8 @@ export default function App() {
     setHasLoaded(true);
   };
 
-  const handleBackground = () => setIsBackgrounded(true);
+  const handleBackground = ({ background }: Background) =>
+    setIsBackgrounded(background);
 
   const handleSlidingComplete = (position: number) =>
     playerRef.current?.seek(position);

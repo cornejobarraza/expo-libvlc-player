@@ -24,6 +24,9 @@ class VlcPlayerManager {
 
   func onAppBackgrounded() {
     for view in views.allObjects {
+      view.isBackgrounded = true
+      let background = ["background": view.isBackgrounded]
+      view.onBackground(background)
       view.onBackground([:])
 
       guard let player = view.mediaPlayer else { continue }

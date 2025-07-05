@@ -41,11 +41,11 @@ object VlcPlayerManager {
     }
 
     fun onAppForegrounded() {
-        views.forEach { view ->
-            view.get()?.let { playerView ->
-                playerView.mediaPlayer?.let { player ->
+        views.forEach { playerView ->
+            playerView.get()?.let { view ->
+                view.mediaPlayer?.let { player ->
                     player.attachViews(
-                        playerView.videoLayout,
+                        view.videoLayout,
                         null,
                         ENABLE_SUBTITLES,
                         USE_TEXTURE_VIEW
@@ -65,12 +65,14 @@ object VlcPlayerManager {
     }
 
     fun onAppBackgrounded() {
-        views.forEach { view ->
-            view.get()?.let { playerView ->
-                playerView.onBackground(mapOf())
+        views.forEach { playerView ->
+            playerView.get()?.let { view ->
+                view.isBackgrounded = true
+                val background = mapOf("background" to view.isBackgrounded)
+                view.onBackground(background)
 
-                playerView.mediaPlayer?.let { player ->
-                    if (playerView.playInBackground != true && player.isPlaying()) {
+                view.mediaPlayer?.let { player ->
+                    if (view.playInBackground != true && player.isPlaying()) {
                         player.pause()
                     }
 

@@ -46,6 +46,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
     private var shouldInit: Boolean = true
     private var shouldCreate: Boolean = true
     private var hasLoaded: Boolean = false
+    internal var isBackgrounded: Boolean = false
 
     private var userVolume: Int = MAX_PLAYER_VOLUME
     private var repeat: Boolean = false
@@ -91,7 +92,9 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
             player.setEventListener(EventListener { event ->
                 when (event.type) {
                     Event.Buffering -> {
-                        onBuffering(mapOf())
+                        if (!isBackgrounded) {
+                            onBuffering(mapOf())
+                        }
 
                         val video = player.getCurrentVideoTrack()
 
@@ -330,6 +333,9 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
     }
 
     fun play() {
+        isBackgrounded = false
+        val background = mapOf("background" to isBackgrounded)
+        onBackground(background)
         mediaPlayer?.play()
     }
 
