@@ -30,7 +30,7 @@ Run `npx pod-install` after installing the npm package.
 import { VLCPLayerView } from "expo-libvlc-player";
 
 return (
-  <View styles={{ height: 576 }}>
+  <View styles={{ height: videoHeight }}>
     <VLCPlayerView
       style={{ height: "100%" }}
       uri="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"

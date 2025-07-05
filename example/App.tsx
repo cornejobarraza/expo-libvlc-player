@@ -8,7 +8,7 @@ import {
   type Warn,
 } from "expo-libvlc-player";
 import { getThumbnailAsync } from "expo-video-thumbnails";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -23,7 +23,7 @@ import {
 } from "react-native";
 
 function msToMinutesSeconds(duration: number) {
-  const totalSeconds = Math.floor(duration / 1000);
+  const totalSeconds = Math.floor(duration / 1_000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
 
@@ -50,8 +50,8 @@ type RepeatMode = boolean | "once";
 
 export default function App() {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
-  const [position, setPosition] = useState<number>(-1);
-  const [duration, setDuration] = useState<number>(-1);
+  const [position, setPosition] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
   const [muted, setMuted] = useState<boolean>(false);
   const [repeat, setRepeat] = useState<RepeatMode>(false);
@@ -60,6 +60,7 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isBackgrounded, setIsBackgrounded] = useState<boolean>(false);
   const [isSeekable, setIsSeekable] = useState<boolean>(false);
+  const [hasLoaded, setHasLoaded] = useState<boolean | null>(null);
 
   const playerRef = useRef<VLCPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -86,7 +87,7 @@ export default function App() {
     }
   };
 
-  const handlePlaybackChange = () => {
+  const handlePlayPause = () => {
     if (!isPlaying) {
       playerRef.current?.play();
       setIsBackgrounded(false);
@@ -156,20 +157,24 @@ export default function App() {
     setIsPlaying(false);
     setIsBackgrounded(false);
     setIsSeekable(false);
+    setHasLoaded(false);
   };
 
   const handlePositionChanged = ({ position }: PositionChanged) =>
-    setPosition(position !== -1 ? position : 0);
+    setPosition(position);
 
   const handleLoad = ({ duration, seekable }: VideoInfo) => {
-    setDuration(duration !== -1 ? duration : 0);
+    setDuration(duration);
     setIsSeekable(seekable);
+    setHasLoaded(true);
   };
 
   const handleBackground = () => setIsBackgrounded(true);
 
   const handleSlidingComplete = (position: number) =>
     playerRef.current?.seek(position);
+
+  const shouldShowLoader = isBuffering || hasLoaded === null;
 
   const shouldShowThumbnail =
     !!thumbnail &&
@@ -187,7 +192,7 @@ export default function App() {
               height: videoHeight,
             }}
           >
-            {isBuffering && (
+            {shouldShowLoader && (
               <ActivityIndicator
                 style={{ ...StyleSheet.absoluteFillObject, zIndex: 20 }}
                 color="white"
@@ -227,66 +232,76 @@ export default function App() {
           </View>
         </Group>
         <Group name="Controls">
-          <View style={styles.duration}>
-            <Text>
-              {position >= 0 && duration > 0
-                ? msToMinutesSeconds(position * duration)
-                : "N/A"}
-            </Text>
-            <Text>{duration > 0 ? msToMinutesSeconds(duration) : "N/A"}</Text>
-          </View>
-          <Slider
-            value={position}
-            onSlidingComplete={handleSlidingComplete}
-            minimumValue={MIN_POSITION_VALUE}
-            maximumValue={MAX_POSITION_VALUE}
-            thumbTintColor="darkred"
-            minimumTrackTintColor="red"
-            maximumTrackTintColor="indianred"
-            disabled={!isSeekable}
-          />
-          <View style={styles.row}>
-            <Button
-              title={!isPlaying ? "Play" : "Pause"}
-              onPress={handlePlaybackChange}
-            />
-            <Button title="Stop" onPress={handleStopPlayer} />
-            <Button
-              title={
-                !repeat
-                  ? "Don't repeat"
-                  : repeat === "once"
-                    ? "Repeat once"
-                    : "Repeat"
-              }
-              onPress={handleRepeatChange}
-              disabled={duration <= 0}
-            />
-          </View>
-          <View style={styles.row}>
-            <Button
-              title="-"
-              onPress={() => handleVolumeChange("decrease")}
-              disabled={volume === MIN_VOLUME_LEVEL || muted}
-            />
-            <Button
-              title={!muted ? "Mute" : "Unmute"}
-              onPress={handleMute}
-              disabled={volume === MIN_VOLUME_LEVEL && !muted}
-            />
-            <Button
-              title="+"
-              onPress={() => handleVolumeChange("increase")}
-              disabled={volume === MAX_VOLUME_LEVEL || muted}
-            />
-          </View>
+          {hasLoaded !== null ? (
+            <>
+              <View style={styles.duration}>
+                <Text>
+                  {position >= 0 && duration > 0
+                    ? msToMinutesSeconds(position * duration)
+                    : "N/A"}
+                </Text>
+                <Text>
+                  {duration > 0 ? msToMinutesSeconds(duration) : "N/A"}
+                </Text>
+              </View>
+              <Slider
+                value={position}
+                onSlidingComplete={handleSlidingComplete}
+                minimumValue={MIN_POSITION_VALUE}
+                maximumValue={MAX_POSITION_VALUE}
+                thumbTintColor="darkred"
+                minimumTrackTintColor="red"
+                maximumTrackTintColor="indianred"
+                disabled={!isSeekable}
+              />
+              <View style={styles.row}>
+                <Button
+                  title={!isPlaying ? "Play" : "Pause"}
+                  onPress={handlePlayPause}
+                />
+                <Button title="Stop" onPress={handleStopPlayer} />
+                <Button
+                  title={
+                    !repeat
+                      ? "Don't repeat"
+                      : repeat === "once"
+                        ? "Repeat once"
+                        : "Repeat"
+                  }
+                  onPress={handleRepeatChange}
+                  disabled={duration <= 0}
+                />
+              </View>
+              <View style={styles.row}>
+                <Button
+                  title="-"
+                  onPress={() => handleVolumeChange("decrease")}
+                  disabled={volume === MIN_VOLUME_LEVEL || muted}
+                />
+                <Button
+                  title={!muted ? "Mute" : "Unmute"}
+                  onPress={handleMute}
+                  disabled={volume === MIN_VOLUME_LEVEL && !muted}
+                />
+                <Button
+                  title="+"
+                  onPress={() => handleVolumeChange("increase")}
+                  disabled={volume === MAX_VOLUME_LEVEL || muted}
+                />
+              </View>
+            </>
+          ) : (
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <ActivityIndicator color="black" size="large" />
+            </View>
+          )}
         </Group>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function Group(props: { name: string; children: React.ReactNode }) {
+function Group(props: { name: string; children: ReactNode }) {
   return (
     <View style={styles.group}>
       <Text style={styles.groupHeader}>{props.name}</Text>
@@ -305,11 +320,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   group: {
-    margin: 20,
+    minHeight: 275,
     backgroundColor: "#fff",
+    gap: 20,
     borderRadius: 10,
     padding: 20,
-    gap: 20,
+    margin: 20,
   },
   container: {
     flex: 1,
