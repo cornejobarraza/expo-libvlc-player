@@ -9,11 +9,17 @@
     "clean": "expo-module clean",
     "lint": "expo-module lint",
     "test": "expo-module test",
-    "prepare": "expo-module prepare",
+    "prepare": "husky",
     "prepublishOnly": "expo-module prepublishOnly",
     "expo-module": "expo-module",
     "open:ios": "xed example/ios",
     "open:android": "open -a \"Android Studio\" example/android"
+  },
+  "lint-staged": {
+    "**/*.{ts,tsx,d.ts}": [
+      "eslint --fix",
+      "tsc --noEmit --skipLibCheck"
+    ]
   },
   "keywords": [
     "react-native",
@@ -40,6 +46,8 @@
     "expo": "53.0.17",
     "expo-module-scripts": "^4.1.6",
     "globals": "^16.2.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
     "react-native": "0.79.5"
   },
   "peerDependencies": {
