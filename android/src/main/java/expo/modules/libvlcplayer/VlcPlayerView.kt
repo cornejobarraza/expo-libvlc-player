@@ -138,11 +138,13 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                         onPlaying(mapOf())
                         audioFocusManager.updateAudioFocus()
 
-                        val timestamp = time
+                        if (player.isSeekable()) {
+                            val timestamp = time
 
-                        if (timestamp != null) {
-                            player.setTime(timestamp.toLong())
-                            time = null
+                            if (timestamp != null) {
+                                player.setTime(timestamp.toLong())
+                                time = null
+                            }
                         }
                     }
 

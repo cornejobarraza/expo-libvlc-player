@@ -140,7 +140,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
             onPlaying([:])
             VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
 
-            if let timestamp = time {
+            if player.isSeekable, let timestamp = time {
                 player.time = VLCTime(int: Int32(timestamp))
                 time = nil
             }
