@@ -3,6 +3,7 @@ import ExpoModulesCore
 import MobileVLCKit
 
 let defaultPlayerRate: Float = 1.0
+let defaultPlayerStart: Int = 0
 let minPlayerVolume: Int = 0
 let maxPlayerVolume: Int = 100
 let playerVolumeStep: Int = 10
@@ -12,13 +13,14 @@ private let enableSubtitles = true
 
 class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     var mediaPlayer: VLCMediaPlayer?
-    var shouldCreate: Bool = false
+    private var shouldInit: Bool = true
+    private var shouldCreate: Bool = true
     private var hasLoaded: Bool = false
 
     private var uri: String = ""
     private var options: [String] = []
     private var userVolume: Int = maxPlayerVolume
-    private var time: Int?
+    private var time: Int? = defaultPlayerStart
     private var shouldRepeat: Bool = false
     var audioMixingMode: AudioMixingMode = .auto
     var playInBackground: Bool = false
@@ -46,31 +48,46 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         clipsToBounds = true
     }
 
-    func createPlayer() {
-        if !shouldCreate { return }
+    func initPlayer() {
+        if !shouldInit return
 
-        destroyPlayer()
-
-        mediaPlayer = VLCMediaPlayer(options: options)
-
-        if let player = mediaPlayer {
-            player.delegate = self
-            player.drawable = self
-
-            guard let url = URL(string: uri) else {
-                let error = ["error": "Invalid URI, media could not be set"]
-                onError(error)
-                return
-            }
-
-            player.media = VLCMedia(url: url)
-
-            if autoplay {
-                player.play()
-            }
+        if shouldCreate {
+            destroyPlayer()
+            createPlayer()
         }
 
+        startPlayer()
+
+        shouldInit = false
+    }
+
+    func createPlayer() {
+        mediaPlayer = VLCMediaPlayer(options: options)
+        mediaPlayer.delegate = self
+        mediaPlayer.drawable = self
         shouldCreate = false
+    }
+
+    func startPlayer() {
+        guard let player = mediaPlayer else { return }
+
+        guard let url = URL(string: uri) else {
+            let error = ["error": "Invalid URI, media could not be set"]
+            onError(error)
+            return
+        }
+
+        player.media = VLCMedia(url: url)
+        hasLoaded = false
+
+        if autoplay {
+            player.play()
+        }
+    }
+
+    func destroyPlayer() {
+        mediaPlayer?.stop()
+        mediaPlayer = nil
     }
 
     func mediaPlayerStateChanged(_: Notification) {
@@ -140,9 +157,13 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
             onPlaying([:])
             VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
 
-            if player.isSeekable, let timestamp = time {
-                player.time = VLCTime(int: Int32(timestamp))
-                time = nil
+            if player.isSeekable {
+                let timestamp = time ?? defaultPlayerStart
+
+                if timestamp != defaultPlayerStart {
+                    player.time = VLCTime(int: Int32(timestamp))
+                    time = defaultPlayerStart
+                }
             }
         case .paused:
             onPaused([:])
@@ -178,18 +199,11 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         onPositionChanged(position)
     }
 
-    func destroyPlayer() {
-        if let player = mediaPlayer {
-            player.stop()
-            mediaPlayer = nil
-        }
-    }
-
     func setUri(_ uri: String) {
         let old = self.uri
         self.uri = uri
 
-        shouldCreate = uri != old
+        shouldInit = uri != old
     }
 
     func setSubtitle(_ subtitle: [String: Any]?) {
@@ -214,6 +228,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         let old = self.options
         self.options = options
 
+        shouldInit = options != old
         shouldCreate = options != old
     }
 

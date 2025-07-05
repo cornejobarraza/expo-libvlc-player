@@ -34,9 +34,13 @@ function msToMinutesSeconds(duration: number) {
 }
 
 const BUFFERING_INTERVAL = 1_000;
-const DEFAULT_PLAYER_URI =
+const PRIMARY_PLAYER_URI =
   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
-const DEFAULT_THUMBNAIL_POSITION = 27_000;
+const SECONDARY_PLAYER_URI =
+  "http://streams.videolan.org/streams/mp4/Mr_MrsSmith-h264_aac.mp4";
+
+const PRIMARY_THUMBNAIL_POSITION = 27_000;
+const SECONDARY_THUMBNAIL_POSITION = 77_000;
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 1;
@@ -49,6 +53,7 @@ type VolumeChangeType = "increase" | "decrease";
 type RepeatMode = boolean | "once";
 
 export default function App() {
+  const [uri, setUri] = useState<string>(PRIMARY_PLAYER_URI);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [position, setPosition] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
@@ -74,14 +79,17 @@ export default function App() {
 
   useEffect(() => {
     generateThumbnail();
-  }, []);
+  }, [uri]);
 
   const generateThumbnail = async () => {
     try {
-      const { uri } = await getThumbnailAsync(DEFAULT_PLAYER_URI, {
-        time: DEFAULT_THUMBNAIL_POSITION,
+      const { uri: url } = await getThumbnailAsync(uri, {
+        time:
+          uri === PRIMARY_PLAYER_URI
+            ? PRIMARY_THUMBNAIL_POSITION
+            : SECONDARY_THUMBNAIL_POSITION,
       });
-      setThumbnail(uri);
+      setThumbnail(url);
     } catch {
       setThumbnail(null);
     }
@@ -214,7 +222,7 @@ export default function App() {
             <VLCPlayerView
               ref={playerRef}
               style={{ height: "100%", borderRadius: 5 }}
-              uri={DEFAULT_PLAYER_URI}
+              uri={uri}
               volume={volume}
               mute={muted}
               repeat={repeat !== false}
@@ -230,6 +238,16 @@ export default function App() {
               onBackground={handleBackground}
             />
           </View>
+          <Button
+            title="Change media"
+            onPress={() =>
+              setUri((prev) =>
+                prev !== PRIMARY_PLAYER_URI
+                  ? PRIMARY_PLAYER_URI
+                  : SECONDARY_PLAYER_URI,
+              )
+            }
+          />
         </Group>
         <Group name="Controls">
           {hasLoaded !== null ? (

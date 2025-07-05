@@ -67,7 +67,7 @@ public class VlcPlayerModule: Module {
             }
 
             Prop("time") { (view: VlcPlayerView, time: Int?) in
-                view.setTime(time)
+                view.setTime(time ?? defaultPlayerStart)
             }
 
             Prop("repeat") { (view: VlcPlayerView, shouldRepeat: Bool?) in
@@ -91,7 +91,7 @@ public class VlcPlayerModule: Module {
             }
 
             OnViewDidUpdateProps { (view: VlcPlayerView) in
-                view.createPlayer()
+                view.initPlayer()
             }
 
             AsyncFunction("play") { (view: VlcPlayerView) in

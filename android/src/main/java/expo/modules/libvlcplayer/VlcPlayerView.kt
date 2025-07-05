@@ -25,6 +25,7 @@ import org.videolan.libvlc.interfaces.IMedia
 import java.util.UUID
 
 const val DEFAULT_PLAYER_RATE: Float = 1f
+const val DEFAULT_PLAYER_START: Int = 0
 const val MIN_PLAYER_VOLUME: Int = 0
 const val MAX_PLAYER_VOLUME: Int = 100
 const val PLAYER_VOLUME_STEP: Int = 10
@@ -42,7 +43,8 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
 
     private var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
-    internal var shouldCreate: Boolean = false
+    private var shouldInit: Boolean = true
+    private var shouldCreate: Boolean = true
     private var hasLoaded: Boolean = false
 
     private var userVolume: Int = MAX_PLAYER_VOLUME
@@ -68,15 +70,24 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
         audioFocusManager = VlcPlayerManager.audioFocusManager
     }
 
+    fun initPlayer() {
+        if (!shouldInit) return
+
+        if (shouldCreate) {
+            destroyPlayer()
+            createPlayer()
+        }
+
+        startPlayer()
+
+        shouldInit = false
+    }
+
     fun createPlayer() {
-        if (!shouldCreate) return
-
-        destroyPlayer()
-
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
 
-        mediaPlayer?.let { player ->
+        mediaPlayer!!.let { player ->
             player.setEventListener(EventListener { event ->
                 when (event.type) {
                     Event.Buffering -> {
@@ -139,11 +150,11 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                         audioFocusManager.updateAudioFocus()
 
                         if (player.isSeekable()) {
-                            val timestamp = time
+                            val timestamp = time ?: DEFAULT_PLAYER_START
 
-                            if (timestamp != null) {
+                            if (timestamp != DEFAULT_PLAYER_START) {
                                 player.setTime(timestamp.toLong())
-                                time = null
+                                time = DEFAULT_PLAYER_START
                             }
                         }
                     }
@@ -186,10 +197,18 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
             })
 
             player.attachViews(videoLayout, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+        }
 
+        shouldCreate = false
+    }
+
+
+    fun startPlayer() {
+        mediaPlayer?.let { player ->
             try {
                 val media = Media(libVLC, Uri.parse(uri))
                 player.setMedia(media)
+                hasLoaded = false
             } catch (_: Exception) {
                 val error = mapOf("error" to "Invalid URI, media could not be set")
                 onError(error)
@@ -199,8 +218,6 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                 player.play()
             }
         }
-
-        shouldCreate = false
     }
 
     fun destroyPlayer() {
@@ -217,7 +234,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
             val old = field
             field = value
 
-            shouldCreate = value != old
+            shouldInit = value != old
         }
 
     fun setSubtitle(subtitle: ReadableMap?) {
@@ -241,6 +258,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
             val old = field
             field = value
 
+            shouldInit = value != old
             shouldCreate = value != old
         }
 
@@ -277,7 +295,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
         }
     }
 
-    var time: Int? = null
+    var time: Int? = DEFAULT_PLAYER_START
         set(value) {
             field = value
         }
