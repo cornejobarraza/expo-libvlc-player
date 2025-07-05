@@ -13,11 +13,12 @@ private let enableSubtitles = true
 class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     var mediaPlayer: VLCMediaPlayer?
     var shouldCreate: Bool = false
+    private var hasLoaded: Bool = false
 
     private var uri: String = ""
     private var options: [String] = []
     private var userVolume: Int = maxPlayerVolume
-    private var time: VLCTime?
+    private var time: Int?
     private var shouldRepeat: Bool = false
     var audioMixingMode: AudioMixingMode = .auto
     var playInBackground: Bool = false
@@ -79,7 +80,9 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         case .buffering:
             onBuffering([:])
 
-            if player.position == 0.0 {
+            let video = player.videoSize
+
+            if video != CGSizeZero && !hasLoaded {
                 var audioTracks: [[String: Any]] = []
 
                 if let audios = player.audioTrackNames as? [String] {
@@ -110,7 +113,6 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
                     }
                 }
 
-                let video = player.videoSize
                 let ratio = player.videoAspectRatio
                 var length = 0
                 if let media = player.media {
@@ -132,13 +134,14 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
                 ]
 
                 onLoad(videoInfo)
+                hasLoaded = true
             }
         case .playing:
             onPlaying([:])
             VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
 
             if let timestamp = time {
-                player.time = timestamp / 1000 // Time is managed in seconds
+                player.time = VLCTime(int: Int32(timestamp))
                 time = nil
             }
         case .paused:
@@ -152,13 +155,13 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
             onPositionChanged(["position": position])
         case .ended:
             onEnded([:])
+            player.stop()
 
             let manualRepeat = !options.hasRepeatOptions() && shouldRepeat
 
             if manualRepeat {
-                player.stop()
-                player.play()
                 onRepeat([:])
+                player.play()
             }
         case .error:
             let error = ["error": "Player encountered an error"]
@@ -253,10 +256,8 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         player.currentVideoSubTitleIndex = Int32(subtitleTrack)
     }
 
-    func setTimestamp(_ timestamp: Int?) {
-        if self.timestamp == nil, let time = timestamp {
-            self.timestamp = VLCTime(int: time)
-        }
+    func setTime(_ time: Int?) {
+        self.time = time
     }
 
     func setRepeat(_ shouldRepeat: Bool) {

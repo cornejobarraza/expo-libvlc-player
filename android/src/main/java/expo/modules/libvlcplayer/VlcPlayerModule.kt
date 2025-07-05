@@ -77,7 +77,7 @@ class VlcPlayerModule : Module() {
             }
 
             Prop("time") { view: VlcPlayerView, time: Int? ->
-                view.time = time?.toLong()
+                view.time = time
             }
 
             Prop("repeat") { view: VlcPlayerView, repeat: Boolean? ->

@@ -43,6 +43,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
     private var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
     internal var shouldCreate: Boolean = false
+    private var hasLoaded: Boolean = false
 
     private var userVolume: Int = MAX_PLAYER_VOLUME
     private var repeat: Boolean = false
@@ -81,7 +82,9 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                     Event.Buffering -> {
                         onBuffering(mapOf())
 
-                        if (player.getPosition() == 0f) {
+                        val video = player.getCurrentVideoTrack()
+
+                        if (video != null && !hasLoaded) {
                             val audioTracks = Arguments.createArray()
 
                             if (player.getAudioTracksCount() > 0) {
@@ -109,7 +112,6 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                                 }
                             }
 
-                            val video = player.getCurrentVideoTrack()
                             val ratio = player.getAspectRatio()
                             val length = player.getLength()
                             val tracks = Arguments.createMap().apply {
@@ -128,6 +130,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                             }
 
                             onLoad(videoInfo)
+                            hasLoaded = true
                         }
                     }
 
@@ -138,7 +141,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                         val timestamp = time
 
                         if (timestamp != null) {
-                            player.setTime(timestamp)
+                            player.setTime(timestamp.toLong())
                             time = null
                         }
                     }
@@ -163,13 +166,13 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
 
                     Event.EndReached -> {
                         onEnded(mapOf())
+                        player.stop()
 
                         val manualRepeat = options?.hasRepeatOptions() == false && repeat
 
                         if (manualRepeat) {
-                            player.stop()
-                            player.play()
                             onRepeat(mapOf())
+                            player.play()
                         }
                     }
 
@@ -272,7 +275,7 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
         }
     }
 
-    var time: Long? = null
+    var time: Int? = null
         set(value) {
             field = value
         }
