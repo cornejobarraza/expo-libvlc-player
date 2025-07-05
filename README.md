@@ -84,7 +84,7 @@ The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
 | `onWarn`            | Called after the player encounters a conflict    | `{ warn: string }`                                                                                            |
 | `onError`           | Called after the `EncounteredError` player event | `{ error: string }`                                                                                           |
 | `onLoad`            | Called after the `Buffering` player event        | `{ width: number, height: number, aspectRatio: string, duration: number, tracks: object, seekable: boolean }` |
-| `onBackground`      | Called after the player enters the background    |                                                                                                               |
+| `onBackground`      | Called after the player enters the background    | `{ background: boolean }`                                                                                     |
 
 ## Disclaimer
 
