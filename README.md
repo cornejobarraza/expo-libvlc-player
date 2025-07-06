@@ -24,6 +24,33 @@ No additional configuration necessary.
 
 Run `npx pod-install` after installing the npm package.
 
+### Configuration in app config
+
+You can configure `expo-libvlc-player` using its built-in config plugin if you use config plugins in your project.
+
+#### Example app.json with config plugin
+
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-libvlc-player",
+        {
+          "supportsBackgroundPlayback": true
+        }
+      ]
+    ]
+  }
+}
+```
+
+#### Configurable properties
+
+| Name                         | Description                                                                                                                                                                                                                      | Default     |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `supportsBackgroundPlayback` | A boolean value to enable background playback on iOS. If `true`, the `audio` key is added to the `UIBackgroundModes` array in the **Info.plist** file. If `false`, the key is removed. When `undefined`, the key is not modified | `undefined` |
+
 ## Usage
 
 ```tsx

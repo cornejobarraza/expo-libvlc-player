@@ -1,15 +1,33 @@
 import { type ConfigPlugin, withInfoPlist } from "expo/config-plugins";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-const withExpoLibVlcPlayer: ConfigPlugin<{}> = (config) => {
+type WithExpoLibVlcPlayerOptions = {
+  supportsBackgroundPlayback?: boolean;
+};
+
+const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerOptions> = (
+  config,
+  { supportsBackgroundPlayback },
+) => {
   withInfoPlist(config, (config) => {
     const currentBackgroundModes = config.modResults.UIBackgroundModes ?? [];
+    const shouldEnableBackgroundAudio = supportsBackgroundPlayback;
 
-    if (!currentBackgroundModes.includes("audio")) {
+    if (typeof supportsBackgroundPlayback === "undefined") {
+      return config;
+    }
+
+    if (
+      shouldEnableBackgroundAudio &&
+      !currentBackgroundModes.includes("audio")
+    ) {
       config.modResults.UIBackgroundModes = [
         ...currentBackgroundModes,
         "audio",
       ];
+    } else if (!shouldEnableBackgroundAudio) {
+      config.modResults.UIBackgroundModes = currentBackgroundModes.filter(
+        (mode: string) => mode !== "audio",
+      );
     }
 
     return config;

@@ -57,3 +57,4 @@ yarn-error.log
 .expo/*
 .eslintrc.js
 plugin/tsconfig.tsbuildinfo
+!plugin/build/
