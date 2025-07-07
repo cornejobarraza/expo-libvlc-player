@@ -47,9 +47,10 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 
 #### Configurable properties
 
-| Name                         | Description                                                                                                                                                                                                                      | Default     |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `supportsBackgroundPlayback` | A boolean value to enable background playback on iOS. If `true`, the `audio` key is added to the `UIBackgroundModes` array in the **Info.plist** file. If `false`, the key is removed. When `undefined`, the key is not modified | `undefined` |
+| Name                         | Description                                                                                                                                                                                                                      | Default                                                |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                   | `"Allow $(PRODUCT_NAME) to access your local network"` |
+| `supportsBackgroundPlayback` | A boolean value to enable background playback on iOS. If `true`, the `audio` key is added to the `UIBackgroundModes` array in the **Info.plist** file. If `false`, the key is removed. When `undefined`, the key is not modified | `undefined`                                            |
 
 ## Usage
 

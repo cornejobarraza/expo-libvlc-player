@@ -1,13 +1,27 @@
-import { type ConfigPlugin, withInfoPlist } from "expo/config-plugins";
+import {
+  type ConfigPlugin,
+  IOSConfig,
+  withInfoPlist,
+} from "expo/config-plugins";
+
+const LOCAL_NETWORK_USAGE =
+  "Allow $(PRODUCT_NAME) to access your local network";
 
 type WithExpoLibVlcPlayerOptions = {
+  localNetworkPermission?: string | false;
   supportsBackgroundPlayback?: boolean;
 };
 
 const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerOptions> = (
   config,
-  { supportsBackgroundPlayback },
+  { localNetworkPermission, supportsBackgroundPlayback } = {},
 ) => {
+  IOSConfig.Permissions.createPermissionsPlugin({
+    NSLocalNetworkUsageDescription: LOCAL_NETWORK_USAGE,
+  })(config, {
+    NSLocalNetworkUsageDescription: localNetworkPermission,
+  });
+
   withInfoPlist(config, (config) => {
     const currentBackgroundModes = config.modResults.UIBackgroundModes ?? [];
     const shouldEnableBackgroundAudio = supportsBackgroundPlayback;
