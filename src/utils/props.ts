@@ -13,7 +13,9 @@ export function convertNativeProps(
   const nativeProps: VlcPlayerViewNativeProps = {};
 
   for (const [key, value] of Object.entries(props)) {
-    nativeProps[key as keyof VlcPlayerViewNativeProps] = value;
+    if (key in ({} as VlcPlayerViewNativeProps)) {
+      (nativeProps as any)[key] = value;
+    }
   }
 
   return nativeProps;
