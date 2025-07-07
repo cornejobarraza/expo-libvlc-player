@@ -24,6 +24,14 @@ No additional configuration necessary.
 
 Run `npx pod-install` after installing the npm package.
 
+#### NSLocalNetworkUsageDescription
+
+Starting from iOS 14, you are required to provide a message for the `NSLocalNetworkUsageDescription` key in Info.plist if your app uses the local network directly or indirectly.
+
+It seems the `MobileVLCKit` library powering the VLC Player on iOS makes use of this feature when playing external media from sources such as RTSP streams.
+
+Provide a custom message specifying how your app will make use of the network so your App Store submission is not rejected for this reason, read more about this [here](https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy).
+
 ### Configuration in app config
 
 You can configure `expo-libvlc-player` using its built-in config plugin if you use config plugins in your project.
@@ -37,6 +45,7 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
       [
         "expo-libvlc-player",
         {
+          "localNetworkPermission": "Allow $(PRODUCT_NAME) to access your local network",
           "supportsBackgroundPlayback": true
         }
       ]
@@ -47,10 +56,10 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 
 #### Configurable properties
 
-| Name                         | Description                                                                                                                                                                                                                      | Default                                                |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                   | `"Allow $(PRODUCT_NAME) to access your local network"` |
-| `supportsBackgroundPlayback` | A boolean value to enable background playback on iOS. If `true`, the `audio` key is added to the `UIBackgroundModes` array in the **Info.plist** file. If `false`, the key is removed. When `undefined`, the key is not modified | `undefined`                                            |
+| Name                         | Description                                                                                                                                                                                                                  | Default                                                |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                               | `"Allow $(PRODUCT_NAME) to access your local network"` |
+| `supportsBackgroundPlayback` | A boolean value to enable background playback on iOS. If `true`, the `audio` key is added to the `UIBackgroundModes` array in the Info.plist file. If `false`, the key is removed. When `undefined`, the key is not modified | `undefined`                                            |
 
 ## Usage
 
