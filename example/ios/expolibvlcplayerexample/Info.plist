@@ -44,10 +44,8 @@
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
-    <key>UIBackgroundModes</key>
-    <array>
-      <string>audio</string>
-    </array>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your local network</string>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>
