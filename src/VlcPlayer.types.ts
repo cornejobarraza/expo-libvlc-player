@@ -1,4 +1,3 @@
-import * as React from "react";
 import type { ViewProps } from "react-native";
 
 export interface VLCPlayerViewRef {

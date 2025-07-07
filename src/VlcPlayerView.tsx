@@ -1,5 +1,5 @@
 import { requireNativeView } from "expo";
-import * as React from "react";
+import { forwardRef, type ComponentType } from "react";
 
 import {
   VlcPlayerViewNativeProps,
@@ -13,12 +13,12 @@ import {
 } from "./VlcPlayer.types";
 import { convertNativeProps } from "./utils/props";
 
-const NativeView: React.ComponentType<VlcPlayerViewNativeProps> =
+const NativeView: ComponentType<VlcPlayerViewNativeProps> =
   requireNativeView("ExpoLibVlcPlayer");
 
 let loggedRenderingChildrenWarning = false;
 
-const VlcPlayerView = React.forwardRef<VLCPlayerViewRef, VlcPlayerViewProps>(
+const VlcPlayerView = forwardRef<VLCPlayerViewRef, VlcPlayerViewProps>(
   (props, ref) => {
     const nativeProps = convertNativeProps(props);
 
