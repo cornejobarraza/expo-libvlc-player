@@ -18,7 +18,7 @@
   "lint-staged": {
     "**/*.{ts,tsx,d.ts}": [
       "eslint --fix",
-      "tsc --noEmit --skipLibCheck"
+      "tsc --noEmit --skipLibCheck --jsx preserve"
     ]
   },
   "keywords": [
