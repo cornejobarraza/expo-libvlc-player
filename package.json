@@ -15,12 +15,6 @@
     "open:ios": "xed example/ios",
     "open:android": "open -a \"Android Studio\" example/android"
   },
-  "lint-staged": {
-    "**/*.{ts,tsx,d.ts}": [
-      "eslint --fix",
-      "tsc --noEmit --skipLibCheck --jsx preserve"
-    ]
-  },
   "keywords": [
     "react-native",
     "vlc",
