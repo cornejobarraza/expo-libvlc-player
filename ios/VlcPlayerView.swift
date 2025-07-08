@@ -37,7 +37,6 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     private let onError = EventDispatcher()
     private let onPositionChanged = EventDispatcher()
     private let onLoad = EventDispatcher()
-    let onBackground = EventDispatcher()
 
     required init(appContext: AppContext? = nil) {
         super.init(appContext: appContext)
@@ -169,7 +168,8 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
                 }
             }
         case .paused:
-            onPaused([:])
+            let background = ["background": isBackgrounded]
+            onPaused(background)
             VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .stopped:
             onStopped([:])
@@ -312,9 +312,6 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     }
 
     func play() {
-        isBackgrounded = false
-        let background = ["background": isBackgrounded]
-        onBackground(background)
         mediaPlayer?.play()
     }
 

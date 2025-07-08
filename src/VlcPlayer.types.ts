@@ -37,7 +37,14 @@ export type BufferingListener = () => void;
 /**
  * @hidden
  */
-export type PlayingPausedListener = () => void;
+export type PlayingListener = () => void;
+
+/**
+ * @hidden
+ */
+export type PausedListener = (event: { nativeEvent: Paused }) => void;
+
+export type Paused = { background: boolean };
 
 /**
  * @hidden
@@ -81,13 +88,6 @@ export type PositionChanged = { position: number };
  * @hidden
  */
 export type LoadListener = (event: { nativeEvent: VideoInfo }) => void;
-
-/**
- * @hidden
- */
-export type BackgroundListener = (event: { nativeEvent: Background }) => void;
-
-export type Background = { background: boolean };
 
 export interface Track {
   id: number;
@@ -137,8 +137,8 @@ export interface VlcPlayerViewNativeProps {
   playInBackground?: boolean;
   autoplay?: boolean;
   onBuffering?: BufferingListener;
-  onPlaying?: PlayingPausedListener;
-  onPaused?: PlayingPausedListener;
+  onPlaying?: PlayingListener;
+  onPaused?: PausedListener;
   onStopped?: StoppedListener;
   onEnded?: EndedListener;
   onRepeat?: RepeatListener;
@@ -146,7 +146,6 @@ export interface VlcPlayerViewNativeProps {
   onError?: ErrorListener;
   onPositionChanged?: PositionChangedListener;
   onLoad?: LoadListener;
-  onBackground?: BackgroundListener;
 }
 
 export type AudioMixingMode =
@@ -270,7 +269,7 @@ export interface VlcPlayerViewProps extends ViewProps {
   /**
    * Event that fires when player pauses
    */
-  onPaused?: () => void;
+  onPaused?: (event: Paused) => void;
   /**
    * Event that fires when player stops
    */
@@ -299,8 +298,4 @@ export interface VlcPlayerViewProps extends ViewProps {
    * Event that fires when player loads
    */
   onLoad?: (event: VideoInfo) => void;
-  /**
-   * Event that fires when player enters the background
-   */
-  onBackground?: (event: Background) => void;
 }

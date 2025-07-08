@@ -5,11 +5,11 @@ import {
   VlcPlayerViewNativeProps,
   VlcPlayerViewProps,
   VLCPlayerViewRef,
+  type Paused,
   type Warn,
   type Error,
   type PositionChanged,
   type VideoInfo,
-  type Background,
 } from "./VlcPlayer.types";
 import { convertNativeProps } from "./utils/props";
 
@@ -29,6 +29,12 @@ const VlcPlayerView = forwardRef<VLCPlayerViewRef, VlcPlayerViewProps>(
       );
       loggedRenderingChildrenWarning = true;
     }
+
+    const onPaused = ({ nativeEvent }: { nativeEvent: Paused }) => {
+      if (props.onPaused) {
+        props.onPaused(nativeEvent);
+      }
+    };
 
     const onWarn = ({ nativeEvent }: { nativeEvent: Warn }) => {
       if (props.onWarn) {
@@ -58,21 +64,15 @@ const VlcPlayerView = forwardRef<VLCPlayerViewRef, VlcPlayerViewProps>(
       }
     };
 
-    const onBackground = ({ nativeEvent }: { nativeEvent: Background }) => {
-      if (props.onBackground) {
-        props.onBackground(nativeEvent);
-      }
-    };
-
     return (
       <NativeView
         {...nativeProps}
         ref={ref}
+        onPaused={onPaused}
         onWarn={onWarn}
         onError={onError}
         onPositionChanged={onPositionChanged}
         onLoad={onLoad}
-        onBackground={onBackground}
       />
     );
   },

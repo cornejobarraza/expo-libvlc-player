@@ -17,7 +17,6 @@ private const val WARN_EVENT = "onWarn"
 private const val ERROR_EVENT = "onError"
 private const val POSITION_CHANGED_EVENT = "onPositionChanged"
 private const val LOAD_EVENT = "onLoad"
-private const val BACKGROUND_EVENT = "onBackground"
 
 val playerEvents = arrayOf(
     BUFFERING_EVENT,
@@ -29,8 +28,7 @@ val playerEvents = arrayOf(
     WARN_EVENT,
     ERROR_EVENT,
     POSITION_CHANGED_EVENT,
-    LOAD_EVENT,
-    BACKGROUND_EVENT
+    LOAD_EVENT
 )
 
 class VlcPlayerModule : Module() {

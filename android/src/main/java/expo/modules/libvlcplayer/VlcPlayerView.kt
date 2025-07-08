@@ -62,7 +62,6 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
     private val onError by EventDispatcher()
     private val onPositionChanged by EventDispatcher()
     private val onLoad by EventDispatcher<WritableMap>()
-    internal val onBackground by EventDispatcher()
 
     private lateinit var audioFocusManager: AudioFocusManager
 
@@ -163,7 +162,8 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
                     }
 
                     Event.Paused -> {
-                        onPaused(mapOf())
+                        val background = mapOf("background" to isBackgrounded)
+                        onPaused(background)
                         audioFocusManager.updateAudioFocus()
                     }
 
@@ -333,9 +333,6 @@ class VlcPlayerView(context: Context, appContext: AppContext) : ExpoView(context
     }
 
     fun play() {
-        isBackgrounded = false
-        val background = mapOf("background" to isBackgrounded)
-        onBackground(background)
         mediaPlayer?.play()
     }
 

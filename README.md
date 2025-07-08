@@ -113,7 +113,7 @@ The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
 | ------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
 | `onBuffering`       | Called after the `Buffering` player event        |                                                                                                               |
 | `onPlaying`         | Called after the `Playing` player event          |                                                                                                               |
-| `onPaused`          | Called after the `Paused` player event           |                                                                                                               |
+| `onPaused`          | Called after the `Paused` player event           | `{ background: boolean }`                                                                                     |
 | `onStopped`         | Called after the `Stopped` player event          |                                                                                                               |
 | `onPositionChanged` | Called after the `PositionChanged` player event  | `{ position: number }`                                                                                        |
 | `onEnded`           | Called after the `EndReached` player event       |                                                                                                               |
@@ -121,7 +121,6 @@ The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
 | `onWarn`            | Called after the player encounters a conflict    | `{ warn: string }`                                                                                            |
 | `onError`           | Called after the `EncounteredError` player event | `{ error: string }`                                                                                           |
 | `onLoad`            | Called after the `Buffering` player event        | `{ width: number, height: number, aspectRatio: string, duration: number, tracks: object, seekable: boolean }` |
-| `onBackground`      | Called after the player enters the background    | `{ background: boolean }`                                                                                     |
 
 ## Disclaimer
 

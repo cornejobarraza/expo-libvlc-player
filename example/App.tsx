@@ -2,11 +2,11 @@ import Slider from "@react-native-community/slider";
 import {
   VLCPlayerView,
   VLCPlayerViewRef,
+  type Paused,
   type PositionChanged,
   type VideoInfo,
   type Error,
   type Warn,
-  type Background,
 } from "expo-libvlc-player";
 import { getThumbnailAsync } from "expo-video-thumbnails";
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -145,7 +145,8 @@ export default function App() {
     setIsPlaying(true);
   };
 
-  const handlePaused = () => {
+  const handlePaused = ({ background }: Paused) => {
+    setIsBackgrounded(background);
     setIsPlaying(false);
   };
 
@@ -176,9 +177,6 @@ export default function App() {
     setIsSeekable(seekable);
     setHasLoaded(true);
   };
-
-  const handleBackground = ({ background }: Background) =>
-    setIsBackgrounded(background);
 
   const handleSlidingComplete = (position: number) =>
     playerRef.current?.seek(position);
@@ -236,7 +234,6 @@ export default function App() {
               onError={handleError}
               onPositionChanged={handlePositionChanged}
               onLoad={handleLoad}
-              onBackground={handleBackground}
             />
           </View>
           <Button
