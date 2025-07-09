@@ -119,7 +119,7 @@ The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
 | `onEnded`           | Called after the `EndReached` player event       |                                                                                                               |
 | `onRepeat`          | Called after the player repeats the media        |                                                                                                               |
 | `onError`           | Called after the `EncounteredError` player event | `{ error: string }`                                                                                           |
-| `onLoad`            | Called after the `Buffering` player event        | `{ width: number, height: number, aspectRatio: string, duration: number, tracks: object, seekable: boolean }` |
+| `onLoad`            | Called after the player loads the media        | `{ width: number, height: number, aspectRatio: string, duration: number, tracks: object, seekable: boolean }` |
 
 ## Disclaimer
 
