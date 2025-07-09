@@ -91,9 +91,7 @@ class VlcPlayerView(
                 EventListener { event ->
                     when (event.type) {
                         Event.Buffering -> {
-                            if (!isBackgrounded) {
-                                onBuffering(mapOf())
-                            }
+                            onBuffering(mapOf())
 
                             val video = player.getCurrentVideoTrack()
 

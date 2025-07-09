@@ -98,9 +98,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
 
         switch player.state {
         case .buffering:
-            if !isBackgrounded {
-                onBuffering([:])
-            }
+            onBuffering([:])
 
             let video = player.videoSize
 

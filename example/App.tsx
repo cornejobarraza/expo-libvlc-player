@@ -181,7 +181,7 @@ export default function App() {
   const handleSlidingComplete = (position: number) =>
     playerRef.current?.seek(position);
 
-  const shouldShowLoader = isBuffering || hasLoaded === null;
+  const shouldShowLoader = (isBuffering || hasLoaded === null) && isPlaying;
 
   const shouldShowThumbnail =
     !!thumbnail &&
