@@ -105,7 +105,7 @@ The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
 | `aspectRatio`      | Sets the player aspect ratio. Must be a valid `string`                                    |          |
 | `audioMixingMode`  | Determines how the player will interact with other audio playing in the system            | `"auto"` |
 | `playInBackground` | Determines whether the player should continue playing after the app enters the background | `false`  |
-| `autoplay`         | Autoplays media once player is created                                                    | `true`   |
+| `autoplay`         | Autoplays media once the player is created                                                    | `true`   |
 
 #### Callback props
 
