@@ -142,6 +142,7 @@ export default function App() {
   };
 
   const handlePlaying = () => {
+    setIsBackgrounded(false);
     setIsPlaying(true);
   };
 
@@ -151,6 +152,7 @@ export default function App() {
   };
 
   const handleStopped = () => {
+    setIsBackgrounded(false);
     setIsPlaying(false);
   };
 
@@ -181,7 +183,8 @@ export default function App() {
   const handleSlidingComplete = (position: number) =>
     playerRef.current?.seek(position);
 
-  const shouldShowLoader = (isBuffering || hasLoaded === null) && isPlaying;
+  const shouldShowLoader =
+    (hasLoaded === null || isBuffering) && !isBackgrounded;
 
   const shouldShowThumbnail =
     !!thumbnail &&
@@ -195,8 +198,10 @@ export default function App() {
         <Group name="View">
           <View
             style={{
+              backgroundColor: "black",
               position: "relative",
               height: videoHeight,
+              borderRadius: 5,
             }}
           >
             {shouldShowLoader && (
