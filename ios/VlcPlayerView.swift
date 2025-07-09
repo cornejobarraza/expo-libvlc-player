@@ -13,8 +13,8 @@ private let enableSubtitles = true
 
 class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     var mediaPlayer: VLCMediaPlayer?
-    private var shouldInit: Bool = true
     private var shouldCreate: Bool = true
+    private var shouldSetup: Bool = true
     private var hasLoaded: Bool = false
     var isBackgrounded: Bool = false
 
@@ -41,34 +41,35 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     required init(appContext: AppContext? = nil) {
         super.init(appContext: appContext)
 
-        backgroundColor = UIColor.black
-
         VlcPlayerManager.shared.registerView(view: self)
 
         clipsToBounds = true
+        backgroundColor = UIColor.black
     }
 
     func initPlayer() {
-        if !shouldInit return
-
         if shouldCreate {
-            destroyPlayer()
             createPlayer()
         }
 
-        startPlayer()
-
-        shouldInit = false
+        if shouldSetup {
+            setupPlayer()
+        }
     }
 
     func createPlayer() {
+        if mediaPlayer != nil {
+            destroyPlayer()
+        }
+
         mediaPlayer = VLCMediaPlayer(options: options)
         mediaPlayer.delegate = self
         mediaPlayer.drawable = self
+
         shouldCreate = false
     }
 
-    func startPlayer() {
+    func setupPlayer() {
         guard let player = mediaPlayer else { return }
 
         guard let url = URL(string: uri) else {
@@ -77,12 +78,14 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
             return
         }
 
-        player.media = VLCMedia(url: url)
         hasLoaded = false
+        player.media = VLCMedia(url: url)
 
         if autoplay {
             player.play()
         }
+
+        shouldSetup = false
     }
 
     func destroyPlayer() {
@@ -101,14 +104,14 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
 
             let video = player.videoSize
 
-            if video != CGSizeZero && !hasLoaded {
+            if video != CGSizeZero, !hasLoaded {
                 var audioTracks: [[String: Any]] = []
 
                 if let audios = player.audioTrackNames as? [String] {
                     if let audioIndexes = player.audioTrackIndexes as? [NSNumber] {
                         for (index, name) in audios.enumerated() {
                             let trackId = audioIndexes[index].intValue
-                            if trackId != -1 && name != "Disable" {
+                            if trackId != -1, name != "Disable" {
                                 audioTracks.append([
                                     "id": trackId,
                                     "name": name,
@@ -163,7 +166,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
                 let timestamp = time ?? defaultPlayerStart
 
                 if timestamp != defaultPlayerStart {
-                    player.time = VLCTime(int: Int32(timestamp))
+                    player.time = VLCTime(int: Int64(timestamp))
                     time = defaultPlayerStart
                 }
             }
@@ -206,7 +209,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         let old = self.uri
         self.uri = uri
 
-        shouldInit = uri != old
+        shouldSetup = uri != old
     }
 
     func setSubtitle(_ subtitle: [String: Any]?) {
@@ -228,11 +231,13 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     }
 
     func setOptions(_ options: [String]) {
+        guard !options.isEmpty else { return }
+
         let old = self.options
         self.options = options
 
-        shouldInit = options != old
         shouldCreate = options != old
+        shouldSetup = options != old
     }
 
     func setVolume(_ volume: Int) {
@@ -279,7 +284,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     }
 
     func setRepeat(_ shouldRepeat: Bool) {
-        if shouldRepeat && options.hasRepeatOptions() {
+        if shouldRepeat, options.hasRepeatOptions() {
             let warn = ["warn": "Repeat already enabled in options"]
             return onWarn(warn)
         }
@@ -291,9 +296,8 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         guard let player = mediaPlayer,
               let aspectRatio = aspectRatio else { return }
 
-        if let cString = strdup(aspectRatio) {
+        aspectRatio.withCString { cString in
             player.videoAspectRatio = cString
-            free(cString)
         }
     }
 

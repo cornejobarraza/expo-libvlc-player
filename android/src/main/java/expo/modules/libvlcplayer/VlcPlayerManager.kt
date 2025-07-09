@@ -1,11 +1,8 @@
 package expo.modules.libvlcplayer
 
-import java.lang.ref.WeakReference
-
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.exception.Exceptions
-
-import org.videolan.libvlc.MediaPlayer
+import java.lang.ref.WeakReference
 
 object VlcPlayerManager {
     private var views: MutableList<WeakReference<VlcPlayerView>> = mutableListOf()
@@ -50,7 +47,7 @@ object VlcPlayerManager {
                         view.videoLayout,
                         null,
                         ENABLE_SUBTITLES,
-                        USE_TEXTURE_VIEW
+                        USE_TEXTURE_VIEW,
                     )
 
                     if (!player.isPlaying()) {

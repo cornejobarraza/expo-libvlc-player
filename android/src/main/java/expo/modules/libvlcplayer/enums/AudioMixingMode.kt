@@ -2,11 +2,14 @@ package expo.modules.libvlcplayer.enums
 
 import expo.modules.kotlin.types.Enumerable
 
-enum class AudioMixingMode(val value: String) : Enumerable {
+enum class AudioMixingMode(
+    val value: String,
+) : Enumerable {
     MIX_WITH_OTHERS("mixWithOthers"),
     DUCK_OTHERS("duckOthers"),
     AUTO("auto"),
-    DO_NOT_MIX("doNotMix");
+    DO_NOT_MIX("doNotMix"),
+    ;
 
     val priority: Int
         get() {

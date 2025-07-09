@@ -22,7 +22,7 @@ let playerEvents = [
     warnEvent,
     errorEvent,
     positionChangedEvent,
-    loadEvent
+    loadEvent,
 ]
 
 public class VlcPlayerModule: Module {
