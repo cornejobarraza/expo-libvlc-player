@@ -11,7 +11,6 @@ private const val PAUSED_EVENT = "onPaused"
 private const val STOPPED_EVENT = "onStopped"
 private const val ENDED_EVENT = "onEnded"
 private const val REPEAT_EVENT = "onRepeat"
-private const val WARN_EVENT = "onWarn"
 private const val ERROR_EVENT = "onError"
 private const val POSITION_CHANGED_EVENT = "onPositionChanged"
 private const val LOAD_EVENT = "onLoad"
@@ -24,7 +23,6 @@ val playerEvents =
         STOPPED_EVENT,
         ENDED_EVENT,
         REPEAT_EVENT,
-        WARN_EVENT,
         ERROR_EVENT,
         POSITION_CHANGED_EVENT,
         LOAD_EVENT,

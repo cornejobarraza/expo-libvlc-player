@@ -6,7 +6,6 @@ import {
   type PositionChanged,
   type VideoInfo,
   type Error,
-  type Warn,
 } from "expo-libvlc-player";
 import { getThumbnailAsync } from "expo-video-thumbnails";
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -160,8 +159,6 @@ export default function App() {
     setRepeat((prev) => (prev !== "once" ? prev : false));
   };
 
-  const handleWarn = ({ warn }: Warn) => Alert.alert("Warning", warn);
-
   const handleError = ({ error }: Error) => {
     Alert.alert("Error", error);
     setIsBuffering(false);
@@ -235,7 +232,6 @@ export default function App() {
               onPaused={handlePaused}
               onStopped={handleStopped}
               onRepeat={handleRepeat}
-              onWarn={handleWarn}
               onError={handleError}
               onPositionChanged={handlePositionChanged}
               onLoad={handleLoad}

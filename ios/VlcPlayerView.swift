@@ -33,7 +33,6 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     private let onStopped = EventDispatcher()
     private let onEnded = EventDispatcher()
     private let onRepeat = EventDispatcher()
-    private let onWarn = EventDispatcher()
     private let onError = EventDispatcher()
     private let onPositionChanged = EventDispatcher()
     private let onLoad = EventDispatcher()
@@ -283,8 +282,8 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
 
     func setRepeat(_ shouldRepeat: Bool) {
         if shouldRepeat, options.hasRepeatOptions() {
-            let warn = ["warn": "Repeat already enabled in options"]
-            return onWarn(warn)
+            let error = ["error": "Repeat already enabled in options"]
+            return onError(error)
         }
 
         self.shouldRepeat = shouldRepeat

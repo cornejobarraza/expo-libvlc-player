@@ -7,7 +7,6 @@ private let pausedEvent = "onPaused"
 private let stoppedEvent = "onStopped"
 private let endedEvent = "onEnded"
 private let repeatEvent = "onRepeat"
-private let warnEvent = "onWarn"
 private let errorEvent = "onError"
 private let positionChangedEvent = "onPositionChanged"
 private let loadEvent = "onLoad"
@@ -19,7 +18,6 @@ let playerEvents = [
     stoppedEvent,
     endedEvent,
     repeatEvent,
-    warnEvent,
     errorEvent,
     positionChangedEvent,
     loadEvent,

@@ -6,7 +6,6 @@ import {
   VlcPlayerViewProps,
   VLCPlayerViewRef,
   type Paused,
-  type Warn,
   type Error,
   type PositionChanged,
   type VideoInfo,
@@ -33,12 +32,6 @@ const VlcPlayerView = forwardRef<VLCPlayerViewRef, VlcPlayerViewProps>(
     const onPaused = ({ nativeEvent }: { nativeEvent: Paused }) => {
       if (props.onPaused) {
         props.onPaused(nativeEvent);
-      }
-    };
-
-    const onWarn = ({ nativeEvent }: { nativeEvent: Warn }) => {
-      if (props.onWarn) {
-        props.onWarn(nativeEvent);
       }
     };
 
@@ -69,7 +62,6 @@ const VlcPlayerView = forwardRef<VLCPlayerViewRef, VlcPlayerViewProps>(
         {...nativeProps}
         ref={ref}
         onPaused={onPaused}
-        onWarn={onWarn}
         onError={onError}
         onPositionChanged={onPositionChanged}
         onLoad={onLoad}

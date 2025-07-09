@@ -64,13 +64,6 @@ export type RepeatListener = () => void;
 /**
  * @hidden
  */
-export type WarnListener = (event: { nativeEvent: Warn }) => void;
-
-export type Warn = { warn: string };
-
-/**
- * @hidden
- */
 export type ErrorListener = (event: { nativeEvent: Error }) => void;
 
 export type Error = { error: string };
@@ -142,7 +135,6 @@ export interface VlcPlayerViewNativeProps {
   onStopped?: StoppedListener;
   onEnded?: EndedListener;
   onRepeat?: RepeatListener;
-  onWarn?: WarnListener;
   onError?: ErrorListener;
   onPositionChanged?: PositionChangedListener;
   onLoad?: LoadListener;
@@ -282,10 +274,6 @@ export interface VlcPlayerViewProps extends ViewProps {
    * Event that fires when player repeats
    */
   onRepeat?: () => void;
-  /**
-   * Event that fires when player emits a warning
-   */
-  onWarn?: (event: Warn) => void;
   /**
    * Event that fires when player encounters an error
    */

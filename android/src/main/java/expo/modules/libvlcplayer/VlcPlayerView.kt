@@ -56,7 +56,6 @@ class VlcPlayerView(
     private val onStopped by EventDispatcher()
     private val onEnded by EventDispatcher()
     private val onRepeat by EventDispatcher()
-    private val onWarn by EventDispatcher()
     private val onError by EventDispatcher()
     private val onPositionChanged by EventDispatcher()
     private val onLoad by EventDispatcher<WritableMap>()
@@ -313,8 +312,8 @@ class VlcPlayerView(
 
     fun setRepeat(repeat: Boolean) {
         if (repeat && options?.hasRepeatOptions() == true) {
-            val warn = mapOf("warn" to "Repeat already enabled in options")
-            return onWarn(warn)
+            val error = mapOf("error" to "Repeat already enabled in options")
+            return onError(error)
         }
 
         this.repeat = repeat
