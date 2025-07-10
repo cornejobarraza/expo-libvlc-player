@@ -4,6 +4,14 @@
 
 <h1 align="center">LibVLC Player for Expo</h1>
 
+### Supported versions
+
+| Platform     | Version |
+| ------------ | ------- |
+| React Native | 0.79    |
+| Android      | 7+      |
+| iOS          | 15.1+   |
+
 ### Installation
 
 Add the package to your npm dependencies
@@ -64,7 +72,7 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 ## Usage
 
 ```tsx
-import { VLCPLayerView } from "expo-libvlc-player";
+import { VLCPlayerView } from "expo-libvlc-player";
 
 return (
   <View styles={{ height: videoHeight }}>
@@ -76,7 +84,7 @@ return (
 );
 ```
 
-See the [example app](example/App.tsx) for additional usage.
+See the [Example App](example/App.tsx) for additional usage.
 
 ### Player methods
 
@@ -170,7 +178,7 @@ The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
 
 The VLC logo and cone icon are trademarks of VideoLAN and are used here solely to indicate compatibility with the following VLC libraries:
 
-- `LibVLC v3.6.2` for Android
+- `libvlcjni v3.6.2` for Android
 - `MobileVLCKit v3.6.0` for iOS
 
 This is an independent open-source implementation that provides React Native bindings for VLC's underlying media libraries.
