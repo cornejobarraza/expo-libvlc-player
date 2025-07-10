@@ -101,7 +101,6 @@ class VlcPlayerView(
                                     val audios = player.getAudioTracks()
 
                                     audios.forEach { track ->
-                                        if (track.id == -1) return@forEach
                                         val trackMap = Arguments.createMap()
                                         trackMap.putInt("id", track.id)
                                         trackMap.putString("name", track.name)

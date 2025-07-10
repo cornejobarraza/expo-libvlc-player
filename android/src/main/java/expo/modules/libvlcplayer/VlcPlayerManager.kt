@@ -52,9 +52,9 @@ object VlcPlayerManager {
 
                     if (!player.isPlaying()) {
                         val time = player.getTime()
-                        val error = (-1).toLong()
+                        val empty = (-1).toLong()
 
-                        if (time != error) {
+                        if (time != empty) {
                             player.setTime(time)
                         }
                     }

@@ -108,12 +108,10 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
                     if let audioIndexes = player.audioTrackIndexes as? [NSNumber] {
                         for (index, name) in audios.enumerated() {
                             let trackId = audioIndexes[index].intValue
-                            if trackId != -1, name != "Disable" {
-                                audioTracks.append([
-                                    "id": trackId,
-                                    "name": name,
-                                ])
-                            }
+                            audioTracks.append([
+                                "id": trackId,
+                                "name": name,
+                            ])
                         }
                     }
                 }
