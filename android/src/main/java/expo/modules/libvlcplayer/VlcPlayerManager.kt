@@ -40,8 +40,6 @@ object VlcPlayerManager {
     fun onAppForegrounded() {
         views.forEach { playerView ->
             playerView.get()?.let { view ->
-                view.isBackgrounded = false
-
                 view.mediaPlayer?.let { player ->
                     player.attachViews(
                         view.videoLayout,
@@ -66,7 +64,7 @@ object VlcPlayerManager {
     fun onAppBackgrounded() {
         views.forEach { playerView ->
             playerView.get()?.let { view ->
-                view.isBackgrounded = true
+                view.onBackground(mapOf())
 
                 view.mediaPlayer?.let { player ->
                     if (view.playInBackground != true && player.isPlaying()) {

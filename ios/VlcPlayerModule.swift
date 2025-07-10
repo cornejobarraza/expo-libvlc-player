@@ -10,6 +10,7 @@ private let repeatEvent = "onRepeat"
 private let errorEvent = "onError"
 private let positionChangedEvent = "onPositionChanged"
 private let loadEvent = "onLoad"
+private let backgroundEvent = "onBackground"
 
 let playerEvents = [
     bufferingEvent,
@@ -21,6 +22,7 @@ let playerEvents = [
     errorEvent,
     positionChangedEvent,
     loadEvent,
+    backgroundEvent,
 ]
 
 public class VlcPlayerModule: Module {
@@ -105,10 +107,6 @@ public class VlcPlayerModule: Module {
             AsyncFunction("seek") { (view: VlcPlayerView, position: Float) in
                 view.seek(position)
             }
-        }
-
-        OnAppEntersForeground {
-            VlcPlayerManager.shared.onAppForegrounded()
         }
 
         OnAppEntersBackground {

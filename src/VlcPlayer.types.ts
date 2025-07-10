@@ -82,6 +82,11 @@ export type PositionChanged = { position: number };
  */
 export type LoadListener = (event: { nativeEvent: VideoInfo }) => void;
 
+/**
+ * @hidden
+ */
+export type BackgroundListener = () => void;
+
 export interface Track {
   id: number;
   name: string;
@@ -131,13 +136,14 @@ export interface VlcPlayerViewNativeProps {
   autoplay?: boolean;
   onBuffering?: BufferingListener;
   onPlaying?: PlayingListener;
+  onPositionChanged?: PositionChangedListener;
   onPaused?: PausedListener;
   onStopped?: StoppedListener;
   onEnded?: EndedListener;
   onRepeat?: RepeatListener;
   onError?: ErrorListener;
-  onPositionChanged?: PositionChangedListener;
   onLoad?: LoadListener;
+  onBackground?: BackgroundListener;
 }
 
 export type AudioMixingMode =
@@ -251,39 +257,43 @@ export interface VlcPlayerViewProps extends ViewProps {
    */
   autoplay?: boolean;
   /**
-   * Event that fires when player buffers
+   * Called after the `Buffering` player event
    */
   onBuffering?: () => void;
   /**
-   * Event that fires when player plays
+   * Called after the `Playing` player event
    */
   onPlaying?: () => void;
   /**
-   * Event that fires when player pauses
-   */
-  onPaused?: (event: Paused) => void;
-  /**
-   * Event that fires when player stops
-   */
-  onStopped?: () => void;
-  /**
-   * Event that fires when player reaches an end
-   */
-  onEnded?: () => void;
-  /**
-   * Event that fires when player repeats
-   */
-  onRepeat?: () => void;
-  /**
-   * Event that fires when player encounters an error
-   */
-  onError?: (event: Error) => void;
-  /**
-   * Event that fires when player position changes
+   * Called after the `PositionChanged` player event
    */
   onPositionChanged?: (event: PositionChanged) => void;
   /**
-   * Event that fires when player loads
+   * Called after the `Paused` player event
+   */
+  onPaused?: (event: Paused) => void;
+  /**
+   * Called after the `Stopped` player event
+   */
+  onStopped?: () => void;
+  /**
+   * Called after the `EndReached` player event
+   */
+  onEnded?: () => void;
+  /**
+   * Called after the player repeats the media
+   */
+  onRepeat?: () => void;
+  /**
+   * Called after the `EncounteredError` player event
+   */
+  onError?: (event: Error) => void;
+  /**
+   * Called after the player loads the media
    */
   onLoad?: (event: VideoInfo) => void;
+  /**
+   * Called after the player enters the background
+   */
+  onBackground?: () => void;
 }

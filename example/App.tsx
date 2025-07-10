@@ -2,10 +2,9 @@ import Slider from "@react-native-community/slider";
 import {
   VLCPlayerView,
   VLCPlayerViewRef,
-  type Paused,
   type PositionChanged,
-  type VideoInfo,
   type Error,
+  type VideoInfo,
 } from "expo-libvlc-player";
 import { getThumbnailAsync } from "expo-video-thumbnails";
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -95,6 +94,63 @@ export default function App() {
     }
   };
 
+  // Restore buffering state after last buffering callback
+  const handleBuffering = () => {
+    setIsBuffering(true);
+
+    const prevTimeout = bufferingTimeoutRef.current;
+
+    if (prevTimeout) {
+      clearTimeout(prevTimeout);
+    }
+
+    bufferingTimeoutRef.current = setTimeout(
+      () => setIsBuffering(false),
+      BUFFERING_INTERVAL,
+    );
+  };
+
+  const handlePlaying = () => {
+    setIsBackgrounded(false);
+    setIsPlaying(true);
+  };
+
+  const handlePositionChanged = ({ position }: PositionChanged) =>
+    setPosition(position);
+
+  const handlePaused = () => {
+    setIsPlaying(false);
+  };
+
+  const handleStopped = () => {
+    setIsBackgrounded(false);
+    setIsPlaying(false);
+  };
+
+  const handleRepeat = () => {
+    setRepeat((prev) => (prev !== "once" ? prev : false));
+  };
+
+  const handleError = ({ error }: Error) => {
+    Alert.alert("Error", error);
+    setIsBuffering(false);
+    setIsPlaying(false);
+    setIsBackgrounded(false);
+    setIsSeekable(false);
+    setHasLoaded(false);
+  };
+
+  const handleLoad = ({ duration, seekable }: VideoInfo) => {
+    setDuration(duration);
+    setIsSeekable(seekable);
+    setHasLoaded(true);
+  };
+
+  const handleBackground = () => setIsBackgrounded(true);
+
+  const handleSlidingComplete = (position: number) =>
+    playerRef.current?.seek(position);
+
   const handlePlayPause = () => {
     if (!isPlaying) {
       playerRef.current?.play();
@@ -123,62 +179,6 @@ export default function App() {
   };
 
   const handleMute = () => setMuted((prev) => !prev);
-
-  // Restore buffering state after last buffering callback
-  const handleBuffering = () => {
-    setIsBuffering(true);
-
-    const prevTimeout = bufferingTimeoutRef.current;
-
-    if (prevTimeout) {
-      clearTimeout(prevTimeout);
-    }
-
-    bufferingTimeoutRef.current = setTimeout(
-      () => setIsBuffering(false),
-      BUFFERING_INTERVAL,
-    );
-  };
-
-  const handlePlaying = () => {
-    setIsBackgrounded(false);
-    setIsPlaying(true);
-  };
-
-  const handlePaused = ({ background }: Paused) => {
-    setIsBackgrounded(background);
-    setIsPlaying(false);
-  };
-
-  const handleStopped = () => {
-    setIsBackgrounded(false);
-    setIsPlaying(false);
-  };
-
-  const handleRepeat = () => {
-    setRepeat((prev) => (prev !== "once" ? prev : false));
-  };
-
-  const handleError = ({ error }: Error) => {
-    Alert.alert("Error", error);
-    setIsBuffering(false);
-    setIsPlaying(false);
-    setIsBackgrounded(false);
-    setIsSeekable(false);
-    setHasLoaded(false);
-  };
-
-  const handlePositionChanged = ({ position }: PositionChanged) =>
-    setPosition(position);
-
-  const handleLoad = ({ duration, seekable }: VideoInfo) => {
-    setDuration(duration);
-    setIsSeekable(seekable);
-    setHasLoaded(true);
-  };
-
-  const handleSlidingComplete = (position: number) =>
-    playerRef.current?.seek(position);
 
   const shouldShowLoader =
     (hasLoaded === null || isBuffering) && !isBackgrounded;
@@ -229,12 +229,13 @@ export default function App() {
               repeat={repeat !== false}
               onBuffering={handleBuffering}
               onPlaying={handlePlaying}
+              onPositionChanged={handlePositionChanged}
               onPaused={handlePaused}
               onStopped={handleStopped}
               onRepeat={handleRepeat}
               onError={handleError}
-              onPositionChanged={handlePositionChanged}
               onLoad={handleLoad}
+              onBackground={handleBackground}
             />
           </View>
           <Button

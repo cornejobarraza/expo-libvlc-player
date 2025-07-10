@@ -29,6 +29,16 @@ const VlcPlayerView = forwardRef<VLCPlayerViewRef, VlcPlayerViewProps>(
       loggedRenderingChildrenWarning = true;
     }
 
+    const onPositionChanged = ({
+      nativeEvent,
+    }: {
+      nativeEvent: PositionChanged;
+    }) => {
+      if (props.onPositionChanged) {
+        props.onPositionChanged(nativeEvent);
+      }
+    };
+
     const onPaused = ({ nativeEvent }: { nativeEvent: Paused }) => {
       if (props.onPaused) {
         props.onPaused(nativeEvent);
@@ -38,16 +48,6 @@ const VlcPlayerView = forwardRef<VLCPlayerViewRef, VlcPlayerViewProps>(
     const onError = ({ nativeEvent }: { nativeEvent: Error }) => {
       if (props.onError) {
         props.onError(nativeEvent);
-      }
-    };
-
-    const onPositionChanged = ({
-      nativeEvent,
-    }: {
-      nativeEvent: PositionChanged;
-    }) => {
-      if (props.onPositionChanged) {
-        props.onPositionChanged(nativeEvent);
       }
     };
 

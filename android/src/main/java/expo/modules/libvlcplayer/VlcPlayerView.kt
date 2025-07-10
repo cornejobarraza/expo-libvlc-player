@@ -44,7 +44,6 @@ class VlcPlayerView(
     private var shouldCreate: Boolean = true
     private var shouldSetup: Boolean = false
     private var hasLoaded: Boolean = false
-    internal var isBackgrounded: Boolean = false
 
     private var userVolume: Int = MAX_PLAYER_VOLUME
     private var repeat: Boolean = false
@@ -59,6 +58,7 @@ class VlcPlayerView(
     private val onError by EventDispatcher()
     private val onPositionChanged by EventDispatcher()
     private val onLoad by EventDispatcher<WritableMap>()
+    val onBackground by EventDispatcher()
 
     private lateinit var audioFocusManager: AudioFocusManager
 
@@ -160,8 +160,7 @@ class VlcPlayerView(
                         }
 
                         Event.Paused -> {
-                            val background = mapOf("background" to isBackgrounded)
-                            onPaused(background)
+                            onPaused(mapOf())
                             audioFocusManager.updateAudioFocus()
                         }
 

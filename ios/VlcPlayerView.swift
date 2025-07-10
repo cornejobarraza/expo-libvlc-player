@@ -16,7 +16,6 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     private var shouldCreate: Bool = true
     private var shouldSetup: Bool = true
     private var hasLoaded: Bool = false
-    var isBackgrounded: Bool = false
 
     private var uri: String = ""
     private var options: [String] = []
@@ -36,6 +35,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     private let onError = EventDispatcher()
     private let onPositionChanged = EventDispatcher()
     private let onLoad = EventDispatcher()
+    let onBackground = EventDispatcher()
 
     required init(appContext: AppContext? = nil) {
         super.init(appContext: appContext)
@@ -166,8 +166,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
                 }
             }
         case .paused:
-            let background = ["background": isBackgrounded]
-            onPaused(background)
+            onPaused([:])
             VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .stopped:
             onStopped([:])
