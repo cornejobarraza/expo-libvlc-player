@@ -91,35 +91,77 @@ See the [example app](example/App.tsx) for additional usage.
 
 The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
 
-| Prop               | Description                                                                               | Default  |
-| ------------------ | ----------------------------------------------------------------------------------------- | -------- |
-| `uri`              | Sets the URI of the media to be played                                                    |          |
-| `subtitle`         | Sets subtitle URI and enabled state                                                       |          |
-| `options`          | Sets the VLC options to initialize the player with                                        | `[]`     |
-| `volume`           | Controls the player volume. Must be an integer number between `0` and `100`               | `100`    |
-| `mute`             | Sets the player volume to `0`                                                             | `false`  |
-| `rate`             | Controls the player rate. Must be a float number between `0` and `1`                      | `1`      |
-| `tracks`           | Sets the player audio and subtitle tracks                                                 |          |
-| `time`             | Controls the player time once created. Must be an integer number in milliseconds          | `0`      |
-| `repeat`           | Repeats the media once playback is ended                                                  | `false`  |
-| `aspectRatio`      | Sets the player aspect ratio. Must be a valid `string`                                    |          |
-| `audioMixingMode`  | Determines how the player will interact with other audio playing in the system            | `"auto"` |
-| `playInBackground` | Determines whether the player should continue playing after the app enters the background | `false`  |
-| `autoplay`         | Autoplays media once the player is created                                                | `true`   |
+| Prop               | Description                                                                                       | Default  |
+| ------------------ | ------------------------------------------------------------------------------------------------- | -------- |
+| `uri`              | Sets the URI of the media to be played                                                            |          |
+| `subtitle`         | Sets subtitle URI and enabled state. See [`Subtitle`](#subtitle) for more                         |          |
+| `options`          | Sets the VLC options to initialize the player with                                                | `[]`     |
+| `volume`           | Controls the player volume. Must be an integer number between `0` and `100`                       | `100`    |
+| `mute`             | Sets the player volume to `0`                                                                     | `false`  |
+| `rate`             | Controls the player rate. Must be a float number between `0` and `1`                              | `1`      |
+| `tracks`           | Sets the current audio and subtitle track indexes. See [`TracksOptions`](#tracksoptions) for more |          |
+| `time`             | Controls the player time once created. Must be an integer number in milliseconds                  | `0`      |
+| `repeat`           | Repeats the media once playback is ended                                                          | `false`  |
+| `aspectRatio`      | Sets the player aspect ratio. Must be a valid `string`                                            |          |
+| `audioMixingMode`  | Determines how the player will interact with other audio playing in the system                    | `"auto"` |
+| `playInBackground` | Determines whether the player should continue playing after the app enters the background         | `false`  |
+| `autoplay`         | Autoplays media once the player is created                                                        | `true`   |
 
 #### Callback props
 
-| Prop                | Description                                      | Payload                                                                                                       |
-| ------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| `onBuffering`       | Called after the `Buffering` player event        |                                                                                                               |
-| `onPlaying`         | Called after the `Playing` player event          |                                                                                                               |
-| `onPaused`          | Called after the `Paused` player event           | `{ background: boolean }`                                                                                     |
-| `onStopped`         | Called after the `Stopped` player event          |                                                                                                               |
-| `onPositionChanged` | Called after the `PositionChanged` player event  | `{ position: number }`                                                                                        |
-| `onEnded`           | Called after the `EndReached` player event       |                                                                                                               |
-| `onRepeat`          | Called after the player repeats the media        |                                                                                                               |
-| `onError`           | Called after the `EncounteredError` player event | `{ error: string }`                                                                                           |
-| `onLoad`            | Called after the player loads the media        | `{ width: number, height: number, aspectRatio: string, duration: number, tracks: object, seekable: boolean }` |
+| Prop                | Description                                                                     | Payload                   |
+| ------------------- | ------------------------------------------------------------------------------- | ------------------------- |
+| `onBuffering`       | Called after the `Buffering` player event                                       |                           |
+| `onPlaying`         | Called after the `Playing` player event                                         |                           |
+| `onPaused`          | Called after the `Paused` player event                                          | `{ background: boolean }` |
+| `onStopped`         | Called after the `Stopped` player event                                         |                           |
+| `onPositionChanged` | Called after the `PositionChanged` player event                                 | `{ position: number }`    |
+| `onEnded`           | Called after the `EndReached` player event                                      |                           |
+| `onRepeat`          | Called after the player repeats the media                                       |                           |
+| `onError`           | Called after the `EncounteredError` player event                                | `{ error: string }`       |
+| `onLoad`            | Called after the player loads the media. See [`VideoInfo`](#videoinfo) for more |                           |
+
+### Player types
+
+#### `Subtitle`
+
+```JSON
+{
+  "uri": "file://path/to/subtitle.srt",
+  "enable": true
+}
+```
+
+#### `TracksOptions`
+
+```JSON
+{
+  "audio": 1,
+  "subtitle": -1
+}
+```
+
+#### `VideoInfo`
+
+```JSON
+{
+  "width": 320,
+  "height": 176,
+  "tracks": {
+    "audio": [
+      { "id": -1, "name": "Disable" },
+      { "id": 1, "name": "English 5.1 Surround - [English]" }
+    ],
+    "subtitle": [
+      { "id": -1, "name": "Disable" },
+      { "id": 1, "name": "Track 1 - [Japanese]" }
+    ]
+  },
+  "aspectRatio": "16:9",
+  "duration": 78920,
+  "seekable": true
+}
+```
 
 ## Disclaimer
 
