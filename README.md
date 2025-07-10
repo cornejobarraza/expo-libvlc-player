@@ -24,7 +24,7 @@ No additional configuration necessary.
 
 Run `npx pod-install` after installing the npm package.
 
-#### NSLocalNetworkUsageDescription
+#### Local network usage
 
 Starting from iOS 14, you are required to provide a message for the `NSLocalNetworkUsageDescription` key in Info.plist if your app uses the local network directly or indirectly.
 
