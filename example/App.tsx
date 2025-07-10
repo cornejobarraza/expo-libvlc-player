@@ -249,69 +249,66 @@ export default function App() {
           />
         </Group>
         <Group name="Controls">
-          {hasLoaded !== null ? (
-            <>
-              <View style={styles.duration}>
-                <Text>
-                  {position >= 0 && duration > 0
-                    ? msToMinutesSeconds(position * duration)
-                    : "N/A"}
-                </Text>
-                <Text>
-                  {duration > 0 ? msToMinutesSeconds(duration) : "N/A"}
-                </Text>
-              </View>
-              <Slider
-                value={position}
-                onSlidingComplete={handleSlidingComplete}
-                minimumValue={MIN_POSITION_VALUE}
-                maximumValue={MAX_POSITION_VALUE}
-                thumbTintColor="darkred"
-                minimumTrackTintColor="red"
-                maximumTrackTintColor="indianred"
-                disabled={!isSeekable}
-              />
-              <View style={styles.row}>
-                <Button
-                  title={!isPlaying ? "Play" : "Pause"}
-                  onPress={handlePlayPause}
-                />
-                <Button title="Stop" onPress={handleStopPlayer} />
-                <Button
-                  title={
-                    !repeat
-                      ? "Don't repeat"
-                      : repeat === "once"
-                        ? "Repeat once"
-                        : "Repeat"
-                  }
-                  onPress={handleRepeatChange}
-                  disabled={duration <= 0}
-                />
-              </View>
-              <View style={styles.row}>
-                <Button
-                  title="-"
-                  onPress={() => handleVolumeChange("decrease")}
-                  disabled={volume === MIN_VOLUME_LEVEL || muted}
-                />
-                <Button
-                  title={!muted ? "Mute" : "Unmute"}
-                  onPress={handleMute}
-                  disabled={volume === MIN_VOLUME_LEVEL && !muted}
-                />
-                <Button
-                  title="+"
-                  onPress={() => handleVolumeChange("increase")}
-                  disabled={volume === MAX_VOLUME_LEVEL || muted}
-                />
-              </View>
-            </>
-          ) : (
-            <View style={{ flex: 1, justifyContent: "center" }}>
-              <ActivityIndicator color="black" size="large" />
-            </View>
-          )}
+          <View style={styles.duration}>
+            <Text>{msToMinutesSeconds(position * duration)}</Text>
+            <Text>{msToMinutesSeconds(duration)}</Text>
+          </View>
+          <Slider
+            value={position}
+            onSlidingComplete={handleSlidingComplete}
+            minimumValue={MIN_POSITION_VALUE}
+            maximumValue={MAX_POSITION_VALUE}
+            thumbTintColor="darkred"
+            minimumTrackTintColor="red"
+            maximumTrackTintColor="indianred"
+            disabled={!isSeekable || hasLoaded === null}
+          />
+          <View style={styles.row}>
+            <Button
+              title={!isPlaying ? "Play" : "Pause"}
+              onPress={handlePlayPause}
+              disabled={hasLoaded === null}
+            />
+            <Button
+              title="Stop"
+              onPress={handleStopPlayer}
+              disabled={hasLoaded === null}
+            />
+            <Button
+              title={
+                !repeat
+                  ? "Don't repeat"
+                  : repeat === "once"
+                    ? "Repeat once"
+                    : "Repeat"
+              }
+              onPress={handleRepeatChange}
+              disabled={duration <= 0 || hasLoaded === null}
+            />
+          </View>
+          <View style={styles.row}>
+            <Button
+              title="-"
+              onPress={() => handleVolumeChange("decrease")}
+              disabled={
+                volume === MIN_VOLUME_LEVEL || muted || hasLoaded === null
+              }
+            />
+            <Button
+              title={!muted ? "Mute" : "Unmute"}
+              onPress={handleMute}
+              disabled={
+                (volume === MIN_VOLUME_LEVEL && !muted) || hasLoaded === null
+              }
+            />
+            <Button
+              title="+"
+              onPress={() => handleVolumeChange("increase")}
+              disabled={
+                volume === MAX_VOLUME_LEVEL || muted || hasLoaded === null
+              }
+            />
+          </View>
         </Group>
       </ScrollView>
     </SafeAreaView>
