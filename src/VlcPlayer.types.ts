@@ -42,9 +42,7 @@ export type PlayingListener = () => void;
 /**
  * @hidden
  */
-export type PausedListener = (event: { nativeEvent: Paused }) => void;
-
-export type Paused = { background: boolean };
+export type PausedListener = () => void;
 
 /**
  * @hidden
@@ -271,7 +269,7 @@ export interface VlcPlayerViewProps extends ViewProps {
   /**
    * Called after the `Paused` player event
    */
-  onPaused?: (event: Paused) => void;
+  onPaused?: () => void;
   /**
    * Called after the `Stopped` player event
    */
