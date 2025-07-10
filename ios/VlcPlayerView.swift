@@ -181,9 +181,9 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
             onEnded([:])
             player.stop()
 
-            let manualRepeat = !options.hasRepeatOptions() && shouldRepeat
+            let userRepeat = !options.hasRepeatOptions() && shouldRepeat
 
-            if manualRepeat {
+            if userRepeat {
                 onRepeat([:])
                 player.play()
             }

@@ -183,9 +183,9 @@ class VlcPlayerView(
                             onEnded(mapOf())
                             player.stop()
 
-                            val manualRepeat = options?.hasRepeatOptions() == false && repeat
+                            val userRepeat = options?.hasRepeatOptions() == false && repeat
 
-                            if (manualRepeat) {
+                            if (userRepeat) {
                                 onRepeat(mapOf())
                                 player.play()
                             }
