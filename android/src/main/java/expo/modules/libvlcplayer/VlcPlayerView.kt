@@ -172,11 +172,6 @@ class VlcPlayerView(
                             onPositionChanged(mapOf("position" to position))
                         }
 
-                        Event.PositionChanged -> {
-                            val position = mapOf("position" to event.positionChanged)
-                            onPositionChanged(position)
-                        }
-
                         Event.EndReached -> {
                             onEnded(mapOf())
                             player.stop()
@@ -192,6 +187,11 @@ class VlcPlayerView(
                         Event.EncounteredError -> {
                             val error = mapOf("error" to "Player encountered an error")
                             onError(error)
+                        }
+
+                        Event.PositionChanged -> {
+                            val position = mapOf("position" to event.positionChanged)
+                            onPositionChanged(position)
                         }
                     }
                 },

@@ -6,11 +6,11 @@ import {
 export function convertNativeProps(
   props?: VlcPlayerViewProps,
 ): VlcPlayerViewNativeProps {
-  if (!props || typeof props !== "object") {
-    return {};
-  }
-
   const nativeProps: VlcPlayerViewNativeProps = {};
+
+  if (!props || typeof props !== "object") {
+    return nativeProps;
+  }
 
   for (const [key, value] of Object.entries(props)) {
     nativeProps[key as keyof VlcPlayerViewNativeProps] = value;

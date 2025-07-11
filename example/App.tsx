@@ -115,9 +115,6 @@ export default function App() {
     setIsPlaying(true);
   };
 
-  const handlePositionChanged = ({ position }: PositionChanged) =>
-    setPosition(position);
-
   const handlePaused = () => {
     setIsPlaying(false);
   };
@@ -139,6 +136,9 @@ export default function App() {
     setIsSeekable(false);
     setHasLoaded(false);
   };
+
+  const handlePositionChanged = ({ position }: PositionChanged) =>
+    setPosition(position);
 
   const handleLoad = ({ duration, seekable }: VideoInfo) => {
     setDuration(duration);
@@ -229,11 +229,11 @@ export default function App() {
               repeat={repeat !== false}
               onBuffering={handleBuffering}
               onPlaying={handlePlaying}
-              onPositionChanged={handlePositionChanged}
               onPaused={handlePaused}
               onStopped={handleStopped}
               onRepeat={handleRepeat}
               onError={handleError}
+              onPositionChanged={handlePositionChanged}
               onLoad={handleLoad}
               onBackground={handleBackground}
             />

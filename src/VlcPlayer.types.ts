@@ -134,12 +134,12 @@ export interface VlcPlayerViewNativeProps {
   autoplay?: boolean;
   onBuffering?: BufferingListener;
   onPlaying?: PlayingListener;
-  onPositionChanged?: PositionChangedListener;
   onPaused?: PausedListener;
   onStopped?: StoppedListener;
   onEnded?: EndedListener;
   onRepeat?: RepeatListener;
   onError?: ErrorListener;
+  onPositionChanged?: PositionChangedListener;
   onLoad?: LoadListener;
   onBackground?: BackgroundListener;
 }
@@ -263,10 +263,6 @@ export interface VlcPlayerViewProps extends ViewProps {
    */
   onPlaying?: () => void;
   /**
-   * Called after the `PositionChanged` player event
-   */
-  onPositionChanged?: (event: PositionChanged) => void;
-  /**
    * Called after the `Paused` player event
    */
   onPaused?: () => void;
@@ -286,6 +282,10 @@ export interface VlcPlayerViewProps extends ViewProps {
    * Called after the `EncounteredError` player event
    */
   onError?: (event: Error) => void;
+  /**
+   * Called after the `PositionChanged` player event
+   */
+  onPositionChanged?: (event: PositionChanged) => void;
   /**
    * Called after the player loads the media
    */

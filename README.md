@@ -121,12 +121,12 @@ The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
 | ------------------- | ------------------------------------------------ | ------------------------- |
 | `onBuffering`       | Called after the `Buffering` player event        |                           |
 | `onPlaying`         | Called after the `Playing` player event          |                           |
-| `onPositionChanged` | Called after the `PositionChanged` player event  | `{ position: number }`    |
 | `onPaused`          | Called after the `Paused` player event           |                           |
 | `onStopped`         | Called after the `Stopped` player event          |                           |
 | `onEnded`           | Called after the `EndReached` player event       |                           |
 | `onRepeat`          | Called after the player repeats the media        |                           |
 | `onError`           | Called after the `EncounteredError` player event | `{ error: string }`       |
+| `onPositionChanged` | Called after the `PositionChanged` player event  | `{ position: number }`    |
 | `onLoad`            | Called after the player loads the media          | [`VideoInfo`](#videoinfo) |
 | `onBackground`      | Called after the player enters the background    |                           |
 
