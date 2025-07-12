@@ -1,6 +1,6 @@
-import AVFoundation
 import ExpoModulesCore
 import MobileVLCKit
+import UIKit
 
 let defaultPlayerRate: Float = 1.0
 let defaultPlayerStart: Int = 0
@@ -11,30 +11,29 @@ let playerVolumeStep: Int = 10
 private let useTextureViews = false
 private let enableSubtitles = true
 
-class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
+class VlcPlayerView: ExpoView {
+    let playerView = UIView()
+
     var mediaPlayer: VLCMediaPlayer?
-    private var shouldCreate: Bool = true
-    private var shouldSetup: Bool = true
-    private var hasLoaded: Bool = false
 
     private var uri: String = ""
-    private var options: [String] = []
+    var options: [String] = []
     private var userVolume: Int = maxPlayerVolume
-    private var time: Int? = defaultPlayerStart
-    private var shouldRepeat: Bool = false
+    var time: Int? = defaultPlayerStart
+    var shouldRepeat: Bool = false
     var audioMixingMode: AudioMixingMode = .auto
     var playInBackground: Bool = false
     private var autoplay: Bool = true
 
-    private let onBuffering = EventDispatcher()
-    private let onPlaying = EventDispatcher()
-    private let onPaused = EventDispatcher()
-    private let onStopped = EventDispatcher()
-    private let onEnded = EventDispatcher()
-    private let onRepeat = EventDispatcher()
-    private let onError = EventDispatcher()
-    private let onPositionChanged = EventDispatcher()
-    private let onLoad = EventDispatcher()
+    let onBuffering = EventDispatcher()
+    let onPlaying = EventDispatcher()
+    let onPaused = EventDispatcher()
+    let onStopped = EventDispatcher()
+    let onEnded = EventDispatcher()
+    let onRepeat = EventDispatcher()
+    let onError = EventDispatcher()
+    let onPositionChanged = EventDispatcher()
+    let onLoad = EventDispatcher()
     let onBackground = EventDispatcher()
 
     required init(appContext: AppContext? = nil) {
@@ -43,29 +42,19 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         VlcPlayerManager.shared.registerView(view: self)
 
         clipsToBounds = true
-        backgroundColor = UIColor.black
+        playerView.backgroundColor = .black
+        addSubview(playerView)
     }
 
-    func initPlayer() {
-        if shouldCreate {
-            createPlayer()
-        }
-
-        if shouldSetup {
-            setupPlayer()
-        }
+    override func layoutSubviews() {
+        playerView.frame = bounds
     }
 
     func createPlayer() {
-        if mediaPlayer != nil {
-            destroyPlayer()
-        }
-
+        destroyPlayer()
         mediaPlayer = VLCMediaPlayer(options: options)
-        mediaPlayer.delegate = self
-        mediaPlayer.drawable = self
-
-        shouldCreate = false
+        mediaPlayer!.delegate = self
+        mediaPlayer!.drawable = playerView
     }
 
     func setupPlayer() {
@@ -77,133 +66,35 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
             return
         }
 
-        hasLoaded = false
         player.media = VLCMedia(url: url)
+        player.media!.delegate = self
 
         if autoplay {
             player.play()
         }
-
-        shouldSetup = false
     }
 
     func destroyPlayer() {
-        mediaPlayer?.stop()
-        mediaPlayer = nil
-    }
-
-    func mediaPlayerStateChanged(_: Notification) {
-        guard let player = mediaPlayer else { return }
-
-        switch player.state {
-        case .buffering:
-            onBuffering([:])
-
-            let video = player.videoSize
-
-            if video != CGSizeZero, !hasLoaded {
-                var audioTracks: [[String: Any]] = []
-
-                if let audios = player.audioTrackNames as? [String] {
-                    if let audioIndexes = player.audioTrackIndexes as? [NSNumber] {
-                        for (index, name) in audios.enumerated() {
-                            let trackId = audioIndexes[index].intValue
-                            audioTracks.append([
-                                "id": trackId,
-                                "name": name,
-                            ])
-                        }
-                    }
-                }
-
-                var subtitleTracks: [[String: Any]] = []
-
-                if let subtitles = player.videoSubTitlesNames as? [String] {
-                    if let subtitleIndexes = player.videoSubTitlesIndexes as? [NSNumber] {
-                        for (index, name) in subtitles.enumerated() {
-                            let trackId = subtitleIndexes[index].intValue
-                            subtitleTracks.append([
-                                "id": trackId,
-                                "name": name,
-                            ])
-                        }
-                    }
-                }
-
-                let ratio = player.videoAspectRatio
-                var length = 0
-                if let media = player.media {
-                    length = Int(media.length.intValue)
-                }
-                let tracks = [
-                    "audio": audioTracks,
-                    "subtitle": subtitleTracks,
-                ]
-                let seekable = player.isSeekable
-
-                let videoInfo: [String: Any] = [
-                    "width": Int(video.width),
-                    "height": Int(video.height),
-                    "aspectRatio": ratio,
-                    "duration": Double(length),
-                    "tracks": tracks,
-                    "seekable": seekable,
-                ]
-
-                onLoad(videoInfo)
-                hasLoaded = true
-            }
-        case .playing:
-            onPlaying([:])
-            VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
-
-            if player.isSeekable {
-                let timestamp = time ?? defaultPlayerStart
-
-                if timestamp != defaultPlayerStart {
-                    player.time = VLCTime(int: Int64(timestamp))
-                    time = defaultPlayerStart
-                }
-            }
-        case .paused:
-            onPaused([:])
-            VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
-        case .stopped:
-            onStopped([:])
-            VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
-
-            let position = 0.0
-            onPositionChanged(["position": position])
-        case .ended:
-            onEnded([:])
+        mediaPlayer?.media?.delegate = nil
+        mediaPlayer?.media = nil
+        if let player = mediaPlayer {
             player.stop()
-
-            let userRepeat = !options.hasRepeatOptions() && shouldRepeat
-
-            if userRepeat {
-                onRepeat([:])
-                player.play()
-            }
-        case .error:
-            let error = ["error": "Player encountered an error"]
-            onError(error)
-        default:
-            break
+            player.drawable = nil
+            player.delegate = nil
         }
-    }
-
-    func mediaPlayerTimeChanged(_: Notification) {
-        guard let player = mediaPlayer else { return }
-
-        let position = ["position": player.position]
-        onPositionChanged(position)
+        mediaPlayer = nil
     }
 
     func setUri(_ uri: String) {
         let old = self.uri
         self.uri = uri
 
-        shouldSetup = uri != old
+        if uri != old {
+            if mediaPlayer == nil {
+                createPlayer()
+            }
+            setupPlayer()
+        }
     }
 
     func setSubtitle(_ subtitle: [String: Any]?) {
@@ -230,8 +121,10 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
         let old = self.options
         self.options = options
 
-        shouldCreate = options != old
-        shouldSetup = options != old
+        if options != old {
+            createPlayer()
+            setupPlayer()
+        }
     }
 
     func setVolume(_ volume: Int) {
@@ -291,7 +184,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
               let aspectRatio = aspectRatio else { return }
 
         aspectRatio.withCString { cString in
-            player.videoAspectRatio = cString
+            player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
         }
     }
 
@@ -338,7 +231,7 @@ class VlcPlayerView: ExpoView, VLCMediaPlayerDelegate {
     }
 }
 
-private extension Array where Element == String {
+extension Array where Element == String {
     func hasRepeatOptions() -> Bool {
         let prefixes: Set<String> = [
             "--input-repeat=", "-input-repeat=", ":input-repeat=",

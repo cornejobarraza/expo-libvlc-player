@@ -42,7 +42,7 @@ object VlcPlayerManager {
             playerView.get()?.let { view ->
                 view.mediaPlayer?.let { player ->
                     player.attachViews(
-                        view.videoLayout,
+                        view.playerView,
                         null,
                         ENABLE_SUBTITLES,
                         USE_TEXTURE_VIEW,

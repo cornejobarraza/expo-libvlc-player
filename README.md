@@ -127,7 +127,7 @@ The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
 | `onRepeat`          | Called after the player repeats the media        |                           |
 | `onError`           | Called after the `EncounteredError` player event | `{ error: string }`       |
 | `onPositionChanged` | Called after the `PositionChanged` player event  | `{ position: number }`    |
-| `onLoad`            | Called after the player loads the media          | [`VideoInfo`](#videoinfo) |
+| `onLoad`            | Called after the `ParsedChanged` media event     | [`VideoInfo`](#videoinfo) |
 | `onBackground`      | Called after the player enters the background    |                           |
 
 ### Player types
@@ -185,7 +185,7 @@ This is an independent open-source implementation that provides React Native bin
 
 For official VLC products and support, please visit [videolan.org](https://www.videolan.org/).
 
-### Credits
+## Credits
 
 This project is heavily inspired by existing libraries such as [expo-video](https://github.com/expo/expo/tree/main/packages/expo-video) and [react-native-vlc-media-player](https://github.com/razorRun/react-native-vlc-media-player).
 

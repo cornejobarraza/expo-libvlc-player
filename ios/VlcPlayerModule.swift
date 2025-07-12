@@ -1,4 +1,3 @@
-import AVFoundation
 import ExpoModulesCore
 
 private let bufferingEvent = "onBuffering"
@@ -86,10 +85,6 @@ public class VlcPlayerModule: Module {
 
             Prop("autoplay") { (view: VlcPlayerView, autoplay: Bool?) in
                 view.setAutoplay(autoplay ?? true)
-            }
-
-            OnViewDidUpdateProps { (view: VlcPlayerView) in
-                view.initPlayer()
             }
 
             AsyncFunction("play") { (view: VlcPlayerView) in

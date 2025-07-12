@@ -98,10 +98,6 @@ class VlcPlayerModule : Module() {
                     view.setAutoplay(autoplay ?: true)
                 }
 
-                OnViewDidUpdateProps { view: VlcPlayerView ->
-                    view.initPlayer()
-                }
-
                 OnViewDestroys { view: VlcPlayerView ->
                     VlcPlayerManager.onViewDestroyed(view)
                     VlcPlayerManager.unregisterView(view)

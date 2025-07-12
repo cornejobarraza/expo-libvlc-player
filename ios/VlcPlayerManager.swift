@@ -1,5 +1,4 @@
 import AVFoundation
-import ExpoModulesCore
 import Foundation
 
 class VlcPlayerManager {

@@ -1,4 +1,4 @@
-import CoreMedia
+import AVFoundation
 import ExpoModulesCore
 
 enum AudioMixingMode: String, Enumerable {

@@ -2,7 +2,6 @@ package expo.modules.libvlcplayer
 
 import android.content.Context
 import android.net.Uri
-import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
 import expo.modules.kotlin.AppContext
@@ -12,8 +11,6 @@ import expo.modules.libvlcplayer.enums.AudioMixingMode
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
-import org.videolan.libvlc.MediaPlayer.Event
-import org.videolan.libvlc.MediaPlayer.EventListener
 import org.videolan.libvlc.interfaces.IMedia
 import org.videolan.libvlc.util.VLCVideoLayout
 import java.util.UUID
@@ -33,182 +30,52 @@ class VlcPlayerView(
 ) : ExpoView(context, appContext) {
     internal val playerViewId: String = UUID.randomUUID().toString()
 
-    internal val videoLayout: VLCVideoLayout =
-        VLCVideoLayout(context).also { layout ->
-            layout.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-            addView(layout)
+    internal val playerView: VLCVideoLayout =
+        VLCVideoLayout(context).also {
+            it.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            addView(it)
         }
 
     private var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
-    private var shouldCreate: Boolean = true
-    private var shouldSetup: Boolean = false
-    private var hasLoaded: Boolean = false
+    internal var media: Media? = null
 
     private var userVolume: Int = MAX_PLAYER_VOLUME
-    private var repeat: Boolean = false
+    internal var repeat: Boolean = false
     private var autoplay: Boolean = true
 
-    private val onBuffering by EventDispatcher()
-    private val onPlaying by EventDispatcher()
-    private val onPaused by EventDispatcher()
-    private val onStopped by EventDispatcher()
-    private val onEnded by EventDispatcher()
-    private val onRepeat by EventDispatcher()
-    private val onError by EventDispatcher()
-    private val onPositionChanged by EventDispatcher()
-    private val onLoad by EventDispatcher<WritableMap>()
-    val onBackground by EventDispatcher()
+    internal val onBuffering by EventDispatcher()
+    internal val onPlaying by EventDispatcher()
+    internal val onPaused by EventDispatcher()
+    internal val onStopped by EventDispatcher()
+    internal val onEnded by EventDispatcher()
+    internal val onRepeat by EventDispatcher()
+    internal val onError by EventDispatcher()
+    internal val onPositionChanged by EventDispatcher()
+    internal val onLoad by EventDispatcher<WritableMap>()
+    internal val onBackground by EventDispatcher()
 
-    private lateinit var audioFocusManager: AudioFocusManager
+    internal lateinit var audioFocusManager: AudioFocusManager
 
     init {
         VlcPlayerManager.registerView(this)
         audioFocusManager = VlcPlayerManager.audioFocusManager
     }
 
-    fun initPlayer() {
-        if (shouldCreate) {
-            createPlayer()
-        }
-
-        if (shouldSetup) {
-            setupPlayer()
-        }
-    }
-
     fun createPlayer() {
-        if (mediaPlayer != null) {
-            destroyPlayer()
-        }
-
+        destroyPlayer()
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
-
-        mediaPlayer!!.let { player ->
-            player.setEventListener(
-                EventListener { event ->
-                    when (event.type) {
-                        Event.Buffering -> {
-                            onBuffering(mapOf())
-
-                            val video = player.getCurrentVideoTrack()
-
-                            if (video != null && !hasLoaded) {
-                                val audioTracks = Arguments.createArray()
-
-                                if (player.getAudioTracksCount() > 0) {
-                                    val audios = player.getAudioTracks()
-
-                                    audios.forEach { track ->
-                                        val trackMap = Arguments.createMap()
-                                        trackMap.putInt("id", track.id)
-                                        trackMap.putString("name", track.name)
-                                        audioTracks.pushMap(trackMap)
-                                    }
-                                }
-
-                                val subtitleTracks = Arguments.createArray()
-
-                                if (player.getSpuTracksCount() > 0) {
-                                    val subtitles = player.getSpuTracks()
-
-                                    subtitles.forEach { track ->
-                                        val trackMap = Arguments.createMap()
-                                        trackMap.putInt("id", track.id)
-                                        trackMap.putString("name", track.name)
-                                        subtitleTracks.pushMap(trackMap)
-                                    }
-                                }
-
-                                val ratio = player.getAspectRatio()
-                                val length = player.getLength()
-                                val tracks =
-                                    Arguments.createMap().apply {
-                                        putArray("audio", audioTracks)
-                                        putArray("subtitle", subtitleTracks)
-                                    }
-                                val seekable = player.isSeekable()
-
-                                val videoInfo =
-                                    Arguments.createMap().apply {
-                                        putInt("width", video?.width ?: 0)
-                                        putInt("height", video?.height ?: 0)
-                                        putString("aspectRatio", ratio)
-                                        putDouble("duration", length.toDouble())
-                                        putMap("tracks", tracks)
-                                        putBoolean("seekable", seekable)
-                                    }
-
-                                onLoad(videoInfo)
-                                hasLoaded = true
-                            }
-                        }
-
-                        Event.Playing -> {
-                            onPlaying(mapOf())
-                            audioFocusManager.updateAudioFocus()
-
-                            if (player.isSeekable()) {
-                                val timestamp = time ?: DEFAULT_PLAYER_START
-
-                                if (timestamp != DEFAULT_PLAYER_START) {
-                                    player.setTime(timestamp.toLong())
-                                    time = DEFAULT_PLAYER_START
-                                }
-                            }
-                        }
-
-                        Event.Paused -> {
-                            onPaused(mapOf())
-                            audioFocusManager.updateAudioFocus()
-                        }
-
-                        Event.Stopped -> {
-                            onStopped(mapOf())
-                            audioFocusManager.updateAudioFocus()
-
-                            val position = 0f
-                            onPositionChanged(mapOf("position" to position))
-                        }
-
-                        Event.EndReached -> {
-                            onEnded(mapOf())
-                            player.stop()
-
-                            val userRepeat = options?.hasRepeatOptions() == false && repeat
-
-                            if (userRepeat) {
-                                onRepeat(mapOf())
-                                player.play()
-                            }
-                        }
-
-                        Event.EncounteredError -> {
-                            val error = mapOf("error" to "Player encountered an error")
-                            onError(error)
-                        }
-
-                        Event.PositionChanged -> {
-                            val position = mapOf("position" to event.positionChanged)
-                            onPositionChanged(position)
-                        }
-                    }
-                },
-            )
-
-            player.attachViews(videoLayout, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
-        }
-
-        shouldCreate = false
+        mediaPlayer!!.attachViews(playerView, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+        setMediaPlayerListener()
     }
 
     fun setupPlayer() {
         mediaPlayer?.let { player ->
             try {
-                hasLoaded = false
-                val media = Media(libVLC, Uri.parse(uri))
+                media = Media(libVLC, Uri.parse(uri))
                 player.setMedia(media)
+                setMediaListener()
             } catch (_: Exception) {
                 val error = mapOf("error" to "Invalid URI, media could not be set")
                 onError(error)
@@ -218,17 +85,18 @@ class VlcPlayerView(
                 player.play()
             }
         }
-
-        shouldSetup = false
     }
 
     fun destroyPlayer() {
+        media?.release()
+        media = null
         mediaPlayer?.let { player ->
             player.stop()
-            player.detachViews()
             player.release()
         }
+        mediaPlayer = null
         libVLC?.release()
+        libVLC = null
     }
 
     var uri: String = ""
@@ -236,7 +104,12 @@ class VlcPlayerView(
             val old = field
             field = value
 
-            shouldSetup = value != old
+            if (value != old) {
+                if (mediaPlayer == null) {
+                    createPlayer()
+                }
+                setupPlayer()
+            }
         }
 
     fun setSubtitle(subtitle: ReadableMap?) {
@@ -265,8 +138,10 @@ class VlcPlayerView(
             val old = field
             field = value
 
-            shouldCreate = value != old
-            shouldSetup = value != old
+            if (value != old) {
+                createPlayer()
+                setupPlayer()
+            }
         }
 
     fun setVolume(volume: Int) {
@@ -360,7 +235,7 @@ class VlcPlayerView(
         }
     }
 
-    private fun ArrayList<String>.hasRepeatOptions(): Boolean {
+    internal fun ArrayList<String>.hasRepeatOptions(): Boolean {
         val prefixes =
             setOf(
                 "--input-repeat=",
