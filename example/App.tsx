@@ -1,7 +1,7 @@
 import Slider from "@react-native-community/slider";
 import {
-  VLCPlayerView,
-  VLCPlayerViewRef,
+  LibVlcPlayerView,
+  LibVlcPlayerViewRef,
   type PositionChanged,
   type Error,
   type VideoInfo,
@@ -66,7 +66,7 @@ export default function App() {
   const [isSeekable, setIsSeekable] = useState<boolean>(false);
   const [hasLoaded, setHasLoaded] = useState<boolean | null>(null);
 
-  const playerRef = useRef<VLCPlayerViewRef | null>(null);
+  const playerRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { width } = useWindowDimensions();
@@ -220,7 +220,7 @@ export default function App() {
                 source={{ uri: thumbnail }}
               />
             )}
-            <VLCPlayerView
+            <LibVlcPlayerView
               ref={playerRef}
               style={{ height: "100%", borderRadius: 5 }}
               uri={uri}

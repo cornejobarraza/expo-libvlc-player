@@ -3,7 +3,7 @@ package expo.modules.libvlcplayer
 import org.videolan.libvlc.MediaPlayer.Event
 import org.videolan.libvlc.MediaPlayer.EventListener
 
-fun VlcPlayerView.setMediaPlayerListener() {
+fun LibVlcPlayerView.setMediaPlayerListener() {
     mediaPlayer?.let { player ->
         player.setEventListener(
             EventListener { event ->

@@ -11,7 +11,7 @@ let playerVolumeStep: Int = 10
 private let useTextureViews = false
 private let enableSubtitles = true
 
-class VlcPlayerView: ExpoView {
+class LibVlcPlayerView: ExpoView {
     let playerView = UIView()
 
     var mediaPlayer: VLCMediaPlayer?
@@ -39,7 +39,7 @@ class VlcPlayerView: ExpoView {
     required init(appContext: AppContext? = nil) {
         super.init(appContext: appContext)
 
-        VlcPlayerManager.shared.registerView(view: self)
+        MediaPlayerManager.shared.registerView(view: self)
 
         clipsToBounds = true
         playerView.backgroundColor = .black
@@ -134,7 +134,7 @@ class VlcPlayerView: ExpoView {
         userVolume = newVolume
 
         player.audio?.volume = Int32(newVolume)
-        VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+        MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
     }
 
     func setMute(_ mute: Bool) {
@@ -145,7 +145,7 @@ class VlcPlayerView: ExpoView {
             minPlayerVolume
 
         player.audio?.volume = Int32(newVolume)
-        VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+        MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
     }
 
     func setRate(_ rate: Float) {
@@ -190,12 +190,12 @@ class VlcPlayerView: ExpoView {
 
     func setAudioMixingMode(_ audioMixingMode: AudioMixingMode) {
         self.audioMixingMode = audioMixingMode
-        VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+        MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
     }
 
     func setPlayInBackground(_ playInBackground: Bool) {
         self.playInBackground = playInBackground
-        VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+        MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
     }
 
     func setAutoplay(_ autoplay: Bool) {
@@ -226,7 +226,7 @@ class VlcPlayerView: ExpoView {
     }
 
     deinit {
-        VlcPlayerManager.shared.unregisterView(view: self)
+        MediaPlayerManager.shared.unregisterView(view: self)
         destroyPlayer()
     }
 }

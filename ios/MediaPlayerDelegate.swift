@@ -1,6 +1,6 @@
 import MobileVLCKit
 
-extension VlcPlayerView: VLCMediaPlayerDelegate {
+extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     func mediaPlayerStateChanged(_: Notification) {
         guard let player = mediaPlayer else { return }
 
@@ -9,22 +9,22 @@ extension VlcPlayerView: VLCMediaPlayerDelegate {
             onBuffering([:])
         case .playing:
             onPlaying([:])
-            VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
 
             if player.isSeekable {
                 let timestamp = time ?? defaultPlayerStart
 
                 if timestamp != defaultPlayerStart {
-                    player.time = VLCTime(int: Int64(timestamp))
+                    player.time = VLCTime(int: Int32(timestamp))
                     time = defaultPlayerStart
                 }
             }
         case .paused:
             onPaused([:])
-            VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .stopped:
             onStopped([:])
-            VlcPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
 
             let position = 0.0
             onPositionChanged(["position": position])
@@ -41,9 +41,9 @@ extension VlcPlayerView: VLCMediaPlayerDelegate {
         case .error:
             let error = ["error": "Player encountered an error"]
             onError(error)
+        default:
+            break
         }
-    default:
-        break
     }
 
     func mediaPlayerTimeChanged(_: Notification) {

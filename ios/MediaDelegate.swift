@@ -1,6 +1,6 @@
 import MobileVLCKit
 
-extension VlcPlayerView: VLCMediaDelegate {
+extension LibVlcPlayerView: VLCMediaDelegate {
     func mediaDidFinishParsing(_: VLCMedia) {
         guard let player = mediaPlayer else { return }
 

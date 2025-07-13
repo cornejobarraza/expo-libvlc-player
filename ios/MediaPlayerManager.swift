@@ -1,17 +1,18 @@
 import AVFoundation
+import ExpoModulesCore
 import Foundation
 
-class VlcPlayerManager {
-    static var shared = VlcPlayerManager()
+class MediaPlayerManager {
+    static var shared = MediaPlayerManager()
 
     private static var managerQueue = DispatchQueue(label: "com.expo.libvlcplayer.manager.managerQueue")
-    private var views = NSHashTable<VlcPlayerView>.weakObjects()
+    private var views = NSHashTable<LibVlcPlayerView>.weakObjects()
 
-    func registerView(view: VlcPlayerView) {
+    func registerView(view: LibVlcPlayerView) {
         views.add(view)
     }
 
-    func unregisterView(view: VlcPlayerView) {
+    func unregisterView(view: LibVlcPlayerView) {
         views.remove(view)
     }
 

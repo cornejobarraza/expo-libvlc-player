@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference
 
 class AudioFocusManager(
     private val appContext: AppContext,
-    private var views: MutableList<WeakReference<VlcPlayerView>>,
+    private var views: MutableList<WeakReference<LibVlcPlayerView>>,
 ) : AudioManager.OnAudioFocusChangeListener {
     private val audioManager by lazy {
         appContext.reactContext?.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: run {

@@ -2,28 +2,28 @@ import { requireNativeView } from "expo";
 import { forwardRef, type ComponentType } from "react";
 
 import {
-  VlcPlayerViewNativeProps,
-  VlcPlayerViewProps,
-  VLCPlayerViewRef,
+  LibVlcPlayerViewNativeProps,
+  LibVlcPlayerViewProps,
+  LibVlcPlayerViewRef,
   type Error,
   type PositionChanged,
   type VideoInfo,
-} from "./VlcPlayer.types";
+} from "./LibVlcPlayer.types";
 import { convertNativeProps } from "./utils/props";
 
-const NativeView: ComponentType<VlcPlayerViewNativeProps> =
+const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
   requireNativeView("ExpoLibVlcPlayer");
 
-let loggedRenderingChildrenWarning = false;
+let loggedRenderingChildrenWarning: boolean = false;
 
-const VlcPlayerView = forwardRef<VLCPlayerViewRef, VlcPlayerViewProps>(
+const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
   (props, ref) => {
     const nativeProps = convertNativeProps(props);
 
     // @ts-expect-error
     if (nativeProps.children && !loggedRenderingChildrenWarning) {
       console.warn(
-        "The <VLCPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the VLCPlayer, consider using absolute positioning.",
+        "The <LibVlcPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the LibVlcPlayer, consider using absolute positioning.",
       );
       loggedRenderingChildrenWarning = true;
     }
@@ -62,4 +62,4 @@ const VlcPlayerView = forwardRef<VLCPlayerViewRef, VlcPlayerViewProps>(
   },
 );
 
-export default VlcPlayerView;
+export default LibVlcPlayerView;

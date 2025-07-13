@@ -4,8 +4,8 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.exception.Exceptions
 import java.lang.ref.WeakReference
 
-object VlcPlayerManager {
-    private var views: MutableList<WeakReference<VlcPlayerView>> = mutableListOf()
+object MediaPlayerManager {
+    private var views: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
 
     lateinit var audioFocusManager: AudioFocusManager
 
@@ -17,12 +17,12 @@ object VlcPlayerManager {
         }
     }
 
-    fun registerView(view: VlcPlayerView) {
+    fun registerView(view: LibVlcPlayerView) {
         views.find { it.get() == view } ?: run { views.add(WeakReference(view)) }
         audioFocusManager.updateAudioFocus()
     }
 
-    fun unregisterView(view: VlcPlayerView) {
+    fun unregisterView(view: LibVlcPlayerView) {
         views.removeAll { it.get() == view }
         audioFocusManager.updateAudioFocus()
     }
@@ -33,7 +33,7 @@ object VlcPlayerManager {
         }
     }
 
-    fun onViewDestroyed(view: VlcPlayerView) {
+    fun onViewDestroyed(view: LibVlcPlayerView) {
         view.destroyPlayer()
     }
 

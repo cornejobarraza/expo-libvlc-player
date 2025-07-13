@@ -30,102 +30,102 @@ val playerEvents =
         BACKGROUND_EVENT,
     )
 
-class VlcPlayerModule : Module() {
+class LibVlcPlayerModule : Module() {
     override fun definition() =
         ModuleDefinition {
             Name("ExpoLibVlcPlayer")
 
             OnCreate {
-                VlcPlayerManager.onModuleCreated(appContext)
+                MediaPlayerManager.onModuleCreated(appContext)
             }
 
             OnDestroy {
-                VlcPlayerManager.onAppDestroyed()
+                MediaPlayerManager.onAppDestroyed()
             }
 
-            View(VlcPlayerView::class) {
+            View(LibVlcPlayerView::class) {
                 Events(playerEvents)
 
-                Prop("uri") { view: VlcPlayerView, uri: String ->
+                Prop("uri") { view: LibVlcPlayerView, uri: String ->
                     view.uri = uri
                 }
 
-                Prop("subtitle") { view: VlcPlayerView, subtitle: ReadableMap? ->
+                Prop("subtitle") { view: LibVlcPlayerView, subtitle: ReadableMap? ->
                     view.setSubtitle(subtitle)
                 }
 
-                Prop("options") { view: VlcPlayerView, options: ArrayList<String>? ->
+                Prop("options") { view: LibVlcPlayerView, options: ArrayList<String>? ->
                     view.options = options
                 }
 
-                Prop("volume") { view: VlcPlayerView, volume: Int? ->
+                Prop("volume") { view: LibVlcPlayerView, volume: Int? ->
                     view.setVolume(volume ?: MAX_PLAYER_VOLUME)
                 }
 
-                Prop("mute") { view: VlcPlayerView, mute: Boolean? ->
+                Prop("mute") { view: LibVlcPlayerView, mute: Boolean? ->
                     view.setMute(mute ?: false)
                 }
 
-                Prop("rate") { view: VlcPlayerView, rate: Float? ->
+                Prop("rate") { view: LibVlcPlayerView, rate: Float? ->
                     view.setRate(rate ?: DEFAULT_PLAYER_RATE)
                 }
 
-                Prop("tracks") { view: VlcPlayerView, tracks: ReadableMap? ->
+                Prop("tracks") { view: LibVlcPlayerView, tracks: ReadableMap? ->
                     view.setTracks(tracks)
                 }
 
-                Prop("time") { view: VlcPlayerView, time: Int? ->
+                Prop("time") { view: LibVlcPlayerView, time: Int? ->
                     view.time = time ?: DEFAULT_PLAYER_START
                 }
 
-                Prop("repeat") { view: VlcPlayerView, repeat: Boolean? ->
+                Prop("repeat") { view: LibVlcPlayerView, repeat: Boolean? ->
                     view.setRepeat(repeat ?: false)
                 }
 
-                Prop("aspectRatio") { view: VlcPlayerView, aspectRatio: String? ->
+                Prop("aspectRatio") { view: LibVlcPlayerView, aspectRatio: String? ->
                     view.setAspectRatio(aspectRatio)
                 }
 
-                Prop("audioMixingMode") { view: VlcPlayerView, audioMixingMode: AudioMixingMode? ->
+                Prop("audioMixingMode") { view: LibVlcPlayerView, audioMixingMode: AudioMixingMode? ->
                     view.audioMixingMode = audioMixingMode
                 }
 
-                Prop("playInBackground") { view: VlcPlayerView, playInBackground: Boolean? ->
+                Prop("playInBackground") { view: LibVlcPlayerView, playInBackground: Boolean? ->
                     view.playInBackground = playInBackground
                 }
 
-                Prop("autoplay") { view: VlcPlayerView, autoplay: Boolean? ->
+                Prop("autoplay") { view: LibVlcPlayerView, autoplay: Boolean? ->
                     view.setAutoplay(autoplay ?: true)
                 }
 
-                OnViewDestroys { view: VlcPlayerView ->
-                    VlcPlayerManager.onViewDestroyed(view)
-                    VlcPlayerManager.unregisterView(view)
+                OnViewDestroys { view: LibVlcPlayerView ->
+                    MediaPlayerManager.onViewDestroyed(view)
+                    MediaPlayerManager.unregisterView(view)
                 }
 
-                AsyncFunction("play") { view: VlcPlayerView ->
+                AsyncFunction("play") { view: LibVlcPlayerView ->
                     view.play()
                 }
 
-                AsyncFunction("pause") { view: VlcPlayerView ->
+                AsyncFunction("pause") { view: LibVlcPlayerView ->
                     view.pause()
                 }
 
-                AsyncFunction("stop") { view: VlcPlayerView ->
+                AsyncFunction("stop") { view: LibVlcPlayerView ->
                     view.stop()
                 }
 
-                AsyncFunction("seek") { view: VlcPlayerView, position: Float ->
+                AsyncFunction("seek") { view: LibVlcPlayerView, position: Float ->
                     view.seek(position)
                 }
             }
 
             OnActivityEntersForeground {
-                VlcPlayerManager.onAppForegrounded()
+                MediaPlayerManager.onAppForegrounded()
             }
 
             OnActivityEntersBackground {
-                VlcPlayerManager.onAppBackgrounded()
+                MediaPlayerManager.onAppBackgrounded()
             }
         }
 }

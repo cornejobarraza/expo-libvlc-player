@@ -1,6 +1,6 @@
 import type { ViewProps } from "react-native";
 
-export interface VLCPlayerViewRef {
+export interface LibVlcPlayerViewRef {
   /**
    * Starts playback for the current player
    *
@@ -117,8 +117,8 @@ export interface TracksOptions {
 /**
  * @hidden
  */
-export interface VlcPlayerViewNativeProps {
-  ref?: React.Ref<VLCPlayerViewRef>;
+export interface LibVlcPlayerViewNativeProps {
+  ref?: React.Ref<LibVlcPlayerViewRef>;
   uri?: string;
   subtitle?: Subtitle;
   options?: string[];
@@ -150,7 +150,7 @@ export type AudioMixingMode =
   | "auto"
   | "doNotMix";
 
-export interface VlcPlayerViewProps extends ViewProps {
+export interface LibVlcPlayerViewProps extends ViewProps {
   /**
    * Sets the URI of the media to be played
    */
@@ -160,7 +160,7 @@ export interface VlcPlayerViewProps extends ViewProps {
    *
    * @example
    * ```tsx
-   * <VLCPlayerView
+   * <LibVlcPlayerView
    *   subtitle={{
    *    uri: "file://",
    *    enable: false,
@@ -206,7 +206,7 @@ export interface VlcPlayerViewProps extends ViewProps {
    *
    * @example
    * ```tsx
-   * <VLCPlayerView
+   * <LibVlcPlayerView
    *    tracks={{
    *       audio: 1,
    *       subtitle: 2,

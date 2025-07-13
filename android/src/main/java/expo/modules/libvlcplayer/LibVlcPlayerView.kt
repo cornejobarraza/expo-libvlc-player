@@ -24,7 +24,7 @@ const val PLAYER_VOLUME_STEP: Int = 10
 val ENABLE_SUBTITLES = true
 val USE_TEXTURE_VIEW = false
 
-class VlcPlayerView(
+class LibVlcPlayerView(
     context: Context,
     appContext: AppContext,
 ) : ExpoView(context, appContext) {
@@ -58,8 +58,8 @@ class VlcPlayerView(
     internal lateinit var audioFocusManager: AudioFocusManager
 
     init {
-        VlcPlayerManager.registerView(this)
-        audioFocusManager = VlcPlayerManager.audioFocusManager
+        MediaPlayerManager.registerView(this)
+        audioFocusManager = MediaPlayerManager.audioFocusManager
     }
 
     fun createPlayer() {

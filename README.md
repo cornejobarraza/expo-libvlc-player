@@ -72,11 +72,11 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 ## Usage
 
 ```tsx
-import { VLCPlayerView } from "expo-libvlc-player";
+import { LibVlcPlayerView } from "expo-libvlc-player";
 
 return (
   <View styles={{ height: videoHeight }}>
-    <VLCPlayerView
+    <LibVlcPlayerView
       style={{ height: "100%" }}
       uri="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
     />

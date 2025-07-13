@@ -4,7 +4,7 @@ import com.facebook.react.bridge.Arguments
 import org.videolan.libvlc.interfaces.IMedia.Event
 import org.videolan.libvlc.interfaces.IMedia.EventListener
 
-fun VlcPlayerView.setMediaListener() {
+fun LibVlcPlayerView.setMediaListener() {
     mediaPlayer?.let { player ->
         media?.setEventListener(
             EventListener { event ->

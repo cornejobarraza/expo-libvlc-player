@@ -5,12 +5,12 @@
   ],
   "apple": {
     "modules": [
-      "VlcPlayerModule"
+      "LibVlcPlayerModule"
     ]
   },
   "android": {
     "modules": [
-      "expo.modules.libvlcplayer.VlcPlayerModule"
+      "expo.modules.libvlcplayer.LibVlcPlayerModule"
     ]
   }
 }

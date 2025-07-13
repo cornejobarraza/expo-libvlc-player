@@ -24,88 +24,88 @@ let playerEvents = [
     backgroundEvent,
 ]
 
-public class VlcPlayerModule: Module {
+public class LibVlcPlayerModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ExpoLibVlcPlayer")
 
         OnDestroy {
-            VlcPlayerManager.shared.onAppDestroyed()
+            MediaPlayerManager.shared.onAppDestroyed()
         }
 
-        View(VlcPlayerView.self) {
+        View(LibVlcPlayerView.self) {
             Events(playerEvents)
 
-            Prop("uri") { (view: VlcPlayerView, uri: String) in
+            Prop("uri") { (view: LibVlcPlayerView, uri: String) in
                 view.setUri(uri)
             }
 
-            Prop("subtitle") { (view: VlcPlayerView, subtitle: [String: Any]?) in
+            Prop("subtitle") { (view: LibVlcPlayerView, subtitle: [String: Any]?) in
                 view.setSubtitle(subtitle)
             }
 
-            Prop("options") { (view: VlcPlayerView, options: [String]?) in
+            Prop("options") { (view: LibVlcPlayerView, options: [String]?) in
                 view.setOptions(options ?? [String]())
             }
 
-            Prop("volume") { (view: VlcPlayerView, volume: Int?) in
+            Prop("volume") { (view: LibVlcPlayerView, volume: Int?) in
                 view.setVolume(volume ?? maxPlayerVolume)
             }
 
-            Prop("mute") { (view: VlcPlayerView, mute: Bool?) in
+            Prop("mute") { (view: LibVlcPlayerView, mute: Bool?) in
                 view.setMute(mute ?? false)
             }
 
-            Prop("rate") { (view: VlcPlayerView, rate: Float?) in
+            Prop("rate") { (view: LibVlcPlayerView, rate: Float?) in
                 view.setRate(rate ?? defaultPlayerRate)
             }
 
-            Prop("tracks") { (view: VlcPlayerView, tracks: [String: Any]?) in
+            Prop("tracks") { (view: LibVlcPlayerView, tracks: [String: Any]?) in
                 view.setTracks(tracks)
             }
 
-            Prop("time") { (view: VlcPlayerView, time: Int?) in
+            Prop("time") { (view: LibVlcPlayerView, time: Int?) in
                 view.setTime(time ?? defaultPlayerStart)
             }
 
-            Prop("repeat") { (view: VlcPlayerView, shouldRepeat: Bool?) in
+            Prop("repeat") { (view: LibVlcPlayerView, shouldRepeat: Bool?) in
                 view.setRepeat(shouldRepeat ?? false)
             }
 
-            Prop("aspectRatio") { (view: VlcPlayerView, aspectRatio: String?) in
+            Prop("aspectRatio") { (view: LibVlcPlayerView, aspectRatio: String?) in
                 view.setAspectRatio(aspectRatio)
             }
 
-            Prop("audioMixingMode") { (view: VlcPlayerView, audioMixingMode: AudioMixingMode?) in
+            Prop("audioMixingMode") { (view: LibVlcPlayerView, audioMixingMode: AudioMixingMode?) in
                 view.setAudioMixingMode(audioMixingMode ?? .auto)
             }
 
-            Prop("playInBackground") { (view: VlcPlayerView, playInBackground: Bool?) in
+            Prop("playInBackground") { (view: LibVlcPlayerView, playInBackground: Bool?) in
                 view.setPlayInBackground(playInBackground ?? false)
             }
 
-            Prop("autoplay") { (view: VlcPlayerView, autoplay: Bool?) in
+            Prop("autoplay") { (view: LibVlcPlayerView, autoplay: Bool?) in
                 view.setAutoplay(autoplay ?? true)
             }
 
-            AsyncFunction("play") { (view: VlcPlayerView) in
+            AsyncFunction("play") { (view: LibVlcPlayerView) in
                 view.play()
             }
 
-            AsyncFunction("pause") { (view: VlcPlayerView) in
+            AsyncFunction("pause") { (view: LibVlcPlayerView) in
                 view.pause()
             }
 
-            AsyncFunction("stop") { (view: VlcPlayerView) in
+            AsyncFunction("stop") { (view: LibVlcPlayerView) in
                 view.stop()
             }
 
-            AsyncFunction("seek") { (view: VlcPlayerView, position: Float) in
+            AsyncFunction("seek") { (view: LibVlcPlayerView, position: Float) in
                 view.seek(position)
             }
         }
 
         OnAppEntersBackground {
-            VlcPlayerManager.shared.onAppBackgrounded()
+            MediaPlayerManager.shared.onAppBackgrounded()
         }
     }
 }
