@@ -32,7 +32,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             onEnded([:])
             player.stop()
 
-            let userRepeat = !options.hasRepeatOptions() && shouldRepeat
+            let userRepeat = !options.hasRepeatOption() && shouldRepeat
 
             if userRepeat {
                 onRepeat([:])

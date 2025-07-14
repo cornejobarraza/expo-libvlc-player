@@ -55,7 +55,7 @@ class LibVlcPlayerModule : Module() {
                 }
 
                 Prop("options") { view: LibVlcPlayerView, options: ArrayList<String>? ->
-                    view.options = options
+                    view.options = options ?: ArrayList<String>()
                 }
 
                 Prop("volume") { view: LibVlcPlayerView, volume: Int? ->
@@ -87,11 +87,11 @@ class LibVlcPlayerModule : Module() {
                 }
 
                 Prop("audioMixingMode") { view: LibVlcPlayerView, audioMixingMode: AudioMixingMode? ->
-                    view.audioMixingMode = audioMixingMode
+                    view.audioMixingMode = audioMixingMode ?: AudioMixingMode.AUTO
                 }
 
                 Prop("playInBackground") { view: LibVlcPlayerView, playInBackground: Boolean? ->
-                    view.playInBackground = playInBackground
+                    view.playInBackground = playInBackground ?: false
                 }
 
                 Prop("autoplay") { view: LibVlcPlayerView, autoplay: Boolean? ->

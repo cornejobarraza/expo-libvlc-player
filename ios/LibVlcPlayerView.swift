@@ -19,7 +19,7 @@ class LibVlcPlayerView: ExpoView {
     private var uri: String = ""
     var options: [String] = []
     private var userVolume: Int = maxPlayerVolume
-    var time: Int? = defaultPlayerStart
+    var time: Int = defaultPlayerStart
     var shouldRepeat: Bool = false
     var audioMixingMode: AudioMixingMode = .auto
     var playInBackground: Bool = false
@@ -128,6 +128,11 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func setVolume(_ volume: Int) {
+        if options.hasAudioOption() {
+            let error = ["error": "Audio disabled via options"]
+            onError(error)
+        }
+
         guard let player = mediaPlayer else { return }
 
         let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
@@ -138,6 +143,11 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func setMute(_ mute: Bool) {
+        if options.hasAudioOption() {
+            let error = ["error": "Audio disabled via options"]
+            onError(error)
+        }
+
         guard let player = mediaPlayer else { return }
 
         let newVolume = !mute ?
@@ -166,14 +176,14 @@ class LibVlcPlayerView: ExpoView {
         player.currentVideoSubTitleIndex = Int32(subtitleTrack)
     }
 
-    func setTime(_ time: Int?) {
+    func setTime(_ time: Int) {
         self.time = time
     }
 
     func setRepeat(_ shouldRepeat: Bool) {
-        if shouldRepeat, options.hasRepeatOptions() {
-            let error = ["error": "Repeat already enabled in options"]
-            return onError(error)
+        if options.hasRepeatOption() {
+            let error = ["error": "Repeat enabled via options"]
+            onError(error)
         }
 
         self.shouldRepeat = shouldRepeat
@@ -232,14 +242,24 @@ class LibVlcPlayerView: ExpoView {
 }
 
 extension Array where Element == String {
-    func hasRepeatOptions() -> Bool {
-        let prefixes: Set<String> = [
+    func hasAudioOption() -> Bool {
+        let options: Set<String> = [
+            "--no-audio", "-no-audio", ":no-audio",
+        ]
+
+        return contains { arg in options.contains(arg) }
+    }
+}
+
+extension Array where Element == String {
+    func hasRepeatOption() -> Bool {
+        let options: Set<String> = [
             "--input-repeat=", "-input-repeat=", ":input-repeat=",
         ]
 
         return contains { arg in
-            prefixes.contains { prefix in
-                arg.hasPrefix(prefix)
+            options.contains { option in
+                arg.hasPrefix(option)
             }
         }
     }

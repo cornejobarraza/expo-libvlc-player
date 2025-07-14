@@ -129,7 +129,7 @@ class LibVlcPlayerView(
         }
     }
 
-    var options: ArrayList<String>? = ArrayList<String>()
+    var options: ArrayList<String> = ArrayList<String>()
         set(value) {
             if (value?.isEmpty() == true) {
                 return
@@ -145,6 +145,11 @@ class LibVlcPlayerView(
         }
 
     fun setVolume(volume: Int) {
+        if (options.hasAudioOption()) {
+            val error = mapOf("error" to "Audio disabled via options")
+            onError(error)
+        }
+
         val newVolume = volume.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
         userVolume = newVolume
 
@@ -153,6 +158,11 @@ class LibVlcPlayerView(
     }
 
     fun setMute(mute: Boolean) {
+        if (options.hasAudioOption()) {
+            val error = mapOf("error" to "Audio disabled via options")
+            onError(error)
+        }
+
         val newVolume =
             if (!mute) {
                 userVolume.coerceIn(PLAYER_VOLUME_STEP, MAX_PLAYER_VOLUME)
@@ -178,15 +188,15 @@ class LibVlcPlayerView(
         }
     }
 
-    var time: Int? = DEFAULT_PLAYER_START
+    var time: Int = DEFAULT_PLAYER_START
         set(value) {
             field = value
         }
 
     fun setRepeat(repeat: Boolean) {
-        if (repeat && options?.hasRepeatOptions() == true) {
-            val error = mapOf("error" to "Repeat already enabled in options")
-            return onError(error)
+        if (options.hasRepeatOption()) {
+            val error = mapOf("error" to "Repeat enabled via options")
+            onError(error)
         }
 
         this.repeat = repeat
@@ -196,13 +206,13 @@ class LibVlcPlayerView(
         mediaPlayer?.setAspectRatio(aspectRatio)
     }
 
-    var audioMixingMode: AudioMixingMode? = AudioMixingMode.AUTO
+    var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO
         set(value) {
             field = value
             audioFocusManager.updateAudioFocus()
         }
 
-    var playInBackground: Boolean? = false
+    var playInBackground: Boolean = false
         set(value) {
             field = value
             audioFocusManager.updateAudioFocus()
@@ -235,8 +245,19 @@ class LibVlcPlayerView(
         }
     }
 
-    internal fun ArrayList<String>.hasRepeatOptions(): Boolean {
-        val prefixes =
+    internal fun ArrayList<String>.hasAudioOption(): Boolean {
+        val options =
+            setOf(
+                "--no-audio",
+                "-no-audio",
+                ":no-audio",
+            )
+
+        return this.any { it in options }
+    }
+
+    internal fun ArrayList<String>.hasRepeatOption(): Boolean {
+        val options =
             setOf(
                 "--input-repeat=",
                 "-input-repeat=",
@@ -244,8 +265,8 @@ class LibVlcPlayerView(
             )
 
         return this.any { arg ->
-            prefixes.any { prefix ->
-                arg.startsWith(prefix)
+            options.any { option ->
+                arg.startsWith(option)
             }
         }
     }
