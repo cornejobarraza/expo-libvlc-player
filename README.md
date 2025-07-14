@@ -97,7 +97,7 @@ See the [Example App](example/App.tsx) for additional usage.
 
 ### Player props
 
-The `VLCPlayerView` extends React Native `ViewProps` and implements its own:
+The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 
 | Prop               | Description                                                                                       | Default  |
 | ------------------ | ------------------------------------------------------------------------------------------------- | -------- |
