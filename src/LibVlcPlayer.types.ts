@@ -90,7 +90,8 @@ export interface Track {
   name: string;
 }
 
-export interface VideoTracks {
+export interface Tracks {
+  video: Track[];
   audio: Track[];
   subtitle: Track[];
 }
@@ -100,7 +101,7 @@ export interface VideoInfo {
   height: number;
   aspectRatio: string | null;
   duration: number;
-  tracks: VideoTracks;
+  tracks: Tracks;
   seekable: boolean;
 }
 
@@ -110,6 +111,7 @@ export interface Subtitle {
 }
 
 export interface TracksOptions {
+  video: number;
   audio: number;
   subtitle: number;
 }
@@ -208,8 +210,9 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * ```tsx
    * <LibVlcPlayerView
    *    tracks={{
-   *       audio: 1,
-   *       subtitle: 2,
+   *      video: 0,
+   *      audio: 1,
+   *      subtitle: 2,
    *    }}
    * />
    * ```

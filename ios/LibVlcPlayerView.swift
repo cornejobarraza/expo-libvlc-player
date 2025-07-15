@@ -169,11 +169,13 @@ class LibVlcPlayerView: ExpoView {
               let tracks = tracks,
               !tracks.isEmpty else { return }
 
-        let audioTrack = tracks["audio"] as? Int ?? -1
-        let subtitleTrack = tracks["subtitle"] as? Int ?? -1
+        let videoTrackIndex = tracks["video"] as? Int ?? -1
+        let audioTrackIndex = tracks["audio"] as? Int ?? -1
+        let subtitleTrackIndex = tracks["subtitle"] as? Int ?? -1
 
-        player.currentAudioTrackIndex = Int32(audioTrack)
-        player.currentVideoSubTitleIndex = Int32(subtitleTrack)
+        player.currentVideoTrackIndex = Int32(videoTrackIndex)
+        player.currentAudioTrackIndex = Int32(audioTrackIndex)
+        player.currentVideoSubTitleIndex = Int32(subtitleTrackIndex)
     }
 
     func setTime(_ time: Int) {

@@ -10,6 +10,19 @@ fun LibVlcPlayerView.setMediaListener() {
             EventListener { event ->
                 when (event.type) {
                     Event.ParsedChanged -> {
+                        val videoTracks = Arguments.createArray()
+
+                        if (player.getVideoTracksCount() > 0) {
+                            val videos = player.getVideoTracks()
+
+                            videos.forEach { track ->
+                                val trackMap = Arguments.createMap()
+                                trackMap.putInt("id", track.id)
+                                trackMap.putString("name", track.name)
+                                videoTracks.pushMap(trackMap)
+                            }
+                        }
+
                         val audioTracks = Arguments.createArray()
 
                         if (player.getAudioTracksCount() > 0) {
@@ -41,6 +54,7 @@ fun LibVlcPlayerView.setMediaListener() {
                         val length = player.getLength()
                         val tracks =
                             Arguments.createMap().apply {
+                                putArray("video", videoTracks)
                                 putArray("audio", audioTracks)
                                 putArray("subtitle", subtitleTracks)
                             }

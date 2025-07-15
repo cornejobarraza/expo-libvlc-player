@@ -4,6 +4,20 @@ extension LibVlcPlayerView: VLCMediaDelegate {
     func mediaDidFinishParsing(_: VLCMedia) {
         guard let player = mediaPlayer else { return }
 
+        var videoTracks: [[String: Any]] = []
+
+        if let videos = player.videoTrackNames as? [String] {
+            if let videoIndexes = player.videoTrackIndexes as? [NSNumber] {
+                for (index, name) in videos.enumerated() {
+                    let trackId = videoIndexes[index].intValue
+                    videoTracks.append([
+                        "id": trackId,
+                        "name": name,
+                    ])
+                }
+            }
+        }
+
         var audioTracks: [[String: Any]] = []
 
         if let audios = player.audioTrackNames as? [String] {
@@ -39,6 +53,7 @@ extension LibVlcPlayerView: VLCMediaDelegate {
             length = Int(media.length.intValue)
         }
         let tracks = [
+            "video": videoTracks,
             "audio": audioTracks,
             "subtitle": subtitleTracks,
         ]

@@ -179,10 +179,12 @@ class LibVlcPlayerView(
     }
 
     fun setTracks(tracks: ReadableMap?) {
+        val videoTrack = tracks?.getInt("video") ?: -1
         val audioTrack = tracks?.getInt("audio") ?: -1
         val subtitleTrack = tracks?.getInt("subtitle") ?: -1
 
         mediaPlayer?.let { player ->
+            player.setVideoTrack(videoTrack)
             player.setAudioTrack(audioTrack)
             player.setSpuTrack(subtitleTrack)
         }
