@@ -28,10 +28,6 @@ public class LibVlcPlayerModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ExpoLibVlcPlayer")
 
-        OnDestroy {
-            MediaPlayerManager.shared.onAppDestroyed()
-        }
-
         View(LibVlcPlayerView.self) {
             Events(playerEvents)
 
@@ -102,6 +98,10 @@ public class LibVlcPlayerModule: Module {
             AsyncFunction("seek") { (view: LibVlcPlayerView, position: Float) in
                 view.seek(position)
             }
+        }
+
+        OnAppEntersForeground {
+            MediaPlayerManager.shared.onAppForegrounded()
         }
 
         OnAppEntersBackground {

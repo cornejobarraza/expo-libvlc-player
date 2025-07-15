@@ -75,13 +75,8 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func destroyPlayer() {
-        mediaPlayer?.media?.delegate = nil
         mediaPlayer?.media = nil
-        if let player = mediaPlayer {
-            player.stop()
-            player.drawable = nil
-            player.delegate = nil
-        }
+        mediaPlayer?.stop()
         mediaPlayer = nil
     }
 
@@ -239,7 +234,6 @@ class LibVlcPlayerView: ExpoView {
 
     deinit {
         MediaPlayerManager.shared.unregisterView(view: self)
-        destroyPlayer()
     }
 }
 

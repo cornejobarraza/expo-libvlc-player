@@ -55,11 +55,8 @@ class LibVlcPlayerView(
     internal val onLoad by EventDispatcher<WritableMap>()
     internal val onBackground by EventDispatcher()
 
-    internal lateinit var audioFocusManager: AudioFocusManager
-
     init {
         MediaPlayerManager.registerView(this)
-        audioFocusManager = MediaPlayerManager.audioFocusManager
     }
 
     fun createPlayer() {
@@ -89,14 +86,9 @@ class LibVlcPlayerView(
 
     fun destroyPlayer() {
         media?.release()
-        media = null
-        mediaPlayer?.let { player ->
-            player.stop()
-            player.release()
-        }
-        mediaPlayer = null
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
         libVLC?.release()
-        libVLC = null
     }
 
     var uri: String = ""
@@ -154,7 +146,7 @@ class LibVlcPlayerView(
         userVolume = newVolume
 
         mediaPlayer?.setVolume(newVolume)
-        audioFocusManager.updateAudioFocus()
+        MediaPlayerManager.audioFocusManager.updateAudioFocus()
     }
 
     fun setMute(mute: Boolean) {
@@ -171,7 +163,7 @@ class LibVlcPlayerView(
             }
 
         mediaPlayer?.setVolume(newVolume)
-        audioFocusManager.updateAudioFocus()
+        MediaPlayerManager.audioFocusManager.updateAudioFocus()
     }
 
     fun setRate(rate: Float) {
@@ -211,13 +203,13 @@ class LibVlcPlayerView(
     var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO
         set(value) {
             field = value
-            audioFocusManager.updateAudioFocus()
+            MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
     var playInBackground: Boolean = false
         set(value) {
             field = value
-            audioFocusManager.updateAudioFocus()
+            MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
     fun setAutoplay(autoplay: Boolean) {
@@ -245,6 +237,12 @@ class LibVlcPlayerView(
                 onError(error)
             }
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        MediaPlayerManager.unregisterView(this)
     }
 
     internal fun ArrayList<String>.hasAudioOption(): Boolean {

@@ -1,6 +1,7 @@
 import AVFoundation
 import ExpoModulesCore
 import Foundation
+import MobileVLCKit
 
 class MediaPlayerManager {
     static var shared = MediaPlayerManager()
@@ -10,15 +11,28 @@ class MediaPlayerManager {
 
     func registerView(view: LibVlcPlayerView) {
         views.add(view)
+        setAppropriateAudioSessionOrWarn()
     }
 
     func unregisterView(view: LibVlcPlayerView) {
+        view.destroyPlayer()
         views.remove(view)
+        setAppropriateAudioSessionOrWarn()
     }
 
-    func onAppDestroyed() {
+    func onAppForegrounded() {
         for view in views.allObjects {
-            view.destroyPlayer()
+            guard let player = view.mediaPlayer else { continue }
+
+            player.drawable = view.playerView
+
+            if !player.isPlaying {
+                let time = player.time.intValue
+
+                if time != 0 {
+                    player.time = VLCTime(int: Int32(time))
+                }
+            }
         }
     }
 
@@ -31,6 +45,8 @@ class MediaPlayerManager {
             if !view.playInBackground, player.isPlaying {
                 player.pause()
             }
+
+            player.drawable = nil
         }
     }
 

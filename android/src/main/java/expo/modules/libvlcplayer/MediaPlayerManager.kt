@@ -23,18 +23,9 @@ object MediaPlayerManager {
     }
 
     fun unregisterView(view: LibVlcPlayerView) {
+        view.destroyPlayer()
         views.removeAll { it.get() == view }
         audioFocusManager.updateAudioFocus()
-    }
-
-    fun onAppDestroyed() {
-        views.forEach { view ->
-            view.get()?.destroyPlayer()
-        }
-    }
-
-    fun onViewDestroyed(view: LibVlcPlayerView) {
-        view.destroyPlayer()
     }
 
     fun onAppForegrounded() {
@@ -50,9 +41,8 @@ object MediaPlayerManager {
 
                     if (!player.isPlaying()) {
                         val time = player.getTime()
-                        val empty = (-1).toLong()
 
-                        if (time != empty) {
+                        if (time != -1L) {
                             player.setTime(time)
                         }
                     }

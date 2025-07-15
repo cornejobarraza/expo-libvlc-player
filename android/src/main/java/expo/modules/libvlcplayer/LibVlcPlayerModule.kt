@@ -39,10 +39,6 @@ class LibVlcPlayerModule : Module() {
                 MediaPlayerManager.onModuleCreated(appContext)
             }
 
-            OnDestroy {
-                MediaPlayerManager.onAppDestroyed()
-            }
-
             View(LibVlcPlayerView::class) {
                 Events(playerEvents)
 
@@ -96,11 +92,6 @@ class LibVlcPlayerModule : Module() {
 
                 Prop("autoplay") { view: LibVlcPlayerView, autoplay: Boolean? ->
                     view.setAutoplay(autoplay ?: true)
-                }
-
-                OnViewDestroys { view: LibVlcPlayerView ->
-                    MediaPlayerManager.onViewDestroyed(view)
-                    MediaPlayerManager.unregisterView(view)
                 }
 
                 AsyncFunction("play") { view: LibVlcPlayerView ->
