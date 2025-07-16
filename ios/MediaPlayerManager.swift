@@ -22,12 +22,12 @@ class MediaPlayerManager {
 
     func onAppForegrounded() {
         for view in views.allObjects {
+            let background = ["background": false]
+            view.onBackground(background)
+
             guard let player = view.mediaPlayer else { continue }
 
-            if player.isPlaying {
-                let background = ["background": false]
-                view.onBackground(background)
-            } else {
+            if !player.isPlaying {
                 let time = Int32(player.time.intValue)
                 let rewind = Int32(5000)
 

@@ -31,13 +31,13 @@ object MediaPlayerManager {
     fun onAppForegrounded() {
         views.forEach { playerView ->
             playerView.get()?.let { view ->
+                val background = mapOf("background" to false)
+                view.onBackground(background)
+
                 view.attachPlayer()
 
                 view.mediaPlayer?.let { player ->
-                    if (player.isPlaying()) {
-                        val background = mapOf("background" to false)
-                        view.onBackground(background)
-                    } else {
+                    if (!player.isPlaying()) {
                         val time = player.getTime()
                         val rewind = 5000L
 

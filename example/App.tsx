@@ -32,6 +32,7 @@ function msToMinutesSeconds(duration: number) {
   return `${minutes}:${formattedSeconds}`;
 }
 
+const BUFFERING_DELAY = 1_000;
 const VLC_OPTIONS = ["--network-caching=1000"];
 const ASPECT_RATIO = 16 / 9;
 
@@ -69,6 +70,7 @@ export default function App() {
   const [hasLoaded, setHasLoaded] = useState<boolean | null>(null);
 
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
+  const bufferingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { width } = useWindowDimensions();
   const videoWidth = width * 0.8;
@@ -95,6 +97,15 @@ export default function App() {
   const handlePlayerEvents = {
     onBuffering: () => {
       setIsBuffering(true);
+
+      if (bufferingTimeoutRef.current) {
+        clearTimeout(bufferingTimeoutRef.current);
+      }
+
+      bufferingTimeoutRef.current = setTimeout(
+        () => setIsBuffering(false),
+        BUFFERING_DELAY,
+      );
     },
     onPlaying: () => {
       setIsBackgrounded(false);
@@ -131,7 +142,11 @@ export default function App() {
       setHasLoaded(true);
     },
     onBackground: ({ background }: Background) => {
-      setIsBackgrounded(background);
+      if (isPlaying) {
+        setIsBackgrounded(background);
+      } else {
+        setIsBackgrounded(true);
+      }
     },
   };
 
