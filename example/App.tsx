@@ -32,7 +32,7 @@ function msToMinutesSeconds(duration: number) {
   return `${minutes}:${formattedSeconds}`;
 }
 
-const BUFFERING_DELAY = 1_000;
+const VLC_OPTIONS = ["--network-caching=1000"];
 const ASPECT_RATIO = 16 / 9;
 
 const PRIMARY_PLAYER_URI =
@@ -68,8 +68,7 @@ export default function App() {
   const [isSeekable, setIsSeekable] = useState<boolean>(false);
   const [hasLoaded, setHasLoaded] = useState<boolean | null>(null);
 
-  const playerRef = useRef<LibVlcPlayerViewRef | null>(null);
-  const bufferingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
 
   const { width } = useWindowDimensions();
   const videoWidth = width * 0.8;
@@ -93,73 +92,61 @@ export default function App() {
     }
   };
 
-  const handleBuffering = () => {
-    setIsBuffering(true);
-
-    const prevTimeout = bufferingTimeoutRef.current;
-
-    if (prevTimeout) {
-      clearTimeout(prevTimeout);
-    }
-
-    bufferingTimeoutRef.current = setTimeout(
-      () => setIsBuffering(false),
-      BUFFERING_DELAY,
-    );
-  };
-
-  const handlePlaying = () => {
-    setIsBackgrounded(false);
-    setIsPlaying(true);
-  };
-
-  const handlePaused = () => {
-    setIsPlaying(false);
-  };
-
-  const handleStopped = () => {
-    setIsBackgrounded(false);
-    setIsPlaying(false);
-  };
-
-  const handleRepeat = () => {
-    setRepeat((prev) => (prev !== "once" ? prev : false));
-  };
-
-  const handleError = ({ error }: Error) => {
-    Alert.alert("Error", error);
-    setIsBuffering(false);
-    setIsPlaying(false);
-    setIsBackgrounded(false);
-    setIsSeekable(false);
-    setHasLoaded(false);
-  };
-
-  const handlePositionChanged = ({ position }: PositionChanged) =>
-    setPosition(position);
-
-  const handleLoad = ({ duration, seekable }: VideoInfo) => {
-    setDuration(duration);
-    setIsSeekable(seekable);
-    setHasLoaded(true);
-  };
-
-  const handleBackground = ({ background }: Background) => {
-    setIsBackgrounded(background);
+  const handlePlayerEvents = {
+    onBuffering: () => {
+      setIsBuffering(true);
+    },
+    onPlaying: () => {
+      setIsBackgrounded(false);
+      setIsBuffering(false);
+      setIsPlaying(true);
+    },
+    onPaused: () => {
+      setIsBuffering(false);
+      setIsPlaying(false);
+    },
+    onStopped: () => {
+      setIsBackgrounded(false);
+      setIsBuffering(false);
+      setIsPlaying(false);
+    },
+    onRepeat: () => {
+      setRepeat((prev) => (prev !== "once" ? prev : false));
+    },
+    onError: ({ error }: Error) => {
+      Alert.alert("Error", error);
+      setIsBuffering(false);
+      setIsPlaying(false);
+      setIsBackgrounded(false);
+      setIsSeekable(false);
+      setHasLoaded(false);
+    },
+    onPositionChanged: ({ position }: PositionChanged) => {
+      setIsBuffering(false);
+      setPosition(position);
+    },
+    onLoad: ({ duration, seekable }: VideoInfo) => {
+      setDuration(duration);
+      setIsSeekable(seekable);
+      setHasLoaded(true);
+    },
+    onBackground: ({ background }: Background) => {
+      setIsBackgrounded(background);
+    },
   };
 
   const handleSlidingComplete = (position: number) =>
-    playerRef.current?.seek(position);
+    playerViewRef.current?.seek(position);
 
   const handlePlayPause = () => {
     if (!isPlaying) {
-      playerRef.current?.play();
+      playerViewRef.current?.play();
     } else {
-      playerRef.current?.pause();
+      playerViewRef.current?.pause();
     }
   };
 
-  const handleStopPlayer = () => playerRef.current?.stop();
+  const handleStopPlayer = () => playerViewRef.current?.stop();
 
   const handleRepeatChange = () =>
     setRepeat((prev) => (!prev ? "once" : prev === "once"));
@@ -221,21 +208,14 @@ export default function App() {
               />
             )}
             <LibVlcPlayerView
-              ref={playerRef}
+              ref={playerViewRef}
               style={{ height: "100%", borderRadius: 5 }}
               uri={uri}
+              options={VLC_OPTIONS}
               volume={volume}
               mute={muted}
               repeat={repeat !== false}
-              onBuffering={handleBuffering}
-              onPlaying={handlePlaying}
-              onPaused={handlePaused}
-              onStopped={handleStopped}
-              onRepeat={handleRepeat}
-              onError={handleError}
-              onPositionChanged={handlePositionChanged}
-              onLoad={handleLoad}
-              onBackground={handleBackground}
+              {...handlePlayerEvents}
             />
           </View>
           <Button
