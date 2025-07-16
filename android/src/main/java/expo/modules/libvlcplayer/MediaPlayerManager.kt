@@ -44,9 +44,10 @@ object MediaPlayerManager {
                         view.onBackground(background)
                     } else {
                         val time = player.getTime()
+                        val rewind = 5000L
 
-                        if (time != -1L) {
-                            player.setTime(time)
+                        if (time >= rewind) {
+                            player.setTime(time - rewind)
                         }
                     }
                 }
@@ -61,7 +62,9 @@ object MediaPlayerManager {
                 view.onBackground(background)
 
                 view.mediaPlayer?.let { player ->
-                    if (view.playInBackground != true && player.isPlaying()) {
+                    val shouldPause = !view.playInBackground && player.isPlaying()
+
+                    if (shouldPause) {
                         player.pause()
                     }
 

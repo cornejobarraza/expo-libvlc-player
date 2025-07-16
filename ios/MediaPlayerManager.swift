@@ -31,9 +31,10 @@ class MediaPlayerManager {
                 view.onBackground(background)
             } else {
                 let time = player.time.intValue
+                let rewind = 5000
 
-                if time != 0 {
-                    player.time = VLCTime(int: Int32(time))
+                if time >= rewind {
+                    player.time = VLCTime(int: Int32(time - rewind))
                 }
             }
         }
@@ -46,7 +47,9 @@ class MediaPlayerManager {
 
             guard let player = view.mediaPlayer else { continue }
 
-            if !view.playInBackground, player.isPlaying {
+            let shouldPause = !view.playInBackground && player.isPlaying
+
+            if shouldPause {
                 player.pause()
             }
 
