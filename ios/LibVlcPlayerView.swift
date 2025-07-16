@@ -111,8 +111,6 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func setOptions(_ options: [String]) {
-        guard !options.isEmpty else { return }
-
         let old = self.options
         self.options = options
 

@@ -131,10 +131,6 @@ class LibVlcPlayerView(
 
     var options: ArrayList<String> = ArrayList<String>()
         set(value) {
-            if (value?.isEmpty() == true) {
-                return
-            }
-
             val old = field
             field = value
 
