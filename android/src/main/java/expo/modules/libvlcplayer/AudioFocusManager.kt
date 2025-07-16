@@ -32,8 +32,6 @@ class AudioFocusManager(
                 } ?: false
             }
 
-    private var userVolume: Int = MAX_PLAYER_VOLUME
-
     private fun playerRequiresFocus(player: MediaPlayer?): Boolean {
         val mPlayer = player ?: return false
         return mPlayer.isPlaying() && mPlayer.getVolume() > MIN_PLAYER_VOLUME
@@ -153,12 +151,18 @@ class AudioFocusManager(
                 val audioMixingMode = findAudioMixingMode()
 
                 appContext.mainQueue.launch {
-                    views.forEach { view ->
-                        view.get()?.mediaPlayer?.let { player ->
-                            if (audioMixingMode == AudioMixingMode.DO_NOT_MIX) {
-                                pausePlayerIfUnmuted(player)
-                            } else {
-                                duckPlayer(player)
+                    views.forEach { weakView ->
+                        weakView.get()?.let { view ->
+                            view.mediaPlayer?.let { player ->
+                                if (audioMixingMode == AudioMixingMode.DO_NOT_MIX) {
+                                    pausePlayerIfUnmuted(player)
+                                } else {
+                                    appContext.mainQueue.launch {
+                                        val volume = player.getVolume() / 20
+                                        view.userVolume = volume
+                                        player.setVolume(volume)
+                                    }
+                                }
                             }
                         }
                     }
@@ -167,8 +171,16 @@ class AudioFocusManager(
 
             AudioManager.AUDIOFOCUS_GAIN -> {
                 appContext.mainQueue.launch {
-                    views.forEach { view ->
-                        unduckPlayer(view.get()?.mediaPlayer)
+                    views.forEach { weakView ->
+                        weakView.get()?.let { view ->
+                            view.mediaPlayer?.let { player ->
+                                if (player.getVolume() > MIN_PLAYER_VOLUME) {
+                                    appContext.mainQueue.launch {
+                                        player.setVolume(view.userVolume)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -180,26 +192,6 @@ class AudioFocusManager(
             if (mediaPlayer.getVolume() > MIN_PLAYER_VOLUME) {
                 appContext.mainQueue.launch {
                     mediaPlayer.pause()
-                }
-            }
-        }
-    }
-
-    private fun duckPlayer(player: MediaPlayer?) {
-        player?.let { weakPlayer ->
-            appContext.mainQueue.launch {
-                val volume = weakPlayer.getVolume() / 20
-                weakPlayer.setVolume(volume)
-                userVolume = volume
-            }
-        }
-    }
-
-    private fun unduckPlayer(player: MediaPlayer?) {
-        player?.let { weakPlayer ->
-            if (weakPlayer.getVolume() > MIN_PLAYER_VOLUME) {
-                appContext.mainQueue.launch {
-                    weakPlayer.setVolume(userVolume)
                 }
             }
         }

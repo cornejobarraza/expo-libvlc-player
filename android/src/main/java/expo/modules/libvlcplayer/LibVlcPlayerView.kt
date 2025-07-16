@@ -40,7 +40,7 @@ class LibVlcPlayerView(
     internal var mediaPlayer: MediaPlayer? = null
     internal var media: Media? = null
 
-    private var userVolume: Int = MAX_PLAYER_VOLUME
+    internal var userVolume: Int = MAX_PLAYER_VOLUME
     internal var repeat: Boolean = false
     private var autoplay: Boolean = true
 
