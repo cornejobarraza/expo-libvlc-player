@@ -31,14 +31,9 @@ object MediaPlayerManager {
     fun onAppForegrounded() {
         views.forEach { playerView ->
             playerView.get()?.let { view ->
-                view.mediaPlayer?.let { player ->
-                    player.attachViews(
-                        view.playerView,
-                        null,
-                        ENABLE_SUBTITLES,
-                        USE_TEXTURE_VIEW,
-                    )
+                view.attachPlayer()
 
+                view.mediaPlayer?.let { player ->
                     if (player.isPlaying()) {
                         val background = mapOf("background" to false)
                         view.onBackground(background)
@@ -67,9 +62,9 @@ object MediaPlayerManager {
                     if (shouldPause) {
                         player.pause()
                     }
-
-                    player.detachViews()
                 }
+
+                view.detachPlayer()
             }
         }
     }

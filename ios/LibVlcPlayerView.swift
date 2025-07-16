@@ -12,7 +12,7 @@ private let useTextureViews = false
 private let enableSubtitles = true
 
 class LibVlcPlayerView: ExpoView {
-    let playerView = UIView()
+    private let playerView = UIView()
 
     var mediaPlayer: VLCMediaPlayer?
 

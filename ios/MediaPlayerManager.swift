@@ -24,8 +24,6 @@ class MediaPlayerManager {
         for view in views.allObjects {
             guard let player = view.mediaPlayer else { continue }
 
-            player.drawable = view.playerView
-
             if player.isPlaying {
                 let background = ["background": false]
                 view.onBackground(background)
@@ -52,8 +50,6 @@ class MediaPlayerManager {
             if shouldPause {
                 player.pause()
             }
-
-            player.drawable = nil
         }
     }
 

@@ -21,8 +21,8 @@ const val MIN_PLAYER_VOLUME: Int = 0
 const val MAX_PLAYER_VOLUME: Int = 100
 const val PLAYER_VOLUME_STEP: Int = 10
 
-val ENABLE_SUBTITLES = true
-val USE_TEXTURE_VIEW = false
+private val ENABLE_SUBTITLES = true
+private val USE_TEXTURE_VIEW = false
 
 class LibVlcPlayerView(
     context: Context,
@@ -30,7 +30,7 @@ class LibVlcPlayerView(
 ) : ExpoView(context, appContext) {
     internal val playerViewId: String = UUID.randomUUID().toString()
 
-    internal val playerView: VLCVideoLayout =
+    private val playerView: VLCVideoLayout =
         VLCVideoLayout(context).also {
             it.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
             addView(it)
@@ -63,8 +63,12 @@ class LibVlcPlayerView(
         destroyPlayer()
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
-        mediaPlayer!!.attachViews(playerView, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+        attachPlayer()
         setMediaPlayerListener()
+    }
+
+    fun attachPlayer() {
+        mediaPlayer?.attachViews(playerView, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
     }
 
     fun setupPlayer() {
@@ -82,6 +86,10 @@ class LibVlcPlayerView(
                 player.play()
             }
         }
+    }
+
+    fun detachPlayer() {
+        mediaPlayer?.detachViews()
     }
 
     fun destroyPlayer() {
