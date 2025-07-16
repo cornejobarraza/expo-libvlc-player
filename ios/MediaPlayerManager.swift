@@ -28,11 +28,11 @@ class MediaPlayerManager {
                 let background = ["background": false]
                 view.onBackground(background)
             } else {
-                let time = player.time.intValue
-                let rewind = 5000
+                let time = Int32(player.time.intValue)
+                let rewind = Int32(5000)
 
                 if time >= rewind {
-                    player.time = VLCTime(int: Int32(time - rewind))
+                    player.time = VLCTime(int: time - rewind)
                 }
             }
         }
