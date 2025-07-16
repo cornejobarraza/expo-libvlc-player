@@ -8,6 +8,7 @@ import {
   type Error,
   type PositionChanged,
   type VideoInfo,
+  type Background,
 } from "./LibVlcPlayer.types";
 import { convertNativeProps } from "./utils/props";
 
@@ -50,6 +51,12 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       }
     };
 
+    const onBackground = ({ nativeEvent }: { nativeEvent: Background }) => {
+      if (props.onBackground) {
+        props.onBackground(nativeEvent);
+      }
+    };
+
     return (
       <NativeView
         {...nativeProps}
@@ -57,6 +64,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         onError={onError}
         onPositionChanged={onPositionChanged}
         onLoad={onLoad}
+        onBackground={onBackground}
       />
     );
   },

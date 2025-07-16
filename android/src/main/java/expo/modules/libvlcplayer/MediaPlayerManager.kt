@@ -39,7 +39,10 @@ object MediaPlayerManager {
                         USE_TEXTURE_VIEW,
                     )
 
-                    if (!player.isPlaying()) {
+                    if (player.isPlaying()) {
+                        val background = mapOf("background" to false)
+                        view.onBackground(background)
+                    } else {
                         val time = player.getTime()
 
                         if (time != -1L) {
@@ -54,7 +57,8 @@ object MediaPlayerManager {
     fun onAppBackgrounded() {
         views.forEach { playerView ->
             playerView.get()?.let { view ->
-                view.onBackground(mapOf())
+                val background = mapOf("background" to true)
+                view.onBackground(background)
 
                 view.mediaPlayer?.let { player ->
                     if (view.playInBackground != true && player.isPlaying()) {

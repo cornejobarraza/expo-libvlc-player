@@ -5,6 +5,7 @@ import {
   type Error,
   type PositionChanged,
   type VideoInfo,
+  type Background,
 } from "expo-libvlc-player";
 import { getThumbnailAsync } from "expo-video-thumbnails";
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -146,7 +147,9 @@ export default function App() {
     setHasLoaded(true);
   };
 
-  const handleBackground = () => setIsBackgrounded(true);
+  const handleBackground = ({ background }: Background) => {
+    setIsBackgrounded(background);
+  };
 
   const handleSlidingComplete = (position: number) =>
     playerRef.current?.seek(position);

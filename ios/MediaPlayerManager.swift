@@ -26,7 +26,10 @@ class MediaPlayerManager {
 
             player.drawable = view.playerView
 
-            if !player.isPlaying {
+            if player.isPlaying {
+                let background = ["background": false]
+                view.onBackground(background)
+            } else {
                 let time = player.time.intValue
 
                 if time != 0 {
@@ -38,7 +41,8 @@ class MediaPlayerManager {
 
     func onAppBackgrounded() {
         for view in views.allObjects {
-            view.onBackground([:])
+            let background = ["background": true]
+            view.onBackground(background)
 
             guard let player = view.mediaPlayer else { continue }
 

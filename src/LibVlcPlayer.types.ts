@@ -80,11 +80,6 @@ export type PositionChanged = { position: number };
  */
 export type LoadListener = (event: { nativeEvent: VideoInfo }) => void;
 
-/**
- * @hidden
- */
-export type BackgroundListener = () => void;
-
 export interface Track {
   id: number;
   name: string;
@@ -104,6 +99,13 @@ export interface VideoInfo {
   tracks: Tracks;
   seekable: boolean;
 }
+
+/**
+ * @hidden
+ */
+export type BackgroundListener = (event: { nativeEvent: Background }) => void;
+
+export type Background = { background: boolean };
 
 export interface Subtitle {
   uri: string;
@@ -294,7 +296,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   onLoad?: (event: VideoInfo) => void;
   /**
-   * Called after the player enters the background
+   * Called after the player enters or exits the background
    */
-  onBackground?: () => void;
+  onBackground?: (event: Background) => void;
 }
