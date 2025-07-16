@@ -27,13 +27,14 @@ function msToMinutesSeconds(duration: number) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
 
-  // Pad seconds with leading zero if needed
   const formattedSeconds = seconds.toString().padStart(2, "0");
 
   return `${minutes}:${formattedSeconds}`;
 }
 
-const BUFFERING_INTERVAL = 1_000;
+const BUFFERING_DELAY = 1_000;
+const ASPECT_RATIO = 16 / 9;
+
 const PRIMARY_PLAYER_URI =
   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 const SECONDARY_PLAYER_URI =
@@ -71,11 +72,8 @@ export default function App() {
   const bufferingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { width } = useWindowDimensions();
-
-  // Scale down to 80% of the screen width
   const videoWidth = width * 0.8;
-  const aspectRatio = 16 / 9;
-  const videoHeight = videoWidth / aspectRatio;
+  const videoHeight = videoWidth / ASPECT_RATIO;
 
   useEffect(() => {
     generateThumbnail();
@@ -95,7 +93,6 @@ export default function App() {
     }
   };
 
-  // Restore buffering state after last buffering callback
   const handleBuffering = () => {
     setIsBuffering(true);
 
@@ -107,7 +104,7 @@ export default function App() {
 
     bufferingTimeoutRef.current = setTimeout(
       () => setIsBuffering(false),
-      BUFFERING_INTERVAL,
+      BUFFERING_DELAY,
     );
   };
 
