@@ -196,4 +196,4 @@ This project is heavily inspired by existing libraries such as [expo-video](http
 
 ## Contributing
 
-This library is actively maintained and contributions are always welcome. Please raise any issues and/or fix them by creating a pull request.
+Contributions are always welcome. Please raise any issues and/or fix them by creating a pull request.
