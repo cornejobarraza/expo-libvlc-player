@@ -109,7 +109,7 @@ export type Background = { background: boolean };
 
 export interface Subtitle {
   uri: string;
-  enable: boolean;
+  selected: boolean;
 }
 
 export interface TracksOptions {
@@ -160,14 +160,14 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   uri: string;
   /**
-   * Sets the subtitle URI and its enabled state
+   * Sets the subtitle URI and selected state
    *
    * @example
    * ```tsx
    * <LibVlcPlayerView
    *    subtitle={{
-   *      uri: "file://",
-   *      enable: false,
+   *      uri: "file://path/to/subtitle.srt",
+   *      selected: true,
    *    }}
    * />
    * ```

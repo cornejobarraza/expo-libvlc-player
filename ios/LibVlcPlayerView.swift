@@ -8,9 +8,6 @@ let minPlayerVolume: Int = 0
 let maxPlayerVolume: Int = 100
 let playerVolumeStep: Int = 10
 
-private let useTextureViews = false
-private let enableSubtitles = true
-
 class LibVlcPlayerView: ExpoView {
     private let playerView = UIView()
 
@@ -105,9 +102,9 @@ class LibVlcPlayerView: ExpoView {
             return
         }
 
-        let enable = subtitle["enable"] as? Bool ?? enableSubtitles
+        let selected = subtitle["selected"] as? Bool ?? false
 
-        player.addPlaybackSlave(url, type: .subtitle, enforce: enable)
+        player.addPlaybackSlave(url, type: .subtitle, enforce: selected)
     }
 
     func setOptions(_ options: [String]) {

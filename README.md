@@ -102,7 +102,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 | Prop               | Description                                                                                             | Default  |
 | ------------------ | ------------------------------------------------------------------------------------------------------- | -------- |
 | `uri`              | Sets the URI of the media to be played                                                                  |          |
-| `subtitle`         | Sets the subtitle URI and its enabled state. See [`Subtitle`](#subtitle) for more                       |          |
+| `subtitle`         | Sets the subtitle URI and selected state. See [`Subtitle`](#subtitle) for more                          |          |
 | `options`          | Sets the VLC options to initialize the player with                                                      | `[]`     |
 | `volume`           | Sets the player volume. Must be an integer number between `0` and `100`                                 | `100`    |
 | `mute`             | Sets the player volume to `0`                                                                           | `false`  |
@@ -137,7 +137,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 ```JSON
 {
   "uri": "file://path/to/subtitle.srt",
-  "enable": true
+  "selected": true
 }
 ```
 

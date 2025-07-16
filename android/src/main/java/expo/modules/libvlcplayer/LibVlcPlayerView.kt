@@ -114,15 +114,10 @@ class LibVlcPlayerView(
 
     fun setSubtitle(subtitle: ReadableMap?) {
         val uri = subtitle?.getString("uri") ?: ""
-        val enable =
-            if (subtitle?.hasKey("enable") == true) {
-                subtitle.getBoolean("enable")
-            } else {
-                ENABLE_SUBTITLES
-            }
+        val selected = subtitle?.getBoolean("selected") ?: false
 
         try {
-            mediaPlayer?.addSlave(IMedia.Slave.Type.Subtitle, Uri.parse(uri), enable)
+            mediaPlayer?.addSlave(IMedia.Slave.Type.Subtitle, Uri.parse(uri), selected)
         } catch (_: Exception) {
             val error = mapOf("error" to "Invalid URI, subtitle could not be set")
             onError(error)
