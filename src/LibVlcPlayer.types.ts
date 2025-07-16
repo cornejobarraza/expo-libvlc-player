@@ -2,25 +2,25 @@ import type { ViewProps } from "react-native";
 
 export interface LibVlcPlayerViewRef {
   /**
-   * Starts playback for the current player
+   * Starts playback of the current player
    *
    * @returns A promise which resolves to `void`
    */
   readonly play: () => Promise<void>;
   /**
-   * Pauses playback for the current player
+   * Pauses playback of the current player
    *
    * @returns A promise which resolves to `void`
    */
   readonly pause: () => Promise<void>;
   /**
-   * Stops playback for the current player
+   * Stops playback of the current player
    *
    * @returns A promise which resolves to `void`
    */
   readonly stop: () => Promise<void>;
   /**
-   * Sets position of the current player
+   * Sets the position of the current player
    *
    * @param position - Must be a float number between `0` and `1`
    *
@@ -160,15 +160,15 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   uri: string;
   /**
-   * Sets subtitle URI and enabled state
+   * Sets the subtitle URI and its enabled state
    *
    * @example
    * ```tsx
    * <LibVlcPlayerView
-   *   subtitle={{
-   *    uri: "file://",
-   *    enable: false,
-   *   }}
+   *    subtitle={{
+   *      uri: "file://",
+   *      enable: false,
+   *    }}
    * />
    * ```
    */
@@ -181,32 +181,28 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * @example ["--network-caching=1000"]
    *
    * @default []
-   *
    */
   options?: string[];
   /**
-   * Controls the player volume. Must be an integer number between `0` and `100`
+   * Sets the player volume. Must be an integer number between `0` and `100`
    *
    * @default 100
-   *
    */
   volume?: number;
   /**
    * Sets the player volume to `0`
    *
    * @default false
-   *
    */
   mute?: boolean;
   /**
-   * Controls the player rate. Must be a float number
+   * Sets the player rate. Must be a float number
    *
    * @default 1
-   *
    */
   rate?: number;
   /**
-   * Sets the player audio and subtitle tracks, see `VideoInfo` for tracks type
+   * Sets the player video, audio and subtitle track indexes
    *
    * @example
    * ```tsx
@@ -221,17 +217,15 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   tracks?: TracksOptions;
   /**
-   * Controls the player time once created. Must be an integer number in milliseconds
+   * Sets the initial player time. Must be an integer number in milliseconds
    *
    * @default 0
-   *
    */
   time?: number;
   /**
-   * Repeats media once playback is ended
+   * Determines whether the player should repeat the media after playback ends
    *
    * @default false
-   *
    */
   repeat?: boolean;
   /**
@@ -253,10 +247,9 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   playInBackground?: boolean;
   /**
-   * Autoplays media once player is created
+   * Autoplays the media once created
    *
    * @default true
-   *
    */
   autoplay?: boolean;
   /**
