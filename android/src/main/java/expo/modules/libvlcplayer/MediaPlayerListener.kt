@@ -14,7 +14,6 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                     Event.Playing -> {
                         onPlaying(mapOf())
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
 
                         if (player.isSeekable()) {
                             val timestamp = time ?: DEFAULT_PLAYER_START
@@ -24,19 +23,23 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                                 time = DEFAULT_PLAYER_START
                             }
                         }
+
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
                     }
 
                     Event.Paused -> {
                         onPaused(mapOf())
+
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
                     }
 
                     Event.Stopped -> {
                         onStopped(mapOf())
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
 
-                        val position = 0f
-                        onPositionChanged(mapOf("position" to position))
+                        val position = mapOf("position" to 0f)
+                        onPositionChanged(position)
+
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
                     }
 
                     Event.EndReached -> {

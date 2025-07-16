@@ -2,8 +2,8 @@ import Slider from "@react-native-community/slider";
 import {
   LibVlcPlayerView,
   LibVlcPlayerViewRef,
-  type PositionChanged,
   type Error,
+  type PositionChanged,
   type VideoInfo,
 } from "expo-libvlc-player";
 import { getThumbnailAsync } from "expo-video-thumbnails";

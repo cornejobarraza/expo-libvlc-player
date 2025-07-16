@@ -28,6 +28,12 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       loggedRenderingChildrenWarning = true;
     }
 
+    const onError = ({ nativeEvent }: { nativeEvent: Error }) => {
+      if (props.onError) {
+        props.onError(nativeEvent);
+      }
+    };
+
     const onPositionChanged = ({
       nativeEvent,
     }: {
@@ -35,12 +41,6 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
     }) => {
       if (props.onPositionChanged) {
         props.onPositionChanged(nativeEvent);
-      }
-    };
-
-    const onError = ({ nativeEvent }: { nativeEvent: Error }) => {
-      if (props.onError) {
-        props.onError(nativeEvent);
       }
     };
 

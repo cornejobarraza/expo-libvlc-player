@@ -9,7 +9,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             onBuffering([:])
         case .playing:
             onPlaying([:])
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
 
             if player.isSeekable {
                 let timestamp = time ?? defaultPlayerStart
@@ -19,15 +18,19 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     time = defaultPlayerStart
                 }
             }
+
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .paused:
             onPaused([:])
+
             MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .stopped:
             onStopped([:])
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
 
-            let position = 0.0
-            onPositionChanged(["position": position])
+            let position = ["position": 0.0]
+            onPositionChanged(position)
+
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .ended:
             onEnded([:])
             player.stop()
