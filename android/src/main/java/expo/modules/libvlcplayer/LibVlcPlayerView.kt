@@ -60,23 +60,12 @@ class LibVlcPlayerView(
         addView(playerView)
     }
 
-    fun buildPlayer() {
-        if (shouldCreate) {
-            createPlayer()
-        }
-
-        if (shouldSetup) {
-            setupPlayer()
-        }
-    }
-
     fun createPlayer() {
         destroyPlayer()
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
         setMediaPlayerListener()
         attachPlayer()
-        shouldCreate = false
     }
 
     fun attachPlayer() {
@@ -93,6 +82,8 @@ class LibVlcPlayerView(
                 val error = mapOf("error" to "Invalid URI, media could not be set")
                 onError(error)
             }
+
+            addPlayerSlaves()
 
             addPlayerSlaves()
 
@@ -120,38 +111,13 @@ class LibVlcPlayerView(
             val old = field
             field = value
 
-            shouldCreate = value != old && mediaPlayer == null
-            shouldSetup = value != old
-        }
-
-    var options: ArrayList<String> = ArrayList<String>()
-        set(value) {
-            val old = field
-            field = value
-
-            shouldCreate = value != old
-            shouldSetup = value != old
-        }
-
-    fun addPlayerSlave(slave: ReadableMap) {
-        val uri = slave.getString("uri") ?: ""
-        val type = slave.getString("type") ?: "subtitle"
-        val selected = false
-
-        val slaveType =
-            if (type == "subtitle") {
-                IMedia.Slave.Type.Subtitle
-            } else {
-                IMedia.Slave.Type.Audio
+            if (value != old) {
+                if (mediaPlayer == null) {
+                    createPlayer()
+                }
+                setupPlayer()
             }
-
-        try {
-            mediaPlayer?.addSlave(slaveType, Uri.parse(uri), selected)
-        } catch (_: Exception) {
-            val error = mapOf("error" to "Invalid URI, $type slave could not be added")
-            onError(error)
         }
-    }
 
     fun addPlayerSlaves() {
         slaves?.filter { it.getString("type") == "subtitle" }?.forEach(::addPlayerSlave)
@@ -186,8 +152,68 @@ class LibVlcPlayerView(
             field = value
 
             if (value != old) {
-                setPlayerTracks()
+                createPlayer()
+                setupPlayer()
             }
+        }
+
+    fun addPlayerSlave(slave: ReadableMap) {
+        val uri = slave.getString("uri") ?: ""
+        val type = slave.getString("type") ?: "subtitle"
+        val selected = false
+
+        val slaveType =
+            if (type == "subtitle") {
+                IMedia.Slave.Type.Subtitle
+            } else {
+                IMedia.Slave.Type.Audio
+            }
+
+        try {
+            mediaPlayer?.addSlave(slaveType, Uri.parse(uri), selected)
+        } catch (_: Exception) {
+            val error = mapOf("error" to "Invalid URI, $type slave could not be added")
+            onError(error)
+        }
+    }
+
+    fun addPlayerSlaves() {
+        slaves?.filter { it.getString("type") == "subtitle" }?.forEach(::addPlayerSlave)
+        slaves?.filter { it.getString("type") == "audio" }?.forEach(::addPlayerSlave)
+    }
+
+    var slaves: ArrayList<ReadableMap>? = null
+        set(value) {
+            field = value
+            addPlayerSlaves()
+        }
+
+    fun setPlayerTracks() {
+        mediaPlayer?.let { player ->
+            val audioTrack = tracks?.takeIf { it.hasKey("audio") }?.getInt("audio") ?: player.getAudioTrack()
+            val videoTrack = tracks?.takeIf { it.hasKey("video") }?.getInt("video") ?: player.getVideoTrack()
+            val spuTrack = tracks?.takeIf { it.hasKey("subtitle") }?.getInt("subtitle") ?: player.getSpuTrack()
+
+            player.setAudioTrack(audioTrack)
+            player.setVideoTrack(videoTrack)
+            player.setSpuTrack(spuTrack)
+        }
+    }
+
+    var tracks: ReadableMap? = null
+        set(value) {
+            if (options.hasAudioTrackOption()) {
+                val error = mapOf("error" to "Audio track selected via options")
+                onError(error)
+            }
+
+            if (options.hasSubtitleTrackOption()) {
+                val error = mapOf("error" to "Subtitle track selected via options")
+                onError(error)
+            }
+
+            field = value
+            setPlayerTracks()
         }
 
     fun setVolume(volume: Int) {
@@ -296,6 +322,36 @@ class LibVlcPlayerView(
             )
 
         return this.any { it in options }
+    }
+
+    internal fun ArrayList<String>.hasAudioTrackOption(): Boolean {
+        val options =
+            setOf(
+                "--audio-track=",
+                "-audio-track=",
+                ":audio-track=",
+            )
+
+        return this.any { arg ->
+            options.any { option ->
+                arg.startsWith(option)
+            }
+        }
+    }
+
+    internal fun ArrayList<String>.hasSubtitleTrackOption(): Boolean {
+        val options =
+            setOf(
+                "--sub-track=",
+                "-sub-track=",
+                ":sub-track=",
+            )
+
+        return this.any { arg ->
+            options.any { option ->
+                arg.startsWith(option)
+            }
+        }
     }
 
     internal fun ArrayList<String>.hasRepeatOption(): Boolean {

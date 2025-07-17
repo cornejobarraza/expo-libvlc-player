@@ -17,7 +17,7 @@ class LibVlcPlayerView: ExpoView {
     private var shouldSetup: Bool = false
 
     private var uri: String = ""
-    private var options: [String] = .init()
+    var options: [String] = .init()
     private var slaves: [[String: Any]]?
     private var tracks: [String: Any]?
     private var userVolume: Int = maxPlayerVolume
@@ -101,16 +101,40 @@ class LibVlcPlayerView: ExpoView {
         let old = self.uri
         self.uri = uri
 
-        shouldCreate = uri != old && mediaPlayer == nil
-        shouldSetup = uri != old
+        if uri != old {
+            if mediaPlayer == nil {
+                createPlayer()
+            }
+            setupPlayer()
+        }
+    }
+
+    func setSubtitle(_ subtitle: [String: Any]?) {
+        guard let player = mediaPlayer,
+              let subtitle = subtitle,
+              !subtitle.isEmpty else { return }
+
+        let uri = subtitle["uri"] as? String ?? ""
+
+        guard let url = URL(string: uri) else {
+            let error = ["error": "Invalid URI, subtitle could not be set"]
+            onError(error)
+            return
+        }
+
+        let selected = subtitle["selected"] as? Bool ?? false
+
+        player.addPlaybackSlave(url, type: .subtitle, enforce: selected)
     }
 
     func setOptions(_ options: [String]) {
         let old = self.options
         self.options = options
 
-        shouldCreate = options != old
-        shouldSetup = options != old
+        if options != old {
+            createPlayer()
+            setupPlayer()
+        }
     }
 
     func addPlayerSlave(_ slave: [[String: Any]]) {
@@ -125,7 +149,7 @@ class LibVlcPlayerView: ExpoView {
         guard let url = URL(string: uri) else {
             let error = ["error": "Invalid URI, \(type) slave could not be added"]
             onError(error)
-            continue
+            return
         }
 
         mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
@@ -137,12 +161,8 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func setSlaves(_ slaves: [[String: Any]]?) {
-        let old = self.slaves
         self.slaves = slaves
-
-        if slaves != old {
-            addPlayerSlaves()
-        }
+        addPlayerSlaves()
     }
 
     func setPlayerTracks() {
@@ -158,12 +178,18 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func setTracks(_ tracks: [String: Any]?) {
-        let old = self.tracks
-        self.tracks = tracks
-
-        if tracks != old {
-            setPlayerTracks()
+        if options.hasAudioTrackOption() {
+            let error = ["error": "Audio track selected via options"]
+            onError(error)
         }
+
+        if options.hasSubtitleTrackOption() {
+            let error = ["error": "Subtitle track selected via options"]
+            onError(error)
+        }
+
+        self.tracks = tracks
+        setPlayerTracks()
     }
 
     func setVolume(_ volume: Int) {
@@ -274,6 +300,34 @@ extension Array where Element == String {
         ]
 
         return contains { arg in options.contains(arg) }
+    }
+}
+
+extension Array where Element == String {
+    func hasAudioTrackOption() -> Bool {
+        let options: Set<String> = [
+            "--audio-track=", "-audio-track=", ":audio-track=",
+        ]
+
+        return contains { arg in
+            options.contains { option in
+                arg.hasPrefix(option)
+            }
+        }
+    }
+}
+
+extension Array where Element == String {
+    func hasSubtitleTrackOption() -> Bool {
+        let options: Set<String> = [
+            "--sub-track=", "-sub-track=", ":sub-track=",
+        ]
+
+        return contains { arg in
+            options.contains { option in
+                arg.hasPrefix(option)
+            }
+        }
     }
 }
 
