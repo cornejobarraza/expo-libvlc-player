@@ -35,12 +35,16 @@ public class LibVlcPlayerModule: Module {
                 view.setUri(uri)
             }
 
-            Prop("subtitle") { (view: LibVlcPlayerView, subtitle: [String: Any]?) in
-                view.setSubtitle(subtitle)
-            }
-
             Prop("options") { (view: LibVlcPlayerView, options: [String]?) in
                 view.setOptions(options ?? [String]())
+            }
+
+            Prop("slaves") { (view: LibVlcPlayerView, slaves: [[String: Any]]?) in
+                view.setSlaves(slaves)
+            }
+
+            Prop("tracks") { (view: LibVlcPlayerView, tracks: [String: Any]?) in
+                view.setTracks(tracks)
             }
 
             Prop("volume") { (view: LibVlcPlayerView, volume: Int?) in
@@ -53,10 +57,6 @@ public class LibVlcPlayerModule: Module {
 
             Prop("rate") { (view: LibVlcPlayerView, rate: Float?) in
                 view.setRate(rate ?? defaultPlayerRate)
-            }
-
-            Prop("tracks") { (view: LibVlcPlayerView, tracks: [String: Any]?) in
-                view.setTracks(tracks)
             }
 
             Prop("time") { (view: LibVlcPlayerView, time: Int?) in
@@ -81,6 +81,10 @@ public class LibVlcPlayerModule: Module {
 
             Prop("autoplay") { (view: LibVlcPlayerView, autoplay: Bool?) in
                 view.setAutoplay(autoplay ?? true)
+            }
+
+            OnViewDidUpdateProps { (view: LibVlcPlayerView) in
+                view.buildPlayer()
             }
 
             AsyncFunction("play") { (view: LibVlcPlayerView) in

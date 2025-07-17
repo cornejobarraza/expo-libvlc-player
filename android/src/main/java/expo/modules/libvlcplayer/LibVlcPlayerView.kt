@@ -30,15 +30,14 @@ class LibVlcPlayerView(
 ) : ExpoView(context, appContext) {
     internal val playerViewId: String = UUID.randomUUID().toString()
 
-    private val playerView: VLCVideoLayout =
-        VLCVideoLayout(context).also {
-            it.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-            addView(it)
-        }
+    private val playerView: VLCVideoLayout = VLCVideoLayout(context)
 
     private var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
     internal var media: Media? = null
+
+    private var shouldCreate: Boolean = false
+    private var shouldSetup: Boolean = false
 
     internal var userVolume: Int = MAX_PLAYER_VOLUME
     internal var repeat: Boolean = false
@@ -57,14 +56,27 @@ class LibVlcPlayerView(
 
     init {
         MediaPlayerManager.registerView(this)
+
+        addView(playerView)
+    }
+
+    fun buildPlayer() {
+        if (shouldCreate) {
+            createPlayer()
+        }
+
+        if (shouldSetup) {
+            setupPlayer()
+        }
     }
 
     fun createPlayer() {
         destroyPlayer()
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
-        attachPlayer()
         setMediaPlayerListener()
+        attachPlayer()
+        shouldCreate = false
     }
 
     fun attachPlayer() {
@@ -82,9 +94,13 @@ class LibVlcPlayerView(
                 onError(error)
             }
 
+            addPlayerSlaves()
+
             if (autoplay) {
                 player.play()
             }
+
+            shouldSetup = false
         }
     }
 
@@ -104,34 +120,73 @@ class LibVlcPlayerView(
             val old = field
             field = value
 
-            if (value != old) {
-                if (mediaPlayer == null) {
-                    createPlayer()
-                }
-                setupPlayer()
-            }
+            shouldCreate = value != old && mediaPlayer == null
+            shouldSetup = value != old
         }
-
-    fun setSubtitle(subtitle: ReadableMap?) {
-        val uri = subtitle?.getString("uri") ?: ""
-        val selected = subtitle?.getBoolean("selected") ?: false
-
-        try {
-            mediaPlayer?.addSlave(IMedia.Slave.Type.Subtitle, Uri.parse(uri), selected)
-        } catch (_: Exception) {
-            val error = mapOf("error" to "Invalid URI, subtitle could not be set")
-            onError(error)
-        }
-    }
 
     var options: ArrayList<String> = ArrayList<String>()
         set(value) {
             val old = field
             field = value
 
+            shouldCreate = value != old
+            shouldSetup = value != old
+        }
+
+    fun addPlayerSlave(slave: ReadableMap) {
+        val uri = slave.getString("uri") ?: ""
+        val type = slave.getString("type") ?: "subtitle"
+        val selected = false
+
+        val slaveType =
+            if (type == "subtitle") {
+                IMedia.Slave.Type.Subtitle
+            } else {
+                IMedia.Slave.Type.Audio
+            }
+
+        try {
+            mediaPlayer?.addSlave(slaveType, Uri.parse(uri), selected)
+        } catch (_: Exception) {
+            val error = mapOf("error" to "Invalid URI, $type slave could not be added")
+            onError(error)
+        }
+    }
+
+    fun addPlayerSlaves() {
+        slaves?.filter { it.getString("type") == "subtitle" }?.forEach(::addPlayerSlave)
+        slaves?.filter { it.getString("type") == "audio" }?.forEach(::addPlayerSlave)
+    }
+
+    var slaves: ArrayList<ReadableMap>? = null
+        set(value) {
+            val old = field
+            field = value
+
             if (value != old) {
-                createPlayer()
-                setupPlayer()
+                addPlayerSlaves()
+            }
+        }
+
+    fun setPlayerTracks() {
+        mediaPlayer?.let { player ->
+            val audioTrack = tracks?.takeIf { it.hasKey("audio") }?.getInt("audio") ?: player.getAudioTrack()
+            val videoTrack = tracks?.takeIf { it.hasKey("video") }?.getInt("video") ?: player.getVideoTrack()
+            val spuTrack = tracks?.takeIf { it.hasKey("subtitle") }?.getInt("subtitle") ?: player.getSpuTrack()
+
+            player.setAudioTrack(audioTrack)
+            player.setVideoTrack(videoTrack)
+            player.setSpuTrack(spuTrack)
+        }
+    }
+
+    var tracks: ReadableMap? = null
+        set(value) {
+            val old = field
+            field = value
+
+            if (value != old) {
+                setPlayerTracks()
             }
         }
 
@@ -167,18 +222,6 @@ class LibVlcPlayerView(
 
     fun setRate(rate: Float) {
         mediaPlayer?.setRate(rate)
-    }
-
-    fun setTracks(tracks: ReadableMap?) {
-        val videoTrack = tracks?.getInt("video") ?: -1
-        val audioTrack = tracks?.getInt("audio") ?: -1
-        val subtitleTrack = tracks?.getInt("subtitle") ?: -1
-
-        mediaPlayer?.let { player ->
-            player.setVideoTrack(videoTrack)
-            player.setAudioTrack(audioTrack)
-            player.setSpuTrack(subtitleTrack)
-        }
     }
 
     var time: Int = DEFAULT_PLAYER_START

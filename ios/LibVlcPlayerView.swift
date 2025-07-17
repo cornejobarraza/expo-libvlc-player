@@ -13,8 +13,13 @@ class LibVlcPlayerView: ExpoView {
 
     var mediaPlayer: VLCMediaPlayer?
 
+    private var shouldCreate: Bool = false
+    private var shouldSetup: Bool = false
+
     private var uri: String = ""
-    var options: [String] = []
+    private var options: [String] = .init()
+    private var slaves: [[String: Any]]?
+    private var tracks: [String: Any]?
     private var userVolume: Int = maxPlayerVolume
     var time: Int = defaultPlayerStart
     var shouldRepeat: Bool = false
@@ -47,11 +52,22 @@ class LibVlcPlayerView: ExpoView {
         playerView.frame = bounds
     }
 
+    func buildPlayer() {
+        if shouldCreate {
+            createPlayer()
+        }
+
+        if shouldSetup {
+            setupPlayer()
+        }
+    }
+
     func createPlayer() {
         destroyPlayer()
         mediaPlayer = VLCMediaPlayer(options: options)
         mediaPlayer!.delegate = self
         mediaPlayer!.drawable = playerView
+        shouldCreate = false
     }
 
     func setupPlayer() {
@@ -66,9 +82,13 @@ class LibVlcPlayerView: ExpoView {
         player.media = VLCMedia(url: url)
         player.media!.delegate = self
 
+        addPlayerSlaves()
+
         if autoplay {
             player.play()
         }
+
+        shouldSetup = false
     }
 
     func destroyPlayer() {
@@ -81,39 +101,68 @@ class LibVlcPlayerView: ExpoView {
         let old = self.uri
         self.uri = uri
 
-        if uri != old {
-            if mediaPlayer == nil {
-                createPlayer()
-            }
-            setupPlayer()
-        }
-    }
-
-    func setSubtitle(_ subtitle: [String: Any]?) {
-        guard let player = mediaPlayer,
-              let subtitle = subtitle,
-              !subtitle.isEmpty else { return }
-
-        let uri = subtitle["uri"] as? String ?? ""
-
-        guard let url = URL(string: uri) else {
-            let error = ["error": "Invalid URI, subtitle could not be set"]
-            onError(error)
-            return
-        }
-
-        let selected = subtitle["selected"] as? Bool ?? false
-
-        player.addPlaybackSlave(url, type: .subtitle, enforce: selected)
+        shouldCreate = uri != old && mediaPlayer == nil
+        shouldSetup = uri != old
     }
 
     func setOptions(_ options: [String]) {
         let old = self.options
         self.options = options
 
-        if options != old {
-            createPlayer()
-            setupPlayer()
+        shouldCreate = options != old
+        shouldSetup = options != old
+    }
+
+    func addPlayerSlave(_ slave: [[String: Any]]) {
+        let uri = slave["uri"] as? String ?? ""
+        let type = slave["type"] as? String ?? "subtitle"
+        let selected = false
+
+        let slaveType = type == "subtitle" ?
+            .subtitle :
+            .audio
+
+        guard let url = URL(string: uri) else {
+            let error = ["error": "Invalid URI, \(type) slave could not be added"]
+            onError(error)
+            continue
+        }
+
+        mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
+    }
+
+    func addPlayerSlaves() {
+        slaves?.filter { $0.getString("type") == "subtitle" }.forEach(addPlayerSlave)
+        slaves?.filter { $0.getString("type") == "audio" }.forEach(addPlayerSlave)
+    }
+
+    func setSlaves(_ slaves: [[String: Any]]?) {
+        let old = self.slaves
+        self.slaves = slaves
+
+        if slaves != old {
+            addPlayerSlaves()
+        }
+    }
+
+    func setPlayerTracks() {
+        guard let player = mediaPlayer else { return }
+
+        let audioTrackIndex = tracks?["audio"] as? Int ?? player.currentAudioTrackIndex
+        let videoTrackIndex = tracks?["video"] as? Int ?? player.currentVideoTrackIndex
+        let videoSubTitleIndex = tracks?["subtitle"] as? Int ?? player.currentVideoSubTitleIndex
+
+        player.currentAudioTrackIndex = Int32(audioTrackIndex)
+        player.currentVideoTrackIndex = Int32(videoTrackIndex)
+        player.currentVideoSubTitleIndex = Int32(videoSubTitleIndex)
+    }
+
+    func setTracks(_ tracks: [String: Any]?) {
+        let old = self.tracks
+        self.tracks = tracks
+
+        if tracks != old {
+            setPlayerTracks()
         }
     }
 
@@ -152,20 +201,6 @@ class LibVlcPlayerView: ExpoView {
         guard let player = mediaPlayer else { return }
 
         player.rate = rate
-    }
-
-    func setTracks(_ tracks: [String: Any]?) {
-        guard let player = mediaPlayer,
-              let tracks = tracks,
-              !tracks.isEmpty else { return }
-
-        let videoTrackIndex = tracks["video"] as? Int ?? -1
-        let audioTrackIndex = tracks["audio"] as? Int ?? -1
-        let subtitleTrackIndex = tracks["subtitle"] as? Int ?? -1
-
-        player.currentVideoTrackIndex = Int32(videoTrackIndex)
-        player.currentAudioTrackIndex = Int32(audioTrackIndex)
-        player.currentVideoSubTitleIndex = Int32(subtitleTrackIndex)
     }
 
     func setTime(_ time: Int) {
