@@ -177,6 +177,12 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 }
 ```
 
+## TODO
+
+- [ ] Recording/snapshot support
+- [ ] Now playing notification
+- [ ] Landscape orientation
+
 ## Disclaimer
 
 **IMPORTANT:** This project is not affiliated with, endorsed by, or officially supported by VideoLAN or the VLC media player project.
