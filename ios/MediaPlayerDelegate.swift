@@ -10,12 +10,11 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         case .playing:
             onPlaying([:])
 
-            if player.isSeekable {
-                let timestamp = time ?? defaultPlayerStart
+            if player.position == 0.0 {
+                setPlayerTracks()
 
-                if timestamp != defaultPlayerStart {
-                    player.time = VLCTime(int: Int32(timestamp))
-                    time = defaultPlayerStart
+                if player.isSeekable, time != defaultPlayerStart {
+                    player.time = VLCTime(int: Int32(time))
                 }
             }
 
@@ -35,9 +34,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             onEnded([:])
             player.stop()
 
-            let userRepeat = !options.hasRepeatOption() && shouldRepeat
+            let canRepeat = !options.hasRepeatOption() && shouldRepeat
 
-            if userRepeat {
+            if canRepeat {
                 onRepeat([:])
                 player.play()
             }

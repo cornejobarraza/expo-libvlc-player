@@ -46,12 +46,16 @@ class LibVlcPlayerModule : Module() {
                     view.uri = uri
                 }
 
-                Prop("subtitle") { view: LibVlcPlayerView, subtitle: ReadableMap? ->
-                    view.setSubtitle(subtitle)
-                }
-
                 Prop("options") { view: LibVlcPlayerView, options: ArrayList<String>? ->
                     view.options = options ?: ArrayList<String>()
+                }
+
+                Prop("slaves") { view: LibVlcPlayerView, slaves: ArrayList<ReadableMap>? ->
+                    view.slaves = slaves
+                }
+
+                Prop("tracks") { view: LibVlcPlayerView, tracks: ReadableMap? ->
+                    view.tracks = tracks
                 }
 
                 Prop("volume") { view: LibVlcPlayerView, volume: Int? ->
@@ -64,10 +68,6 @@ class LibVlcPlayerModule : Module() {
 
                 Prop("rate") { view: LibVlcPlayerView, rate: Float? ->
                     view.setRate(rate ?: DEFAULT_PLAYER_RATE)
-                }
-
-                Prop("tracks") { view: LibVlcPlayerView, tracks: ReadableMap? ->
-                    view.setTracks(tracks)
                 }
 
                 Prop("time") { view: LibVlcPlayerView, time: Int? ->

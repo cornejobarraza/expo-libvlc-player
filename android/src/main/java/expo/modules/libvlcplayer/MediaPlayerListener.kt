@@ -15,12 +15,11 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     Event.Playing -> {
                         onPlaying(mapOf())
 
-                        if (player.isSeekable()) {
-                            val timestamp = time ?: DEFAULT_PLAYER_START
+                        if (player.getPosition() == 0f) {
+                            setPlayerTracks()
 
-                            if (timestamp != DEFAULT_PLAYER_START) {
-                                player.setTime(timestamp.toLong())
-                                time = DEFAULT_PLAYER_START
+                            if (player.isSeekable() && time != DEFAULT_PLAYER_START) {
+                                player.setTime(time.toLong())
                             }
                         }
 
@@ -46,9 +45,9 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         onEnded(mapOf())
                         player.stop()
 
-                        val userRepeat = !options.hasRepeatOption() && repeat
+                        val canRepeat = !options.hasRepeatOption() && repeat
 
-                        if (userRepeat) {
+                        if (canRepeat) {
                             onRepeat(mapOf())
                             player.play()
                         }

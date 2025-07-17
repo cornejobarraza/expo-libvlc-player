@@ -24,7 +24,7 @@ export interface LibVlcPlayerViewRef {
    *
    * @param position - Must be a float number between `0` and `1`
    *
-   * @returns void
+   * @returns A promise which resolves to `void`
    */
   readonly seek: (position: number) => Promise<void>;
 }
@@ -85,18 +85,18 @@ export interface Track {
   name: string;
 }
 
-export interface Tracks {
-  video: Track[];
+export interface VideoTracks {
   audio: Track[];
+  video: Track[];
   subtitle: Track[];
 }
 
 export interface VideoInfo {
   width: number;
   height: number;
+  tracks: VideoTracks;
   aspectRatio: string | null;
   duration: number;
-  tracks: Tracks;
   seekable: boolean;
 }
 
@@ -107,15 +107,15 @@ export type BackgroundListener = (event: { nativeEvent: Background }) => void;
 
 export type Background = { background: boolean };
 
-export interface Subtitle {
+export interface Slave {
   uri: string;
-  selected: boolean;
+  type: "audio" | "subtitle";
 }
 
-export interface TracksOptions {
-  video: number;
-  audio: number;
-  subtitle: number;
+export interface Tracks {
+  audio?: number;
+  video?: number;
+  subtitle?: number;
 }
 
 /**
@@ -124,12 +124,12 @@ export interface TracksOptions {
 export interface LibVlcPlayerViewNativeProps {
   ref?: React.Ref<LibVlcPlayerViewRef>;
   uri?: string;
-  subtitle?: Subtitle;
   options?: string[];
+  slaves?: Slave[];
+  tracks?: Tracks;
   volume?: number;
   mute?: boolean;
   rate?: number;
-  tracks?: TracksOptions;
   time?: number;
   repeat?: boolean;
   aspectRatio?: string;
@@ -160,29 +160,54 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   uri: string;
   /**
-   * Sets the subtitle URI and selected state
-   *
-   * @example
-   * ```tsx
-   * <LibVlcPlayerView
-   *    subtitle={{
-   *      uri: "file://path/to/subtitle.srt",
-   *      selected: true,
-   *    }}
-   * />
-   * ```
-   */
-  subtitle?: Subtitle;
-  /**
    * https://wiki.videolan.org/VLC_command-line_help/
    *
    * Sets the VLC options to initialize the player with
    *
-   * @example ["--network-caching=1000"]
-   *
+   * @example
+   * ```tsx
+   * <LibVlcPlayerView
+   *    options={["--network-caching=1000"]}
+   * />
+   * ```
    * @default []
    */
   options?: string[];
+  /**
+   * Sets the player audio and subtitle slaves
+   *
+   * @example
+   * ```tsx
+   * <LibVlcPlayerView
+   *    slaves={[
+   *      {
+   *        uri: "file://path/to/audio.aac",
+   *        type: "audio",
+   *      },
+   *      {
+   *        uri: "file://path/to/subtitle.srt",
+   *        type: "subtitle",
+   *      },
+   *    ]}
+   * />
+   * ```
+   */
+  slaves?: Slave[];
+  /**
+   * Sets the player audio, video and subtitle track indexes
+   *
+   * @example
+   * ```tsx
+   * <LibVlcPlayerView
+   *    tracks={{
+   *      audio: 1,
+   *      video: 2,
+   *      subtitle: -1,
+   *    }}
+   * />
+   * ```
+   */
+  tracks?: Tracks;
   /**
    * Sets the player volume. Must be an integer number between `0` and `100`
    *
@@ -201,21 +226,6 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * @default 1
    */
   rate?: number;
-  /**
-   * Sets the player video, audio and subtitle track indexes
-   *
-   * @example
-   * ```tsx
-   * <LibVlcPlayerView
-   *    tracks={{
-   *      video: 0,
-   *      audio: 1,
-   *      subtitle: 2,
-   *    }}
-   * />
-   * ```
-   */
-  tracks?: TracksOptions;
   /**
    * Sets the initial player time. Must be an integer number in milliseconds
    *
