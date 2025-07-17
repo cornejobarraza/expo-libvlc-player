@@ -99,21 +99,21 @@ See the [Example App](example/App.tsx) for additional usage.
 
 The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 
-| Prop               | Description                                                                                             | Default  |
-| ------------------ | ------------------------------------------------------------------------------------------------------- | -------- |
-| `uri`              | Sets the URI of the media to be played                                                                  |          |
-| `subtitle`         | Sets the subtitle URI and selected state. See [`Subtitle`](#subtitle) for more                          |          |
-| `options`          | Sets the VLC options to initialize the player with                                                      | `[]`     |
-| `volume`           | Sets the player volume. Must be an integer number between `0` and `100`                                 | `100`    |
-| `mute`             | Sets the player volume to `0`                                                                           | `false`  |
-| `rate`             | Sets the player rate. Must be a float number between `0` and `1`                                        | `1`      |
-| `tracks`           | Sets the player video, audio and subtitle track indexes. See [`TracksOptions`](#tracksoptions) for more |          |
-| `time`             | Sets the initial player time. Must be an integer number in milliseconds                                 | `0`      |
-| `repeat`           | Determines whether the player should repeat the media after playback ends                               | `false`  |
-| `aspectRatio`      | Sets the player aspect ratio. Must be a valid `string`                                                  |          |
-| `audioMixingMode`  | Determines how the player will interact with other audio playing in the system                          | `"auto"` |
-| `playInBackground` | Determines whether the player should continue playing after the app enters the background               | `false`  |
-| `autoplay`         | Autoplays the media once created                                                                        | `true`   |
+| Prop               | Description                                                                               | Default  |
+| ------------------ | ----------------------------------------------------------------------------------------- | -------- |
+| `uri`              | Sets the URI of the media to be played                                                    |          |
+| `options`          | Sets the VLC options to initialize the player with                                        | `[]`     |
+| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                 |          |
+| `tracks`           | Sets the player audio, video and subtitle track indexes. See [`Tracks`](#tracks) for more |          |
+| `volume`           | Sets the player volume. Must be an integer number between `0` and `100`                   | `100`    |
+| `mute`             | Sets the player volume to `0`                                                             | `false`  |
+| `rate`             | Sets the player rate. Must be a float number between `0` and `1`                          | `1`      |
+| `time`             | Sets the initial player time. Must be an integer number in milliseconds                   | `0`      |
+| `repeat`           | Determines whether the player should repeat the media after playback ends                 | `false`  |
+| `aspectRatio`      | Sets the player aspect ratio. Must be a valid `string`                                    |          |
+| `audioMixingMode`  | Determines how the player will interact with other audio playing in the system            | `"auto"` |
+| `playInBackground` | Determines whether the player should continue playing after the app enters the background | `false`  |
+| `autoplay`         | Autoplays the media once created                                                          | `true`   |
 
 #### Callback props
 
@@ -132,22 +132,22 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 
 ### Player types
 
-#### `Subtitle`
+#### `Slave`
 
 ```JSON
 {
   "uri": "file://path/to/subtitle.srt",
-  "selected": true
+  "type": "subtitle",
 }
 ```
 
-#### `TracksOptions`
+#### `Tracks`
 
 ```JSON
 {
-  "video": 0,
   "audio": 1,
-  "subtitle": 2
+  "video": 2,
+  "subtitle": -1,
 }
 ```
 
@@ -158,17 +158,17 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
   "width": 320,
   "height": 176,
   "tracks": {
-    "video": [
-      { "id": -1, "name": "Disable" },
-      { "id": 0, "name": "Track 1 - [English]" }
-    ],
     "audio": [
       { "id": -1, "name": "Disable" },
       { "id": 1, "name": "English 5.1 Surround - [English]" }
     ],
+    "video": [
+      { "id": -1, "name": "Disable" },
+      { "id": 2, "name": "Track 1" }
+    ],
     "subtitle": [
       { "id": -1, "name": "Disable" },
-      { "id": 2, "name": "Track 1 - [Japanese]" }
+      { "id": 3, "name": "Track 1 - [Japanese]" }
     ]
   },
   "aspectRatio": "16:9",

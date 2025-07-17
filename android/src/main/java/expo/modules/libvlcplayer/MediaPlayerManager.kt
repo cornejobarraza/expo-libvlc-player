@@ -23,9 +23,9 @@ object MediaPlayerManager {
     }
 
     fun unregisterView(view: LibVlcPlayerView) {
-        view.destroyPlayer()
         views.removeAll { it.get() == view }
         audioFocusManager.updateAudioFocus()
+        view.destroyPlayer()
     }
 
     fun onAppForegrounded() {
@@ -40,10 +40,14 @@ object MediaPlayerManager {
                     if (!player.isPlaying()) {
                         val time = player.getTime()
                         val rewind = 5000L
+                        val newTime =
+                            if (time >= rewind) {
+                                time - rewind
+                            } else {
+                                time
+                            }
 
-                        if (time >= rewind) {
-                            player.setTime(time - rewind)
-                        }
+                        player.setTime(newTime)
                     }
                 }
             }
