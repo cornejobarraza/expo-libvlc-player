@@ -55,8 +55,8 @@ type VolumeChangeType = "increase" | "decrease";
 type RepeatMode = boolean | "once";
 
 export default function App() {
-  const [uri, setUri] = useState<string>(PRIMARY_PLAYER_URI);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const [uri, setUri] = useState<string>(PRIMARY_PLAYER_URI);
   const [position, setPosition] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);

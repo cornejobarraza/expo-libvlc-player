@@ -12,41 +12,35 @@ fun LibVlcPlayerView.setMediaListener() {
                     Event.ParsedChanged -> {
                         val audioTracks = Arguments.createArray()
 
-                        if (player.getAudioTracksCount() > 0) {
-                            val audios = player.getAudioTracks()
+                        val audios = player.getAudioTracks()
 
-                            audios.forEach { track ->
-                                val trackMap = Arguments.createMap()
-                                trackMap.putInt("id", track.id)
-                                trackMap.putString("name", track.name)
-                                audioTracks.pushMap(trackMap)
-                            }
+                        audios.forEach { track ->
+                            val trackMap = Arguments.createMap()
+                            trackMap.putInt("id", track.id)
+                            trackMap.putString("name", track.name)
+                            audioTracks.pushMap(trackMap)
                         }
 
                         val videoTracks = Arguments.createArray()
 
-                        if (player.getVideoTracksCount() > 0) {
-                            val videos = player.getVideoTracks()
+                        val videos = player.getVideoTracks()
 
-                            videos.forEach { track ->
-                                val trackMap = Arguments.createMap()
-                                trackMap.putInt("id", track.id)
-                                trackMap.putString("name", track.name)
-                                videoTracks.pushMap(trackMap)
-                            }
+                        videos.forEach { track ->
+                            val trackMap = Arguments.createMap()
+                            trackMap.putInt("id", track.id)
+                            trackMap.putString("name", track.name)
+                            videoTracks.pushMap(trackMap)
                         }
 
                         val subtitleTracks = Arguments.createArray()
 
-                        if (player.getSpuTracksCount() > 0) {
-                            val subtitles = player.getSpuTracks()
+                        val subtitles = player.getSpuTracks()
 
-                            subtitles.forEach { track ->
-                                val trackMap = Arguments.createMap()
-                                trackMap.putInt("id", track.id)
-                                trackMap.putString("name", track.name)
-                                subtitleTracks.pushMap(trackMap)
-                            }
+                        subtitles.forEach { track ->
+                            val trackMap = Arguments.createMap()
+                            trackMap.putInt("id", track.id)
+                            trackMap.putString("name", track.name)
+                            subtitleTracks.pushMap(trackMap)
                         }
 
                         val video = player.getCurrentVideoTrack()

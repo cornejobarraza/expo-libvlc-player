@@ -13,6 +13,8 @@ class LibVlcPlayerView: ExpoView {
 
     var mediaPlayer: VLCMediaPlayer?
 
+    private var shouldCreate: Bool = false
+
     private var uri: String = ""
     var options: [String] = .init()
     private var slaves: [[String: Any]]?
@@ -50,14 +52,13 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func createPlayer() {
+        if !shouldCreate {
+            return
+        }
+
         destroyPlayer()
         mediaPlayer = VLCMediaPlayer(options: options)
         mediaPlayer!.delegate = self
-        mediaPlayer!.drawable = playerView
-    }
-
-    func setupPlayer() {
-        guard let player = mediaPlayer else { return }
 
         guard let url = URL(string: uri) else {
             let error = ["error": "Invalid URI, media could not be set"]
@@ -65,14 +66,17 @@ class LibVlcPlayerView: ExpoView {
             return
         }
 
-        player.media = VLCMedia(url: url)
-        player.media!.delegate = self
+        mediaPlayer!.media = VLCMedia(url: url)
+        mediaPlayer!.media!.delegate = self
+        mediaPlayer!.drawable = playerView
 
         addPlayerSlaves()
 
         if autoplay {
-            player.play()
+            mediaPlayer!.play()
         }
+
+        shouldCreate = false
     }
 
     func destroyPlayer() {
@@ -85,27 +89,19 @@ class LibVlcPlayerView: ExpoView {
         let old = self.uri
         self.uri = uri
 
-        if uri != old {
-            if mediaPlayer == nil {
-                createPlayer()
-            }
-            setupPlayer()
-        }
+        shouldCreate = uri != old
     }
 
     func setOptions(_ options: [String]) {
         let old = self.options
         self.options = options
 
-        if options != old {
-            createPlayer()
-            setupPlayer()
-        }
+        shouldCreate = options != old
     }
 
     func addPlayerSlave(_ slave: [String: Any]) {
         let uri = slave["uri"] as? String ?? ""
-        let type = slave["type"] as? String ?? "subtitle"
+        let type = slave["type"] as? String ?? "item"
         let selected = false
 
         let slaveType = type == "subtitle" ?
@@ -113,7 +109,7 @@ class LibVlcPlayerView: ExpoView {
             VLCMediaPlaybackSlaveType.audio
 
         guard let url = URL(string: uri) else {
-            let error = ["error": "Invalid URI, \(type) slave could not be added"]
+            let error = ["error": "Invalid slave, \(type) could not be added"]
             onError(error)
             return
         }
@@ -122,6 +118,7 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func addPlayerSlaves() {
+        // Add in this specific order, otherwise subtitle slaves will be missing
         slaves?.filter { ($0["type"] as? String) == "subtitle" }.forEach { addPlayerSlave($0) }
         slaves?.filter { ($0["type"] as? String) == "audio" }.forEach { addPlayerSlave($0) }
     }

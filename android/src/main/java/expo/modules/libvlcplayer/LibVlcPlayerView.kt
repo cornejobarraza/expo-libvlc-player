@@ -35,6 +35,7 @@ class LibVlcPlayerView(
     private var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
     internal var media: Media? = null
+    private var shouldCreate: Boolean = false
 
     internal var userVolume: Int = MAX_PLAYER_VOLUME
     internal var repeat: Boolean = false
@@ -58,34 +59,36 @@ class LibVlcPlayerView(
     }
 
     fun createPlayer() {
+        if (!shouldCreate) {
+            return
+        }
+
         destroyPlayer()
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
         setMediaPlayerListener()
-        attachPlayer()
+
+        try {
+            media = Media(libVLC, Uri.parse(uri))
+            mediaPlayer!!.setMedia(media)
+            setMediaListener()
+            attachPlayer()
+        } catch (_: Exception) {
+            val error = mapOf("error" to "Invalid URI, media could not be set")
+            onError(error)
+        }
+
+        addPlayerSlaves()
+
+        if (autoplay) {
+            mediaPlayer!!.play()
+        }
+
+        shouldCreate = false
     }
 
     fun attachPlayer() {
         mediaPlayer?.attachViews(playerView, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
-    }
-
-    fun setupPlayer() {
-        mediaPlayer?.let { player ->
-            try {
-                media = Media(libVLC, Uri.parse(uri))
-                player.setMedia(media)
-                setMediaListener()
-            } catch (_: Exception) {
-                val error = mapOf("error" to "Invalid URI, media could not be set")
-                onError(error)
-            }
-
-            addPlayerSlaves()
-
-            if (autoplay) {
-                player.play()
-            }
-        }
     }
 
     fun detachPlayer() {
@@ -104,12 +107,7 @@ class LibVlcPlayerView(
             val old = field
             field = value
 
-            if (value != old) {
-                if (mediaPlayer == null) {
-                    createPlayer()
-                }
-                setupPlayer()
-            }
+            shouldCreate = value != old
         }
 
     var options: ArrayList<String> = ArrayList<String>()
@@ -117,15 +115,12 @@ class LibVlcPlayerView(
             val old = field
             field = value
 
-            if (value != old) {
-                createPlayer()
-                setupPlayer()
-            }
+            shouldCreate = value != old
         }
 
     fun addPlayerSlave(slave: ReadableMap) {
         val uri = slave.getString("uri") ?: ""
-        val type = slave.getString("type") ?: "subtitle"
+        val type = slave.getString("type") ?: "item"
         val selected = false
 
         val slaveType =
@@ -138,12 +133,13 @@ class LibVlcPlayerView(
         try {
             mediaPlayer?.addSlave(slaveType, Uri.parse(uri), selected)
         } catch (_: Exception) {
-            val error = mapOf("error" to "Invalid URI, $type slave could not be added")
+            val error = mapOf("error" to "Invalid slave, $type could not be added")
             onError(error)
         }
     }
 
     fun addPlayerSlaves() {
+        // Add in this specific order, otherwise subtitle slaves will be missing
         slaves?.filter { it.getString("type") == "subtitle" }?.forEach(::addPlayerSlave)
         slaves?.filter { it.getString("type") == "audio" }?.forEach(::addPlayerSlave)
     }
