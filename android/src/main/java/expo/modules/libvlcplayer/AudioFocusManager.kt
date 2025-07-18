@@ -23,7 +23,6 @@ class AudioFocusManager(
     }
 
     private var currentFocusRequest: AudioFocusRequest? = null
-    private var currentMixingMode: AudioMixingMode = AudioMixingMode.MIX_WITH_OTHERS
     private val anyPlayerRequiresFocus: Boolean
         get() =
             views.toList().any { weakView ->
@@ -44,7 +43,7 @@ class AudioFocusManager(
             }
 
         if (mixingModes.isEmpty()) {
-            return AudioMixingMode.MIX_WITH_OTHERS
+            return AudioMixingMode.AUTO
         }
 
         return mixingModes.reduce { currentAudioMixingMode, next ->
@@ -57,15 +56,13 @@ class AudioFocusManager(
 
         if (audioMixingMode == AudioMixingMode.MIX_WITH_OTHERS || !anyPlayerRequiresFocus) {
             abandonAudioFocus()
-            currentMixingMode = audioMixingMode
             return
         }
 
         val audioFocusType =
-            when (currentMixingMode) {
+            when (audioMixingMode) {
                 AudioMixingMode.DUCK_OTHERS -> AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
-                AudioMixingMode.AUTO -> AudioManager.AUDIOFOCUS_GAIN
-                AudioMixingMode.DO_NOT_MIX -> AudioManager.AUDIOFOCUS_GAIN
+                AudioMixingMode.AUTO, AudioMixingMode.DO_NOT_MIX -> AudioManager.AUDIOFOCUS_GAIN
                 else -> AudioManager.AUDIOFOCUS_GAIN
             }
 
@@ -94,8 +91,6 @@ class AudioFocusManager(
             @Suppress("DEPRECATION")
             audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, audioFocusType)
         }
-
-        currentMixingMode = audioMixingMode
     }
 
     private fun abandonAudioFocus() {
@@ -112,7 +107,7 @@ class AudioFocusManager(
     }
 
     fun updateAudioFocus() {
-        if (anyPlayerRequiresFocus || findAudioMixingMode() != currentMixingMode) {
+        if (anyPlayerRequiresFocus) {
             requestAudioFocus()
         } else {
             abandonAudioFocus()
@@ -157,11 +152,9 @@ class AudioFocusManager(
                                 if (audioMixingMode == AudioMixingMode.DO_NOT_MIX) {
                                     pausePlayerIfUnmuted(player)
                                 } else {
-                                    appContext.mainQueue.launch {
-                                        val volume = player.getVolume() / 20
-                                        view.userVolume = volume
-                                        player.setVolume(volume)
-                                    }
+                                    val volume = player.getVolume() / 20
+                                    view.userVolume = volume
+                                    player.setVolume(volume)
                                 }
                             }
                         }
@@ -175,9 +168,7 @@ class AudioFocusManager(
                         weakView.get()?.let { view ->
                             view.mediaPlayer?.let { player ->
                                 if (player.getVolume() > MIN_PLAYER_VOLUME) {
-                                    appContext.mainQueue.launch {
-                                        player.setVolume(view.userVolume)
-                                    }
+                                    player.setVolume(view.userVolume)
                                 }
                             }
                         }
@@ -190,9 +181,7 @@ class AudioFocusManager(
     private fun pausePlayerIfUnmuted(player: MediaPlayer?) {
         player?.let { mediaPlayer ->
             if (mediaPlayer.getVolume() > MIN_PLAYER_VOLUME) {
-                appContext.mainQueue.launch {
-                    mediaPlayer.pause()
-                }
+                mediaPlayer.pause()
             }
         }
     }

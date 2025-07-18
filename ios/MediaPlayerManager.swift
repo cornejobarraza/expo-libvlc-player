@@ -4,10 +4,10 @@ import Foundation
 import MobileVLCKit
 
 class MediaPlayerManager {
-    static var shared = MediaPlayerManager()
+    static let shared = MediaPlayerManager()
 
-    private static var managerQueue = DispatchQueue(label: "com.expo.libvlcplayer.manager.managerQueue")
-    private var views = NSHashTable<LibVlcPlayerView>.weakObjects()
+    private static let managerQueue = DispatchQueue(label: "com.expo.libvlcplayer.manager.managerQueue")
+    private let views = NSHashTable<LibVlcPlayerView>.weakObjects()
 
     func registerView(view: LibVlcPlayerView) {
         views.add(view)
@@ -114,14 +114,10 @@ class MediaPlayerManager {
 
     private func findAudioMixingMode() -> AudioMixingMode? {
         let playingViews = views.allObjects.filter { view in
-            if let isPlaying = view.mediaPlayer?.isPlaying, isPlaying {
-                return true
-            }
-
-            return false
+            view.mediaPlayer?.isPlaying == true
         }
 
-        var audioMixingMode: AudioMixingMode = .mixWithOthers
+        var audioMixingMode: AudioMixingMode = .auto
 
         if playingViews.isEmpty {
             return nil
