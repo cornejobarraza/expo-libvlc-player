@@ -194,7 +194,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   slaves?: Slave[];
   /**
-   * Sets the player audio, video and subtitle track indexes
+   * Sets the player audio, video and subtitle tracks
    *
    * @example
    * ```tsx

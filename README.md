@@ -104,7 +104,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 | `uri`              | Sets the URI of the media to be played                                                    |          |
 | `options`          | Sets the VLC options to initialize the player with                                        | `[]`     |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                 |          |
-| `tracks`           | Sets the player audio, video and subtitle track indexes. See [`Tracks`](#tracks) for more |          |
+| `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more |          |
 | `volume`           | Sets the player volume. Must be an integer number between `0` and `100`                   | `100`    |
 | `mute`             | Sets the player volume to `0`                                                             | `false`  |
 | `rate`             | Sets the player rate. Must be a float number between `0` and `1`                          | `1`      |
