@@ -15,9 +15,9 @@ class MediaPlayerManager {
     }
 
     func unregisterView(view: LibVlcPlayerView) {
-        view.destroyPlayer()
         views.remove(view)
         setAppropriateAudioSessionOrWarn()
+        view.destroyPlayer()
     }
 
     func onAppForegrounded() {
