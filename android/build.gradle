@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 group = 'expo.modules.libvlcplayer'
-version = '0.1.26'
+version = '0.1.27'
 
 def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
 apply from: expoModulesCorePlugin
@@ -27,7 +27,7 @@ android {
     namespace "expo.modules.libvlcplayer"
     defaultConfig {
         versionCode 1
-        versionName "0.1.26"
+        versionName "0.1.27"
         consumerProguardFiles("proguard-rules.pro")
     }
     lintOptions {
