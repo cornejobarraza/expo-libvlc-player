@@ -1,8 +1,14 @@
 <p align="center">
-     <img src="https://images.videolan.org/images/VLC-IconSmall.png" alt="VLC icon">
+     <img alt="VLC icon" src="https://images.videolan.org/images/VLC-IconSmall.png">
 </p>
 
 <h1 align="center">LibVLC Player for Expo</h1>
+
+<p align="center">
+     <a href="https://www.npmjs.com/package/expo-libvlc-player" target="_blank">
+          <img alt="npm version" src="https://img.shields.io/npm/v/expo-libvlc-player">
+     </a>
+</p>
 
 ### Supported versions
 
