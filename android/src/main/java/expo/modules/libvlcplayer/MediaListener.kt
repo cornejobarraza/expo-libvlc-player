@@ -14,7 +14,7 @@ fun LibVlcPlayerView.setMediaListener() {
 
                         val audios = player.getAudioTracks()
 
-                        audios.forEach { track ->
+                        audios?.forEach { track ->
                             val trackMap = Arguments.createMap()
                             trackMap.putInt("id", track.id)
                             trackMap.putString("name", track.name)
@@ -25,7 +25,7 @@ fun LibVlcPlayerView.setMediaListener() {
 
                         val videos = player.getVideoTracks()
 
-                        videos.forEach { track ->
+                        videos?.forEach { track ->
                             val trackMap = Arguments.createMap()
                             trackMap.putInt("id", track.id)
                             trackMap.putString("name", track.name)
@@ -36,7 +36,7 @@ fun LibVlcPlayerView.setMediaListener() {
 
                         val subtitles = player.getSpuTracks()
 
-                        subtitles.forEach { track ->
+                        subtitles?.forEach { track ->
                             val trackMap = Arguments.createMap()
                             trackMap.putInt("id", track.id)
                             trackMap.putString("name", track.name)
