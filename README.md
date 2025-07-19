@@ -40,11 +40,11 @@ Run `npx pod-install` after installing the npm package.
 
 #### Local network usage
 
-Starting from iOS 14, you are required to provide a message for the `NSLocalNetworkUsageDescription` key in Info.plist if your app uses the local network directly or indirectly.
+Starting from iOS 14 you are required to provide a message for the `NSLocalNetworkUsageDescription` key in the Info.plist file if your app uses the local network directly or indirectly.
 
 It seems the `MobileVLCKit` library powering the VLC Player on iOS makes use of this feature when playing external media from sources such as RTSP streams.
 
-Provide a custom message specifying how your app will make use of the network so your App Store submission is not rejected for this reason, read more about this [here](https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy).
+Provide a custom message specifying how your app will make use of the network so your App Store submission is not rejected for this reason. Read more about this [here](https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy).
 
 ### Configuration in app config
 
