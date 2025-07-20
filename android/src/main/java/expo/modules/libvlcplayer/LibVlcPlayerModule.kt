@@ -9,8 +9,8 @@ private const val BUFFERING_EVENT = "onBuffering"
 private const val PLAYING_EVENT = "onPlaying"
 private const val PAUSED_EVENT = "onPaused"
 private const val STOPPED_EVENT = "onStopped"
-private const val ENDED_EVENT = "onEnded"
-private const val ERROR_EVENT = "onError"
+private const val END_REACHED_EVENT = "onEndReached"
+private const val ENCOUNTERED_ERROR_EVENT = "onEncounteredError"
 private const val POSITION_CHANGED_EVENT = "onPositionChanged"
 private const val PARSED_CHANGED_EVENT = "onParsedChanged"
 private const val BACKGROUND_EVENT = "onBackground"
@@ -21,8 +21,8 @@ val playerEvents =
         PLAYING_EVENT,
         PAUSED_EVENT,
         STOPPED_EVENT,
-        ENDED_EVENT,
-        ERROR_EVENT,
+        END_REACHED_EVENT,
+        ENCOUNTERED_ERROR_EVENT,
         POSITION_CHANGED_EVENT,
         PARSED_CHANGED_EVENT,
         BACKGROUND_EVENT,

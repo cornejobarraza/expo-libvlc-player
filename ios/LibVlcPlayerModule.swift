@@ -4,8 +4,8 @@ private let bufferingEvent = "onBuffering"
 private let playingEvent = "onPlaying"
 private let pausedEvent = "onPaused"
 private let stoppedEvent = "onStopped"
-private let endedEvent = "onEnded"
-private let errorEvent = "onError"
+private let endReachedEvent = "onEndReached"
+private let encounteredErrorEvent = "onEncounteredError"
 private let positionChangedEvent = "onPositionChanged"
 private let parsedChangedEvent = "onParsedChanged"
 private let backgroundEvent = "onBackground"
@@ -15,8 +15,8 @@ let playerEvents = [
     playingEvent,
     pausedEvent,
     stoppedEvent,
-    endedEvent,
-    errorEvent,
+    endReachedEvent,
+    encounteredErrorEvent,
     positionChangedEvent,
     parsedChangedEvent,
     backgroundEvent,

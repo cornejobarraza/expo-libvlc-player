@@ -45,8 +45,8 @@ class LibVlcPlayerView(
     internal val onPlaying by EventDispatcher()
     internal val onPaused by EventDispatcher()
     internal val onStopped by EventDispatcher()
-    internal val onEnded by EventDispatcher()
-    internal val onError by EventDispatcher()
+    internal val onEndReached by EventDispatcher()
+    internal val onEncounteredError by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
     internal val onParsedChanged by EventDispatcher<WritableMap>()
     internal val onBackground by EventDispatcher()
@@ -74,7 +74,7 @@ class LibVlcPlayerView(
             attachPlayer()
         } catch (_: Exception) {
             val error = mapOf("error" to "Invalid URI, media could not be set")
-            onError(error)
+            onEncounteredError(error)
         }
 
         addPlayerSlaves()
@@ -133,7 +133,7 @@ class LibVlcPlayerView(
             mediaPlayer?.addSlave(slaveType, Uri.parse(uri), selected)
         } catch (_: Exception) {
             val error = mapOf("error" to "Invalid slave, $type could not be added")
-            onError(error)
+            onEncounteredError(error)
         }
     }
 
@@ -165,12 +165,12 @@ class LibVlcPlayerView(
         set(value) {
             if (options.hasAudioTrackOption()) {
                 val error = mapOf("error" to "Audio track selected via options")
-                onError(error)
+                onEncounteredError(error)
             }
 
             if (options.hasSubtitleTrackOption()) {
                 val error = mapOf("error" to "Subtitle track selected via options")
-                onError(error)
+                onEncounteredError(error)
             }
 
             field = value
@@ -180,7 +180,7 @@ class LibVlcPlayerView(
     fun setVolume(volume: Int) {
         if (options.hasAudioOption()) {
             val error = mapOf("error" to "Audio disabled via options")
-            onError(error)
+            onEncounteredError(error)
         }
 
         val newVolume = volume.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
@@ -193,7 +193,7 @@ class LibVlcPlayerView(
     fun setMute(mute: Boolean) {
         if (options.hasAudioOption()) {
             val error = mapOf("error" to "Audio disabled via options")
-            onError(error)
+            onEncounteredError(error)
         }
 
         val newVolume =
@@ -219,7 +219,7 @@ class LibVlcPlayerView(
     fun setRepeat(repeat: Boolean) {
         if (options.hasRepeatOption()) {
             val error = mapOf("error" to "Repeat enabled via options")
-            onError(error)
+            onEncounteredError(error)
         }
 
         this.repeat = repeat
@@ -263,7 +263,7 @@ class LibVlcPlayerView(
                 player.setPosition(position)
             } else {
                 val error = mapOf("error" to "Media is not seekable")
-                onError(error)
+                onEncounteredError(error)
             }
         }
     }

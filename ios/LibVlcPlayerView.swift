@@ -30,8 +30,8 @@ class LibVlcPlayerView: ExpoView {
     let onPlaying = EventDispatcher()
     let onPaused = EventDispatcher()
     let onStopped = EventDispatcher()
-    let onEnded = EventDispatcher()
-    let onError = EventDispatcher()
+    let onEndReached = EventDispatcher()
+    let onEncounteredError = EventDispatcher()
     let onPositionChanged = EventDispatcher()
     let onParsedChanged = EventDispatcher()
     let onBackground = EventDispatcher()
@@ -61,7 +61,7 @@ class LibVlcPlayerView: ExpoView {
 
         guard let url = URL(string: uri) else {
             let error = ["error": "Invalid URI, media could not be set"]
-            onError(error)
+            onEncounteredError(error)
             return
         }
 
@@ -109,7 +109,7 @@ class LibVlcPlayerView: ExpoView {
 
         guard let url = URL(string: uri) else {
             let error = ["error": "Invalid slave, \(type) could not be added"]
-            onError(error)
+            onEncounteredError(error)
             return
         }
 
@@ -142,12 +142,12 @@ class LibVlcPlayerView: ExpoView {
     func setTracks(_ tracks: [String: Any]?) {
         if options.hasAudioTrackOption() {
             let error = ["error": "Audio track selected via options"]
-            onError(error)
+            onEncounteredError(error)
         }
 
         if options.hasSubtitleTrackOption() {
             let error = ["error": "Subtitle track selected via options"]
-            onError(error)
+            onEncounteredError(error)
         }
 
         self.tracks = tracks
@@ -157,7 +157,7 @@ class LibVlcPlayerView: ExpoView {
     func setVolume(_ volume: Int) {
         if options.hasAudioOption() {
             let error = ["error": "Audio disabled via options"]
-            onError(error)
+            onEncounteredError(error)
         }
 
         let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
@@ -170,7 +170,7 @@ class LibVlcPlayerView: ExpoView {
     func setMute(_ mute: Bool) {
         if options.hasAudioOption() {
             let error = ["error": "Audio disabled via options"]
-            onError(error)
+            onEncounteredError(error)
         }
 
         let newVolume = !mute ?
@@ -192,7 +192,7 @@ class LibVlcPlayerView: ExpoView {
     func setRepeat(_ shouldRepeat: Bool) {
         if options.hasRepeatOption() {
             let error = ["error": "Repeat enabled via options"]
-            onError(error)
+            onEncounteredError(error)
         }
 
         self.shouldRepeat = shouldRepeat
@@ -239,7 +239,7 @@ class LibVlcPlayerView: ExpoView {
             player.position = position
         } else {
             let error = ["error": "Media is not seekable"]
-            onError(error)
+            onEncounteredError(error)
         }
     }
 

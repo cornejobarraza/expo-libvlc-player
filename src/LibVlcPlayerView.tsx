@@ -6,7 +6,7 @@ import {
   LibVlcPlayerViewProps,
   LibVlcPlayerViewRef,
   type Error,
-  type PositionChanged,
+  type Position,
   type VideoInfo,
   type Background,
 } from "./LibVlcPlayer.types";
@@ -29,17 +29,13 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       loggedRenderingChildrenWarning = true;
     }
 
-    const onError = ({ nativeEvent }: { nativeEvent: Error }) => {
-      if (props.onError) {
-        props.onError(nativeEvent);
+    const onEncounteredError = ({ nativeEvent }: { nativeEvent: Error }) => {
+      if (props.onEncounteredError) {
+        props.onEncounteredError(nativeEvent);
       }
     };
 
-    const onPositionChanged = ({
-      nativeEvent,
-    }: {
-      nativeEvent: PositionChanged;
-    }) => {
+    const onPositionChanged = ({ nativeEvent }: { nativeEvent: Position }) => {
       if (props.onPositionChanged) {
         props.onPositionChanged(nativeEvent);
       }
@@ -61,7 +57,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       <NativeView
         {...nativeProps}
         ref={ref}
-        onError={onError}
+        onEncounteredError={onEncounteredError}
         onPositionChanged={onPositionChanged}
         onParsedChanged={onParsedChanged}
         onBackground={onBackground}

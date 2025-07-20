@@ -123,17 +123,17 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 
 #### Callback props
 
-| Prop                | Description                                            | Payload                   |
-| ------------------- | ------------------------------------------------------ | ------------------------- |
-| `onBuffering`       | Called after the `Buffering` player event              |                           |
-| `onPlaying`         | Called after the `Playing` player event                |                           |
-| `onPaused`          | Called after the `Paused` player event                 |                           |
-| `onStopped`         | Called after the `Stopped` player event                |                           |
-| `onEnded`           | Called after the `EndReached` player event             |                           |
-| `onError`           | Called after the `EncounteredError` player event       | `{ error: string }`       |
-| `onPositionChanged` | Called after the `PositionChanged` player event        | `{ position: number }`    |
-| `onParsedChanged`   | Called after the `ParsedChanged` media event           | [`VideoInfo`](#videoinfo) |
-| `onBackground`      | Called after the player enters or exits the background | `{ background: boolean }` |
+| Prop                 | Description                                            | Payload                   |
+| -------------------- | ------------------------------------------------------ | ------------------------- |
+| `onBuffering`        | Called after the `Buffering` player event              |                           |
+| `onPlaying`          | Called after the `Playing` player event                |                           |
+| `onPaused`           | Called after the `Paused` player event                 |                           |
+| `onStopped`          | Called after the `Stopped` player event                |                           |
+| `onEndReached`       | Called after the `EndReached` player event             |                           |
+| `onEncounteredError` | Called after the `EncounteredError` player event       | `{ error: string }`       |
+| `onPositionChanged`  | Called after the `PositionChanged` player event        | `{ position: number }`    |
+| `onParsedChanged`    | Called after the `ParsedChanged` media event           | [`VideoInfo`](#videoinfo) |
+| `onBackground`       | Called after the player enters or exits the background | `{ background: boolean }` |
 
 ### Player types
 

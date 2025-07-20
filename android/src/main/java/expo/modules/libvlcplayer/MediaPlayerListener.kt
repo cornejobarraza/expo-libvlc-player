@@ -41,7 +41,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     }
 
                     Event.EndReached -> {
-                        onEnded(mapOf())
+                        onEndReached(mapOf())
 
                         player.stop()
 
@@ -54,7 +54,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                     Event.EncounteredError -> {
                         val error = mapOf("error" to "Player encountered an error")
-                        onError(error)
+                        onEncounteredError(error)
                     }
 
                     Event.PositionChanged -> {

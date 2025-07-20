@@ -30,7 +30,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
             MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .ended:
-            onEnded([:])
+            onEndReached([:])
 
             player.stop()
 
@@ -41,7 +41,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             }
         case .error:
             let error = ["error": "Player encountered an error"]
-            onError(error)
+            onEncounteredError(error)
         default:
             break
         }

@@ -3,7 +3,7 @@ import {
   LibVlcPlayerView,
   LibVlcPlayerViewRef,
   type Error,
-  type PositionChanged,
+  type Position,
   type VideoInfo,
   type Background,
 } from "expo-libvlc-player";
@@ -122,7 +122,7 @@ export default function App() {
       setIsPlaying(false);
       setRepeat((prev) => prev !== "once");
     },
-    onError: ({ error }: Error) => {
+    onEncounteredError: ({ error }: Error) => {
       Alert.alert("Error", error);
       setIsBuffering(false);
       setIsPlaying(false);
@@ -130,7 +130,7 @@ export default function App() {
       setIsSeekable(false);
       setHasParsed(false);
     },
-    onPositionChanged: ({ position }: PositionChanged) => {
+    onPositionChanged: ({ position }: Position) => {
       setIsBuffering(false);
       setPosition(position);
     },
