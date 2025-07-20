@@ -64,7 +64,7 @@ fun LibVlcPlayerView.setMediaListener() {
                                 putBoolean("seekable", seekable)
                             }
 
-                        onLoad(videoInfo)
+                        onParsedChanged(videoInfo)
                     }
                 }
             },

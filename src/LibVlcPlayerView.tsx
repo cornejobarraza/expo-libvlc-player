@@ -45,9 +45,9 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       }
     };
 
-    const onLoad = ({ nativeEvent }: { nativeEvent: VideoInfo }) => {
-      if (props.onLoad) {
-        props.onLoad(nativeEvent);
+    const onParsedChanged = ({ nativeEvent }: { nativeEvent: VideoInfo }) => {
+      if (props.onParsedChanged) {
+        props.onParsedChanged(nativeEvent);
       }
     };
 
@@ -63,7 +63,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         ref={ref}
         onError={onError}
         onPositionChanged={onPositionChanged}
-        onLoad={onLoad}
+        onParsedChanged={onParsedChanged}
         onBackground={onBackground}
       />
     );

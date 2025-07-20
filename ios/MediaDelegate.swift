@@ -65,6 +65,6 @@ extension LibVlcPlayerView: VLCMediaDelegate {
             "seekable": seekable,
         ]
 
-        onLoad(videoInfo)
+        onParsedChanged(videoInfo)
     }
 }

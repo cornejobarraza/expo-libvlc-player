@@ -7,7 +7,7 @@ private let stoppedEvent = "onStopped"
 private let endedEvent = "onEnded"
 private let errorEvent = "onError"
 private let positionChangedEvent = "onPositionChanged"
-private let loadEvent = "onLoad"
+private let parsedChangedEvent = "onParsedChanged"
 private let backgroundEvent = "onBackground"
 
 let playerEvents = [
@@ -18,7 +18,7 @@ let playerEvents = [
     endedEvent,
     errorEvent,
     positionChangedEvent,
-    loadEvent,
+    parsedChangedEvent,
     backgroundEvent,
 ]
 
@@ -103,11 +103,11 @@ public class LibVlcPlayerModule: Module {
         }
 
         OnAppEntersForeground {
-            MediaPlayerManager.shared.onAppForegrounded()
+            MediaPlayerManager.shared.onAppForeground()
         }
 
         OnAppEntersBackground {
-            MediaPlayerManager.shared.onAppBackgrounded()
+            MediaPlayerManager.shared.onAppBackground()
         }
     }
 }

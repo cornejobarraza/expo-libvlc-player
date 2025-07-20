@@ -48,7 +48,7 @@ class LibVlcPlayerView(
     internal val onEnded by EventDispatcher()
     internal val onError by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
-    internal val onLoad by EventDispatcher<WritableMap>()
+    internal val onParsedChanged by EventDispatcher<WritableMap>()
     internal val onBackground by EventDispatcher()
 
     init {

@@ -20,7 +20,7 @@ class MediaPlayerManager {
         view.destroyPlayer()
     }
 
-    func onAppForegrounded() {
+    func onAppForeground() {
         for view in views.allObjects {
             let background = ["background": false]
             view.onBackground(background)
@@ -39,7 +39,7 @@ class MediaPlayerManager {
         }
     }
 
-    func onAppBackgrounded() {
+    func onAppBackground() {
         for view in views.allObjects {
             let background = ["background": true]
             view.onBackground(background)

@@ -12,7 +12,7 @@ private const val STOPPED_EVENT = "onStopped"
 private const val ENDED_EVENT = "onEnded"
 private const val ERROR_EVENT = "onError"
 private const val POSITION_CHANGED_EVENT = "onPositionChanged"
-private const val LOAD_EVENT = "onLoad"
+private const val PARSED_CHANGED_EVENT = "onParsedChanged"
 private const val BACKGROUND_EVENT = "onBackground"
 
 val playerEvents =
@@ -24,7 +24,7 @@ val playerEvents =
         ENDED_EVENT,
         ERROR_EVENT,
         POSITION_CHANGED_EVENT,
-        LOAD_EVENT,
+        PARSED_CHANGED_EVENT,
         BACKGROUND_EVENT,
     )
 
@@ -114,11 +114,11 @@ class LibVlcPlayerModule : Module() {
             }
 
             OnActivityEntersForeground {
-                MediaPlayerManager.onAppForegrounded()
+                MediaPlayerManager.onAppForeground()
             }
 
             OnActivityEntersBackground {
-                MediaPlayerManager.onAppBackgrounded()
+                MediaPlayerManager.onAppBackground()
             }
         }
 }

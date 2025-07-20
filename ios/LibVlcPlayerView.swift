@@ -33,7 +33,7 @@ class LibVlcPlayerView: ExpoView {
     let onEnded = EventDispatcher()
     let onError = EventDispatcher()
     let onPositionChanged = EventDispatcher()
-    let onLoad = EventDispatcher()
+    let onParsedChanged = EventDispatcher()
     let onBackground = EventDispatcher()
 
     required init(appContext: AppContext? = nil) {

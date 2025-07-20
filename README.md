@@ -132,7 +132,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 | `onEnded`           | Called after the `EndReached` player event             |                           |
 | `onError`           | Called after the `EncounteredError` player event       | `{ error: string }`       |
 | `onPositionChanged` | Called after the `PositionChanged` player event        | `{ position: number }`    |
-| `onLoad`            | Called after the `ParsedChanged` media event           | [`VideoInfo`](#videoinfo) |
+| `onParsedChanged`   | Called after the `ParsedChanged` media event           | [`VideoInfo`](#videoinfo) |
 | `onBackground`      | Called after the player enters or exits the background | `{ background: boolean }` |
 
 ### Player types
@@ -142,7 +142,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 ```JSON
 {
   "uri": "file://path/to/subtitle.srt",
-  "type": "subtitle",
+  "type": "subtitle"
 }
 ```
 
@@ -152,7 +152,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 {
   "audio": 1,
   "video": 2,
-  "subtitle": -1,
+  "subtitle": -1
 }
 ```
 

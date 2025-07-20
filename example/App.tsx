@@ -67,7 +67,7 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isBackgrounded, setIsBackgrounded] = useState<boolean>(false);
   const [isSeekable, setIsSeekable] = useState<boolean>(false);
-  const [hasLoaded, setHasLoaded] = useState<boolean | null>(null);
+  const [hasParsed, setHasParsed] = useState<boolean | null>(null);
 
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -128,16 +128,16 @@ export default function App() {
       setIsPlaying(false);
       setIsBackgrounded(false);
       setIsSeekable(false);
-      setHasLoaded(false);
+      setHasParsed(false);
     },
     onPositionChanged: ({ position }: PositionChanged) => {
       setIsBuffering(false);
       setPosition(position);
     },
-    onLoad: ({ duration, seekable }: VideoInfo) => {
+    onParsedChanged: ({ duration, seekable }: VideoInfo) => {
       setDuration(duration);
       setIsSeekable(seekable);
-      setHasLoaded(true);
+      setHasParsed(true);
     },
     onBackground: ({ background }: Background) => {
       if (isPlaying) {
@@ -181,7 +181,7 @@ export default function App() {
   const handleMute = () => setMuted((prev) => !prev);
 
   const shouldShowLoader =
-    (hasLoaded === null || isBuffering) && !isBackgrounded;
+    (hasParsed === null || isBuffering) && !isBackgrounded;
 
   const shouldShowThumbnail =
     !!thumbnail &&
@@ -255,18 +255,18 @@ export default function App() {
             thumbTintColor="darkred"
             minimumTrackTintColor="red"
             maximumTrackTintColor="indianred"
-            disabled={!isSeekable || hasLoaded === null}
+            disabled={!isSeekable || hasParsed === null}
           />
           <View style={styles.row}>
             <Button
               title={!isPlaying ? "Play" : "Pause"}
               onPress={handlePlayPause}
-              disabled={hasLoaded === null}
+              disabled={hasParsed === null}
             />
             <Button
               title="Stop"
               onPress={handleStopPlayer}
-              disabled={hasLoaded === null}
+              disabled={hasParsed === null}
             />
             <Button
               title={
@@ -277,7 +277,7 @@ export default function App() {
                     : "Repeat"
               }
               onPress={handleRepeatChange}
-              disabled={duration <= 0 || hasLoaded === null}
+              disabled={duration <= 0 || hasParsed === null}
             />
           </View>
           <View style={styles.row}>
@@ -285,21 +285,21 @@ export default function App() {
               title="-"
               onPress={() => handleVolumeChange("decrease")}
               disabled={
-                volume === MIN_VOLUME_LEVEL || muted || hasLoaded === null
+                volume === MIN_VOLUME_LEVEL || muted || hasParsed === null
               }
             />
             <Button
               title={!muted ? "Mute" : "Unmute"}
               onPress={handleMute}
               disabled={
-                (volume === MIN_VOLUME_LEVEL && !muted) || hasLoaded === null
+                (volume === MIN_VOLUME_LEVEL && !muted) || hasParsed === null
               }
             />
             <Button
               title="+"
               onPress={() => handleVolumeChange("increase")}
               disabled={
-                volume === MAX_VOLUME_LEVEL || muted || hasLoaded === null
+                volume === MAX_VOLUME_LEVEL || muted || hasParsed === null
               }
             />
           </View>

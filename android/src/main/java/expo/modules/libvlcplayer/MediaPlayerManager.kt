@@ -28,7 +28,7 @@ object MediaPlayerManager {
         view.destroyPlayer()
     }
 
-    fun onAppForegrounded() {
+    fun onAppForeground() {
         views.forEach { playerView ->
             playerView.get()?.let { view ->
                 val background = mapOf("background" to false)
@@ -54,7 +54,7 @@ object MediaPlayerManager {
         }
     }
 
-    fun onAppBackgrounded() {
+    fun onAppBackground() {
         views.forEach { playerView ->
             playerView.get()?.let { view ->
                 val background = mapOf("background" to true)
