@@ -54,6 +54,4 @@ yarn-error.log
 # Other
 .eslintrc.js
 !plugin/build/
-
-# typescript
 *.tsbuildinfo
