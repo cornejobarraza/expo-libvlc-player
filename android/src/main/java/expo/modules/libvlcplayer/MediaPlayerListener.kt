@@ -10,10 +10,6 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                 when (event.type) {
                     Event.Buffering -> {
                         onBuffering(mapOf())
-                    }
-
-                    Event.Playing -> {
-                        onPlaying(mapOf())
 
                         if (player.getPosition() == 0f) {
                             setPlayerTracks()
@@ -22,6 +18,10 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                                 player.setTime(time.toLong())
                             }
                         }
+                    }
+
+                    Event.Playing -> {
+                        onPlaying(mapOf())
 
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
                     }
@@ -35,20 +35,19 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     Event.Stopped -> {
                         onStopped(mapOf())
 
-                        val position = mapOf("position" to 0f)
-                        onPositionChanged(position)
+                        player.setPosition(0f)
 
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
                     }
 
                     Event.EndReached -> {
                         onEnded(mapOf())
+
                         player.stop()
 
                         val canRepeat = !options.hasRepeatOption() && repeat
 
                         if (canRepeat) {
-                            onRepeat(mapOf())
                             player.play()
                         }
                     }

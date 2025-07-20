@@ -7,8 +7,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         switch player.state {
         case .buffering:
             onBuffering([:])
-        case .playing:
-            onPlaying([:])
 
             if player.position == 0.0 {
                 setPlayerTracks()
@@ -17,6 +15,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     player.time = VLCTime(int: Int32(time))
                 }
             }
+        case .playing:
+            onPlaying([:])
 
             MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .paused:
@@ -26,18 +26,17 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         case .stopped:
             onStopped([:])
 
-            let position = ["position": 0.0]
-            onPositionChanged(position)
+            player.position = 0.0
 
             MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .ended:
             onEnded([:])
+
             player.stop()
 
             let canRepeat = !options.hasRepeatOption() && shouldRepeat
 
             if canRepeat {
-                onRepeat([:])
                 player.play()
             }
         case .error:
@@ -49,9 +48,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     }
 
     func mediaPlayerTimeChanged(_: Notification) {
-        guard let player = mediaPlayer else { return }
-
-        let position = ["position": player.position]
+        let position = ["position": mediaPlayer?.position]
         onPositionChanged(position)
     }
 }
