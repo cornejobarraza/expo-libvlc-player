@@ -120,9 +120,7 @@ export default function App() {
       setIsBackgrounded(false);
       setIsBuffering(false);
       setIsPlaying(false);
-    },
-    onRepeat: () => {
-      setRepeat((prev) => (prev !== "once" ? prev : false));
+      setRepeat((prev) => prev !== "once");
     },
     onError: ({ error }: Error) => {
       Alert.alert("Error", error);

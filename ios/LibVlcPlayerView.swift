@@ -31,7 +31,6 @@ class LibVlcPlayerView: ExpoView {
     let onPaused = EventDispatcher()
     let onStopped = EventDispatcher()
     let onEnded = EventDispatcher()
-    let onRepeat = EventDispatcher()
     let onError = EventDispatcher()
     let onPositionChanged = EventDispatcher()
     let onLoad = EventDispatcher()
@@ -161,12 +160,10 @@ class LibVlcPlayerView: ExpoView {
             onError(error)
         }
 
-        guard let player = mediaPlayer else { return }
-
         let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
         userVolume = newVolume
 
-        player.audio?.volume = Int32(newVolume)
+        mediaPlayer?.audio?.volume = Int32(newVolume)
         MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
     }
 
@@ -176,20 +173,16 @@ class LibVlcPlayerView: ExpoView {
             onError(error)
         }
 
-        guard let player = mediaPlayer else { return }
-
         let newVolume = !mute ?
             max(playerVolumeStep, min(maxPlayerVolume, userVolume)) :
             minPlayerVolume
 
-        player.audio?.volume = Int32(newVolume)
+        mediaPlayer?.audio?.volume = Int32(newVolume)
         MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
     }
 
     func setRate(_ rate: Float) {
-        guard let player = mediaPlayer else { return }
-
-        player.rate = rate
+        mediaPlayer?.rate = rate
     }
 
     func setTime(_ time: Int) {
@@ -206,11 +199,10 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func setAspectRatio(_ aspectRatio: String?) {
-        guard let player = mediaPlayer,
-              let aspectRatio = aspectRatio else { return }
+        guard let aspectRatio = aspectRatio else { return }
 
         aspectRatio.withCString { cString in
-            player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+            mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
         }
     }
 

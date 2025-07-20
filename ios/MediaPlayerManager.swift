@@ -66,15 +66,9 @@ class MediaPlayerManager {
         var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession.categoryOptions
 
         let isOutputtingAudio = views.allObjects.contains { view in
-            if let isPlaying = view.mediaPlayer?.isPlaying,
-               let isMuted = view.mediaPlayer?.audio?.isMuted
-            {
-                if isPlaying, !isMuted {
-                    return true
-                }
-            }
+            guard let player = view.mediaPlayer else { return false }
 
-            return false
+            return player.isPlaying && player.audio?.isMuted == false
         }
 
         let shouldMixOverride = audioMixingMode == .mixWithOthers

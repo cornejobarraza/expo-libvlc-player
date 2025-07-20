@@ -57,11 +57,6 @@ export type EndedListener = () => void;
 /**
  * @hidden
  */
-export type RepeatListener = () => void;
-
-/**
- * @hidden
- */
 export type ErrorListener = (event: { nativeEvent: Error }) => void;
 
 export type Error = { error: string };
@@ -141,7 +136,6 @@ export interface LibVlcPlayerViewNativeProps {
   onPaused?: PausedListener;
   onStopped?: StoppedListener;
   onEnded?: EndedListener;
-  onRepeat?: RepeatListener;
   onError?: ErrorListener;
   onPositionChanged?: PositionChangedListener;
   onLoad?: LoadListener;
@@ -282,10 +276,6 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Called after the `EndReached` player event
    */
   onEnded?: () => void;
-  /**
-   * Called after the player repeats the media
-   */
-  onRepeat?: () => void;
   /**
    * Called after the `EncounteredError` player event
    */
