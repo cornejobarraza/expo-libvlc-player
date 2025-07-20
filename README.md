@@ -94,32 +94,32 @@ See the [Example App](example/App.tsx) for additional usage.
 
 ### Player methods
 
-| Method    | Description                             | Params                                              |
-| --------- | --------------------------------------- | --------------------------------------------------- |
-| `play()`  | Starts playback of the current player   |                                                     |
-| `pause()` | Pauses playback of the current player   |                                                     |
-| `stop()`  | Stops playback of the current player    |                                                     |
-| `seek()`  | Sets the position of the current player | `position` - Must be a float number between 0 and 1 |
+| Method    | Description                                                                 | Params             |
+| --------- | --------------------------------------------------------------------------- | ------------------ |
+| `play()`  | Starts playback of the current player                                       |                    |
+| `pause()` | Pauses playback of the current player                                       |                    |
+| `stop()`  | Stops playback of the current player                                        |                    |
+| `seek()`  | Changes position of the current player. Must be a float between `0` and `1` | `position: number` |
 
 ### Player props
 
 The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 
-| Prop               | Description                                                                               | Default  |
-| ------------------ | ----------------------------------------------------------------------------------------- | -------- |
-| `uri`              | Sets the URI of the media to be played                                                    |          |
-| `options`          | Sets the VLC options to initialize the player with                                        | `[]`     |
-| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                 |          |
-| `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more        |          |
-| `volume`           | Sets the player volume. Must be an integer number between `0` and `100`                   | `100`    |
-| `mute`             | Sets the player volume to `0`                                                             | `false`  |
-| `rate`             | Sets the player rate. Must be a float number between `0` and `1`                          | `1`      |
-| `time`             | Sets the initial player time. Must be an integer number in milliseconds                   | `0`      |
-| `repeat`           | Determines whether the player should repeat the media after playback ends                 | `false`  |
-| `aspectRatio`      | Sets the player aspect ratio. Must be a valid `string`                                    |          |
-| `audioMixingMode`  | Determines how the player will interact with other audio playing in the system            | `"auto"` |
-| `playInBackground` | Determines whether the player should continue playing after the app enters the background | `false`  |
-| `autoplay`         | Autoplays the media once created                                                          | `true`   |
+| Prop               | Description                                                                         | Default  |
+| ------------------ | ----------------------------------------------------------------------------------- | -------- |
+| `uri`              | Sets the URI of the media to be played                                              |          |
+| `options`          | Sets the VLC options to initialize the player with                                  | `[]`     |
+| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more           |          |
+| `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more  |          |
+| `volume`           | Sets the player volume. Must be an integer between `0` and `100`                    | `100`    |
+| `mute`             | Sets the player volume to `0` when `true`                                           | `false`  |
+| `rate`             | Sets the player rate. Must be a float between `0` and `1`                           | `1`      |
+| `time`             | Sets the initial player time. Must be an integer in milliseconds                    | `0`      |
+| `repeat`           | Determines whether the player should repeat the media after playback ends           | `false`  |
+| `aspectRatio`      | Sets the player aspect ratio. Must be a valid format                                |          |
+| `audioMixingMode`  | Determines how the player will interact with other audio playing in the system      | `"auto"` |
+| `playInBackground` | Determines whether the player should continue playing after entering the background | `false`  |
+| `autoplay`         | Determines whether the media should autoplay once created                           | `true`   |
 
 #### Callback props
 

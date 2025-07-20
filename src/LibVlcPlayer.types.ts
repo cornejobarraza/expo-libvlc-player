@@ -20,9 +20,9 @@ export interface LibVlcPlayerViewRef {
    */
   readonly stop: () => Promise<void>;
   /**
-   * Sets the position of the current player
+   * Changes position of the current player
    *
-   * @param position - Must be a float number between `0` and `1`
+   * @param position - Must be a float between `0` and `1`
    *
    * @returns A promise which resolves to `void`
    */
@@ -203,13 +203,13 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   tracks?: Tracks;
   /**
-   * Sets the player volume. Must be an integer number between `0` and `100`
+   * Sets the player volume. Must be an integer between `0` and `100`
    *
    * @default 100
    */
   volume?: number;
   /**
-   * Sets the player volume to `0`
+   * Sets the player volume to `0` when `true`
    *
    * @default false
    */
@@ -221,7 +221,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   rate?: number;
   /**
-   * Sets the initial player time. Must be an integer number in milliseconds
+   * Sets the initial player time. Must be an integer in milliseconds
    *
    * @default 0
    */
@@ -233,7 +233,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   repeat?: boolean;
   /**
-   * Sets the player aspect ratio. Must be a valid string
+   * Sets the player aspect ratio. Must be a valid format
    *
    * @example "16:9"
    */
@@ -245,13 +245,13 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   audioMixingMode?: AudioMixingMode;
   /**
-   * Determines whether the player should continue playing after the app enters the background
+   * Determines whether the player should continue playing after entering the background
    *
    * @default false
    */
   playInBackground?: boolean;
   /**
-   * Autoplays the media once created
+   * Determines whether the media should autoplay once created
    *
    * @default true
    */
