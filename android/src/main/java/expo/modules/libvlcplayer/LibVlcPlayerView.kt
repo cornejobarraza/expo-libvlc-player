@@ -65,13 +65,13 @@ class LibVlcPlayerView(
         destroyPlayer()
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
+        mediaPlayer!!.attachViews(playerView, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
         setMediaPlayerListener()
 
         try {
             media = Media(libVLC, Uri.parse(uri))
             mediaPlayer!!.setMedia(media)
             setMediaListener()
-            attachPlayer()
         } catch (_: Exception) {
             val error = mapOf("error" to "Invalid URI, media could not be set")
             onEncounteredError(error)

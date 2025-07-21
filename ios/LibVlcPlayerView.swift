@@ -57,6 +57,7 @@ class LibVlcPlayerView: ExpoView {
 
         destroyPlayer()
         mediaPlayer = VLCMediaPlayer(options: options)
+        mediaPlayer!.drawable = playerView
         mediaPlayer!.delegate = self
 
         guard let url = URL(string: uri) else {
@@ -67,7 +68,6 @@ class LibVlcPlayerView: ExpoView {
 
         mediaPlayer!.media = VLCMedia(url: url)
         mediaPlayer!.media!.delegate = self
-        mediaPlayer!.drawable = playerView
 
         addPlayerSlaves()
 

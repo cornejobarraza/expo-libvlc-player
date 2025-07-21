@@ -13,13 +13,13 @@ import {
   ActivityIndicator,
   Alert,
   Button,
+  Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
-  useWindowDimensions,
 } from "react-native";
 
 function msToMinutesSeconds(duration: number) {
@@ -72,8 +72,7 @@ export default function App() {
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { width } = useWindowDimensions();
-  const videoWidth = width * 0.8;
+  const videoWidth = Dimensions.get("screen").width * 0.8;
   const videoHeight = videoWidth / ASPECT_RATIO;
 
   useEffect(() => {
