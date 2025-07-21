@@ -35,7 +35,8 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     Event.Stopped -> {
                         onStopped(mapOf())
 
-                        player.setPosition(0f)
+                        val position = mapOf("position" to 0f)
+                        onPositionChanged(position)
 
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
                     }

@@ -26,7 +26,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         case .stopped:
             onStopped([:])
 
-            player.position = 0.0
+            let position = ["position": 0.0]
+            onPositionChanged(position)
 
             MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .ended:
