@@ -25,7 +25,7 @@ class LibVlcPlayerView: ExpoView {
     var playInBackground: Bool = false
     private var autoplay: Bool = true
 
-    var videoLength: Int = 0
+    var videoLength: Int32 = 0
     private var userVolume: Int = maxPlayerVolume
 
     let onBuffering = EventDispatcher()
