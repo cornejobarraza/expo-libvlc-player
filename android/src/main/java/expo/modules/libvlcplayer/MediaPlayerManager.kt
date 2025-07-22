@@ -5,7 +5,7 @@ import expo.modules.kotlin.exception.Exceptions
 import java.lang.ref.WeakReference
 
 object MediaPlayerManager {
-    private var playerViews: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
+    internal var playerViews: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
 
     lateinit var audioFocusManager: AudioFocusManager
 
@@ -13,7 +13,7 @@ object MediaPlayerManager {
         val context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
 
         if (!this::audioFocusManager.isInitialized) {
-            audioFocusManager = AudioFocusManager(appContext, playerViews)
+            audioFocusManager = AudioFocusManager(appContext)
         }
     }
 

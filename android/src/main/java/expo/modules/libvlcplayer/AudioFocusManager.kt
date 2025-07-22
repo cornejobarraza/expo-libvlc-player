@@ -10,11 +10,9 @@ import expo.modules.kotlin.exception.CodedException
 import expo.modules.libvlcplayer.enums.AudioMixingMode
 import kotlinx.coroutines.launch
 import org.videolan.libvlc.MediaPlayer
-import java.lang.ref.WeakReference
 
 class AudioFocusManager(
     private val appContext: AppContext,
-    private var playerViews: MutableList<WeakReference<LibVlcPlayerView>>,
 ) : AudioManager.OnAudioFocusChangeListener {
     private val audioManager by lazy {
         appContext.reactContext?.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: run {
@@ -25,8 +23,8 @@ class AudioFocusManager(
     private var currentFocusRequest: AudioFocusRequest? = null
     private val anyPlayerRequiresFocus: Boolean
         get() =
-            playerViews.toList().any { weakView ->
-                weakView.get()?.let { view ->
+            MediaPlayerManager.playerViews.toList().any { playerView ->
+                playerView.get()?.let { view ->
                     playerRequiresFocus(view.mediaPlayer)
                 } ?: false
             }
@@ -38,7 +36,7 @@ class AudioFocusManager(
 
     private fun findAudioMixingMode(): AudioMixingMode {
         val mixingModes =
-            playerViews.toList().mapNotNull { view ->
+            MediaPlayerManager.playerViews.toList().mapNotNull { view ->
                 view.get()?.takeIf { it.mediaPlayer?.isPlaying() == true }?.audioMixingMode
             }
 
@@ -118,7 +116,7 @@ class AudioFocusManager(
         when (focusChange) {
             AudioManager.AUDIOFOCUS_LOSS -> {
                 appContext.mainQueue.launch {
-                    playerViews.forEach { view ->
+                    MediaPlayerManager.playerViews.forEach { view ->
                         pausePlayerIfUnmuted(view.get()?.mediaPlayer)
                     }
 
@@ -134,7 +132,7 @@ class AudioFocusManager(
                 }
 
                 appContext.mainQueue.launch {
-                    playerViews.forEach { view ->
+                    MediaPlayerManager.playerViews.forEach { view ->
                         pausePlayerIfUnmuted(view.get()?.mediaPlayer)
                     }
 
@@ -146,8 +144,8 @@ class AudioFocusManager(
                 val audioMixingMode = findAudioMixingMode()
 
                 appContext.mainQueue.launch {
-                    playerViews.forEach { weakView ->
-                        weakView.get()?.let { view ->
+                    MediaPlayerManager.playerViews.forEach { playerView ->
+                        playerView.get()?.let { view ->
                             view.mediaPlayer?.let { player ->
                                 if (audioMixingMode == AudioMixingMode.DO_NOT_MIX) {
                                     pausePlayerIfUnmuted(player)
@@ -164,8 +162,8 @@ class AudioFocusManager(
 
             AudioManager.AUDIOFOCUS_GAIN -> {
                 appContext.mainQueue.launch {
-                    playerViews.forEach { weakView ->
-                        weakView.get()?.let { view ->
+                    MediaPlayerManager.playerViews.forEach { playerView ->
+                        playerView.get()?.let { view ->
                             view.mediaPlayer?.let { player ->
                                 if (player.getVolume() > MIN_PLAYER_VOLUME) {
                                     player.setVolume(view.userVolume)
@@ -179,9 +177,9 @@ class AudioFocusManager(
     }
 
     private fun pausePlayerIfUnmuted(player: MediaPlayer?) {
-        player?.let { mediaPlayer ->
-            if (mediaPlayer.getVolume() > MIN_PLAYER_VOLUME) {
-                mediaPlayer.pause()
+        player?.let { mPlayer ->
+            if (mPlayer.getVolume() > MIN_PLAYER_VOLUME) {
+                mPlayer.pause()
             }
         }
     }
