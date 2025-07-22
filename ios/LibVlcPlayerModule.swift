@@ -26,6 +26,10 @@ public class LibVlcPlayerModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ExpoLibVlcPlayer")
 
+        OnDestroy {
+            MediaPlayerManager.shared.onModuleDestroyed()
+        }
+
         View(LibVlcPlayerView.self) {
             Events(playerEvents)
 

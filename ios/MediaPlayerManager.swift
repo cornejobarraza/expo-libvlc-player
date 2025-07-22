@@ -9,6 +9,12 @@ class MediaPlayerManager {
     private static let managerQueue = DispatchQueue(label: "com.expo.libvlcplayer.manager.managerQueue")
     private let playerViews = NSHashTable<LibVlcPlayerView>.weakObjects()
 
+    func onModuleDestroyed() {
+        for view in playerViews.allObjects {
+            view.destroyPlayer()
+        }
+    }
+
     func registerPlayerView(view: LibVlcPlayerView) {
         playerViews.add(view)
         setAppropriateAudioSessionOrWarn()
@@ -17,7 +23,6 @@ class MediaPlayerManager {
     func unregisterPlayerView(view: LibVlcPlayerView) {
         playerViews.remove(view)
         setAppropriateAudioSessionOrWarn()
-        view.destroyPlayer()
     }
 
     func onAppForeground() {

@@ -37,6 +37,10 @@ class LibVlcPlayerModule : Module() {
                 MediaPlayerManager.onModuleCreated(appContext)
             }
 
+            OnDestroy {
+                MediaPlayerManager.onModuleDestroyed()
+            }
+
             View(LibVlcPlayerView::class) {
                 Events(playerEvents)
 

@@ -17,6 +17,12 @@ object MediaPlayerManager {
         }
     }
 
+    fun onModuleDestroyed() {
+        playerViews.forEach { playerView ->
+            playerView.get()?.destroyPlayer()
+        }
+    }
+
     fun registerPlayerView(view: LibVlcPlayerView) {
         playerViews.find { it.get() == view } ?: run { playerViews.add(WeakReference(view)) }
         audioFocusManager.updateAudioFocus()
@@ -25,7 +31,6 @@ object MediaPlayerManager {
     fun unregisterPlayerView(view: LibVlcPlayerView) {
         playerViews.removeAll { it.get() == view }
         audioFocusManager.updateAudioFocus()
-        view.destroyPlayer()
     }
 
     fun onAppForeground() {
