@@ -5,7 +5,6 @@ import {
   type Error,
   type Position,
   type VideoInfo,
-  type Background,
 } from "expo-libvlc-player";
 import { unlockAsync } from "expo-screen-orientation";
 import { getThumbnailAsync } from "expo-video-thumbnails";
@@ -69,7 +68,7 @@ export default function App() {
   const [isStopped, setIsStopped] = useState<boolean>(false);
   const [isBackgrounded, setIsBackgrounded] = useState<boolean>(false);
   const [isSeekable, setIsSeekable] = useState<boolean>(false);
-  const [hasParsed, setHasParsed] = useState<boolean | null>(null);
+  const [isParsed, setIsParsed] = useState<boolean | null>(null);
 
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -115,7 +114,6 @@ export default function App() {
       );
     },
     onPlaying: () => {
-      setIsBackgrounded(false);
       setIsBuffering(false);
       setIsPlaying(true);
       setIsStopped(false);
@@ -126,7 +124,6 @@ export default function App() {
       setIsStopped(false);
     },
     onStopped: () => {
-      setIsBackgrounded(false);
       setIsBuffering(false);
       setIsPlaying(false);
       setIsStopped(true);
@@ -139,38 +136,36 @@ export default function App() {
       setIsStopped(false);
       setIsBackgrounded(false);
       setIsSeekable(false);
-      setHasParsed(false);
+      setIsParsed(false);
     },
     onPositionChanged: ({ position }: Position) => {
-      setIsBuffering(false);
       setPosition(position);
+      setIsBuffering(false);
     },
     onParsedChanged: ({ duration, seekable }: VideoInfo) => {
       setDuration(duration);
       setIsSeekable(seekable);
-      setHasParsed(true);
+      setIsParsed(true);
     },
-    onBackground: ({ background }: Background) => {
-      if (isPlaying) {
-        setIsBackgrounded(background);
-      } else {
-        setIsBackgrounded(true);
-      }
+    onBackground: () => {
+      setIsBackgrounded(true);
     },
   };
 
-  const handleSlidingComplete = (position: number) =>
+  const handleSlidingComplete = (position: number) => {
     playerViewRef.current?.seek(position);
+    setIsBackgrounded(false);
+  };
 
   const handlePlayPause = () => {
-    if (!isPlaying) {
-      playerViewRef.current?.play();
-    } else {
-      playerViewRef.current?.pause();
-    }
+    playerViewRef.current?.[!isPlaying ? "play" : "pause"]();
+    setIsBackgrounded(false);
   };
 
-  const handleStopPlayer = () => playerViewRef.current?.stop();
+  const handleStopPlayer = () => {
+    playerViewRef.current?.stop();
+    setIsBackgrounded(false);
+  };
 
   const handleRepeatChange = () =>
     setRepeat((prev) => (!prev ? "once" : prev === "once"));
@@ -192,7 +187,7 @@ export default function App() {
   const handleMute = () => setMuted((prev) => !prev);
 
   const shouldShowLoader =
-    (hasParsed === null || isBuffering) && !isBackgrounded;
+    (isParsed === null || isBuffering) && !isBackgrounded;
 
   const shouldShowThumbnail =
     !!thumbnail &&
@@ -266,18 +261,18 @@ export default function App() {
             thumbTintColor="darkred"
             minimumTrackTintColor="red"
             maximumTrackTintColor="indianred"
-            disabled={!isSeekable || hasParsed === null}
+            disabled={!isSeekable || isParsed === null}
           />
           <View style={styles.row}>
             <Button
               title={!isPlaying ? "Play" : "Pause"}
               onPress={handlePlayPause}
-              disabled={hasParsed === null}
+              disabled={isParsed === null}
             />
             <Button
               title="Stop"
               onPress={handleStopPlayer}
-              disabled={hasParsed === null}
+              disabled={isParsed === null}
             />
             <Button
               title={
@@ -288,7 +283,7 @@ export default function App() {
                     : "Repeat"
               }
               onPress={handleRepeatChange}
-              disabled={duration <= 0 || hasParsed === null}
+              disabled={duration <= 0 || isParsed === null}
             />
           </View>
           <View style={styles.row}>
@@ -296,21 +291,21 @@ export default function App() {
               title="-"
               onPress={() => handleVolumeChange("decrease")}
               disabled={
-                volume === MIN_VOLUME_LEVEL || muted || hasParsed === null
+                volume === MIN_VOLUME_LEVEL || muted || isParsed === null
               }
             />
             <Button
               title={!muted ? "Mute" : "Unmute"}
               onPress={handleMute}
               disabled={
-                (volume === MIN_VOLUME_LEVEL && !muted) || hasParsed === null
+                (volume === MIN_VOLUME_LEVEL && !muted) || isParsed === null
               }
             />
             <Button
               title="+"
               onPress={() => handleVolumeChange("increase")}
               disabled={
-                volume === MAX_VOLUME_LEVEL || muted || hasParsed === null
+                volume === MAX_VOLUME_LEVEL || muted || isParsed === null
               }
             />
           </View>

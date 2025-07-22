@@ -36,9 +36,6 @@ object MediaPlayerManager {
     fun onAppForeground() {
         playerViews.forEach { playerView ->
             playerView.get()?.let { view ->
-                val background = mapOf("background" to false)
-                view.onBackground(background)
-
                 view.mediaPlayer?.let { player ->
                     if (!player.isPlaying()) {
                         val time = player.getTime()
@@ -56,8 +53,7 @@ object MediaPlayerManager {
     fun onAppBackground() {
         playerViews.forEach { playerView ->
             playerView.get()?.let { view ->
-                val background = mapOf("background" to true)
-                view.onBackground(background)
+                view.onBackground(mapOf())
 
                 view.mediaPlayer?.let { player ->
                     val shouldPause = !view.playInBackground && player.isPlaying()

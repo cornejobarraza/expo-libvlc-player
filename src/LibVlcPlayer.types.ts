@@ -98,9 +98,7 @@ export interface VideoInfo {
 /**
  * @hidden
  */
-export type BackgroundListener = (event: { nativeEvent: Background }) => void;
-
-export type Background = { background: boolean };
+export type BackgroundListener = () => void;
 
 export interface Slave {
   uri: string;
@@ -289,7 +287,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   onParsedChanged?: (event: VideoInfo) => void;
   /**
-   * Called after the player enters or exits the background
+   * Called after the player enters the background
    */
-  onBackground?: (event: Background) => void;
+  onBackground?: () => void;
 }

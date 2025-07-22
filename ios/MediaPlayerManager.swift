@@ -27,9 +27,6 @@ class MediaPlayerManager {
 
     func onAppForeground() {
         for view in playerViews.allObjects {
-            let background = ["background": false]
-            view.onBackground(background)
-
             guard let player = view.mediaPlayer else { continue }
 
             if !player.isPlaying {
@@ -45,8 +42,7 @@ class MediaPlayerManager {
 
     func onAppBackground() {
         for view in playerViews.allObjects {
-            let background = ["background": true]
-            view.onBackground(background)
+            view.onBackground([:])
 
             guard let player = view.mediaPlayer else { continue }
 
