@@ -64,18 +64,18 @@ class LibVlcPlayerView: ExpoView {
         addPlayerSlaves()
 
         if volume != maxPlayerVolume {
-            mediaPlayer!.volume = Int32(volume)
+            mediaPlayer!.audio?.volume = Int32(volume)
         }
 
         if mute {
-            mediaPlayer!.volume = Int32(minPlayerVolume)
+            mediaPlayer!.audio?.volume = Int32(minPlayerVolume)
         }
 
         if rate != defaultPlayerRate {
             mediaPlayer!.rate = rate
         }
 
-        if aspectRatio != nil {
+        if let aspectRatio = aspectRatio {
             aspectRatio.withCString { cString in
                 mediaPlayer!.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
             }
