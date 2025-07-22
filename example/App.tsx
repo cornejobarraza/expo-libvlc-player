@@ -7,6 +7,7 @@ import {
   type VideoInfo,
   type Background,
 } from "expo-libvlc-player";
+import { unlockAsync } from "expo-screen-orientation";
 import { getThumbnailAsync } from "expo-video-thumbnails";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import {
@@ -75,6 +76,12 @@ export default function App() {
 
   const videoWidth = Dimensions.get("screen").width * 0.8;
   const videoHeight = videoWidth / ASPECT_RATIO;
+
+  useEffect(() => {
+    unlockOrientation();
+  }, []);
+
+  const unlockOrientation = async () => unlockAsync();
 
   useEffect(() => {
     generateThumbnail();
