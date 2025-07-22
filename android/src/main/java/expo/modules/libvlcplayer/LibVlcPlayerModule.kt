@@ -69,7 +69,7 @@ class LibVlcPlayerModule : Module() {
                 }
 
                 Prop("time") { view: LibVlcPlayerView, time: Int? ->
-                    view.time = time ?: DEFAULT_PLAYER_START
+                    view.time = time ?: DEFAULT_PLAYER_TIME
                 }
 
                 Prop("repeat") { view: LibVlcPlayerView, repeat: Boolean? ->

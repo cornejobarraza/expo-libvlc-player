@@ -11,7 +11,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             if player.position == 0.0 {
                 setPlayerTracks()
 
-                if player.isSeekable, time != defaultPlayerStart {
+                if time != defaultPlayerTime {
                     player.time = VLCTime(int: Int32(time))
                 }
             }
@@ -25,6 +25,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .stopped:
             onStopped([:])
+
+            time = defaultPlayerTime
 
             let position = ["position": 0.0]
             onPositionChanged(position)

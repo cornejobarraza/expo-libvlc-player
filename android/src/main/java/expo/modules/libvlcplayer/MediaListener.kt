@@ -45,7 +45,13 @@ fun LibVlcPlayerView.setMediaListener() {
 
                         val video = player.getCurrentVideoTrack()
                         val ratio = player.getAspectRatio()
-                        val length = player.getLength()
+                        val pLength = player.getLength()
+                        val length =
+                            if (pLength != -1L) {
+                                pLength
+                            } else {
+                                0L
+                            }
                         val tracks =
                             Arguments.createMap().apply {
                                 putArray("audio", audioTracks)
@@ -65,6 +71,8 @@ fun LibVlcPlayerView.setMediaListener() {
                             }
 
                         onParsedChanged(videoInfo)
+
+                        videoLength = length
                     }
                 }
             },

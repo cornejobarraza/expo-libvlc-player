@@ -16,7 +16,7 @@ import org.videolan.libvlc.util.VLCVideoLayout
 import java.util.UUID
 
 const val DEFAULT_PLAYER_RATE: Float = 1f
-const val DEFAULT_PLAYER_START: Int = 0
+const val DEFAULT_PLAYER_TIME: Int = 0
 const val MIN_PLAYER_VOLUME: Int = 0
 const val MAX_PLAYER_VOLUME: Int = 100
 const val PLAYER_VOLUME_STEP: Int = 10
@@ -37,9 +37,11 @@ class LibVlcPlayerView(
     internal var media: Media? = null
     private var shouldCreate: Boolean = false
 
-    internal var userVolume: Int = MAX_PLAYER_VOLUME
     internal var repeat: Boolean = false
     private var autoplay: Boolean = true
+
+    internal var videoLength: Long = 0L
+    internal var userVolume: Int = MAX_PLAYER_VOLUME
 
     internal val onBuffering by EventDispatcher()
     internal val onPlaying by EventDispatcher()
@@ -211,7 +213,7 @@ class LibVlcPlayerView(
         mediaPlayer?.setRate(rate)
     }
 
-    var time: Int = DEFAULT_PLAYER_START
+    var time: Int = DEFAULT_PLAYER_TIME
         set(value) {
             field = value
         }
@@ -262,9 +264,12 @@ class LibVlcPlayerView(
             if (player.isSeekable()) {
                 player.setPosition(position)
             } else {
-                val error = mapOf("error" to "Media is not seekable")
-                onEncounteredError(error)
+                val time = position * videoLength.toFloat()
+                this.time = time.toInt()
             }
+
+            val userPosition = mapOf("position" to position)
+            onPositionChanged(userPosition)
         }
     }
 

@@ -65,6 +65,7 @@ export default function App() {
 
   const [isBuffering, setIsBuffering] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isStopped, setIsStopped] = useState<boolean>(false);
   const [isBackgrounded, setIsBackgrounded] = useState<boolean>(false);
   const [isSeekable, setIsSeekable] = useState<boolean>(false);
   const [hasParsed, setHasParsed] = useState<boolean | null>(null);
@@ -110,21 +111,25 @@ export default function App() {
       setIsBackgrounded(false);
       setIsBuffering(false);
       setIsPlaying(true);
+      setIsStopped(false);
     },
     onPaused: () => {
       setIsBuffering(false);
       setIsPlaying(false);
+      setIsStopped(false);
     },
     onStopped: () => {
       setIsBackgrounded(false);
       setIsBuffering(false);
       setIsPlaying(false);
-      setRepeat((prev) => prev !== "once");
+      setIsStopped(true);
+      setRepeat((prev) => (prev !== "once" ? prev : false));
     },
     onEncounteredError: ({ error }: Error) => {
       Alert.alert("Error", error);
       setIsBuffering(false);
       setIsPlaying(false);
+      setIsStopped(false);
       setIsBackgrounded(false);
       setIsSeekable(false);
       setHasParsed(false);
@@ -185,7 +190,7 @@ export default function App() {
   const shouldShowThumbnail =
     !!thumbnail &&
     !isPlaying &&
-    (position === MIN_POSITION_VALUE || isBackgrounded);
+    (position === MIN_POSITION_VALUE || isStopped || isBackgrounded);
 
   return (
     <SafeAreaView style={styles.container}>

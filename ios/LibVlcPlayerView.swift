@@ -3,7 +3,7 @@ import MobileVLCKit
 import UIKit
 
 let defaultPlayerRate: Float = 1.0
-let defaultPlayerStart: Int = 0
+let defaultPlayerTime: Int = 0
 let minPlayerVolume: Int = 0
 let maxPlayerVolume: Int = 100
 let playerVolumeStep: Int = 10
@@ -19,12 +19,14 @@ class LibVlcPlayerView: ExpoView {
     var options: [String] = .init()
     private var slaves: [[String: Any]]?
     private var tracks: [String: Any]?
-    private var userVolume: Int = maxPlayerVolume
-    var time: Int = defaultPlayerStart
+    var time: Int = defaultPlayerTime
     var shouldRepeat: Bool = false
     var audioMixingMode: AudioMixingMode = .auto
     var playInBackground: Bool = false
     private var autoplay: Bool = true
+
+    var videoLength: Int = 0
+    private var userVolume: Int = maxPlayerVolume
 
     let onBuffering = EventDispatcher()
     let onPlaying = EventDispatcher()
@@ -238,9 +240,12 @@ class LibVlcPlayerView: ExpoView {
         if player.isSeekable {
             player.position = position
         } else {
-            let error = ["error": "Media is not seekable"]
-            onEncounteredError(error)
+            let time = position * Float(videoLength)
+            player.time = VLCTime(int: Int32(time))
         }
+
+        let userPosition = ["position": position]
+        onPositionChanged(userPosition)
     }
 
     deinit {

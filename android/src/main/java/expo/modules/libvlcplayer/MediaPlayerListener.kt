@@ -14,7 +14,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         if (player.getPosition() == 0f) {
                             setPlayerTracks()
 
-                            if (player.isSeekable() && time != DEFAULT_PLAYER_START) {
+                            if (time != DEFAULT_PLAYER_TIME) {
                                 player.setTime(time.toLong())
                             }
                         }
@@ -34,6 +34,8 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                     Event.Stopped -> {
                         onStopped(mapOf())
+
+                        time = DEFAULT_PLAYER_TIME
 
                         val position = mapOf("position" to 0f)
                         onPositionChanged(position)
