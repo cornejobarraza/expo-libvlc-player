@@ -4,6 +4,7 @@ import UIKit
 
 let defaultPlayerRate: Float = 1.0
 let defaultPlayerTime: Int = 0
+
 let minPlayerVolume: Int = 0
 let maxPlayerVolume: Int = 100
 let playerVolumeStep: Int = 10
@@ -12,18 +13,7 @@ class LibVlcPlayerView: ExpoView {
     private let playerView = UIView()
 
     var mediaPlayer: VLCMediaPlayer?
-
     private var shouldCreate: Bool = false
-
-    private var uri: String = ""
-    var options: [String] = .init()
-    private var slaves: [[String: Any]]?
-    private var tracks: [String: Any]?
-    var time: Int = defaultPlayerTime
-    var shouldRepeat: Bool = false
-    var audioMixingMode: AudioMixingMode = .auto
-    var playInBackground: Bool = false
-    private var autoplay: Bool = true
 
     var videoLength: Int32 = 0
     private var userVolume: Int = maxPlayerVolume
@@ -73,6 +63,24 @@ class LibVlcPlayerView: ExpoView {
 
         addPlayerSlaves()
 
+        if volume != maxPlayerVolume {
+            mediaPlayer!.volume = Int32(volume)
+        }
+
+        if mute {
+            mediaPlayer!.volume = Int32(minPlayerVolume)
+        }
+
+        if rate != defaultPlayerRate {
+            mediaPlayer!.rate = rate
+        }
+
+        if aspectRatio != nil {
+            aspectRatio.withCString { cString in
+                mediaPlayer!.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+            }
+        }
+
         if autoplay {
             mediaPlayer!.play()
         }
@@ -86,18 +94,16 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer = nil
     }
 
-    func setUri(_ uri: String) {
-        let old = self.uri
-        self.uri = uri
-
-        shouldCreate = uri != old
+    var uri: String = "" {
+        didSet {
+            shouldCreate = uri != oldValue
+        }
     }
 
-    func setOptions(_ options: [String]) {
-        let old = self.options
-        self.options = options
-
-        shouldCreate = options != old
+    var options: [String] = .init() {
+        didSet {
+            shouldCreate = options != oldValue
+        }
     }
 
     func addPlayerSlave(_ slave: [String: Any]) {
@@ -124,9 +130,10 @@ class LibVlcPlayerView: ExpoView {
         slaves?.filter { ($0["type"] as? String) == "audio" }.forEach { addPlayerSlave($0) }
     }
 
-    func setSlaves(_ slaves: [[String: Any]]?) {
-        self.slaves = slaves
-        addPlayerSlaves()
+    var slaves: [[String: Any]]? {
+        didSet {
+            addPlayerSlaves()
+        }
     }
 
     func setPlayerTracks() {
@@ -141,86 +148,93 @@ class LibVlcPlayerView: ExpoView {
         player.currentVideoSubTitleIndex = Int32(videoSubTitleIndex)
     }
 
-    func setTracks(_ tracks: [String: Any]?) {
-        if options.hasAudioTrackOption() {
-            let error = ["error": "Audio track selected via options"]
-            onEncounteredError(error)
-        }
+    var tracks: [String: Any]? {
+        didSet {
+            if options.hasAudioTrackOption() {
+                let error = ["error": "Audio track selected via options"]
+                onEncounteredError(error)
+            }
 
-        if options.hasSubtitleTrackOption() {
-            let error = ["error": "Subtitle track selected via options"]
-            onEncounteredError(error)
-        }
+            if options.hasSubtitleTrackOption() {
+                let error = ["error": "Subtitle track selected via options"]
+                onEncounteredError(error)
+            }
 
-        self.tracks = tracks
-        setPlayerTracks()
-    }
-
-    func setVolume(_ volume: Int) {
-        if options.hasAudioOption() {
-            let error = ["error": "Audio disabled via options"]
-            onEncounteredError(error)
-        }
-
-        let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
-        userVolume = newVolume
-
-        mediaPlayer?.audio?.volume = Int32(newVolume)
-        MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
-    }
-
-    func setMute(_ mute: Bool) {
-        if options.hasAudioOption() {
-            let error = ["error": "Audio disabled via options"]
-            onEncounteredError(error)
-        }
-
-        let newVolume = !mute ?
-            max(playerVolumeStep, min(maxPlayerVolume, userVolume)) :
-            minPlayerVolume
-
-        mediaPlayer?.audio?.volume = Int32(newVolume)
-        MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
-    }
-
-    func setRate(_ rate: Float) {
-        mediaPlayer?.rate = rate
-    }
-
-    func setTime(_ time: Int) {
-        self.time = time
-    }
-
-    func setRepeat(_ shouldRepeat: Bool) {
-        if options.hasRepeatOption() {
-            let error = ["error": "Repeat enabled via options"]
-            onEncounteredError(error)
-        }
-
-        self.shouldRepeat = shouldRepeat
-    }
-
-    func setAspectRatio(_ aspectRatio: String?) {
-        guard let aspectRatio = aspectRatio else { return }
-
-        aspectRatio.withCString { cString in
-            mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+            setPlayerTracks()
         }
     }
 
-    func setAudioMixingMode(_ audioMixingMode: AudioMixingMode) {
-        self.audioMixingMode = audioMixingMode
-        MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+    var volume: Int = maxPlayerVolume {
+        didSet {
+            if options.hasAudioOption() {
+                let error = ["error": "Audio disabled via options"]
+                onEncounteredError(error)
+            }
+
+            let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
+            userVolume = newVolume
+
+            mediaPlayer?.audio?.volume = Int32(newVolume)
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+        }
     }
 
-    func setPlayInBackground(_ playInBackground: Bool) {
-        self.playInBackground = playInBackground
-        MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+    var mute: Bool = false {
+        didSet {
+            if options.hasAudioOption() {
+                let error = ["error": "Audio disabled via options"]
+                onEncounteredError(error)
+            }
+
+            let newVolume = !mute ?
+                max(playerVolumeStep, min(maxPlayerVolume, userVolume)) :
+                minPlayerVolume
+
+            mediaPlayer?.audio?.volume = Int32(newVolume)
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+        }
     }
 
-    func setAutoplay(_ autoplay: Bool) {
-        self.autoplay = autoplay
+    var rate: Float = defaultPlayerRate {
+        didSet {
+            mediaPlayer?.rate = rate
+        }
     }
+
+    var time: Int = defaultPlayerTime
+
+    var shouldRepeat: Bool = false {
+        didSet {
+            if options.hasRepeatOption() {
+                let error = ["error": "Repeat enabled via options"]
+                onEncounteredError(error)
+            }
+        }
+    }
+
+    var aspectRatio: String? {
+        didSet {
+            guard let aspectRatio = aspectRatio else { return }
+
+            aspectRatio.withCString { cString in
+                mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+            }
+        }
+    }
+
+    var audioMixingMode: AudioMixingMode = .auto {
+        didSet {
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+        }
+    }
+
+    var playInBackground: Bool = false {
+        didSet {
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+        }
+    }
+
+    var autoplay: Bool = true
 
     func play() {
         mediaPlayer?.play()

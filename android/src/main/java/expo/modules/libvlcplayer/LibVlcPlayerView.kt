@@ -17,6 +17,7 @@ import java.util.UUID
 
 const val DEFAULT_PLAYER_RATE: Float = 1f
 const val DEFAULT_PLAYER_TIME: Int = 0
+
 const val MIN_PLAYER_VOLUME: Int = 0
 const val MAX_PLAYER_VOLUME: Int = 100
 const val PLAYER_VOLUME_STEP: Int = 10
@@ -36,9 +37,6 @@ class LibVlcPlayerView(
     internal var mediaPlayer: MediaPlayer? = null
     internal var media: Media? = null
     private var shouldCreate: Boolean = false
-
-    internal var repeat: Boolean = false
-    private var autoplay: Boolean = true
 
     internal var videoLength: Long = 0L
     internal var userVolume: Int = MAX_PLAYER_VOLUME
@@ -81,6 +79,22 @@ class LibVlcPlayerView(
 
         addPlayerSlaves()
 
+        if (volume != MAX_PLAYER_VOLUME) {
+            mediaPlayer!!.setVolume(volume)
+        }
+
+        if (mute) {
+            mediaPlayer!!.setVolume(MIN_PLAYER_VOLUME)
+        }
+
+        if (rate != DEFAULT_PLAYER_RATE) {
+            mediaPlayer!!.setRate(rate)
+        }
+
+        if (aspectRatio != null) {
+            mediaPlayer!!.setAspectRatio(aspectRatio)
+        }
+
         if (autoplay) {
             mediaPlayer!!.play()
         }
@@ -99,7 +113,6 @@ class LibVlcPlayerView(
         set(value) {
             val old = field
             field = value
-
             shouldCreate = value != old
         }
 
@@ -107,7 +120,6 @@ class LibVlcPlayerView(
         set(value) {
             val old = field
             field = value
-
             shouldCreate = value != old
         }
 
@@ -171,57 +183,65 @@ class LibVlcPlayerView(
             setPlayerTracks()
         }
 
-    fun setVolume(volume: Int) {
-        if (options.hasAudioOption()) {
-            val error = mapOf("error" to "Audio disabled via options")
-            onEncounteredError(error)
-        }
-
-        val newVolume = volume.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
-        userVolume = newVolume
-
-        mediaPlayer?.setVolume(newVolume)
-        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-    }
-
-    fun setMute(mute: Boolean) {
-        if (options.hasAudioOption()) {
-            val error = mapOf("error" to "Audio disabled via options")
-            onEncounteredError(error)
-        }
-
-        val newVolume =
-            if (!mute) {
-                userVolume.coerceIn(PLAYER_VOLUME_STEP, MAX_PLAYER_VOLUME)
-            } else {
-                MIN_PLAYER_VOLUME
+    var volume: Int = MAX_PLAYER_VOLUME
+        set(value) {
+            if (options.hasAudioOption()) {
+                val error = mapOf("error" to "Audio disabled via options")
+                onEncounteredError(error)
             }
 
-        mediaPlayer?.setVolume(newVolume)
-        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-    }
+            field = value
 
-    fun setRate(rate: Float) {
-        mediaPlayer?.setRate(rate)
-    }
+            val volume = value.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
+            userVolume = volume
+
+            mediaPlayer?.setVolume(volume)
+            MediaPlayerManager.audioFocusManager.updateAudioFocus()
+        }
+
+    var mute: Boolean = false
+        set(value) {
+            if (options.hasAudioOption()) {
+                val error = mapOf("error" to "Audio disabled via options")
+                onEncounteredError(error)
+            }
+
+            field = value
+
+            val newVolume =
+                if (!value) {
+                    userVolume.coerceIn(PLAYER_VOLUME_STEP, MAX_PLAYER_VOLUME)
+                } else {
+                    MIN_PLAYER_VOLUME
+                }
+
+            mediaPlayer?.setVolume(newVolume)
+            MediaPlayerManager.audioFocusManager.updateAudioFocus()
+        }
+
+    var rate: Float = DEFAULT_PLAYER_RATE
+        set(value) {
+            field = value
+            mediaPlayer?.setRate(value)
+        }
 
     var time: Int = DEFAULT_PLAYER_TIME
+
+    var repeat: Boolean = false
         set(value) {
+            if (options.hasRepeatOption()) {
+                val error = mapOf("error" to "Repeat enabled via options")
+                onEncounteredError(error)
+            }
+
             field = value
         }
 
-    fun setRepeat(repeat: Boolean) {
-        if (options.hasRepeatOption()) {
-            val error = mapOf("error" to "Repeat enabled via options")
-            onEncounteredError(error)
+    var aspectRatio: String? = null
+        set(value) {
+            field = value
+            mediaPlayer?.setAspectRatio(value)
         }
-
-        this.repeat = repeat
-    }
-
-    fun setAspectRatio(aspectRatio: String?) {
-        mediaPlayer?.setAspectRatio(aspectRatio)
-    }
 
     var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO
         set(value) {
@@ -235,9 +255,7 @@ class LibVlcPlayerView(
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
-    fun setAutoplay(autoplay: Boolean) {
-        this.autoplay = autoplay
-    }
+    var autoplay: Boolean = true
 
     fun play() {
         mediaPlayer?.play()
