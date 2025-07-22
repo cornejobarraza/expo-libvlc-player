@@ -34,20 +34,14 @@ object MediaPlayerManager {
                 val background = mapOf("background" to false)
                 view.onBackground(background)
 
-                view.attachPlayer()
-
                 view.mediaPlayer?.let { player ->
                     if (!player.isPlaying()) {
                         val time = player.getTime()
                         val rewind = 5000L
-                        val newTime =
-                            if (time >= rewind) {
-                                time - rewind
-                            } else {
-                                time
-                            }
 
-                        player.setTime(newTime)
+                        if (time >= rewind) {
+                            player.setTime(time - rewind)
+                        }
                     }
                 }
             }
@@ -67,8 +61,6 @@ object MediaPlayerManager {
                         player.pause()
                     }
                 }
-
-                view.detachPlayer()
             }
         }
     }

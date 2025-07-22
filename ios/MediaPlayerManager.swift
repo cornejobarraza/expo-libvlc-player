@@ -30,11 +30,10 @@ class MediaPlayerManager {
             if !player.isPlaying {
                 let time = Int32(player.time.intValue)
                 let rewind = Int32(5000)
-                let newTime = time >= rewind ?
-                    time - rewind :
-                    time
 
-                player.time = VLCTime(int: newTime)
+                if time >= rewind {
+                    player.time = VLCTime(int: time - rewind)
+                }
             }
         }
     }

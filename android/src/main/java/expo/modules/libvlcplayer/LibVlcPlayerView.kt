@@ -88,14 +88,6 @@ class LibVlcPlayerView(
         shouldCreate = false
     }
 
-    fun attachPlayer() {
-        mediaPlayer?.attachViews(playerView, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
-    }
-
-    fun detachPlayer() {
-        mediaPlayer?.detachViews()
-    }
-
     fun destroyPlayer() {
         media?.release()
         mediaPlayer?.stop()
