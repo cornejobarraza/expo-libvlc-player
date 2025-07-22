@@ -22,7 +22,7 @@ const val MAX_PLAYER_VOLUME: Int = 100
 const val PLAYER_VOLUME_STEP: Int = 10
 
 private val ENABLE_SUBTITLES = true
-private val USE_TEXTURE_VIEW = false
+private val USE_TEXTURE_VIEW = true
 
 class LibVlcPlayerView(
     context: Context,

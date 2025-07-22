@@ -184,8 +184,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 
 ## TODO
 
-- [ ] Recording/snapshot support
-- [ ] Landscape orientation
+- [ ] Recording and snapshot support
 
 ## Disclaimer
 
