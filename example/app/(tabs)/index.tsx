@@ -54,7 +54,7 @@ const VOLUME_CHANGE_STEP = 10;
 type VolumeChangeType = "increase" | "decrease";
 type RepeatMode = boolean | "once";
 
-export default function App() {
+export default function Tab() {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [uri, setUri] = useState<string>(PRIMARY_PLAYER_URI);
   const [position, setPosition] = useState<number>(0);
@@ -71,7 +71,7 @@ export default function App() {
   const [isParsed, setIsParsed] = useState<boolean | null>(null);
 
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
-  const bufferingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const bufferingTimeoutRef = useRef<number | null>(null);
 
   const videoWidth = Dimensions.get("screen").width * 0.8;
   const videoHeight = videoWidth / ASPECT_RATIO;
