@@ -24,7 +24,7 @@ DerivedData
 *.xcuserstate
 project.xcworkspace
 
-# Android/IJ
+# Android
 .classpath
 .cxx
 .gradle
@@ -35,9 +35,10 @@ local.properties
 android.iml
 android/app/libs
 android/keystores/debug.keystore
+example/android/
 
-# Cocoapods
-example/ios/Pods
+# iOS
+example/ios/
 
 # Ruby
 example/vendor/
