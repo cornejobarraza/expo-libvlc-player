@@ -7,21 +7,21 @@ class MediaPlayerManager {
     static let shared = MediaPlayerManager()
 
     private static let managerQueue = DispatchQueue(label: "com.expo.libvlcplayer.manager.managerQueue")
-    private let views = NSHashTable<LibVlcPlayerView>.weakObjects()
+    private let playerViews = NSHashTable<LibVlcPlayerView>.weakObjects()
 
-    func registerView(view: LibVlcPlayerView) {
-        views.add(view)
+    func registerPlayerView(view: LibVlcPlayerView) {
+        playerViews.add(view)
         setAppropriateAudioSessionOrWarn()
     }
 
-    func unregisterView(view: LibVlcPlayerView) {
-        views.remove(view)
+    func unregisterPlayerView(view: LibVlcPlayerView) {
+        playerViews.remove(view)
         setAppropriateAudioSessionOrWarn()
         view.destroyPlayer()
     }
 
     func onAppForeground() {
-        for view in views.allObjects {
+        for view in playerViews.allObjects {
             let background = ["background": false]
             view.onBackground(background)
 
@@ -40,7 +40,7 @@ class MediaPlayerManager {
     }
 
     func onAppBackground() {
-        for view in views.allObjects {
+        for view in playerViews.allObjects {
             let background = ["background": true]
             view.onBackground(background)
 
@@ -65,7 +65,7 @@ class MediaPlayerManager {
         let audioMixingMode = findAudioMixingMode()
         var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession.categoryOptions
 
-        let isOutputtingAudio = views.allObjects.contains { view in
+        let isOutputtingAudio = playerViews.allObjects.contains { view in
             guard let player = view.mediaPlayer else { return false }
 
             return player.isPlaying && player.audio?.isMuted == false
@@ -107,7 +107,7 @@ class MediaPlayerManager {
     }
 
     private func findAudioMixingMode() -> AudioMixingMode? {
-        let playingViews = views.allObjects.filter { view in
+        let playingViews = playerViews.allObjects.filter { view in
             view.mediaPlayer?.isPlaying == true
         }
 

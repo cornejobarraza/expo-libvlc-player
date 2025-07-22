@@ -5,7 +5,7 @@ import expo.modules.kotlin.exception.Exceptions
 import java.lang.ref.WeakReference
 
 object MediaPlayerManager {
-    private var views: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
+    private var playerViews: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
 
     lateinit var audioFocusManager: AudioFocusManager
 
@@ -13,23 +13,23 @@ object MediaPlayerManager {
         val context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
 
         if (!this::audioFocusManager.isInitialized) {
-            audioFocusManager = AudioFocusManager(appContext, views)
+            audioFocusManager = AudioFocusManager(appContext, playerViews)
         }
     }
 
-    fun registerView(view: LibVlcPlayerView) {
-        views.find { it.get() == view } ?: run { views.add(WeakReference(view)) }
+    fun registerPlayerView(view: LibVlcPlayerView) {
+        playerViews.find { it.get() == view } ?: run { playerViews.add(WeakReference(view)) }
         audioFocusManager.updateAudioFocus()
     }
 
-    fun unregisterView(view: LibVlcPlayerView) {
-        views.removeAll { it.get() == view }
+    fun unregisterPlayerView(view: LibVlcPlayerView) {
+        playerViews.removeAll { it.get() == view }
         audioFocusManager.updateAudioFocus()
         view.destroyPlayer()
     }
 
     fun onAppForeground() {
-        views.forEach { playerView ->
+        playerViews.forEach { playerView ->
             playerView.get()?.let { view ->
                 val background = mapOf("background" to false)
                 view.onBackground(background)
@@ -55,7 +55,7 @@ object MediaPlayerManager {
     }
 
     fun onAppBackground() {
-        views.forEach { playerView ->
+        playerViews.forEach { playerView ->
             playerView.get()?.let { view ->
                 val background = mapOf("background" to true)
                 view.onBackground(background)

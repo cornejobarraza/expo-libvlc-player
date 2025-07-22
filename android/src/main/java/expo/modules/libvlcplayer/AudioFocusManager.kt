@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference
 
 class AudioFocusManager(
     private val appContext: AppContext,
-    private var views: MutableList<WeakReference<LibVlcPlayerView>>,
+    private var playerViews: MutableList<WeakReference<LibVlcPlayerView>>,
 ) : AudioManager.OnAudioFocusChangeListener {
     private val audioManager by lazy {
         appContext.reactContext?.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: run {
@@ -25,7 +25,7 @@ class AudioFocusManager(
     private var currentFocusRequest: AudioFocusRequest? = null
     private val anyPlayerRequiresFocus: Boolean
         get() =
-            views.toList().any { weakView ->
+            playerViews.toList().any { weakView ->
                 weakView.get()?.let { view ->
                     playerRequiresFocus(view.mediaPlayer)
                 } ?: false
@@ -38,7 +38,7 @@ class AudioFocusManager(
 
     private fun findAudioMixingMode(): AudioMixingMode {
         val mixingModes =
-            views.toList().mapNotNull { view ->
+            playerViews.toList().mapNotNull { view ->
                 view.get()?.takeIf { it.mediaPlayer?.isPlaying() == true }?.audioMixingMode
             }
 
@@ -118,7 +118,7 @@ class AudioFocusManager(
         when (focusChange) {
             AudioManager.AUDIOFOCUS_LOSS -> {
                 appContext.mainQueue.launch {
-                    views.forEach { view ->
+                    playerViews.forEach { view ->
                         pausePlayerIfUnmuted(view.get()?.mediaPlayer)
                     }
 
@@ -134,7 +134,7 @@ class AudioFocusManager(
                 }
 
                 appContext.mainQueue.launch {
-                    views.forEach { view ->
+                    playerViews.forEach { view ->
                         pausePlayerIfUnmuted(view.get()?.mediaPlayer)
                     }
 
@@ -146,7 +146,7 @@ class AudioFocusManager(
                 val audioMixingMode = findAudioMixingMode()
 
                 appContext.mainQueue.launch {
-                    views.forEach { weakView ->
+                    playerViews.forEach { weakView ->
                         weakView.get()?.let { view ->
                             view.mediaPlayer?.let { player ->
                                 if (audioMixingMode == AudioMixingMode.DO_NOT_MIX) {
@@ -164,7 +164,7 @@ class AudioFocusManager(
 
             AudioManager.AUDIOFOCUS_GAIN -> {
                 appContext.mainQueue.launch {
-                    views.forEach { weakView ->
+                    playerViews.forEach { weakView ->
                         weakView.get()?.let { view ->
                             view.mediaPlayer?.let { player ->
                                 if (player.getVolume() > MIN_PLAYER_VOLUME) {

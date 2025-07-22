@@ -54,7 +54,7 @@ class LibVlcPlayerView(
     internal val onBackground by EventDispatcher()
 
     init {
-        MediaPlayerManager.registerView(this)
+        MediaPlayerManager.registerPlayerView(this)
 
         addView(playerView)
     }
@@ -271,12 +271,6 @@ class LibVlcPlayerView(
             val userPosition = mapOf("position" to position)
             onPositionChanged(userPosition)
         }
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-
-        MediaPlayerManager.unregisterView(this)
     }
 
     internal fun ArrayList<String>.hasAudioOption(): Boolean {

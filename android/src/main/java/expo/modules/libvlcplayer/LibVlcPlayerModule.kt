@@ -92,6 +92,10 @@ class LibVlcPlayerModule : Module() {
                     view.setAutoplay(autoplay ?: true)
                 }
 
+                OnViewDestroys { view: LibVlcPlayerView ->
+                    MediaPlayerManager.unregisterPlayerView(view)
+                }
+
                 OnViewDidUpdateProps { view: LibVlcPlayerView ->
                     view.createPlayer()
                 }
