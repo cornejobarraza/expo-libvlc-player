@@ -31,6 +31,7 @@ object MediaPlayerManager {
     fun unregisterPlayerView(view: LibVlcPlayerView) {
         playerViews.removeAll { it.get() == view }
         audioFocusManager.updateAudioFocus()
+        view.destroyPlayer()
     }
 
     fun onAppForeground() {

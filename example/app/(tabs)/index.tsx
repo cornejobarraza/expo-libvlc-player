@@ -36,9 +36,9 @@ const BUFFERING_DELAY = 1_000;
 const VLC_OPTIONS = ["--network-caching=1000"];
 const ASPECT_RATIO = 16 / 9;
 
-const PRIMARY_PLAYER_URI =
+const PRIMARY_PLAYER_SOURCE =
   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
-const SECONDARY_PLAYER_URI =
+const SECONDARY_PLAYER_SOURCE =
   "http://streams.videolan.org/streams/mp4/Mr_MrsSmith-h264_aac.mp4";
 
 const PRIMARY_THUMBNAIL_POSITION = 27_000;
@@ -56,7 +56,7 @@ type RepeatMode = boolean | "once";
 
 export default function Tab() {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
-  const [uri, setUri] = useState<string>(PRIMARY_PLAYER_URI);
+  const [source, setSource] = useState<string>(PRIMARY_PLAYER_SOURCE);
   const [position, setPosition] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
@@ -84,13 +84,13 @@ export default function Tab() {
 
   useEffect(() => {
     generateThumbnail();
-  }, [uri]);
+  }, [source]);
 
   const generateThumbnail = async () => {
     try {
-      const { uri: url } = await getThumbnailAsync(uri, {
+      const { uri: url } = await getThumbnailAsync(source, {
         time:
-          uri === PRIMARY_PLAYER_URI
+          source === PRIMARY_PLAYER_SOURCE
             ? PRIMARY_THUMBNAIL_POSITION
             : SECONDARY_THUMBNAIL_POSITION,
       });
@@ -227,9 +227,10 @@ export default function Tab() {
               />
             )}
             <LibVlcPlayerView
+              key={source} // Re-render on source change
               ref={playerViewRef}
               style={{ height: "100%", borderRadius: 5 }}
-              uri={uri}
+              source={source}
               options={VLC_OPTIONS}
               volume={volume}
               mute={muted}
@@ -240,10 +241,10 @@ export default function Tab() {
           <Button
             title="Change media"
             onPress={() =>
-              setUri((prev) =>
-                prev !== PRIMARY_PLAYER_URI
-                  ? PRIMARY_PLAYER_URI
-                  : SECONDARY_PLAYER_URI,
+              setSource((prev) =>
+                prev !== PRIMARY_PLAYER_SOURCE
+                  ? PRIMARY_PLAYER_SOURCE
+                  : SECONDARY_PLAYER_SOURCE,
               )
             }
           />

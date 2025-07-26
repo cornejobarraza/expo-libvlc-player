@@ -80,11 +80,11 @@ class LibVlcPlayerView(
         setMediaPlayerListener()
 
         try {
-            media = Media(libVLC, Uri.parse(uri))
+            media = Media(libVLC, Uri.parse(source))
             mediaPlayer!!.setMedia(media)
             setMediaListener()
         } catch (_: Exception) {
-            val error = mapOf("error" to "Invalid URI, media could not be set")
+            val error = mapOf("error" to "Invalid source, media could not be set")
             onEncounteredError(error)
         }
 
@@ -119,7 +119,7 @@ class LibVlcPlayerView(
         libVLC?.release()
     }
 
-    var uri: String = ""
+    var source: String = ""
         set(value) {
             val old = field
             field = value
@@ -134,7 +134,7 @@ class LibVlcPlayerView(
         }
 
     fun addPlayerSlave(slave: ReadableMap) {
-        val uri = slave.getString("uri") ?: ""
+        val source = slave.getString("source") ?: ""
         val type = slave.getString("type") ?: "item"
         val selected = false
 
@@ -146,7 +146,7 @@ class LibVlcPlayerView(
             }
 
         try {
-            mediaPlayer?.addSlave(slaveType, Uri.parse(uri), selected)
+            mediaPlayer?.addSlave(slaveType, Uri.parse(source), selected)
         } catch (_: Exception) {
             val error = mapOf("error" to "Invalid slave, $type could not be added")
             onEncounteredError(error)

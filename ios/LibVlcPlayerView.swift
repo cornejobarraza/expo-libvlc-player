@@ -52,8 +52,8 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer!.drawable = playerView
         mediaPlayer!.delegate = self
 
-        guard let url = URL(string: uri) else {
-            let error = ["error": "Invalid URI, media could not be set"]
+        guard let url = URL(string: source) else {
+            let error = ["error": "Invalid source, media could not be set"]
             onEncounteredError(error)
             return
         }
@@ -93,9 +93,9 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer = nil
     }
 
-    var uri: String = "" {
+    var source: String = "" {
         didSet {
-            shouldCreate = uri != oldValue
+            shouldCreate = source != oldValue
         }
     }
 
@@ -106,7 +106,7 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func addPlayerSlave(_ slave: [String: Any]) {
-        let uri = slave["uri"] as? String ?? ""
+        let source = slave["source"] as? String ?? ""
         let type = slave["type"] as? String ?? "item"
         let selected = false
 
@@ -114,7 +114,7 @@ class LibVlcPlayerView: ExpoView {
             VLCMediaPlaybackSlaveType.subtitle :
             VLCMediaPlaybackSlaveType.audio
 
-        guard let url = URL(string: uri) else {
+        guard let url = URL(string: source) else {
             let error = ["error": "Invalid slave, \(type) could not be added"]
             onEncounteredError(error)
             return

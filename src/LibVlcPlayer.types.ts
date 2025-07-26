@@ -29,6 +29,45 @@ export interface LibVlcPlayerViewRef {
   readonly seek: (position: number) => Promise<void>;
 }
 
+export type LibVlcSource = string | number;
+
+export interface Track {
+  id: number;
+  name: string;
+}
+
+export interface VideoTracks {
+  audio: Track[];
+  video: Track[];
+  subtitle: Track[];
+}
+
+export interface VideoInfo {
+  width: number;
+  height: number;
+  tracks: VideoTracks;
+  aspectRatio: string | null;
+  duration: number;
+  seekable: boolean;
+}
+
+export interface Slave {
+  source: LibVlcSource;
+  type: "audio" | "subtitle";
+}
+
+export interface Tracks {
+  audio?: number;
+  video?: number;
+  subtitle?: number;
+}
+
+export type AudioMixingMode =
+  | "mixWithOthers"
+  | "duckOthers"
+  | "auto"
+  | "doNotMix";
+
 /**
  * @hidden
  */
@@ -75,48 +114,17 @@ export type Position = { position: number };
  */
 export type ParsedChangedListener = (event: { nativeEvent: VideoInfo }) => void;
 
-export interface Track {
-  id: number;
-  name: string;
-}
-
-export interface VideoTracks {
-  audio: Track[];
-  video: Track[];
-  subtitle: Track[];
-}
-
-export interface VideoInfo {
-  width: number;
-  height: number;
-  tracks: VideoTracks;
-  aspectRatio: string | null;
-  duration: number;
-  seekable: boolean;
-}
-
 /**
  * @hidden
  */
 export type BackgroundListener = () => void;
-
-export interface Slave {
-  uri: string;
-  type: "audio" | "subtitle";
-}
-
-export interface Tracks {
-  audio?: number;
-  video?: number;
-  subtitle?: number;
-}
 
 /**
  * @hidden
  */
 export interface LibVlcPlayerViewNativeProps {
   ref?: React.Ref<LibVlcPlayerViewRef>;
-  uri?: string;
+  source?: LibVlcSource;
   options?: string[];
   slaves?: Slave[];
   tracks?: Tracks;
@@ -140,17 +148,11 @@ export interface LibVlcPlayerViewNativeProps {
   onBackground?: BackgroundListener;
 }
 
-export type AudioMixingMode =
-  | "mixWithOthers"
-  | "duckOthers"
-  | "auto"
-  | "doNotMix";
-
 export interface LibVlcPlayerViewProps extends ViewProps {
   /**
-   * Sets the URI of the media to be played
+   * Sets the source of the media to be played
    */
-  uri: string;
+  source: LibVlcSource;
   /**
    * https://wiki.videolan.org/VLC_command-line_help/
    *
@@ -173,11 +175,11 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * <LibVlcPlayerView
    *    slaves={[
    *      {
-   *        uri: "file://path/to/audio.aac",
+   *        source: "file://path/to/audio.aac",
    *        type: "audio",
    *      },
    *      {
-   *        uri: "file://path/to/subtitle.srt",
+   *        source: "file://path/to/subtitle.srt",
    *        type: "subtitle",
    *      },
    *    ]}

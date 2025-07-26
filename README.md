@@ -84,7 +84,7 @@ return (
   <View styles={{ height: videoHeight }}>
     <LibVlcPlayerView
       style={{ height: "100%" }}
-      uri="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      source="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
     />
   </View>
 );
@@ -107,7 +107,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 
 | Prop               | Description                                                                         | Default  |
 | ------------------ | ----------------------------------------------------------------------------------- | -------- |
-| `uri`              | Sets the URI of the media to be played                                              |          |
+| `source`           | Sets the source of the media to be played                                           |          |
 | `options`          | Sets the VLC options to initialize the player with                                  | `[]`     |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more           |          |
 | `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more  |          |
@@ -139,16 +139,16 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 
 #### `Slave`
 
-```JSON
+```json
 {
-  "uri": "file://path/to/subtitle.srt",
+  "source": "file://path/to/subtitle.srt",
   "type": "subtitle"
 }
 ```
 
 #### `Tracks`
 
-```JSON
+```json
 {
   "audio": 1,
   "video": 2,
@@ -158,7 +158,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 
 #### `VideoInfo`
 
-```JSON
+```json
 {
   "width": 320,
   "height": 176,

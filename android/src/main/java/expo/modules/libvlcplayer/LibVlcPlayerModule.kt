@@ -44,8 +44,8 @@ class LibVlcPlayerModule : Module() {
             View(LibVlcPlayerView::class) {
                 Events(playerEvents)
 
-                Prop("uri") { view: LibVlcPlayerView, uri: String ->
-                    view.uri = uri
+                Prop("source") { view: LibVlcPlayerView, source: String ->
+                    view.source = source
                 }
 
                 Prop("options") { view: LibVlcPlayerView, options: ArrayList<String>? ->

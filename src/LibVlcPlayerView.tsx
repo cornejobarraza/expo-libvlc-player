@@ -9,6 +9,7 @@ import {
   type Position,
   type VideoInfo,
 } from "./LibVlcPlayer.types";
+import { parseSource } from "./utils/assets";
 import { convertNativeProps } from "./utils/props";
 
 const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
@@ -50,6 +51,11 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       <NativeView
         {...nativeProps}
         ref={ref}
+        source={parseSource(props.source)}
+        slaves={props.slaves?.map((slave) => ({
+          ...slave,
+          source: parseSource(slave.source),
+        }))}
         onEncounteredError={onEncounteredError}
         onPositionChanged={onPositionChanged}
         onParsedChanged={onParsedChanged}
