@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 export default function Tab() {
   return (
     <View style={styles.container}>
-      <Text>Tab Settings</Text>
+      <Text>Media should keep playing on this tab</Text>
     </View>
   );
 }

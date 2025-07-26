@@ -44,7 +44,7 @@ class LibVlcPlayerModule : Module() {
             View(LibVlcPlayerView::class) {
                 Events(playerEvents)
 
-                Prop("source") { view: LibVlcPlayerView, source: String ->
+                Prop("source") { view: LibVlcPlayerView, source: String? ->
                     view.source = source
                 }
 

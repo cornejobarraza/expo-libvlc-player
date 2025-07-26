@@ -93,15 +93,23 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer = nil
     }
 
-    var source: String = "" {
+    var source: String? {
         didSet {
-            shouldCreate = source != oldValue
+            if source != nil {
+                shouldCreate = source != oldValue
+            } else {
+                destroyPlayer()
+            }
         }
     }
 
     var options: [String] = .init() {
         didSet {
-            shouldCreate = options != oldValue
+            if source != nil {
+                shouldCreate = options != oldValue
+            } else {
+                destroyPlayer()
+            }
         }
     }
 

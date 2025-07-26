@@ -81,12 +81,10 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 import { LibVlcPlayerView } from "expo-libvlc-player";
 
 return (
-  <View styles={{ height: videoHeight }}>
-    <LibVlcPlayerView
-      style={{ height: "100%" }}
-      source="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-    />
-  </View>
+  <LibVlcPlayerView
+    style={{ height: "100%" }}
+    source="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+  />
 );
 ```
 
@@ -182,10 +180,6 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 }
 ```
 
-## TODO
-
-- [ ] Recording and snapshot support
-
 ## Disclaimer
 
 **IMPORTANT:** This project is not affiliated with, endorsed by, or officially supported by VideoLAN or the VLC media player project.
@@ -206,3 +200,7 @@ This project is heavily inspired by existing libraries such as [expo-video](http
 ## Contributing
 
 Contributions are always welcome. Please raise any issues and/or fix them by creating a pull request.
+
+### TODO
+
+- [ ] Recording and snapshot support

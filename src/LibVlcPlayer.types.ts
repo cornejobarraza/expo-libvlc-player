@@ -29,7 +29,7 @@ export interface LibVlcPlayerViewRef {
   readonly seek: (position: number) => Promise<void>;
 }
 
-export type LibVlcSource = string | number;
+export type LibVlcSource = string | number | null;
 
 export interface Track {
   id: number;
@@ -52,7 +52,7 @@ export interface VideoInfo {
 }
 
 export interface Slave {
-  source: LibVlcSource;
+  source: NonNullable<LibVlcSource>;
   type: "audio" | "subtitle";
 }
 

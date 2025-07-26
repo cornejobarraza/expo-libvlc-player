@@ -33,7 +33,7 @@ public class LibVlcPlayerModule: Module {
         View(LibVlcPlayerView.self) {
             Events(playerEvents)
 
-            Prop("source") { (view: LibVlcPlayerView, source: String) in
+            Prop("source") { (view: LibVlcPlayerView, source: String?) in
                 view.source = source
             }
 

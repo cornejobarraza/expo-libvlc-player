@@ -119,18 +119,28 @@ class LibVlcPlayerView(
         libVLC?.release()
     }
 
-    var source: String = ""
+    var source: String? = null
         set(value) {
             val old = field
             field = value
-            shouldCreate = value != old
+
+            if (value != null) {
+                shouldCreate = value != old
+            } else {
+                destroyPlayer()
+            }
         }
 
     var options: ArrayList<String> = ArrayList<String>()
         set(value) {
             val old = field
             field = value
-            shouldCreate = value != old
+
+            if (source != null) {
+                shouldCreate = value != old
+            } else {
+                destroyPlayer()
+            }
         }
 
     fun addPlayerSlave(slave: ReadableMap) {

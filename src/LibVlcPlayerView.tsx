@@ -54,7 +54,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         source={parseSource(props.source)}
         slaves={props.slaves?.map((slave) => ({
           ...slave,
-          source: parseSource(slave.source),
+          source: parseSource(slave.source)!,
         }))}
         onEncounteredError={onEncounteredError}
         onPositionChanged={onPositionChanged}

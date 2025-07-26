@@ -2,18 +2,18 @@ import Slider from "@react-native-community/slider";
 import {
   LibVlcPlayerView,
   LibVlcPlayerViewRef,
+  type LibVlcSource,
   type Error,
   type Position,
   type VideoInfo,
 } from "expo-libvlc-player";
 import { unlockAsync } from "expo-screen-orientation";
 import { getThumbnailAsync } from "expo-video-thumbnails";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Button,
-  Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
@@ -25,16 +25,12 @@ import {
 function msToMinutesSeconds(duration: number) {
   const totalSeconds = Math.floor(duration / 1_000);
   const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-
-  const formattedSeconds = seconds.toString().padStart(2, "0");
-
-  return `${minutes}:${formattedSeconds}`;
+  const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
 }
 
-const BUFFERING_DELAY = 1_000;
 const VLC_OPTIONS = ["--network-caching=1000"];
-const ASPECT_RATIO = 16 / 9;
+const BUFFERING_DELAY = 1_000;
 
 const PRIMARY_PLAYER_SOURCE =
   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
@@ -51,12 +47,12 @@ const MIN_VOLUME_LEVEL = 0;
 const MAX_VOLUME_LEVEL = 100;
 const VOLUME_CHANGE_STEP = 10;
 
-type VolumeChangeType = "increase" | "decrease";
+type VolumeChange = "increase" | "decrease";
 type RepeatMode = boolean | "once";
 
 export default function Tab() {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
-  const [source, setSource] = useState<string>(PRIMARY_PLAYER_SOURCE);
+  const [source, setSource] = useState<LibVlcSource>(PRIMARY_PLAYER_SOURCE);
   const [position, setPosition] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
@@ -73,9 +69,6 @@ export default function Tab() {
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<number | null>(null);
 
-  const videoWidth = Dimensions.get("screen").width * 0.8;
-  const videoHeight = videoWidth / ASPECT_RATIO;
-
   useEffect(() => {
     unlockOrientation();
   }, []);
@@ -83,21 +76,40 @@ export default function Tab() {
   const unlockOrientation = async () => unlockAsync();
 
   useEffect(() => {
-    generateThumbnail();
+    if (source !== null) {
+      generateThumbnail();
+    } else {
+      resetPlayerState();
+    }
   }, [source]);
 
   const generateThumbnail = async () => {
     try {
+      if (typeof source !== "string") return;
+
       const { uri: url } = await getThumbnailAsync(source, {
         time:
           source === PRIMARY_PLAYER_SOURCE
             ? PRIMARY_THUMBNAIL_POSITION
             : SECONDARY_THUMBNAIL_POSITION,
       });
+
       setThumbnail(url);
     } catch {
       setThumbnail(null);
     }
+  };
+
+  const resetPlayerState = () => {
+    setThumbnail(null);
+    setPosition(0);
+    setDuration(0);
+    setIsBuffering(false);
+    setIsPlaying(false);
+    setIsStopped(false);
+    setIsBackgrounded(false);
+    setIsSeekable(false);
+    setIsParsed(false);
   };
 
   const handlePlayerEvents = {
@@ -131,12 +143,7 @@ export default function Tab() {
     },
     onEncounteredError: ({ error }: Error) => {
       Alert.alert("Error", error);
-      setIsBuffering(false);
-      setIsPlaying(false);
-      setIsStopped(false);
-      setIsBackgrounded(false);
-      setIsSeekable(false);
-      setIsParsed(false);
+      resetPlayerState();
     },
     onPositionChanged: ({ position }: Position) => {
       setPosition(position);
@@ -170,7 +177,7 @@ export default function Tab() {
   const handleRepeatChange = () =>
     setRepeat((prev) => (!prev ? "once" : prev === "once"));
 
-  const handleVolumeChange = (type: VolumeChangeType) => {
+  const handleVolumeChange = (type: VolumeChange) => {
     const newVolume =
       type === "increase"
         ? volume + VOLUME_CHANGE_STEP
@@ -194,19 +201,34 @@ export default function Tab() {
     !isPlaying &&
     (position === MIN_POSITION_VALUE || isStopped || isBackgrounded);
 
+  const hasNullable = source === null || isParsed === null;
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.container}>
-        <Text style={styles.header}>Example App</Text>
-        <Group name="View">
+      <ScrollView overScrollMode="never" bounces={false}>
+        <View style={styles.group}>
           <View
             style={{
               backgroundColor: "black",
               position: "relative",
-              height: videoHeight,
               borderRadius: 5,
+              aspectRatio: 16 / 9,
             }}
           >
+            {source === null && (
+              <View
+                style={{
+                  ...StyleSheet.absoluteFillObject,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  zIndex: 30,
+                }}
+              >
+                <Text style={{ color: "white", fontWeight: 500 }}>
+                  NO MEDIA
+                </Text>
+              </View>
+            )}
             {shouldShowLoader && (
               <ActivityIndicator
                 style={{ ...StyleSheet.absoluteFillObject, zIndex: 20 }}
@@ -216,10 +238,11 @@ export default function Tab() {
             )}
             {shouldShowThumbnail && (
               <Image
+                key={source} // Re-render on source change
                 style={{
+                  ...StyleSheet.absoluteFillObject,
                   width: "100%",
                   height: "100%",
-                  ...StyleSheet.absoluteFillObject,
                   borderRadius: 5,
                   zIndex: 10,
                 }}
@@ -239,17 +262,23 @@ export default function Tab() {
             />
           </View>
           <Button
-            title="Change media"
+            title={
+              source === null
+                ? "Create media"
+                : source === PRIMARY_PLAYER_SOURCE
+                  ? "Change media"
+                  : "Remove media"
+            }
             onPress={() =>
               setSource((prev) =>
-                prev !== PRIMARY_PLAYER_SOURCE
+                prev === null
                   ? PRIMARY_PLAYER_SOURCE
-                  : SECONDARY_PLAYER_SOURCE,
+                  : prev === PRIMARY_PLAYER_SOURCE
+                    ? SECONDARY_PLAYER_SOURCE
+                    : null,
               )
             }
           />
-        </Group>
-        <Group name="Controls">
           <View style={styles.duration}>
             <Text>{msToMinutesSeconds(position * duration)}</Text>
             <Text>{msToMinutesSeconds(duration)}</Text>
@@ -262,18 +291,18 @@ export default function Tab() {
             thumbTintColor="darkred"
             minimumTrackTintColor="red"
             maximumTrackTintColor="indianred"
-            disabled={!isSeekable || isParsed === null}
+            disabled={!isSeekable || hasNullable}
           />
           <View style={styles.row}>
             <Button
               title={!isPlaying ? "Play" : "Pause"}
               onPress={handlePlayPause}
-              disabled={isParsed === null}
+              disabled={hasNullable}
             />
             <Button
               title="Stop"
               onPress={handleStopPlayer}
-              disabled={isParsed === null}
+              disabled={hasNullable}
             />
             <Button
               title={
@@ -284,67 +313,42 @@ export default function Tab() {
                     : "Repeat"
               }
               onPress={handleRepeatChange}
-              disabled={duration <= 0 || isParsed === null}
+              disabled={duration <= 0 || hasNullable}
             />
           </View>
           <View style={styles.row}>
             <Button
               title="-"
               onPress={() => handleVolumeChange("decrease")}
-              disabled={
-                volume === MIN_VOLUME_LEVEL || muted || isParsed === null
-              }
+              disabled={volume === MIN_VOLUME_LEVEL || muted || hasNullable}
             />
             <Button
               title={!muted ? "Mute" : "Unmute"}
               onPress={handleMute}
-              disabled={
-                (volume === MIN_VOLUME_LEVEL && !muted) || isParsed === null
-              }
+              disabled={(volume === MIN_VOLUME_LEVEL && !muted) || hasNullable}
             />
             <Button
               title="+"
               onPress={() => handleVolumeChange("increase")}
-              disabled={
-                volume === MAX_VOLUME_LEVEL || muted || isParsed === null
-              }
+              disabled={volume === MAX_VOLUME_LEVEL || muted || hasNullable}
             />
           </View>
-        </Group>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function Group(props: { name: string; children: ReactNode }) {
-  return (
-    <View style={styles.group}>
-      <Text style={styles.groupHeader}>{props.name}</Text>
-      {props.children}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  header: {
-    fontSize: 30,
-    margin: 20,
-  },
-  groupHeader: {
-    fontSize: 20,
-    marginBottom: 20,
-  },
-  group: {
-    minHeight: 275,
-    backgroundColor: "#fff",
-    gap: 20,
-    borderRadius: 10,
-    padding: 20,
-    margin: 20,
-  },
   container: {
     flex: 1,
+    justifyContent: "center",
     backgroundColor: "#eee",
+  },
+  group: {
+    backgroundColor: "#fff",
+    gap: 24,
+    padding: 24,
   },
   duration: {
     flexDirection: "row",
@@ -355,6 +359,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexWrap: "wrap",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
   },
 });
