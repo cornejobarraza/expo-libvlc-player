@@ -32,9 +32,10 @@ function msToMinutesSeconds(duration: number) {
   return `${minutes}:${formattedSeconds}`;
 }
 
-const BUFFERING_DELAY = 1_000;
+const VIDEO_SCALE = 0.8;
 const VLC_OPTIONS = ["--network-caching=1000"];
 const ASPECT_RATIO = 16 / 9;
+const BUFFERING_DELAY = 1_000;
 
 const PRIMARY_PLAYER_SOURCE =
   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
@@ -51,7 +52,7 @@ const MIN_VOLUME_LEVEL = 0;
 const MAX_VOLUME_LEVEL = 100;
 const VOLUME_CHANGE_STEP = 10;
 
-type VolumeChangeType = "increase" | "decrease";
+type VolumeChange = "increase" | "decrease";
 type RepeatMode = boolean | "once";
 
 export default function Tab() {
@@ -73,7 +74,7 @@ export default function Tab() {
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<number | null>(null);
 
-  const videoWidth = Dimensions.get("screen").width * 0.8;
+  const videoWidth = Dimensions.get("screen").width * VIDEO_SCALE;
   const videoHeight = videoWidth / ASPECT_RATIO;
 
   useEffect(() => {
@@ -170,7 +171,7 @@ export default function Tab() {
   const handleRepeatChange = () =>
     setRepeat((prev) => (!prev ? "once" : prev === "once"));
 
-  const handleVolumeChange = (type: VolumeChangeType) => {
+  const handleVolumeChange = (type: VolumeChange) => {
     const newVolume =
       type === "increase"
         ? volume + VOLUME_CHANGE_STEP
