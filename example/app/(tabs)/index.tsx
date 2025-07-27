@@ -201,7 +201,7 @@ export default function Tab() {
     !isPlaying &&
     (position === MIN_POSITION_VALUE || isStopped || isBackgrounded);
 
-  const hasNullable = source === null || isParsed === null;
+  const hasNullState = source === null || isParsed === null;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -238,7 +238,7 @@ export default function Tab() {
             )}
             {shouldShowThumbnail && (
               <Image
-                key={source} // Re-render on source change
+                key={thumbnail} // Re-render on thumbnail change
                 style={{
                   ...StyleSheet.absoluteFillObject,
                   width: "100%",
@@ -291,18 +291,18 @@ export default function Tab() {
             thumbTintColor="darkred"
             minimumTrackTintColor="red"
             maximumTrackTintColor="indianred"
-            disabled={!isSeekable || hasNullable}
+            disabled={!isSeekable || hasNullState}
           />
           <View style={styles.row}>
             <Button
               title={!isPlaying ? "Play" : "Pause"}
               onPress={handlePlayPause}
-              disabled={hasNullable}
+              disabled={hasNullState}
             />
             <Button
               title="Stop"
               onPress={handleStopPlayer}
-              disabled={hasNullable}
+              disabled={hasNullState}
             />
             <Button
               title={
@@ -313,24 +313,24 @@ export default function Tab() {
                     : "Repeat"
               }
               onPress={handleRepeatChange}
-              disabled={duration <= 0 || hasNullable}
+              disabled={duration <= 0 || hasNullState}
             />
           </View>
           <View style={styles.row}>
             <Button
               title="-"
               onPress={() => handleVolumeChange("decrease")}
-              disabled={volume === MIN_VOLUME_LEVEL || muted || hasNullable}
+              disabled={volume === MIN_VOLUME_LEVEL || muted || hasNullState}
             />
             <Button
               title={!muted ? "Mute" : "Unmute"}
               onPress={handleMute}
-              disabled={(volume === MIN_VOLUME_LEVEL && !muted) || hasNullable}
+              disabled={(volume === MIN_VOLUME_LEVEL && !muted) || hasNullState}
             />
             <Button
               title="+"
               onPress={() => handleVolumeChange("increase")}
-              disabled={volume === MAX_VOLUME_LEVEL || muted || hasNullable}
+              disabled={volume === MAX_VOLUME_LEVEL || muted || hasNullState}
             />
           </View>
         </View>

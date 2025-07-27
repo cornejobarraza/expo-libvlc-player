@@ -88,7 +88,7 @@ return (
 );
 ```
 
-See the [Example App](example/App.tsx) for additional usage.
+See the [Example App](<example/app/(tabs)/index.tsx>) for additional usage.
 
 ### Player methods
 
