@@ -52,7 +52,7 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer!.drawable = playerView
         mediaPlayer!.delegate = self
 
-        guard let url = URL(string: source) else {
+        guard let source = source, let url = URL(string: source) else {
             let error = ["error": "Invalid source, media could not be set"]
             onEncounteredError(error)
             return
