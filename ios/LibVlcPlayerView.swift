@@ -38,6 +38,10 @@ class LibVlcPlayerView: ExpoView {
         addSubview(playerView)
     }
 
+    deinit {
+        MediaPlayerManager.shared.unregisterPlayerView(self)
+    }
+
     override func layoutSubviews() {
         playerView.frame = bounds
     }

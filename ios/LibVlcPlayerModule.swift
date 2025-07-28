@@ -85,10 +85,6 @@ public class LibVlcPlayerModule: Module {
                 view.autoplay = autoplay ?? true
             }
 
-            OnViewDestroys { (view: LibVlcPlayerView) in
-                MediaPlayerManager.shared.unregisterPlayerView(view)
-            }
-
             OnViewDidUpdateProps { (view: LibVlcPlayerView) in
                 view.createPlayer()
             }
