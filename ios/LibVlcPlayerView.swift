@@ -31,7 +31,7 @@ class LibVlcPlayerView: ExpoView {
     required init(appContext: AppContext? = nil) {
         super.init(appContext: appContext)
 
-        MediaPlayerManager.shared.registerPlayerView(view: self)
+        MediaPlayerManager.shared.registerPlayerView(self)
 
         clipsToBounds = true
         playerView.backgroundColor = .black
@@ -267,10 +267,6 @@ class LibVlcPlayerView: ExpoView {
 
         let userPosition = ["position": position]
         onPositionChanged(userPosition)
-    }
-
-    deinit {
-        MediaPlayerManager.shared.unregisterPlayerView(view: self)
     }
 }
 

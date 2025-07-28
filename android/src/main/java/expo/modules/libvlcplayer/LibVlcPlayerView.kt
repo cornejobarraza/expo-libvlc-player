@@ -31,7 +31,10 @@ class LibVlcPlayerView(
 ) : ExpoView(context, appContext) {
     internal val playerViewId: String = UUID.randomUUID().toString()
 
-    private val playerView: VLCVideoLayout = VLCVideoLayout(context)
+    private val playerView: VLCVideoLayout =
+        VLCVideoLayout(context).also {
+            addView(it)
+        }
 
     private var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
@@ -53,20 +56,12 @@ class LibVlcPlayerView(
 
     init {
         MediaPlayerManager.registerPlayerView(this)
-
-        addView(playerView)
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-
-        mediaPlayer?.attachViews(playerView, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
 
-        mediaPlayer?.detachViews()
+        attachPlayer()
     }
 
     fun createPlayer() {
@@ -78,6 +73,7 @@ class LibVlcPlayerView(
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
         setMediaPlayerListener()
+        attachPlayer()
 
         try {
             media = Media(libVLC, Uri.parse(source))
@@ -111,6 +107,10 @@ class LibVlcPlayerView(
         }
 
         shouldCreate = false
+    }
+
+    fun attachPlayer() {
+        mediaPlayer?.attachViews(playerView, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
     }
 
     fun destroyPlayer() {
