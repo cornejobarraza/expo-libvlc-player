@@ -47,13 +47,13 @@ extension LibVlcPlayerView: VLCMediaDelegate {
         }
 
         let video = player.videoSize
-        let ratio = player.videoAspectRatio
-        let length = player.media?.length.intValue ?? 0
         let tracks = [
             "audio": audioTracks,
             "video": videoTracks,
             "subtitle": subtitleTracks,
         ]
+        let ratio = player.videoAspectRatio
+        let length = player.media?.length.intValue ?? 0
         let seekable = player.isSeekable
 
         let videoInfo: [String: Any] = [

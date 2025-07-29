@@ -121,10 +121,6 @@ class LibVlcPlayerModule : Module() {
                 }
             }
 
-            OnActivityEntersForeground {
-                MediaPlayerManager.onAppForeground()
-            }
-
             OnActivityEntersBackground {
                 MediaPlayerManager.onAppBackground()
             }

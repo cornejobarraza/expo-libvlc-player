@@ -26,21 +26,6 @@ class MediaPlayerManager {
         view.destroyPlayer()
     }
 
-    func onAppForeground() {
-        for view in playerViews.allObjects {
-            guard let player = view.mediaPlayer else { continue }
-
-            if !player.isPlaying {
-                let time = Int32(player.time.intValue)
-                let rewind = Int32(5000)
-
-                if time >= rewind {
-                    player.time = VLCTime(int: time - rewind)
-                }
-            }
-        }
-    }
-
     func onAppBackground() {
         for view in playerViews.allObjects {
             view.onBackground([:])

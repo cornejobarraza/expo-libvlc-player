@@ -106,10 +106,6 @@ public class LibVlcPlayerModule: Module {
             }
         }
 
-        OnAppEntersForeground {
-            MediaPlayerManager.shared.onAppForeground()
-        }
-
         OnAppEntersBackground {
             MediaPlayerManager.shared.onAppBackground()
         }

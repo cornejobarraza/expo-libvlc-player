@@ -34,23 +34,6 @@ object MediaPlayerManager {
         view.destroyPlayer()
     }
 
-    fun onAppForeground() {
-        playerViews.forEach { playerView ->
-            playerView.get()?.let { view ->
-                view.mediaPlayer?.let { player ->
-                    if (!player.isPlaying()) {
-                        val time = player.getTime()
-                        val rewind = 5000L
-
-                        if (time >= rewind) {
-                            player.setTime(time - rewind)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     fun onAppBackground() {
         playerViews.forEach { playerView ->
             playerView.get()?.let { view ->

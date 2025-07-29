@@ -61,7 +61,6 @@ export default function Tab() {
 
   const [isBuffering, setIsBuffering] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [isStopped, setIsStopped] = useState<boolean>(false);
   const [isBackgrounded, setIsBackgrounded] = useState<boolean>(false);
   const [isSeekable, setIsSeekable] = useState<boolean>(false);
   const [isParsed, setIsParsed] = useState<boolean | null>(null);
@@ -109,7 +108,6 @@ export default function Tab() {
     setDuration(0);
     setIsBuffering(false);
     setIsPlaying(false);
-    setIsStopped(false);
     setIsBackgrounded(false);
     setIsSeekable(false);
   };
@@ -130,18 +128,16 @@ export default function Tab() {
     onPlaying: () => {
       setIsBuffering(false);
       setIsPlaying(true);
-      setIsStopped(false);
     },
     onPaused: () => {
       setIsBuffering(false);
       setIsPlaying(false);
-      setIsStopped(false);
     },
     onStopped: () => {
+      setPosition(0);
+      setRepeat((prev) => (prev !== "once" ? prev : false));
       setIsBuffering(false);
       setIsPlaying(false);
-      setIsStopped(true);
-      setRepeat((prev) => (prev !== "once" ? prev : false));
     },
     onEncounteredError: ({ error }: Error) => {
       Alert.alert("Error", error);
@@ -201,7 +197,7 @@ export default function Tab() {
   const shouldShowThumbnail =
     !!thumbnail &&
     !isPlaying &&
-    (position === MIN_POSITION_VALUE || isStopped || isBackgrounded);
+    (position === MIN_POSITION_VALUE || isBackgrounded);
 
   const hasNullState = source === null || isParsed === null;
 

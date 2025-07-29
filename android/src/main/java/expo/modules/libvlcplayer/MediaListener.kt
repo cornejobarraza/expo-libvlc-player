@@ -11,7 +11,6 @@ fun LibVlcPlayerView.setMediaListener() {
                 when (event.type) {
                     Event.ParsedChanged -> {
                         val audioTracks = Arguments.createArray()
-
                         val audios = player.getAudioTracks()
 
                         audios?.forEach { track ->
@@ -22,7 +21,6 @@ fun LibVlcPlayerView.setMediaListener() {
                         }
 
                         val videoTracks = Arguments.createArray()
-
                         val videos = player.getVideoTracks()
 
                         videos?.forEach { track ->
@@ -33,7 +31,6 @@ fun LibVlcPlayerView.setMediaListener() {
                         }
 
                         val subtitleTracks = Arguments.createArray()
-
                         val subtitles = player.getSpuTracks()
 
                         subtitles?.forEach { track ->
@@ -44,6 +41,12 @@ fun LibVlcPlayerView.setMediaListener() {
                         }
 
                         val video = player.getCurrentVideoTrack()
+                        val tracks =
+                            Arguments.createMap().apply {
+                                putArray("audio", audioTracks)
+                                putArray("video", videoTracks)
+                                putArray("subtitle", subtitleTracks)
+                            }
                         val ratio = player.getAspectRatio()
                         val pLength = player.getLength()
                         val length =
@@ -51,12 +54,6 @@ fun LibVlcPlayerView.setMediaListener() {
                                 pLength
                             } else {
                                 0L
-                            }
-                        val tracks =
-                            Arguments.createMap().apply {
-                                putArray("audio", audioTracks)
-                                putArray("video", videoTracks)
-                                putArray("subtitle", subtitleTracks)
                             }
                         val seekable = player.isSeekable()
 
