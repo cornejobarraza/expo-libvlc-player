@@ -4,44 +4,38 @@ extension LibVlcPlayerView: VLCMediaDelegate {
     func mediaDidFinishParsing(_: VLCMedia) {
         guard let player = mediaPlayer else { return }
 
-        var audioTracks: [[String: Any]] = []
+        var audioTracks: [Track] = []
 
         if let audios = player.audioTrackNames as? [String] {
             if let audioIndexes = player.audioTrackIndexes as? [NSNumber] {
-                for (index, name) in audios.enumerated() {
+                for (index, trackName) in audios.enumerated() {
                     let trackId = audioIndexes[index].intValue
-                    audioTracks.append([
-                        "id": trackId,
-                        "name": name,
-                    ])
+                    let track = Track(id: trackId, name: trackName)
+                    audioTracks.append(track)
                 }
             }
         }
 
-        var videoTracks: [[String: Any]] = []
+        var videoTracks: [Track] = []
 
         if let videos = player.videoTrackNames as? [String] {
             if let videoIndexes = player.videoTrackIndexes as? [NSNumber] {
-                for (index, name) in videos.enumerated() {
+                for (index, trackName) in videos.enumerated() {
                     let trackId = videoIndexes[index].intValue
-                    videoTracks.append([
-                        "id": trackId,
-                        "name": name,
-                    ])
+                    let track = Track(id: trackId, name: trackName)
+                    videoTracks.append(track)
                 }
             }
         }
 
-        var subtitleTracks: [[String: Any]] = []
+        var subtitleTracks: [Track] = []
 
         if let subtitles = player.videoSubTitlesNames as? [String] {
             if let subtitleIndexes = player.videoSubTitlesIndexes as? [NSNumber] {
-                for (index, name) in subtitles.enumerated() {
+                for (index, trackName) in subtitles.enumerated() {
                     let trackId = subtitleIndexes[index].intValue
-                    subtitleTracks.append([
-                        "id": trackId,
-                        "name": name,
-                    ])
+                    let track = Track(id: trackId, name: trackName)
+                    subtitleTracks.append(track)
                 }
             }
         }

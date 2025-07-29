@@ -1,9 +1,10 @@
 package expo.modules.libvlcplayer
 
-import com.facebook.react.bridge.ReadableMap
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.libvlcplayer.enums.AudioMixingMode
+import expo.modules.libvlcplayer.records.Slave
+import expo.modules.libvlcplayer.records.Tracks
 
 private const val BUFFERING_EVENT = "onBuffering"
 private const val PLAYING_EVENT = "onPlaying"
@@ -52,11 +53,11 @@ class LibVlcPlayerModule : Module() {
                     view.options = options ?: ArrayList<String>()
                 }
 
-                Prop("slaves") { view: LibVlcPlayerView, slaves: ArrayList<ReadableMap>? ->
+                Prop("slaves") { view: LibVlcPlayerView, slaves: ArrayList<Slave>? ->
                     view.slaves = slaves
                 }
 
-                Prop("tracks") { view: LibVlcPlayerView, tracks: ReadableMap? ->
+                Prop("tracks") { view: LibVlcPlayerView, tracks: Tracks? ->
                     view.tracks = tracks
                 }
 

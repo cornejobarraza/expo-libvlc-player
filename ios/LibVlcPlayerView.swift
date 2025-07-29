@@ -117,14 +117,13 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    func addPlayerSlave(_ slave: [String: Any]) {
-        let source = slave["source"] as? String ?? ""
-        let type = slave["type"] as? String ?? "item"
-        let selected = false
-
+    func addPlayerSlave(_ slave: Slave) {
+        let source = slave.source
+        let type = slave.type
         let slaveType = type == "subtitle" ?
             VLCMediaPlaybackSlaveType.subtitle :
             VLCMediaPlaybackSlaveType.audio
+        let selected = false
 
         guard let url = URL(string: source) else {
             let error = ["error": "Invalid slave, \(type) could not be added"]
@@ -137,11 +136,11 @@ class LibVlcPlayerView: ExpoView {
 
     func addPlayerSlaves() {
         // Add in this specific order, otherwise subtitle slaves will be missing
-        slaves?.filter { ($0["type"] as? String) == "subtitle" }.forEach { addPlayerSlave($0) }
-        slaves?.filter { ($0["type"] as? String) == "audio" }.forEach { addPlayerSlave($0) }
+        slaves?.filter { $0.type == "subtitle" }.forEach { addPlayerSlave($0) }
+        slaves?.filter { $0.type == "audio" }.forEach { addPlayerSlave($0) }
     }
 
-    var slaves: [[String: Any]]? {
+    var slaves: [Slave]? {
         didSet {
             addPlayerSlaves()
         }
@@ -159,7 +158,7 @@ class LibVlcPlayerView: ExpoView {
         player.currentVideoSubTitleIndex = Int32(videoSubTitleIndex)
     }
 
-    var tracks: [String: Any]? {
+    var tracks: Tracks? {
         didSet {
             if options.hasAudioTrackOption() {
                 let error = ["error": "Audio track selected via options"]

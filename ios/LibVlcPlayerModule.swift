@@ -41,11 +41,11 @@ public class LibVlcPlayerModule: Module {
                 view.options = options ?? [String]()
             }
 
-            Prop("slaves") { (view: LibVlcPlayerView, slaves: [[String: Any]]?) in
+            Prop("slaves") { (view: LibVlcPlayerView, slaves: [Slave]?) in
                 view.slaves = slaves
             }
 
-            Prop("tracks") { (view: LibVlcPlayerView, tracks: [String: Any]?) in
+            Prop("tracks") { (view: LibVlcPlayerView, tracks: Tracks?) in
                 view.tracks = tracks
             }
 

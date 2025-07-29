@@ -2,12 +2,12 @@ package expo.modules.libvlcplayer
 
 import android.content.Context
 import android.net.Uri
-import com.facebook.react.bridge.ReadableMap
-import com.facebook.react.bridge.WritableMap
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
 import expo.modules.libvlcplayer.enums.AudioMixingMode
+import expo.modules.libvlcplayer.records.Slave
+import expo.modules.libvlcplayer.records.Tracks
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
@@ -53,7 +53,7 @@ class LibVlcPlayerView(
     internal val onEndReached by EventDispatcher()
     internal val onEncounteredError by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
-    internal val onParsedChanged by EventDispatcher<WritableMap>()
+    internal val onParsedChanged by EventDispatcher()
     internal val onBackground by EventDispatcher()
 
     init {
@@ -146,17 +146,16 @@ class LibVlcPlayerView(
             }
         }
 
-    fun addPlayerSlave(slave: ReadableMap) {
-        val source = slave.getString("source") ?: ""
-        val type = slave.getString("type") ?: "item"
-        val selected = false
-
+    fun addPlayerSlave(slave: Slave) {
+        val type = slave.type
         val slaveType =
             if (type == "subtitle") {
                 IMedia.Slave.Type.Subtitle
             } else {
                 IMedia.Slave.Type.Audio
             }
+        val source = slave.source
+        val selected = false
 
         try {
             mediaPlayer?.addSlave(slaveType, Uri.parse(source), selected)
@@ -168,11 +167,11 @@ class LibVlcPlayerView(
 
     fun addPlayerSlaves() {
         // Add in this specific order, otherwise subtitle slaves will be missing
-        slaves?.filter { it.getString("type") == "subtitle" }?.forEach(::addPlayerSlave)
-        slaves?.filter { it.getString("type") == "audio" }?.forEach(::addPlayerSlave)
+        slaves?.filter { it.type == "subtitle" }?.forEach(::addPlayerSlave)
+        slaves?.filter { it.type == "audio" }?.forEach(::addPlayerSlave)
     }
 
-    var slaves: ArrayList<ReadableMap>? = null
+    var slaves: ArrayList<Slave>? = null
         set(value) {
             field = value
             addPlayerSlaves()
@@ -180,9 +179,9 @@ class LibVlcPlayerView(
 
     fun setPlayerTracks() {
         mediaPlayer?.let { player ->
-            val audioTrack = tracks?.takeIf { it.hasKey("audio") }?.getInt("audio") ?: player.getAudioTrack()
-            val videoTrack = tracks?.takeIf { it.hasKey("video") }?.getInt("video") ?: player.getVideoTrack()
-            val spuTrack = tracks?.takeIf { it.hasKey("subtitle") }?.getInt("subtitle") ?: player.getSpuTrack()
+            val audioTrack = tracks?.audio ?: player.getAudioTrack()
+            val videoTrack = tracks?.video ?: player.getVideoTrack()
+            val spuTrack = tracks?.subtitle ?: player.getSpuTrack()
 
             player.setAudioTrack(audioTrack)
             player.setVideoTrack(videoTrack)
@@ -190,7 +189,7 @@ class LibVlcPlayerView(
         }
     }
 
-    var tracks: ReadableMap? = null
+    var tracks: Tracks? = null
         set(value) {
             if (options.hasAudioTrackOption()) {
                 val error = mapOf("error" to "Audio track selected via options")

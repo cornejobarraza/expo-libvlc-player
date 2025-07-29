@@ -1,6 +1,6 @@
 package expo.modules.libvlcplayer
 
-import com.facebook.react.bridge.Arguments
+import expo.modules.libvlcplayer.records.Track
 import org.videolan.libvlc.interfaces.IMedia.Event
 import org.videolan.libvlc.interfaces.IMedia.EventListener
 
@@ -10,43 +10,37 @@ fun LibVlcPlayerView.setMediaListener() {
             EventListener { event ->
                 when (event.type) {
                     Event.ParsedChanged -> {
-                        val audioTracks = Arguments.createArray()
+                        val audioTracks = mutableListOf<Track>()
                         val audios = player.getAudioTracks()
 
                         audios?.forEach { track ->
-                            val trackMap = Arguments.createMap()
-                            trackMap.putInt("id", track.id)
-                            trackMap.putString("name", track.name)
-                            audioTracks.pushMap(trackMap)
+                            val trackObj = Track(id = track.id, name = track.name)
+                            audioTracks.add(trackObj)
                         }
 
-                        val videoTracks = Arguments.createArray()
+                        val videoTracks = mutableListOf<Track>()
                         val videos = player.getVideoTracks()
 
                         videos?.forEach { track ->
-                            val trackMap = Arguments.createMap()
-                            trackMap.putInt("id", track.id)
-                            trackMap.putString("name", track.name)
-                            videoTracks.pushMap(trackMap)
+                            val trackObj = Track(id = track.id, name = track.name)
+                            videoTracks.add(trackObj)
                         }
 
-                        val subtitleTracks = Arguments.createArray()
+                        val subtitleTracks = mutableListOf<Track>()
                         val subtitles = player.getSpuTracks()
 
                         subtitles?.forEach { track ->
-                            val trackMap = Arguments.createMap()
-                            trackMap.putInt("id", track.id)
-                            trackMap.putString("name", track.name)
-                            subtitleTracks.pushMap(trackMap)
+                            val trackObj = Track(id = track.id, name = track.name)
+                            subtitleTracks.add(trackObj)
                         }
 
                         val video = player.getCurrentVideoTrack()
                         val tracks =
-                            Arguments.createMap().apply {
-                                putArray("audio", audioTracks)
-                                putArray("video", videoTracks)
-                                putArray("subtitle", subtitleTracks)
-                            }
+                            mapOf(
+                                "audio" to audioTracks,
+                                "video" to videoTracks,
+                                "subtitle" to subtitleTracks,
+                            )
                         val ratio = player.getAspectRatio()
                         val pLength = player.getLength()
                         val length =
@@ -58,14 +52,14 @@ fun LibVlcPlayerView.setMediaListener() {
                         val seekable = player.isSeekable()
 
                         val videoInfo =
-                            Arguments.createMap().apply {
-                                putInt("width", video?.width ?: 0)
-                                putInt("height", video?.height ?: 0)
-                                putMap("tracks", tracks)
-                                putString("aspectRatio", ratio)
-                                putDouble("duration", length.toDouble())
-                                putBoolean("seekable", seekable)
-                            }
+                            mapOf(
+                                "width" to (video?.width ?: 0),
+                                "height" to (video?.height ?: 0),
+                                "tracks" to tracks,
+                                "aspectRatio" to ratio,
+                                "duration" to length.toDouble(),
+                                "seekable" to seekable,
+                            )
 
                         onParsedChanged(videoInfo)
 
