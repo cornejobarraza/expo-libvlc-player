@@ -34,6 +34,14 @@ For bare React Native projects, you must ensure that you have [installed and con
 
 No additional configuration necessary.
 
+#### Black screen issue
+
+On Android the `libvlcjni` player detaches from the View when its surface is destroyed after switching to a different screen.
+
+This causes nothing to be displayed when coming back to the player screen due to resources being previously released.
+
+As a workaround the View is attached to the player when its surface is created again but causes a brief black screen.
+
 ### Configure for iOS
 
 Run `npx pod-install` after installing the npm package.
@@ -42,7 +50,7 @@ Run `npx pod-install` after installing the npm package.
 
 Starting from iOS 14 you are required to provide a message for the `NSLocalNetworkUsageDescription` key in the Info.plist file if your app uses the local network directly or indirectly.
 
-It seems the `MobileVLCKit` library powering the VLC Player on iOS makes use of this feature when playing external media from sources such as RTSP streams.
+It seems the `MobileVLCKit` player on iOS makes use of this feature when playing external media from sources such as RTSP streams.
 
 Provide a custom message specifying how your app will make use of the network so your App Store submission is not rejected for this reason. Read more about this [here](https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy).
 
