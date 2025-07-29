@@ -73,35 +73,38 @@ export default function Tab() {
     unlockOrientation();
   }, []);
 
-  const unlockOrientation = async () => unlockAsync();
+  const unlockOrientation = async () => await unlockAsync();
 
   useEffect(() => {
-    if (source !== null) {
-      generateThumbnail();
-    } else {
+    if (source === null) {
       resetPlayerState();
     }
+
+    generateThumbnail();
   }, [source]);
 
   const generateThumbnail = async () => {
     try {
-      if (typeof source !== "string") return;
+      const isValidSource = typeof source === "string";
 
-      const { uri: url } = await getThumbnailAsync(source, {
+      if (!isValidSource) {
+        return setThumbnail(null);
+      }
+
+      const { uri } = await getThumbnailAsync(source, {
         time:
           source === PRIMARY_PLAYER_SOURCE
             ? PRIMARY_THUMBNAIL_POSITION
             : SECONDARY_THUMBNAIL_POSITION,
       });
 
-      setThumbnail(url);
+      setThumbnail(uri);
     } catch {
       setThumbnail(null);
     }
   };
 
   const resetPlayerState = () => {
-    setThumbnail(null);
     setPosition(0);
     setDuration(0);
     setIsBuffering(false);
@@ -109,7 +112,6 @@ export default function Tab() {
     setIsStopped(false);
     setIsBackgrounded(false);
     setIsSeekable(false);
-    setIsParsed(false);
   };
 
   const handlePlayerEvents = {
@@ -238,7 +240,6 @@ export default function Tab() {
             )}
             {shouldShowThumbnail && (
               <Image
-                key={thumbnail} // Re-render on thumbnail change
                 style={{
                   ...StyleSheet.absoluteFillObject,
                   width: "100%",
@@ -264,7 +265,7 @@ export default function Tab() {
           <Button
             title={
               source === null
-                ? "Create media"
+                ? "Reset media"
                 : source === PRIMARY_PLAYER_SOURCE
                   ? "Change media"
                   : "Remove media"
