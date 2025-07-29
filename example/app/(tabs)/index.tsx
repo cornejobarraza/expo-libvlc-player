@@ -5,7 +5,7 @@ import {
   type LibVlcSource,
   type Error,
   type Position,
-  type VideoInfo,
+  type MediaInfo,
 } from "expo-libvlc-player";
 import { unlockAsync } from "expo-screen-orientation";
 import { getThumbnailAsync } from "expo-video-thumbnails";
@@ -147,7 +147,7 @@ export default function Tab() {
       setPosition(position);
       setIsBuffering(false);
     },
-    onParsedChanged: ({ duration, seekable }: VideoInfo) => {
+    onParsedChanged: ({ duration, seekable }: MediaInfo) => {
       setDuration(duration);
       setIsSeekable(seekable);
       setIsParsed(true);

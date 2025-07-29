@@ -138,7 +138,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 | `onEndReached`       | Called after the `EndReached` player event       |                           |
 | `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`       |
 | `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`    |
-| `onParsedChanged`    | Called after the `ParsedChanged` media event     | [`VideoInfo`](#videoinfo) |
+| `onParsedChanged`    | Called after the `ParsedChanged` media event     | [`MediaInfo`](#mediainfo) |
 | `onBackground`       | Called after the player enters the background    |                           |
 
 ### Player types
@@ -162,7 +162,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 }
 ```
 
-#### `VideoInfo`
+#### `MediaInfo`
 
 ```json
 {

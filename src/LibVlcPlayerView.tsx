@@ -7,7 +7,7 @@ import {
   LibVlcPlayerViewRef,
   type Error,
   type Position,
-  type VideoInfo,
+  type MediaInfo,
 } from "./LibVlcPlayer.types";
 import { parseSource } from "./utils/assets";
 import { convertNativeProps } from "./utils/props";
@@ -41,7 +41,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       }
     };
 
-    const onParsedChanged = ({ nativeEvent }: { nativeEvent: VideoInfo }) => {
+    const onParsedChanged = ({ nativeEvent }: { nativeEvent: MediaInfo }) => {
       if (props.onParsedChanged) {
         props.onParsedChanged(nativeEvent);
       }

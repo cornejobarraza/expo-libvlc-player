@@ -42,7 +42,7 @@ export interface VideoTracks {
   subtitle: Track[];
 }
 
-export interface VideoInfo {
+export interface MediaInfo {
   width: number;
   height: number;
   tracks: VideoTracks;
@@ -112,7 +112,7 @@ export type Position = { position: number };
 /**
  * @hidden
  */
-export type ParsedChangedListener = (event: { nativeEvent: VideoInfo }) => void;
+export type ParsedChangedListener = (event: { nativeEvent: MediaInfo }) => void;
 
 /**
  * @hidden
@@ -287,7 +287,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
   /**
    * Called after the player loads the media
    */
-  onParsedChanged?: (event: VideoInfo) => void;
+  onParsedChanged?: (event: MediaInfo) => void;
   /**
    * Called after the player enters the background
    */

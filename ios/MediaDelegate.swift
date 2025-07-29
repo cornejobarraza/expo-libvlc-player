@@ -50,7 +50,7 @@ extension LibVlcPlayerView: VLCMediaDelegate {
         let length = player.media?.length.intValue ?? 0
         let seekable = player.isSeekable
 
-        let videoInfo: [String: Any] = [
+        let mediaInfo: [String: Any] = [
             "width": Int(video.width),
             "height": Int(video.height),
             "tracks": tracks,
@@ -59,7 +59,7 @@ extension LibVlcPlayerView: VLCMediaDelegate {
             "seekable": seekable,
         ]
 
-        onParsedChanged(videoInfo)
+        onParsedChanged(mediaInfo)
 
         videoLength = length
     }

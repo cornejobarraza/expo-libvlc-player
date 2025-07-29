@@ -51,7 +51,7 @@ fun LibVlcPlayerView.setMediaListener() {
                             }
                         val seekable = player.isSeekable()
 
-                        val videoInfo =
+                        val mediaInfo =
                             mapOf(
                                 "width" to (video?.width ?: 0),
                                 "height" to (video?.height ?: 0),
@@ -61,7 +61,7 @@ fun LibVlcPlayerView.setMediaListener() {
                                 "seekable" to seekable,
                             )
 
-                        onParsedChanged(videoInfo)
+                        onParsedChanged(mediaInfo)
 
                         videoLength = length
                     }
