@@ -12,6 +12,7 @@ import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.interfaces.IMedia
+import org.videolan.libvlc.util.DisplayManager
 import org.videolan.libvlc.util.VLCVideoLayout
 import java.util.UUID
 
@@ -22,8 +23,9 @@ const val MIN_PLAYER_VOLUME: Int = 0
 const val MAX_PLAYER_VOLUME: Int = 100
 const val PLAYER_VOLUME_STEP: Int = 10
 
-private val ENABLE_SUBTITLES = true
-private val USE_TEXTURE_VIEW = true
+private val DISPLAY_MANAGER: DisplayManager? = null
+private val ENABLE_SUBTITLES: Boolean = true
+private val USE_TEXTURE_VIEW: Boolean = true
 
 class LibVlcPlayerView(
     context: Context,
@@ -58,10 +60,16 @@ class LibVlcPlayerView(
         MediaPlayerManager.registerPlayerView(this)
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        mediaPlayer?.attachViews(playerView, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
 
-        attachPlayer()
+        mediaPlayer?.detachViews()
     }
 
     fun createPlayer() {
@@ -73,7 +81,6 @@ class LibVlcPlayerView(
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
         setMediaPlayerListener()
-        attachPlayer()
 
         try {
             media = Media(libVLC, Uri.parse(source))
@@ -107,10 +114,6 @@ class LibVlcPlayerView(
         }
 
         shouldCreate = false
-    }
-
-    fun attachPlayer() {
-        mediaPlayer?.attachViews(playerView, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
     }
 
     fun destroyPlayer() {
