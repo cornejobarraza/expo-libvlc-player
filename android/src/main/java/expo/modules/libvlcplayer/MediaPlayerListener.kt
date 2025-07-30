@@ -44,7 +44,9 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                         player.stop()
 
-                        if (!options.hasRepeatOption() && repeat) {
+			val shouldReplay = !options.hasRepeatOption() && repeat
+
+			if (shouldReplay) {
                             player.play()
                         }
                     }
