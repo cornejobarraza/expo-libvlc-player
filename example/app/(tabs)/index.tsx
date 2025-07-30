@@ -236,6 +236,7 @@ export default function Tab() {
             )}
             {shouldShowThumbnail && (
               <Image
+                key={thumbnail} // Re-render on thumbnail change
                 style={{
                   ...StyleSheet.absoluteFillObject,
                   width: "100%",
