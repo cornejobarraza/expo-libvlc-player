@@ -140,8 +140,13 @@ export default function Tab() {
       setIsPlaying(false);
     },
     onEncounteredError: ({ error }: Error) => {
-      Alert.alert("Error", error);
-      resetPlayerState();
+      Alert.alert("An error occurred", error);
+
+      const isPlayerError = error.includes("encountered");
+
+      if (isPlayerError) {
+        resetPlayerState();
+      }
     },
     onPositionChanged: ({ position }: Position) => {
       setPosition(position);
