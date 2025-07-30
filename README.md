@@ -36,23 +36,25 @@ No additional configuration necessary.
 
 #### Black screen issue
 
-On Android the `libvlcjni` player detaches from the View when its surface is destroyed after switching to a different screen.
+On Android, the `libvlcjni` player detaches from the View when the surface is destroyed during screen transitions.
 
-This causes nothing to be displayed when coming back to the player screen due to resources being previously released.
+This causes the player to display nothing when returning to the screen as native resources are automatically released.
 
-As a workaround the View is attached to the player when its surface is created again but causes a brief black screen.
+The current workaround reattaches the View when the surface is recreated, but this results in a brief black screen.
 
 ### Configure for iOS
 
 Run `npx pod-install` after installing the npm package.
 
-#### Local network usage
+#### Local network privacy
 
-Starting from iOS 14 you are required to provide a message for the `NSLocalNetworkUsageDescription` key in the Info.plist file if your app uses the local network directly or indirectly.
+On iOS, the `MobileVLCKit` player seems to interact with the local network when playing media from external sources.
 
-It seems the `MobileVLCKit` player on iOS makes use of this feature when playing external media from sources such as RTSP streams.
+Starting in iOS 14 a clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
 
-Provide a custom message specifying how your app will make use of the network so your App Store submission is not rejected for this reason. Read more about this [here](https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy).
+Specify how your app will make use of the local network so your App Store submission is not rejected:
+
+https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy
 
 ### Configuration in app config
 
