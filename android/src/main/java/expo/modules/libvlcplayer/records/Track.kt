@@ -5,7 +5,7 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 data class Track(
-    @Field val id: Int,
-    @Field val name: String,
+    @Field val id: Int = 0,
+    @Field val name: String = "",
 ) : Record,
     Serializable

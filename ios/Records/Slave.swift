@@ -2,8 +2,8 @@ import ExpoModulesCore
 
 struct Slave: Record {
     @Field
-    var source: String
+    var source: String = ""
 
     @Field
-    var type: String
+    var type: String = ""
 }

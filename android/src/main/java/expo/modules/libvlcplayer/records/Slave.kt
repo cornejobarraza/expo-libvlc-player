@@ -5,7 +5,7 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 class Slave(
-    @Field var source: String,
-    @Field var type: String,
+    @Field var source: String = "",
+    @Field var type: String = "",
 ) : Record,
     Serializable
