@@ -63,7 +63,7 @@ fun LibVlcPlayerView.setMediaListener() {
 
                         onParsedChanged(mediaInfo)
 
-                        videoLength = length
+                        mediaLength = length
                     }
                 }
             },

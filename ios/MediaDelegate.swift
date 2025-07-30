@@ -61,6 +61,6 @@ extension LibVlcPlayerView: VLCMediaDelegate {
 
         onParsedChanged(mediaInfo)
 
-        videoLength = length
+        mediaLength = length
     }
 }

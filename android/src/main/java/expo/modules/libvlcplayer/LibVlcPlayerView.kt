@@ -43,7 +43,7 @@ class LibVlcPlayerView(
     internal var media: Media? = null
     private var shouldCreate: Boolean = false
 
-    internal var videoLength: Long = 0L
+    internal var mediaLength: Long = 0L
     internal var userVolume: Int = MAX_PLAYER_VOLUME
 
     internal val onBuffering by EventDispatcher()
@@ -296,7 +296,7 @@ class LibVlcPlayerView(
             if (player.isSeekable()) {
                 player.setPosition(position)
             } else {
-                val time = position * videoLength.toFloat()
+                val time = position * mediaLength.toFloat()
                 this.time = time.toInt()
             }
 

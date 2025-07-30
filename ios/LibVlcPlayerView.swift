@@ -15,7 +15,7 @@ class LibVlcPlayerView: ExpoView {
     var mediaPlayer: VLCMediaPlayer?
     private var shouldCreate: Bool = false
 
-    var videoLength: Int32 = 0
+    var mediaLength: Int32 = 0
     private var userVolume: Int = maxPlayerVolume
 
     let onBuffering = EventDispatcher()
@@ -149,9 +149,9 @@ class LibVlcPlayerView: ExpoView {
     func setPlayerTracks() {
         guard let player = mediaPlayer else { return }
 
-        let audioTrackIndex = tracks?["audio"] as? Int ?? Int(player.currentAudioTrackIndex)
-        let videoTrackIndex = tracks?["video"] as? Int ?? Int(player.currentVideoTrackIndex)
-        let videoSubTitleIndex = tracks?["subtitle"] as? Int ?? Int(player.currentVideoSubTitleIndex)
+        let audioTrackIndex = tracks?.audio ?? Int(player.currentAudioTrackIndex)
+        let videoTrackIndex = tracks?.video ?? Int(player.currentVideoTrackIndex)
+        let videoSubTitleIndex = tracks?.subtitle ?? Int(player.currentVideoSubTitleIndex)
 
         player.currentAudioTrackIndex = Int32(audioTrackIndex)
         player.currentVideoTrackIndex = Int32(videoTrackIndex)
@@ -264,7 +264,7 @@ class LibVlcPlayerView: ExpoView {
         if player.isSeekable {
             player.position = position
         } else {
-            let time = position * Float(videoLength)
+            let time = position * Float(mediaLength)
             player.time = VLCTime(int: Int32(time))
         }
 

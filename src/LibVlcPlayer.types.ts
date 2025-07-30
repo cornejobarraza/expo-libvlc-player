@@ -36,7 +36,7 @@ export interface Track {
   name: string;
 }
 
-export interface VideoTracks {
+export interface MediaTracks {
   audio: Track[];
   video: Track[];
   subtitle: Track[];
@@ -45,7 +45,7 @@ export interface VideoTracks {
 export interface MediaInfo {
   width: number;
   height: number;
-  tracks: VideoTracks;
+  tracks: MediaTracks;
   aspectRatio: string | null;
   duration: number;
   seekable: boolean;
