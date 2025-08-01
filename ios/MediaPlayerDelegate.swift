@@ -33,9 +33,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
             player.stop()
 
-	    let shouldReplay = !options.hasRepeatOption() && shouldRepeat
+            let shouldReplay = !options.hasRepeatOption() && shouldRepeat
 
-	    if shouldReplay {
+            if shouldReplay {
                 player.play()
             }
         case .error:

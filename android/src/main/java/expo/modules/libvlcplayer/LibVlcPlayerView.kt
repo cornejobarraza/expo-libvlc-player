@@ -299,9 +299,6 @@ class LibVlcPlayerView(
                 val time = position * mediaLength.toFloat()
                 this.time = time.toInt()
             }
-
-            val userPosition = mapOf("position" to position)
-            onPositionChanged(userPosition)
         }
     }
 

@@ -164,6 +164,7 @@ export default function Tab() {
 
   const handleSlidingComplete = (position: number) => {
     playerViewRef.current?.seek(position);
+    setPosition(position);
     setIsBackgrounded(false);
   };
 
