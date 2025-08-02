@@ -6,6 +6,7 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
 import expo.modules.libvlcplayer.enums.AudioMixingMode
+import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
 import org.videolan.libvlc.LibVLC
@@ -54,7 +55,7 @@ class LibVlcPlayerView(
     internal val onEndReached by EventDispatcher()
     internal val onEncounteredError by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
-    internal val onParsedChanged by EventDispatcher()
+    internal val onParsedChanged by EventDispatcher<MediaInfo>()
     internal val onBackground by EventDispatcher()
 
     init {

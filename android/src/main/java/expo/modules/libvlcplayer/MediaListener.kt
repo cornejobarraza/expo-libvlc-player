@@ -1,5 +1,7 @@
 package expo.modules.libvlcplayer
 
+import expo.modules.libvlcplayer.records.MediaInfo
+import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Track
 import org.videolan.libvlc.interfaces.IMedia.Event
 import org.videolan.libvlc.interfaces.IMedia.EventListener
@@ -36,10 +38,10 @@ fun LibVlcPlayerView.setMediaListener() {
 
                         val video = player.getCurrentVideoTrack()
                         val tracks =
-                            mapOf(
-                                "audio" to audioTracks,
-                                "video" to videoTracks,
-                                "subtitle" to subtitleTracks,
+                            MediaTracks(
+                                audio = audioTracks,
+                                video = videoTracks,
+                                subtitle = subtitleTracks,
                             )
                         val pLength = player.getLength()
                         val length =
@@ -51,12 +53,12 @@ fun LibVlcPlayerView.setMediaListener() {
                         val seekable = player.isSeekable()
 
                         val mediaInfo =
-                            mapOf(
-                                "width" to (video?.width ?: 0),
-                                "height" to (video?.height ?: 0),
-                                "tracks" to tracks,
-                                "duration" to length.toDouble(),
-                                "seekable" to seekable,
+                            MediaInfo(
+                                width = video?.width ?: 0,
+                                height = video?.height ?: 0,
+                                tracks = tracks,
+                                duration = length.toDouble(),
+                                seekable = seekable,
                             )
 
                         onParsedChanged(mediaInfo)
