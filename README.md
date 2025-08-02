@@ -125,7 +125,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 | `time`             | Sets the initial player time. Must be an integer in milliseconds                    | `0`      |
 | `repeat`           | Determines whether the player should repeat the media after playback ends           | `false`  |
 | `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`           | `0`      |
-| `aspectRatio`      | Sets the player aspect ratio. Must be a valid format string                         |          |
+| `aspectRatio`      | Sets the player aspect ratio. Must be a valid string or `null` to reset to default  |          |
 | `audioMixingMode`  | Determines how the player will interact with other audio playing in the system      | `"auto"` |
 | `playInBackground` | Determines whether the player should continue playing after entering the background | `false`  |
 | `autoplay`         | Determines whether the media should autoplay once created                           | `true`   |
@@ -185,7 +185,6 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
       { "id": 3, "name": "Track 1 - [Japanese]" }
     ]
   },
-  "aspectRatio": "16:9",
   "duration": 78920,
   "seekable": true
 }

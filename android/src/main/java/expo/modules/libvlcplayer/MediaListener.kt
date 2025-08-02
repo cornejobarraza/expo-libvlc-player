@@ -41,7 +41,6 @@ fun LibVlcPlayerView.setMediaListener() {
                                 "video" to videoTracks,
                                 "subtitle" to subtitleTracks,
                             )
-                        val ratio = player.getAspectRatio()
                         val pLength = player.getLength()
                         val length =
                             if (pLength != -1L) {
@@ -56,7 +55,6 @@ fun LibVlcPlayerView.setMediaListener() {
                                 "width" to (video?.width ?: 0),
                                 "height" to (video?.height ?: 0),
                                 "tracks" to tracks,
-                                "aspectRatio" to ratio,
                                 "duration" to length.toDouble(),
                                 "seekable" to seekable,
                             )

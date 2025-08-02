@@ -46,7 +46,6 @@ export interface MediaInfo {
   width: number;
   height: number;
   tracks: MediaTracks;
-  aspectRatio: string | null;
   duration: number;
   seekable: boolean;
 }
@@ -134,7 +133,7 @@ export interface LibVlcPlayerViewNativeProps {
   time?: number;
   repeat?: boolean;
   scale?: number;
-  aspectRatio?: string;
+  aspectRatio?: string | null;
   audioMixingMode?: AudioMixingMode;
   playInBackground?: boolean;
   autoplay?: boolean;
@@ -240,11 +239,11 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   scale?: number;
   /**
-   * Sets the player aspect ratio. Must be a valid format string
+   * Sets the player aspect ratio. Must be a valid string or `null` to reset to default
    *
    * @example "16:9"
    */
-  aspectRatio?: string;
+  aspectRatio?: string | null;
   /**
    * Determines how the player will interact with other audio playing in the system
    *

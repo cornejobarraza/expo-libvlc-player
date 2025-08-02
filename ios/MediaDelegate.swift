@@ -46,7 +46,6 @@ extension LibVlcPlayerView: VLCMediaDelegate {
             "video": videoTracks,
             "subtitle": subtitleTracks,
         ]
-        let ratio = player.videoAspectRatio
         let length = player.media?.length.intValue ?? 0
         let seekable = player.isSeekable
 
@@ -54,7 +53,6 @@ extension LibVlcPlayerView: VLCMediaDelegate {
             "width": Int(video.width),
             "height": Int(video.height),
             "tracks": tracks,
-            "aspectRatio": ratio,
             "duration": Double(length),
             "seekable": seekable,
         ]
