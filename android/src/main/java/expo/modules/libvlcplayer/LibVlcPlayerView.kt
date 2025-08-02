@@ -18,6 +18,7 @@ import java.util.UUID
 
 const val DEFAULT_PLAYER_RATE: Float = 1f
 const val DEFAULT_PLAYER_TIME: Int = 0
+const val DEFAULT_PLAYER_SCALE: Float = 0f
 
 const val MIN_PLAYER_VOLUME: Int = 0
 const val MAX_PLAYER_VOLUME: Int = 100
@@ -260,6 +261,12 @@ class LibVlcPlayerView(
             }
 
             field = value
+        }
+
+    var scale: Float = DEFAULT_PLAYER_SCALE
+        set(value) {
+            field = value
+            mediaPlayer?.setScale(value)
         }
 
     var aspectRatio: String? = null

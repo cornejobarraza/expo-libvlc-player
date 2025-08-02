@@ -215,7 +215,7 @@ export default function Tab() {
             style={{
               backgroundColor: "black",
               position: "relative",
-              borderRadius: 5,
+              borderRadius: 6,
               aspectRatio: 16 / 9,
             }}
           >
@@ -247,7 +247,7 @@ export default function Tab() {
                   ...StyleSheet.absoluteFillObject,
                   width: "100%",
                   height: "100%",
-                  borderRadius: 5,
+                  borderRadius: 6,
                   zIndex: 10,
                 }}
                 source={{ uri: thumbnail }}
@@ -256,7 +256,7 @@ export default function Tab() {
             <LibVlcPlayerView
               key={source} // Re-render on source change
               ref={playerViewRef}
-              style={{ height: "100%", borderRadius: 5 }}
+              style={{ height: "100%", borderRadius: 6 }}
               source={source}
               options={VLC_OPTIONS}
               volume={volume}

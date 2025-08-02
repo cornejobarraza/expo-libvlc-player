@@ -4,6 +4,7 @@ import UIKit
 
 let defaultPlayerRate: Float = 1.0
 let defaultPlayerTime: Int = 0
+let defaultPlayerScale: Float = 0.0
 
 let minPlayerVolume: Int = 0
 let maxPlayerVolume: Int = 100
@@ -219,6 +220,12 @@ class LibVlcPlayerView: ExpoView {
                 let error = ["error": "Repeat enabled via options"]
                 onEncounteredError(error)
             }
+        }
+    }
+
+    var scale: Float = defaultPlayerScale {
+        didSet {
+            mediaPlayer?.scaleFactor = scale
         }
     }
 

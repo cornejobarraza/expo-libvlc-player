@@ -17,6 +17,10 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                                 time = DEFAULT_PLAYER_TIME
                             }
 
+                            if (scale != DEFAULT_PLAYER_SCALE) {
+                                player.setScale(scale)
+                            }
+
                             setPlayerTracks()
                         }
                     }

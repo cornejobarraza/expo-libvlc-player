@@ -14,6 +14,10 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     time = defaultPlayerTime
                 }
 
+                if scale != defaultPlayerScale {
+                    player.scaleFactor = scale
+                }
+
                 setPlayerTracks()
             }
         case .playing:

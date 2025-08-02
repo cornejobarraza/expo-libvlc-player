@@ -81,6 +81,10 @@ class LibVlcPlayerModule : Module() {
                     view.repeat = repeat ?: false
                 }
 
+                Prop("scale") { view: LibVlcPlayerView, scale: Float? ->
+                    view.scale = scale ?: DEFAULT_PLAYER_SCALE
+                }
+
                 Prop("aspectRatio") { view: LibVlcPlayerView, aspectRatio: String? ->
                     view.aspectRatio = aspectRatio
                 }

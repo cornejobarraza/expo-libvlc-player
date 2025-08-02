@@ -133,6 +133,7 @@ export interface LibVlcPlayerViewNativeProps {
   rate?: number;
   time?: number;
   repeat?: boolean;
+  scale?: number;
   aspectRatio?: string;
   audioMixingMode?: AudioMixingMode;
   playInBackground?: boolean;
@@ -233,7 +234,13 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   repeat?: boolean;
   /**
-   * Sets the player aspect ratio. Must be a valid format
+   * Sets the player scaling factor. Must be a float equal or greater than `0`
+   *
+   * @default 0
+   */
+  scale?: number;
+  /**
+   * Sets the player aspect ratio. Must be a valid format string
    *
    * @example "16:9"
    */
