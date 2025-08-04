@@ -44,6 +44,7 @@ class LibVlcPlayerView(
     internal var mediaPlayer: MediaPlayer? = null
     internal var media: Media? = null
     private var shouldCreate: Boolean = false
+    internal var shouldInit: Boolean = true
 
     internal var mediaLength: Long = 0L
     internal var userVolume: Int = MAX_PLAYER_VOLUME
@@ -93,29 +94,12 @@ class LibVlcPlayerView(
             onEncounteredError(error)
         }
 
-        addPlayerSlaves()
-
-        if (volume != MAX_PLAYER_VOLUME) {
-            mediaPlayer!!.setVolume(volume)
-        }
-
-        if (mute) {
-            mediaPlayer!!.setVolume(MIN_PLAYER_VOLUME)
-        }
-
-        if (rate != DEFAULT_PLAYER_RATE) {
-            mediaPlayer!!.setRate(rate)
-        }
-
-        if (aspectRatio != null) {
-            mediaPlayer!!.setAspectRatio(aspectRatio)
-        }
-
         if (autoplay) {
             mediaPlayer!!.play()
         }
 
         shouldCreate = false
+        shouldInit = true
     }
 
     fun destroyPlayer() {

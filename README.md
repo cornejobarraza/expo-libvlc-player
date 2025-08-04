@@ -36,7 +36,7 @@ No additional configuration necessary.
 
 #### Black screen issue
 
-On Android, the `libvlcjni` player detaches from the View when the surface is destroyed during screen transitions.
+On Android, the `libvlcjni` player detaches from the View when the surface is destroyed during screen changes.
 
 This causes the player to display nothing when returning to the screen as native resources are automatically released.
 

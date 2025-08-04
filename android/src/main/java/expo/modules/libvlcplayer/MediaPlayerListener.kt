@@ -10,25 +10,46 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                 when (event.type) {
                     Event.Buffering -> {
                         onBuffering(mapOf())
-
-                        if (player.getPosition() == 0f) {
-                            if (time != DEFAULT_PLAYER_TIME) {
-                                player.setTime(time.toLong())
-                                time = DEFAULT_PLAYER_TIME
-                            }
-
-                            if (scale != DEFAULT_PLAYER_SCALE) {
-                                player.setScale(scale)
-                            }
-
-                            setPlayerTracks()
-                        }
                     }
 
                     Event.Playing -> {
                         onPlaying(mapOf())
 
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                        if (shouldInit) {
+                            addPlayerSlaves()
+                            setPlayerTracks()
+
+                            if (volume != MAX_PLAYER_VOLUME || mute) {
+                                val newVolume =
+                                    if (mute) {
+                                        MIN_PLAYER_VOLUME
+                                    } else {
+                                        volume
+                                    }
+
+                                player.setVolume(newVolume)
+                            }
+
+                            if (rate != DEFAULT_PLAYER_RATE) {
+                                player.setRate(rate)
+                            }
+
+                            if (time != DEFAULT_PLAYER_TIME) {
+                                player.setTime(time.toLong())
+                            }
+
+                            if (scale != DEFAULT_PLAYER_SCALE) {
+                                player.setScale(scale)
+                            }
+
+                            if (aspectRatio != null) {
+                                player.setAspectRatio(aspectRatio)
+                            }
+
+                            shouldInit = false
+                        }
                     }
 
                     Event.Paused -> {
@@ -61,7 +82,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     }
 
                     Event.PositionChanged -> {
-                        val position = mapOf("position" to event.positionChanged)
+                        val position = mapOf("position" to player.getPosition())
                         onPositionChanged(position)
                     }
                 }

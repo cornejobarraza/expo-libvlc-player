@@ -7,23 +7,43 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         switch player.state {
         case .buffering:
             onBuffering([:])
+        case .playing:
+            onPlaying([:])
 
-            if player.position == 0.0 {
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+
+            if shouldInit {
+                addPlayerSlaves()
+                setPlayerTracks()
+
+                if volume != maxPlayerVolume || mute {
+                    let newVolume = mute ?
+                        minPlayerVolume :
+                        volume
+
+                    player.audio?.volume = Int32(newVolume)
+                }
+
+                if rate != defaultPlayerRate {
+                    player.rate = rate
+                }
+
                 if time != defaultPlayerTime {
                     player.time = VLCTime(int: Int32(time))
-                    time = defaultPlayerTime
                 }
 
                 if scale != defaultPlayerScale {
                     player.scaleFactor = scale
                 }
 
-                setPlayerTracks()
-            }
-        case .playing:
-            onPlaying([:])
+                if let aspectRatio = aspectRatio {
+                    aspectRatio.withCString { cString in
+                        player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+                    }
+                }
 
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+                shouldInit = false
+            }
         case .paused:
             onPaused([:])
 
