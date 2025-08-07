@@ -228,9 +228,7 @@ export default function Tab() {
                   zIndex: 30,
                 }}
               >
-                <Text style={{ color: "white", fontWeight: 500 }}>
-                  NO MEDIA
-                </Text>
+                <Text style={{ color: "white" }}>NO MEDIA</Text>
               </View>
             )}
             {shouldShowLoader && (
