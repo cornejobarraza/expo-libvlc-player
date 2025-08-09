@@ -17,10 +17,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
 
-                        if (shouldInit) {
-                            addPlayerSlaves()
-                            setPlayerTracks()
-
+                        if (shouldSetup) {
                             if (volume != MAX_PLAYER_VOLUME || mute) {
                                 val newVolume =
                                     if (mute) {
@@ -48,7 +45,9 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                                 player.setAspectRatio(aspectRatio)
                             }
 
-                            shouldInit = false
+                            setPlayerTracks()
+
+                            shouldSetup = false
                         }
                     }
 
@@ -62,6 +61,8 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         onStopped(mapOf())
 
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                        shouldSetup = true
                     }
 
                     Event.EndReached -> {

@@ -12,10 +12,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
             MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
 
-            if shouldInit {
-                addPlayerSlaves()
-                setPlayerTracks()
-
+            if shouldSetup {
                 if volume != maxPlayerVolume || mute {
                     let newVolume = mute ?
                         minPlayerVolume :
@@ -42,7 +39,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     }
                 }
 
-                shouldInit = false
+                setPlayerTracks()
+
+                shouldSetup = false
             }
         case .paused:
             onPaused([:])
@@ -52,6 +51,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             onStopped([:])
 
             MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+
+            shouldSetup = true
         case .ended:
             onEndReached([:])
 

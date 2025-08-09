@@ -15,7 +15,7 @@ class LibVlcPlayerView: ExpoView {
 
     var mediaPlayer: VLCMediaPlayer?
     private var shouldCreate: Bool = false
-    var shouldInit: Bool = true
+    var shouldSetup: Bool = true
 
     var mediaLength: Int32 = 0
     private var userVolume: Int = maxPlayerVolume
@@ -67,12 +67,14 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer!.media = VLCMedia(url: url)
         mediaPlayer!.media!.delegate = self
 
+        addPlayerSlaves()
+
         if autoplay {
             mediaPlayer!.play()
         }
 
         shouldCreate = false
-        shouldInit = true
+        shouldSetup = true
     }
 
     func destroyPlayer() {
