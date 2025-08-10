@@ -4,7 +4,7 @@ extension LibVlcPlayerView: VLCMediaDelegate {
     func mediaDidFinishParsing(_: VLCMedia) {
         guard let player = mediaPlayer else { return }
 
-        var audioTracks = []
+        var audioTracks: [Track] = []
 
         if let audios = player.audioTrackNames as? [String] {
             if let audioIndexes = player.audioTrackIndexes as? [NSNumber] {
@@ -16,7 +16,7 @@ extension LibVlcPlayerView: VLCMediaDelegate {
             }
         }
 
-        var videoTracks = []
+        var videoTracks: [Track] = []
 
         if let videos = player.videoTrackNames as? [String] {
             if let videoIndexes = player.videoTrackIndexes as? [NSNumber] {
@@ -28,7 +28,7 @@ extension LibVlcPlayerView: VLCMediaDelegate {
             }
         }
 
-        var subtitleTracks = []
+        var subtitleTracks: [Track] = []
 
         if let subtitles = player.videoSubTitlesNames as? [String] {
             if let subtitleIndexes = player.videoSubTitlesIndexes as? [NSNumber] {
@@ -44,7 +44,7 @@ extension LibVlcPlayerView: VLCMediaDelegate {
         let tracks = MediaTracks(
             audio: audioTracks,
             video: videoTracks,
-            subtitle: subtitleTracks,
+            subtitle: subtitleTracks
         )
         let length = player.media?.length.intValue ?? 0
         let seekable = player.isSeekable
@@ -54,7 +54,7 @@ extension LibVlcPlayerView: VLCMediaDelegate {
             height: Int(video.height),
             tracks: tracks,
             duration: Double(length),
-            seekable: seekable,
+            seekable: seekable
         )
 
         onParsedChanged(mediaInfo)
