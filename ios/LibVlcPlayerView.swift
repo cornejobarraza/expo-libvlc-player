@@ -215,12 +215,13 @@ class LibVlcPlayerView: ExpoView {
 
     var aspectRatio: String? {
         didSet {
-            guard let aspectRatio = aspectRatio {
-                aspectRatio.withCString { cString in
-                    mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
-                }
-            } else {
-                mediaPlayer?.videoAspectRatio = aspectRatio
+            guard let aspectRatio = aspectRatio else {
+                mediaPlayer?.videoAspectRatio = nil
+                return
+            }
+
+            aspectRatio.withCString { cString in
+                mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
             }
         }
     }
