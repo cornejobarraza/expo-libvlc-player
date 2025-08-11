@@ -66,13 +66,7 @@ class LibVlcPlayerView(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        mediaPlayer?.attachViews(playerView, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-
-        mediaPlayer?.detachViews()
+        attachPlayer()
     }
 
     fun createPlayer() {
@@ -84,6 +78,7 @@ class LibVlcPlayerView(
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
         setMediaPlayerListener()
+        attachPlayer()
 
         try {
             media = Media(libVLC, Uri.parse(source))
@@ -102,6 +97,16 @@ class LibVlcPlayerView(
 
         shouldCreate = false
         shouldSetup = true
+    }
+
+    fun attachPlayer() {
+        mediaPlayer?.let { player ->
+            val attached = player.getVLCVout().areViewsAttached()
+
+            if (!attached) {
+                player.attachViews(playerView, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+            }
+        }
     }
 
     fun destroyPlayer() {
