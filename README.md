@@ -36,11 +36,11 @@ No additional configuration necessary.
 
 #### Black screen issue
 
-On Android, the `libvlcjni` player detaches from the View when the surface is destroyed during screen changes.
+On Android, the `libvlcjni` player detaches from the View when its surface is destroyed after switching screens.
 
-This causes the player to display nothing when returning to the screen as native resources are automatically released.
+This causes nothing to be displayed when coming back to the screen as native resources are released automatically.
 
-The current workaround reattaches the View when the surface is recreated, but this results in a brief black screen.
+The current workaround is to reattach the View when its surface is recreated but this results in a brief black screen.
 
 ### Configure for iOS
 
@@ -52,9 +52,9 @@ On iOS, the `MobileVLCKit` player seems to interact with the local network when 
 
 Starting in iOS 14 a clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
 
-Specify how your app will make use of the local network so your App Store submission is not rejected:
+Specify how your app will make use of said feature so your App Store submission is not rejected for that reason.
 
-https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy
+> https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy
 
 ### Configuration in app config
 
@@ -102,12 +102,12 @@ See the [Example App](<example/app/(tabs)/index.tsx>) for additional usage.
 
 ### Player methods
 
-| Method    | Description                                                                 | Params             |
-| --------- | --------------------------------------------------------------------------- | ------------------ |
-| `play()`  | Starts playback of the current player                                       |                    |
-| `pause()` | Pauses playback of the current player                                       |                    |
-| `stop()`  | Stops playback of the current player                                        |                    |
-| `seek()`  | Changes position of the current player. Must be a float between `0` and `1` | `position: number` |
+| Method    | Description                                                              | Params             |
+| --------- | ------------------------------------------------------------------------ | ------------------ |
+| `play()`  | Starts playback of the current player                                    |                    |
+| `pause()` | Pauses playback of the current player                                    |                    |
+| `stop()`  | Stops playback of the current player                                     |                    |
+| `seek()`  | Sets position of the current player. Must be a float between `0` and `1` | `position: number` |
 
 ### Player props
 
@@ -192,14 +192,12 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 
 ## Disclaimer
 
-**IMPORTANT:** This project is not affiliated with, endorsed by, or officially supported by VideoLAN or the VLC media player project.
+**IMPORTANT:** This project is not affiliated with, endorsed by, or officially supported by VideoLAN.
 
-The VLC logo and cone icon are trademarks of VideoLAN and are used here solely to indicate compatibility with the following VLC libraries:
+The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with the following **LibVLC** bindings:
 
 - `libvlcjni v3.6.2` for Android
 - `MobileVLCKit v3.6.0` for iOS
-
-This is an independent open-source implementation that provides React Native bindings for VLC's underlying media libraries.
 
 For official VLC products and support, please visit [videolan.org](https://www.videolan.org/).
 
