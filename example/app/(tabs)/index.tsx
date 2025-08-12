@@ -142,9 +142,11 @@ export default function Tab() {
     onEncounteredError: ({ error }: Error) => {
       Alert.alert("An error occurred", error);
 
-      const isPlayerError = error.includes("encountered");
+      const message = error.toLowerCase();
+      const hasToReset =
+        message.includes("player") || message.includes("media");
 
-      if (isPlayerError) {
+      if (hasToReset) {
         resetPlayerState();
       }
     },
