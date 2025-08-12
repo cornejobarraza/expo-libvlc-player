@@ -41,9 +41,9 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       }
     };
 
-    const onParsedChanged = ({ nativeEvent }: { nativeEvent: MediaInfo }) => {
-      if (props.onParsedChanged) {
-        props.onParsedChanged(nativeEvent);
+    const onFirstPlay = ({ nativeEvent }: { nativeEvent: MediaInfo }) => {
+      if (props.onFirstPlay) {
+        props.onFirstPlay(nativeEvent);
       }
     };
 
@@ -58,7 +58,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         }))}
         onEncounteredError={onEncounteredError}
         onPositionChanged={onPositionChanged}
-        onParsedChanged={onParsedChanged}
+        onFirstPlay={onFirstPlay}
       />
     );
   },

@@ -63,7 +63,6 @@ export default function Tab() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isBackgrounded, setIsBackgrounded] = useState<boolean>(false);
   const [isSeekable, setIsSeekable] = useState<boolean>(false);
-  const [isParsed, setIsParsed] = useState<boolean | null>(null);
 
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<number | null>(null);
@@ -72,32 +71,26 @@ export default function Tab() {
     unlockOrientation();
   }, []);
 
-  const unlockOrientation = async () => await unlockAsync();
-
   useEffect(() => {
-    if (source === null) {
-      resetPlayerState();
-    }
-
     generateThumbnail();
   }, [source]);
+
+  const unlockOrientation = async () => await unlockAsync();
 
   const generateThumbnail = async () => {
     try {
       const isValidSource = typeof source === "string";
 
-      if (!isValidSource) {
-        return setThumbnail(null);
+      if (isValidSource) {
+        const { uri } = await getThumbnailAsync(source, {
+          time:
+            source === PRIMARY_PLAYER_SOURCE
+              ? PRIMARY_THUMBNAIL_POSITION
+              : SECONDARY_THUMBNAIL_POSITION,
+        });
+
+        setThumbnail(uri);
       }
-
-      const { uri } = await getThumbnailAsync(source, {
-        time:
-          source === PRIMARY_PLAYER_SOURCE
-            ? PRIMARY_THUMBNAIL_POSITION
-            : SECONDARY_THUMBNAIL_POSITION,
-      });
-
-      setThumbnail(uri);
     } catch {
       setThumbnail(null);
     }
@@ -154,10 +147,9 @@ export default function Tab() {
       setPosition(position);
       setIsBuffering(false);
     },
-    onParsedChanged: ({ duration, seekable }: MediaInfo) => {
+    onFirstPlay: ({ duration, seekable }: MediaInfo) => {
       setDuration(duration);
       setIsSeekable(seekable);
-      setIsParsed(true);
     },
     onBackground: () => {
       setIsBackgrounded(true);
@@ -199,15 +191,14 @@ export default function Tab() {
 
   const handleMute = () => setMuted((prev) => !prev);
 
-  const shouldShowLoader =
-    (isParsed === null || isBuffering) && !isBackgrounded;
+  const shouldShowLoader = isBuffering && !isBackgrounded;
 
   const shouldShowThumbnail =
     !!thumbnail &&
     !isPlaying &&
     (position === MIN_POSITION_VALUE || isBackgrounded);
 
-  const hasNullState = source === null || isParsed === null;
+  const hasNullSource = source === null;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -273,19 +264,26 @@ export default function Tab() {
                   ? "Change media"
                   : "Remove media"
             }
-            onPress={() =>
-              setSource((prev) =>
-                prev === null
+            onPress={() => {
+              setThumbnail(null);
+
+              const newSource =
+                source === null
                   ? PRIMARY_PLAYER_SOURCE
-                  : prev === PRIMARY_PLAYER_SOURCE
+                  : source === PRIMARY_PLAYER_SOURCE
                     ? SECONDARY_PLAYER_SOURCE
-                    : null,
-              )
-            }
+                    : null;
+
+              setSource(newSource);
+
+              if (newSource === null) {
+                resetPlayerState();
+              }
+            }}
           />
           <View style={styles.duration}>
             <Text>{msToMinutesSeconds(position * duration)}</Text>
-            <Text>{msToMinutesSeconds(duration)}</Text>
+            <Text>{duration > 0 ? msToMinutesSeconds(duration) : "N/A"}</Text>
           </View>
           <Slider
             value={position}
@@ -294,19 +292,19 @@ export default function Tab() {
             maximumValue={MAX_POSITION_VALUE}
             thumbTintColor="darkred"
             minimumTrackTintColor="red"
-            maximumTrackTintColor="indianred"
-            disabled={!isSeekable || hasNullState}
+            maximumTrackTintColor="lightgray"
+            disabled={!isSeekable || hasNullSource}
           />
           <View style={styles.row}>
             <Button
               title={!isPlaying ? "Play" : "Pause"}
               onPress={handlePlayPause}
-              disabled={hasNullState}
+              disabled={hasNullSource}
             />
             <Button
               title="Stop"
               onPress={handleStopPlayer}
-              disabled={hasNullState}
+              disabled={hasNullSource}
             />
             <Button
               title={
@@ -317,24 +315,26 @@ export default function Tab() {
                     : "Repeat"
               }
               onPress={handleRepeatChange}
-              disabled={duration <= 0 || hasNullState}
+              disabled={duration <= 0 || hasNullSource}
             />
           </View>
           <View style={styles.row}>
             <Button
               title="-"
               onPress={() => handleVolumeChange("decrease")}
-              disabled={volume === MIN_VOLUME_LEVEL || muted || hasNullState}
+              disabled={volume === MIN_VOLUME_LEVEL || muted || hasNullSource}
             />
             <Button
               title={!muted ? "Mute" : "Unmute"}
               onPress={handleMute}
-              disabled={(volume === MIN_VOLUME_LEVEL && !muted) || hasNullState}
+              disabled={
+                (volume === MIN_VOLUME_LEVEL && !muted) || hasNullSource
+              }
             />
             <Button
               title="+"
               onPress={() => handleVolumeChange("increase")}
-              disabled={volume === MAX_VOLUME_LEVEL || muted || hasNullState}
+              disabled={volume === MAX_VOLUME_LEVEL || muted || hasNullSource}
             />
           </View>
         </View>

@@ -7,7 +7,9 @@ import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
 import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.records.MediaInfo
+import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Slave
+import expo.modules.libvlcplayer.records.Track
 import expo.modules.libvlcplayer.records.Tracks
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
@@ -44,10 +46,10 @@ class LibVlcPlayerView(
     internal var mediaPlayer: MediaPlayer? = null
     internal var media: Media? = null
     private var shouldCreate: Boolean = false
-    internal var shouldSetup: Boolean = true
 
     internal var mediaLength: Long = 0L
     internal var userVolume: Int = MAX_PLAYER_VOLUME
+    internal var firstPlay: Boolean = true
 
     internal val onBuffering by EventDispatcher()
     internal val onPlaying by EventDispatcher()
@@ -56,7 +58,7 @@ class LibVlcPlayerView(
     internal val onEndReached by EventDispatcher()
     internal val onEncounteredError by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
-    internal val onParsedChanged by EventDispatcher<MediaInfo>()
+    internal val onFirstPlay by EventDispatcher<MediaInfo>()
     internal val onBackground by EventDispatcher()
 
     init {
@@ -67,6 +69,12 @@ class LibVlcPlayerView(
         super.onAttachedToWindow()
 
         attachPlayer()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        mediaPlayer?.detachViews()
     }
 
     fun createPlayer() {
@@ -83,7 +91,7 @@ class LibVlcPlayerView(
         try {
             media = Media(libVLC, Uri.parse(source))
             mediaPlayer!!.setMedia(media)
-            setMediaListener()
+            media!!.release()
         } catch (_: Exception) {
             val error = mapOf("error" to "Invalid source, media could not be set")
             onEncounteredError(error)
@@ -96,7 +104,6 @@ class LibVlcPlayerView(
         }
 
         shouldCreate = false
-        shouldSetup = true
     }
 
     fun attachPlayer() {
@@ -106,6 +113,101 @@ class LibVlcPlayerView(
             if (!attached) {
                 player.attachViews(playerView, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
             }
+        }
+    }
+
+    fun setupMediaInfo() {
+        var mediaInfo = MediaInfo()
+
+        mediaPlayer?.let { player ->
+            val audioTracks = mutableListOf<Track>()
+            val audios = player.getAudioTracks()
+
+            audios?.forEach { track ->
+                val trackObj = Track(id = track.id, name = track.name)
+                audioTracks.add(trackObj)
+            }
+
+            val videoTracks = mutableListOf<Track>()
+            val videos = player.getVideoTracks()
+
+            videos?.forEach { track ->
+                val trackObj = Track(id = track.id, name = track.name)
+                videoTracks.add(trackObj)
+            }
+
+            val subtitleTracks = mutableListOf<Track>()
+            val subtitles = player.getSpuTracks()
+
+            subtitles?.forEach { track ->
+                val trackObj = Track(id = track.id, name = track.name)
+                subtitleTracks.add(trackObj)
+            }
+
+            val video = player.getCurrentVideoTrack()
+            val tracks =
+                MediaTracks(
+                    audio = audioTracks,
+                    video = videoTracks,
+                    subtitle = subtitleTracks,
+                )
+            val pLength = player.getLength()
+            val length =
+                if (pLength != -1L) {
+                    pLength
+                } else {
+                    0L
+                }
+            val seekable = player.isSeekable()
+
+            mediaInfo =
+                MediaInfo(
+                    width = video?.width ?: 0,
+                    height = video?.height ?: 0,
+                    tracks = tracks,
+                    duration = length.toDouble(),
+                    seekable = seekable,
+                )
+
+            mediaLength = length
+        }
+
+        onFirstPlay(mediaInfo)
+    }
+
+    fun setupPlayer() {
+        mediaPlayer?.let { player ->
+            setupMediaInfo()
+            setPlayerTracks()
+
+            if (volume != MAX_PLAYER_VOLUME || mute) {
+                val newVolume =
+                    if (mute) {
+                        MIN_PLAYER_VOLUME
+                    } else {
+                        volume
+                    }
+
+                player.setVolume(newVolume)
+            }
+
+            if (rate != DEFAULT_PLAYER_RATE) {
+                player.setRate(rate)
+            }
+
+            if (time != DEFAULT_PLAYER_TIME) {
+                player.setTime(time.toLong())
+            }
+
+            if (scale != DEFAULT_PLAYER_SCALE) {
+                player.setScale(scale)
+            }
+
+            if (aspectRatio != null) {
+                player.setAspectRatio(aspectRatio)
+            }
+
+            firstPlay = false
         }
     }
 

@@ -15,40 +15,11 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     Event.Playing -> {
                         onPlaying(mapOf())
 
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-                        if (shouldSetup) {
-                            if (volume != MAX_PLAYER_VOLUME || mute) {
-                                val newVolume =
-                                    if (mute) {
-                                        MIN_PLAYER_VOLUME
-                                    } else {
-                                        volume
-                                    }
-
-                                player.setVolume(newVolume)
-                            }
-
-                            if (rate != DEFAULT_PLAYER_RATE) {
-                                player.setRate(rate)
-                            }
-
-                            if (time != DEFAULT_PLAYER_TIME) {
-                                player.setTime(time.toLong())
-                            }
-
-                            if (scale != DEFAULT_PLAYER_SCALE) {
-                                player.setScale(scale)
-                            }
-
-                            if (aspectRatio != null) {
-                                player.setAspectRatio(aspectRatio)
-                            }
-
-                            setPlayerTracks()
-
-                            shouldSetup = false
+                        if (firstPlay) {
+                            setupPlayer()
                         }
+
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
                     }
 
                     Event.Paused -> {
@@ -60,9 +31,9 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     Event.Stopped -> {
                         onStopped(mapOf())
 
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                        firstPlay = true
 
-                        shouldSetup = true
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
                     }
 
                     Event.EndReached -> {
