@@ -111,7 +111,7 @@ export type Position = { position: number };
 /**
  * @hidden
  */
-export type ParsedChangedListener = (event: { nativeEvent: MediaInfo }) => void;
+export type FirstPlayListener = (event: { nativeEvent: MediaInfo }) => void;
 
 /**
  * @hidden
@@ -144,7 +144,7 @@ export interface LibVlcPlayerViewNativeProps {
   onEndReached?: EndReachedListener;
   onEncounteredError?: EncounteredErrorListener;
   onPositionChanged?: PositionChangedListener;
-  onParsedChanged?: ParsedChangedListener;
+  onFirstPlay?: FirstPlayListener;
   onBackground?: BackgroundListener;
 }
 
@@ -291,9 +291,9 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   onPositionChanged?: (event: Position) => void;
   /**
-   * Called after the player loads the media
+   * Called after the first playing event
    */
-  onParsedChanged?: (event: MediaInfo) => void;
+  onFirstPlay?: (event: MediaInfo) => void;
   /**
    * Called after the player enters the background
    */

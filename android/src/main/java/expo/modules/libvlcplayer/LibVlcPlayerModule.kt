@@ -13,7 +13,7 @@ private const val STOPPED_EVENT = "onStopped"
 private const val END_REACHED_EVENT = "onEndReached"
 private const val ENCOUNTERED_ERROR_EVENT = "onEncounteredError"
 private const val POSITION_CHANGED_EVENT = "onPositionChanged"
-private const val PARSED_CHANGED_EVENT = "onParsedChanged"
+private const val FIRST_PLAY_EVENT = "onFirstPlay"
 private const val BACKGROUND_EVENT = "onBackground"
 
 val playerEvents =
@@ -25,7 +25,7 @@ val playerEvents =
         END_REACHED_EVENT,
         ENCOUNTERED_ERROR_EVENT,
         POSITION_CHANGED_EVENT,
-        PARSED_CHANGED_EVENT,
+        FIRST_PLAY_EVENT,
         BACKGROUND_EVENT,
     )
 

@@ -7,7 +7,7 @@ private let stoppedEvent = "onStopped"
 private let endReachedEvent = "onEndReached"
 private let encounteredErrorEvent = "onEncounteredError"
 private let positionChangedEvent = "onPositionChanged"
-private let parsedChangedEvent = "onParsedChanged"
+private let firstPlayEvent = "onFirstPlay"
 private let backgroundEvent = "onBackground"
 
 let playerEvents = [
@@ -18,7 +18,7 @@ let playerEvents = [
     endReachedEvent,
     encounteredErrorEvent,
     positionChangedEvent,
-    parsedChangedEvent,
+    firstPlayEvent,
     backgroundEvent,
 ]
 

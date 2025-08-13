@@ -15,10 +15,10 @@ class LibVlcPlayerView: ExpoView {
 
     var mediaPlayer: VLCMediaPlayer?
     private var shouldCreate: Bool = false
-    var shouldSetup: Bool = true
 
     var mediaLength: Int32 = 0
     private var userVolume: Int = maxPlayerVolume
+    var firstPlay: Bool = true
 
     let onBuffering = EventDispatcher()
     let onPlaying = EventDispatcher()
@@ -27,7 +27,7 @@ class LibVlcPlayerView: ExpoView {
     let onEndReached = EventDispatcher()
     let onEncounteredError = EventDispatcher()
     let onPositionChanged = EventDispatcher()
-    let onParsedChanged = EventDispatcher()
+    let onFirstPlay = EventDispatcher()
     let onBackground = EventDispatcher()
 
     required init(appContext: AppContext? = nil) {
@@ -65,7 +65,6 @@ class LibVlcPlayerView: ExpoView {
         }
 
         mediaPlayer!.media = VLCMedia(url: url)
-        mediaPlayer!.media!.delegate = self
 
         addPlayerSlaves()
 
@@ -74,7 +73,104 @@ class LibVlcPlayerView: ExpoView {
         }
 
         shouldCreate = false
-        shouldSetup = true
+    }
+
+    func setupMediaInfo() {
+        var mediaInfo = MediaInfo()
+
+        if let player = mediaPlayer {
+            var audioTracks: [Track] = []
+
+            if let audios = player.audioTrackNames as? [String] {
+                if let audioIndexes = player.audioTrackIndexes as? [NSNumber] {
+                    for (index, trackName) in audios.enumerated() {
+                        let trackId = audioIndexes[index].intValue
+                        let track = Track(id: trackId, name: trackName)
+                        audioTracks.append(track)
+                    }
+                }
+            }
+
+            var videoTracks: [Track] = []
+
+            if let videos = player.videoTrackNames as? [String] {
+                if let videoIndexes = player.videoTrackIndexes as? [NSNumber] {
+                    for (index, trackName) in videos.enumerated() {
+                        let trackId = videoIndexes[index].intValue
+                        let track = Track(id: trackId, name: trackName)
+                        videoTracks.append(track)
+                    }
+                }
+            }
+
+            var subtitleTracks: [Track] = []
+
+            if let subtitles = player.videoSubTitlesNames as? [String] {
+                if let subtitleIndexes = player.videoSubTitlesIndexes as? [NSNumber] {
+                    for (index, trackName) in subtitles.enumerated() {
+                        let trackId = subtitleIndexes[index].intValue
+                        let track = Track(id: trackId, name: trackName)
+                        subtitleTracks.append(track)
+                    }
+                }
+            }
+
+            let video = player.videoSize
+            let tracks = MediaTracks(
+                audio: audioTracks,
+                video: videoTracks,
+                subtitle: subtitleTracks
+            )
+            let length = player.media?.length.intValue ?? 0
+            let seekable = player.isSeekable
+
+            mediaInfo = MediaInfo(
+                width: Int(video.width),
+                height: Int(video.height),
+                tracks: tracks,
+                duration: Double(length),
+                seekable: seekable
+            )
+
+            mediaLength = length
+        }
+
+        onFirstPlay(mediaInfo)
+    }
+
+    func setupPlayer() {
+        guard let player = mediaPlayer else { return }
+
+        setupMediaInfo()
+        setPlayerTracks()
+
+        if volume != maxPlayerVolume || mute {
+            let newVolume = mute ?
+                minPlayerVolume :
+                volume
+
+            player.audio?.volume = Int32(newVolume)
+        }
+
+        if rate != defaultPlayerRate {
+            player.rate = rate
+        }
+
+        if time != defaultPlayerTime {
+            player.time = VLCTime(int: Int32(time))
+        }
+
+        if scale != defaultPlayerScale {
+            player.scaleFactor = scale
+        }
+
+        if let aspectRatio = aspectRatio {
+            aspectRatio.withCString { cString in
+                player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+            }
+        }
+
+        firstPlay = false
     }
 
     func destroyPlayer() {

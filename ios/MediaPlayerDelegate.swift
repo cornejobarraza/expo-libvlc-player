@@ -10,39 +10,11 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         case .playing:
             onPlaying([:])
 
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
-
-            if shouldSetup {
-                if volume != maxPlayerVolume || mute {
-                    let newVolume = mute ?
-                        minPlayerVolume :
-                        volume
-
-                    player.audio?.volume = Int32(newVolume)
-                }
-
-                if rate != defaultPlayerRate {
-                    player.rate = rate
-                }
-
-                if time != defaultPlayerTime {
-                    player.time = VLCTime(int: Int32(time))
-                }
-
-                if scale != defaultPlayerScale {
-                    player.scaleFactor = scale
-                }
-
-                if let aspectRatio = aspectRatio {
-                    aspectRatio.withCString { cString in
-                        player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
-                    }
-                }
-
-                setPlayerTracks()
-
-                shouldSetup = false
+            if firstPlay {
+                setupPlayer()
             }
+
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .paused:
             onPaused([:])
 
@@ -50,9 +22,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         case .stopped:
             onStopped([:])
 
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            firstPlay = true
 
-            shouldSetup = true
+            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
         case .ended:
             onEndReached([:])
 

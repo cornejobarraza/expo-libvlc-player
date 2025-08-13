@@ -36,11 +36,11 @@ No additional configuration necessary.
 
 #### Black screen issue
 
-On Android, the `libvlcjni` player detaches from the View when its surface is destroyed after switching screens.
+On Android, the `libvlcjni` player detaches from the View when its surface is destroyed after switching tabs.
 
 This causes nothing to be displayed when coming back to the screen as native resources are released automatically.
 
-The current workaround is to reattach the View when its surface is recreated but this results in a brief black screen.
+The current workaround is to reattach the View when its surface is recreated but results in a brief black screen.
 
 ### Configure for iOS
 
@@ -141,7 +141,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements its own:
 | `onEndReached`       | Called after the `EndReached` player event       |                           |
 | `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`       |
 | `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`    |
-| `onParsedChanged`    | Called after the `ParsedChanged` media event     | [`MediaInfo`](#mediainfo) |
+| `onFirstPlay`        | Called after the first playing event             | [`MediaInfo`](#mediainfo) |
 | `onBackground`       | Called after the player enters the background    |                           |
 
 ### Player types
