@@ -28,7 +28,7 @@ npm install expo-libvlc-player
 
 ### Bare React Native projects
 
-For bare React Native projects, you must ensure that you have [installed and configured](https://docs.expo.dev/bare/installing-expo-modules/) the `expo` package before continuing.
+For bare React Native projects, you must ensure that you have [installed and configured](https://docs.expo.dev/bare/installing-expo-modules/) the `expo` package.
 
 ### Configure for Android
 
@@ -36,11 +36,11 @@ No additional configuration necessary.
 
 #### Black screen issue
 
-On Android, the `libvlcjni` player detaches from the View when its surface is destroyed after switching tabs.
+On Android, the `libvlcjni` player detaches from the View when the surface is destroyed after switching tabs.
 
 This causes nothing to be displayed when coming back to the screen as native resources are released automatically.
 
-The current workaround is to reattach the View when its surface is recreated but results in a brief black screen.
+The current workaround is to reattach the View once the surface is recreated but this results in a brief black screen.
 
 ### Configure for iOS
 
@@ -50,11 +50,9 @@ Run `npx pod-install` after installing the npm package.
 
 On iOS, the `MobileVLCKit` player seems to interact with the local network when playing media from external sources.
 
-Starting in iOS 14 a clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
+Starting in iOS 14, a clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
 
-Specify how your app will make use of said feature so your App Store submission is not rejected for that reason.
-
-> https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy
+https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy#Essentials
 
 ### Configuration in app config
 
@@ -91,10 +89,12 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 import { LibVlcPlayerView } from "expo-libvlc-player";
 
 return (
-  <LibVlcPlayerView
-    style={{ height: "100%" }}
-    source="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-  />
+  <View style={{ aspectRatio: 16 / 9 }}>
+    <LibVlcPlayerView
+      style={{ height: "100%" }}
+      source="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    />
+  </View>
 );
 ```
 
@@ -102,12 +102,12 @@ See the [Example App](<example/app/(tabs)/index.tsx>) for additional usage.
 
 ### Player methods
 
-| Method    | Description                                                              | Params             |
-| --------- | ------------------------------------------------------------------------ | ------------------ |
-| `play()`  | Starts playback of the current player                                    |                    |
-| `pause()` | Pauses playback of the current player                                    |                    |
-| `stop()`  | Stops playback of the current player                                     |                    |
-| `seek()`  | Sets position of the current player. Must be a float between `0` and `1` | `position: number` |
+| Method                   | Description                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| `play()`                 | Starts playback of the current player                                        |
+| `pause()`                | Pauses playback of the current player                                        |
+| `stop()`                 | Stops playback of the current player                                         |
+| `seek(position: number)` | Sets the position of the current player. Must be a float between `0` and `1` |
 
 ### Player props
 
