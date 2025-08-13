@@ -1,7 +1,7 @@
-apply plugin: 'com.android.library'
+apply plugin: "com.android.library"
 
-group = 'expo.modules.libvlcplayer'
-version = '0.1.64'
+group = "expo.modules.libvlcplayer"
+version = "0.1.65"
 
 def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
 apply from: expoModulesCorePlugin
@@ -27,7 +27,7 @@ android {
     namespace "expo.modules.libvlcplayer"
     defaultConfig {
         versionCode 1
-        versionName "0.1.64"
+        versionName "0.1.65"
         consumerProguardFiles("proguard-rules.pro")
     }
     lintOptions {
@@ -40,6 +40,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.facebook.react:react-native:+'
-    implementation 'org.videolan.android:libvlc-all:3.6.2'
+    implementation "com.facebook.react:react-native:+"
+    implementation "org.videolan.android:libvlc-all:3.6.2"
 }
