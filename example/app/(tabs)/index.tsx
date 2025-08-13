@@ -29,16 +29,12 @@ function msToMinutesSeconds(duration: number) {
   return `${minutes}:${seconds}`;
 }
 
-const VLC_OPTIONS = ["--network-caching=1000"];
-const BUFFERING_DELAY = 1_000;
-
-const PRIMARY_PLAYER_SOURCE =
+const BIG_BUCK_BUNNY =
   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
-const SECONDARY_PLAYER_SOURCE =
-  "http://streams.videolan.org/streams/mp4/Mr_MrsSmith-h264_aac.mp4";
+const VLC_OPTIONS = ["--network-caching=1000"];
 
-const PRIMARY_THUMBNAIL_POSITION = 27_000;
-const SECONDARY_THUMBNAIL_POSITION = 77_000;
+const THUMBNAIL_TIME = 27_000;
+const BUFFERING_DELAY = 1_000;
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 1;
@@ -50,9 +46,8 @@ const VOLUME_CHANGE_STEP = 10;
 type VolumeChange = "increase" | "decrease";
 type RepeatMode = boolean | "once";
 
-export default function Tab() {
+export default function HomeTab() {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
-  const [source, setSource] = useState<LibVlcSource>(PRIMARY_PLAYER_SOURCE);
   const [position, setPosition] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
@@ -73,24 +68,17 @@ export default function Tab() {
 
   useEffect(() => {
     generateThumbnail();
-  }, [source]);
+  }, []);
 
   const unlockOrientation = async () => await unlockAsync();
 
   const generateThumbnail = async () => {
     try {
-      const isValidSource = typeof source === "string";
+      const { uri } = await getThumbnailAsync(BIG_BUCK_BUNNY, {
+        time: THUMBNAIL_TIME,
+      });
 
-      if (isValidSource) {
-        const { uri } = await getThumbnailAsync(source, {
-          time:
-            source === PRIMARY_PLAYER_SOURCE
-              ? PRIMARY_THUMBNAIL_POSITION
-              : SECONDARY_THUMBNAIL_POSITION,
-        });
-
-        setThumbnail(uri);
-      }
+      setThumbnail(uri);
     } catch {
       setThumbnail(null);
     }
@@ -198,8 +186,6 @@ export default function Tab() {
     !isPlaying &&
     (position === MIN_POSITION_VALUE || isBackgrounded);
 
-  const hasNullSource = source === null;
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView overScrollMode="never" bounces={false}>
@@ -212,18 +198,6 @@ export default function Tab() {
               aspectRatio: 16 / 9,
             }}
           >
-            {source === null && (
-              <View
-                style={{
-                  ...StyleSheet.absoluteFillObject,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  zIndex: 30,
-                }}
-              >
-                <Text style={{ color: "white" }}>NO MEDIA</Text>
-              </View>
-            )}
             {shouldShowLoader && (
               <ActivityIndicator
                 style={{ ...StyleSheet.absoluteFillObject, zIndex: 20 }}
@@ -233,7 +207,6 @@ export default function Tab() {
             )}
             {shouldShowThumbnail && (
               <Image
-                key={thumbnail} // Re-render on thumbnail change
                 style={{
                   ...StyleSheet.absoluteFillObject,
                   width: "100%",
@@ -245,10 +218,9 @@ export default function Tab() {
               />
             )}
             <LibVlcPlayerView
-              key={source} // Re-render on source change
               ref={playerViewRef}
               style={{ height: "100%", borderRadius: 6 }}
-              source={source}
+              source={BIG_BUCK_BUNNY}
               options={VLC_OPTIONS}
               volume={volume}
               mute={muted}
@@ -256,31 +228,6 @@ export default function Tab() {
               {...handlePlayerEvents}
             />
           </View>
-          <Button
-            title={
-              source === null
-                ? "Reset media"
-                : source === PRIMARY_PLAYER_SOURCE
-                  ? "Change media"
-                  : "Remove media"
-            }
-            onPress={() => {
-              setThumbnail(null);
-
-              const newSource =
-                source === null
-                  ? PRIMARY_PLAYER_SOURCE
-                  : source === PRIMARY_PLAYER_SOURCE
-                    ? SECONDARY_PLAYER_SOURCE
-                    : null;
-
-              setSource(newSource);
-
-              if (newSource === null) {
-                resetPlayerState();
-              }
-            }}
-          />
           <View style={styles.duration}>
             <Text>{msToMinutesSeconds(position * duration)}</Text>
             <Text>{duration > 0 ? msToMinutesSeconds(duration) : "N/A"}</Text>
@@ -293,19 +240,14 @@ export default function Tab() {
             thumbTintColor="darkred"
             minimumTrackTintColor="red"
             maximumTrackTintColor="lightgray"
-            disabled={!isSeekable || hasNullSource}
+            disabled={!isSeekable}
           />
           <View style={styles.row}>
             <Button
               title={!isPlaying ? "Play" : "Pause"}
               onPress={handlePlayPause}
-              disabled={hasNullSource}
             />
-            <Button
-              title="Stop"
-              onPress={handleStopPlayer}
-              disabled={hasNullSource}
-            />
+            <Button title="Stop" onPress={handleStopPlayer} />
             <Button
               title={
                 !repeat
@@ -315,26 +257,24 @@ export default function Tab() {
                     : "Repeat"
               }
               onPress={handleRepeatChange}
-              disabled={duration <= 0 || hasNullSource}
+              disabled={duration <= 0}
             />
           </View>
           <View style={styles.row}>
             <Button
               title="-"
               onPress={() => handleVolumeChange("decrease")}
-              disabled={volume === MIN_VOLUME_LEVEL || muted || hasNullSource}
+              disabled={volume === MIN_VOLUME_LEVEL || muted}
             />
             <Button
               title={!muted ? "Mute" : "Unmute"}
               onPress={handleMute}
-              disabled={
-                (volume === MIN_VOLUME_LEVEL && !muted) || hasNullSource
-              }
+              disabled={volume === MIN_VOLUME_LEVEL && !muted}
             />
             <Button
               title="+"
               onPress={() => handleVolumeChange("increase")}
-              disabled={volume === MAX_VOLUME_LEVEL || muted || hasNullSource}
+              disabled={volume === MAX_VOLUME_LEVEL || muted}
             />
           </View>
         </View>
