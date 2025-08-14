@@ -17,7 +17,6 @@ import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.interfaces.IMedia
 import org.videolan.libvlc.util.DisplayManager
 import org.videolan.libvlc.util.VLCVideoLayout
-import java.util.UUID
 
 const val DEFAULT_PLAYER_RATE: Float = 1f
 const val DEFAULT_PLAYER_TIME: Int = 0
@@ -35,8 +34,6 @@ class LibVlcPlayerView(
     context: Context,
     appContext: AppContext,
 ) : ExpoView(context, appContext) {
-    internal val playerViewId: String = UUID.randomUUID().toString()
-
     private val playerView: VLCVideoLayout =
         VLCVideoLayout(context).also {
             addView(it)
