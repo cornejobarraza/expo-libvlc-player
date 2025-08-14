@@ -109,6 +109,10 @@ class LibVlcPlayerView(
 
             if (!attached) {
                 player.attachViews(playerView, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+
+                if (!player.isPlaying()) {
+                    player.setTime(player.getTime())
+                }
             }
         }
     }

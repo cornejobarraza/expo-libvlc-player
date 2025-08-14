@@ -179,8 +179,6 @@ export default function HomeTab() {
 
   const handleMute = () => setMuted((prev) => !prev);
 
-  const shouldShowLoader = isBuffering && !isBackgrounded;
-
   const shouldShowThumbnail =
     !!thumbnail &&
     !isPlaying &&
@@ -198,7 +196,7 @@ export default function HomeTab() {
               aspectRatio: 16 / 9,
             }}
           >
-            {shouldShowLoader && (
+            {isBuffering && (
               <ActivityIndicator
                 style={{ ...StyleSheet.absoluteFillObject, zIndex: 20 }}
                 color="white"
