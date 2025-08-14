@@ -204,6 +204,7 @@ class LibVlcPlayerView(
                 player.setAspectRatio(aspectRatio)
             }
 
+            time = DEFAULT_PLAYER_TIME
             firstPlay = false
         }
     }

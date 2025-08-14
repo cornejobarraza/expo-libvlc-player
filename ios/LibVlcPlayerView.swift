@@ -170,6 +170,7 @@ class LibVlcPlayerView: ExpoView {
             }
         }
 
+        time = defaultPlayerTime
         firstPlay = false
     }
 
