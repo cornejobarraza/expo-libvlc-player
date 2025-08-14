@@ -102,19 +102,12 @@ class LibVlcPlayerView(
 
     fun attachPlayer() {
         mediaPlayer?.let { player ->
-            val attached = player.getVLCVout().areViewsAttached()
-
             if (playerView.getParent() == null) {
                 addView(playerView)
             }
 
-            if (!attached) {
+            if (!player.getVLCVout().areViewsAttached()) {
                 player.attachViews(playerView, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
-
-                if (!player.isPlaying()) {
-                    // Prevent slow video output after view attachment
-                    player.setTime(player.getTime())
-                }
             }
         }
     }
