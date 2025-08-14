@@ -14,17 +14,17 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 setupPlayer()
             }
 
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            MediaPlayerManager.shared.setAppropriateAudioSession()
         case .paused:
             onPaused([:])
 
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            MediaPlayerManager.shared.setAppropriateAudioSession()
         case .stopped:
             onStopped([:])
 
             firstPlay = true
 
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            MediaPlayerManager.shared.setAppropriateAudioSession()
         case .ended:
             onEndReached([:])
 

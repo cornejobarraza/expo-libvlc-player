@@ -226,25 +226,27 @@ class LibVlcPlayerView(
     var source: String? = null
         set(value) {
             val old = field
-            field = value
 
             if (value != null) {
                 shouldCreate = value != old
             } else {
                 destroyPlayer()
             }
+
+            field = value
         }
 
     var options: ArrayList<String> = ArrayList<String>()
         set(value) {
             val old = field
-            field = value
 
             if (source != null) {
                 shouldCreate = value != old
             } else {
                 destroyPlayer()
             }
+
+            field = value
         }
 
     fun addPlayerSlave(slave: Slave) {
@@ -274,8 +276,8 @@ class LibVlcPlayerView(
 
     var slaves: ArrayList<Slave>? = null
         set(value) {
-            field = value
             addPlayerSlaves()
+            field = value
         }
 
     fun setPlayerTracks() {
@@ -292,18 +294,8 @@ class LibVlcPlayerView(
 
     var tracks: Tracks? = null
         set(value) {
-            if (options.hasAudioTrackOption()) {
-                val error = mapOf("error" to "Audio track selected via options")
-                onEncounteredError(error)
-            }
-
-            if (options.hasSubtitleTrackOption()) {
-                val error = mapOf("error" to "Subtitle track selected via options")
-                onEncounteredError(error)
-            }
-
-            field = value
             setPlayerTracks()
+            field = value
         }
 
     var volume: Int = MAX_PLAYER_VOLUME
@@ -313,13 +305,13 @@ class LibVlcPlayerView(
                 onEncounteredError(error)
             }
 
-            field = value
-
             val volume = value.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
             userVolume = volume
 
             mediaPlayer?.setVolume(volume)
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+            field = value
         }
 
     var mute: Boolean = false
@@ -328,8 +320,6 @@ class LibVlcPlayerView(
                 val error = mapOf("error" to "Audio disabled via options")
                 onEncounteredError(error)
             }
-
-            field = value
 
             val newVolume =
                 if (!value) {
@@ -340,12 +330,14 @@ class LibVlcPlayerView(
 
             mediaPlayer?.setVolume(newVolume)
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+            field = value
         }
 
     var rate: Float = DEFAULT_PLAYER_RATE
         set(value) {
-            field = value
             mediaPlayer?.setRate(value)
+            field = value
         }
 
     var time: Int = DEFAULT_PLAYER_TIME
@@ -362,26 +354,26 @@ class LibVlcPlayerView(
 
     var scale: Float = DEFAULT_PLAYER_SCALE
         set(value) {
-            field = value
             mediaPlayer?.setScale(value)
+            field = value
         }
 
     var aspectRatio: String? = null
         set(value) {
-            field = value
             mediaPlayer?.setAspectRatio(value)
+            field = value
         }
 
     var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO
         set(value) {
-            field = value
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
+            field = value
         }
 
     var playInBackground: Boolean = false
         set(value) {
-            field = value
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
+            field = value
         }
 
     var autoplay: Boolean = true
@@ -418,36 +410,6 @@ class LibVlcPlayerView(
             )
 
         return this.any { it in options }
-    }
-
-    internal fun ArrayList<String>.hasAudioTrackOption(): Boolean {
-        val options =
-            setOf(
-                "--audio-track=",
-                "-audio-track=",
-                ":audio-track=",
-            )
-
-        return this.any { arg ->
-            options.any { option ->
-                arg.startsWith(option)
-            }
-        }
-    }
-
-    internal fun ArrayList<String>.hasSubtitleTrackOption(): Boolean {
-        val options =
-            setOf(
-                "--sub-track=",
-                "-sub-track=",
-                ":sub-track=",
-            )
-
-        return this.any { arg ->
-            options.any { option ->
-                arg.startsWith(option)
-            }
-        }
     }
 
     internal fun ArrayList<String>.hasRepeatOption(): Boolean {

@@ -17,12 +17,12 @@ class MediaPlayerManager {
 
     func registerPlayerView(_ view: LibVlcPlayerView) {
         playerViews.add(view)
-        setAppropriateAudioSessionOrWarn()
+        setAppropriateAudioSession()
     }
 
     func unregisterPlayerView(_ view: LibVlcPlayerView) {
         playerViews.remove(view)
-        setAppropriateAudioSessionOrWarn()
+        setAppropriateAudioSession()
         view.destroyPlayer()
     }
 
@@ -40,7 +40,7 @@ class MediaPlayerManager {
         }
     }
 
-    func setAppropriateAudioSessionOrWarn() {
+    func setAppropriateAudioSession() {
         Self.managerQueue.async { [weak self] in
             self?.setAudioSession()
         }

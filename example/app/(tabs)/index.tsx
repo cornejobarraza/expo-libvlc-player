@@ -2,7 +2,6 @@ import Slider from "@react-native-community/slider";
 import {
   LibVlcPlayerView,
   LibVlcPlayerViewRef,
-  type LibVlcSource,
   type Error,
   type Position,
   type MediaInfo,
@@ -86,7 +85,7 @@ export default function HomeTab() {
     }
   };
 
-  const handlePlayerEvents = {
+  const playerEvents = {
     onBuffering: () => {
       setIsBuffering(true);
 
@@ -229,7 +228,7 @@ export default function HomeTab() {
               volume={volume}
               mute={muted}
               repeat={repeat !== false}
-              {...handlePlayerEvents}
+              {...playerEvents}
             />
           </View>
           <View style={styles.duration}>

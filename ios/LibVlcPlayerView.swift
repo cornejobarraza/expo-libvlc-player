@@ -243,16 +243,6 @@ class LibVlcPlayerView: ExpoView {
 
     var tracks: Tracks? {
         didSet {
-            if options.hasAudioTrackOption() {
-                let error = ["error": "Audio track selected via options"]
-                onEncounteredError(error)
-            }
-
-            if options.hasSubtitleTrackOption() {
-                let error = ["error": "Subtitle track selected via options"]
-                onEncounteredError(error)
-            }
-
             setPlayerTracks()
         }
     }
@@ -268,7 +258,7 @@ class LibVlcPlayerView: ExpoView {
             userVolume = newVolume
 
             mediaPlayer?.audio?.volume = Int32(newVolume)
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            MediaPlayerManager.shared.setAppropriateAudioSession()
         }
     }
 
@@ -284,7 +274,7 @@ class LibVlcPlayerView: ExpoView {
                 minPlayerVolume
 
             mediaPlayer?.audio?.volume = Int32(newVolume)
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            MediaPlayerManager.shared.setAppropriateAudioSession()
         }
     }
 
@@ -326,13 +316,13 @@ class LibVlcPlayerView: ExpoView {
 
     var audioMixingMode: AudioMixingMode = .auto {
         didSet {
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            MediaPlayerManager.shared.setAppropriateAudioSession()
         }
     }
 
     var playInBackground: Bool = false {
         didSet {
-            MediaPlayerManager.shared.setAppropriateAudioSessionOrWarn()
+            MediaPlayerManager.shared.setAppropriateAudioSession()
         }
     }
 
@@ -369,34 +359,6 @@ extension Array where Element == String {
         ]
 
         return contains { arg in options.contains(arg) }
-    }
-}
-
-extension Array where Element == String {
-    func hasAudioTrackOption() -> Bool {
-        let options: Set<String> = [
-            "--audio-track=", "-audio-track=", ":audio-track=",
-        ]
-
-        return contains { arg in
-            options.contains { option in
-                arg.hasPrefix(option)
-            }
-        }
-    }
-}
-
-extension Array where Element == String {
-    func hasSubtitleTrackOption() -> Bool {
-        let options: Set<String> = [
-            "--sub-track=", "-sub-track=", ":sub-track=",
-        ]
-
-        return contains { arg in
-            options.contains { option in
-                arg.hasPrefix(option)
-            }
-        }
     }
 }
 
