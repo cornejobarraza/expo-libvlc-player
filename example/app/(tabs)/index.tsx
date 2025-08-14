@@ -35,6 +35,7 @@ const VLC_OPTIONS = ["--network-caching=1000"];
 
 const THUMBNAIL_TIME = 27_000;
 const BUFFERING_DELAY = 1_000;
+const DEFAULT_DURATION = 0;
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 1;
@@ -48,14 +49,15 @@ type RepeatMode = boolean | "once";
 
 export default function HomeTab() {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
-  const [position, setPosition] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(0);
+  const [position, setPosition] = useState<number>(MIN_POSITION_VALUE);
+  const [duration, setDuration] = useState<number>(DEFAULT_DURATION);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
   const [muted, setMuted] = useState<boolean>(false);
   const [repeat, setRepeat] = useState<RepeatMode>(false);
 
   const [isBuffering, setIsBuffering] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isStopped, setIsStopped] = useState<boolean>(false);
   const [isBackgrounded, setIsBackgrounded] = useState<boolean>(false);
   const [isSeekable, setIsSeekable] = useState<boolean>(false);
 
@@ -84,15 +86,6 @@ export default function HomeTab() {
     }
   };
 
-  const resetPlayerState = () => {
-    setPosition(0);
-    setDuration(0);
-    setIsBuffering(false);
-    setIsPlaying(false);
-    setIsBackgrounded(false);
-    setIsSeekable(false);
-  };
-
   const handlePlayerEvents = {
     onBuffering: () => {
       setIsBuffering(true);
@@ -109,16 +102,19 @@ export default function HomeTab() {
     onPlaying: () => {
       setIsBuffering(false);
       setIsPlaying(true);
+      setIsStopped(false);
     },
     onPaused: () => {
       setIsBuffering(false);
       setIsPlaying(false);
+      setIsStopped(false);
     },
     onStopped: () => {
-      setPosition(0);
+      setPosition(MIN_POSITION_VALUE);
       setRepeat((prev) => (prev !== "once" ? prev : false));
       setIsBuffering(false);
       setIsPlaying(false);
+      setIsStopped(true);
     },
     onEncounteredError: ({ error }: Error) => {
       Alert.alert("An error occurred", error);
@@ -179,10 +175,20 @@ export default function HomeTab() {
 
   const handleMute = () => setMuted((prev) => !prev);
 
+  const resetPlayerState = () => {
+    setPosition(MIN_POSITION_VALUE);
+    setDuration(DEFAULT_DURATION);
+    setIsBuffering(false);
+    setIsPlaying(false);
+    setIsStopped(false);
+    setIsBackgrounded(false);
+    setIsSeekable(false);
+  };
+
   const shouldShowThumbnail =
     !!thumbnail &&
     !isPlaying &&
-    (position === MIN_POSITION_VALUE || isBackgrounded);
+    (position === MIN_POSITION_VALUE || isStopped || isBackgrounded);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -228,7 +234,11 @@ export default function HomeTab() {
           </View>
           <View style={styles.duration}>
             <Text>{msToMinutesSeconds(position * duration)}</Text>
-            <Text>{duration > 0 ? msToMinutesSeconds(duration) : "N/A"}</Text>
+            <Text>
+              {duration > DEFAULT_DURATION
+                ? msToMinutesSeconds(duration)
+                : "N/A"}
+            </Text>
           </View>
           <Slider
             value={position}
@@ -245,7 +255,11 @@ export default function HomeTab() {
               title={!isPlaying ? "Play" : "Pause"}
               onPress={handlePlayPause}
             />
-            <Button title="Stop" onPress={handleStopPlayer} />
+            <Button
+              title="Stop"
+              onPress={handleStopPlayer}
+              disabled={isStopped}
+            />
             <Button
               title={
                 !repeat
@@ -255,7 +269,7 @@ export default function HomeTab() {
                     : "Repeat"
               }
               onPress={handleRepeatChange}
-              disabled={duration <= 0}
+              disabled={duration <= DEFAULT_DURATION}
             />
           </View>
           <View style={styles.row}>

@@ -34,10 +34,7 @@ class LibVlcPlayerView(
     context: Context,
     appContext: AppContext,
 ) : ExpoView(context, appContext) {
-    private val playerView: VLCVideoLayout =
-        VLCVideoLayout(context).also {
-            addView(it)
-        }
+    private val playerView: VLCVideoLayout = VLCVideoLayout(context)
 
     private var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
@@ -71,7 +68,7 @@ class LibVlcPlayerView(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
 
-        mediaPlayer?.detachViews()
+        detachPlayer()
     }
 
     fun createPlayer() {
@@ -83,7 +80,6 @@ class LibVlcPlayerView(
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
         setMediaPlayerListener()
-        attachPlayer()
 
         try {
             media = Media(libVLC, Uri.parse(source))
@@ -101,20 +97,31 @@ class LibVlcPlayerView(
         }
 
         shouldCreate = false
+        firstPlay = true
     }
 
     fun attachPlayer() {
         mediaPlayer?.let { player ->
             val attached = player.getVLCVout().areViewsAttached()
 
+            if (playerView.getParent() == null) {
+                addView(playerView)
+            }
+
             if (!attached) {
                 player.attachViews(playerView, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
 
                 if (!player.isPlaying()) {
+                    // Prevent slow video output after view attachment
                     player.setTime(player.getTime())
                 }
             }
         }
+    }
+
+    fun detachPlayer() {
+        mediaPlayer?.detachViews()
+        removeAllViews()
     }
 
     fun setupMediaInfo() {
@@ -178,6 +185,7 @@ class LibVlcPlayerView(
 
     fun setupPlayer() {
         mediaPlayer?.let { player ->
+            attachPlayer()
             setupMediaInfo()
             setPlayerTracks()
 

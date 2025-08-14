@@ -73,6 +73,7 @@ class LibVlcPlayerView: ExpoView {
         }
 
         shouldCreate = false
+        firstPlay = true
     }
 
     func setupMediaInfo() {

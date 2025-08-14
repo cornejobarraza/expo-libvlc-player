@@ -31,6 +31,8 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     Event.Stopped -> {
                         onStopped(mapOf())
 
+                        detachPlayer()
+
                         firstPlay = true
 
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
