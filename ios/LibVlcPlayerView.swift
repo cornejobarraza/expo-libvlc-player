@@ -356,7 +356,7 @@ class LibVlcPlayerView: ExpoView {
             player.position = position
         } else {
             let time = position * Float(mediaLength)
-            player.time = VLCTime(int: Int32(time))
+            self.time = Int(time)
         }
     }
 }
