@@ -54,7 +54,7 @@ class LibVlcPlayerModule : Module() {
                 }
 
                 Prop("slaves") { view: LibVlcPlayerView, slaves: ArrayList<Slave>? ->
-                    view.slaves = slaves
+                    view.slaves = slaves ?: ArrayList<Slave>()
                 }
 
                 Prop("tracks") { view: LibVlcPlayerView, tracks: Tracks? ->

@@ -249,32 +249,28 @@ class LibVlcPlayerView(
             field = value
         }
 
-    fun addPlayerSlave(slave: Slave) {
-        val type = slave.type
-        val slaveType =
-            if (type == "subtitle") {
-                IMedia.Slave.Type.Subtitle
-            } else {
-                IMedia.Slave.Type.Audio
-            }
-        val source = slave.source
-        val selected = false
+    fun addPlayerSlaves() {
+        slaves.forEach { slave ->
+            val type = slave.type
+            val slaveType =
+                if (type == "subtitle") {
+                    IMedia.Slave.Type.Subtitle
+                } else {
+                    IMedia.Slave.Type.Audio
+                }
+            val source = slave.source
+            val selected = slave.selected ?: false
 
-        try {
-            mediaPlayer?.addSlave(slaveType, Uri.parse(source), selected)
-        } catch (_: Exception) {
-            val error = mapOf("error" to "Invalid slave, $type could not be added")
-            onEncounteredError(error)
+            try {
+                mediaPlayer?.addSlave(slaveType, Uri.parse(source), selected)
+            } catch (_: Exception) {
+                val error = mapOf("error" to "Invalid slave, $type could not be added")
+                onEncounteredError(error)
+            }
         }
     }
 
-    fun addPlayerSlaves() {
-        // Add in this specific order, otherwise subtitle slaves will be missing
-        slaves?.filter { it.type == "subtitle" }?.forEach(::addPlayerSlave)
-        slaves?.filter { it.type == "audio" }?.forEach(::addPlayerSlave)
-    }
-
-    var slaves: ArrayList<Slave>? = null
+    var slaves: ArrayList<Slave> = ArrayList<Slave>()
         set(value) {
             addPlayerSlaves()
             field = value

@@ -42,7 +42,7 @@ public class LibVlcPlayerModule: Module {
             }
 
             Prop("slaves") { (view: LibVlcPlayerView, slaves: [Slave]?) in
-                view.slaves = slaves
+                view.slaves = slaves ?? [Slave]()
             }
 
             Prop("tracks") { (view: LibVlcPlayerView, tracks: Tracks?) in

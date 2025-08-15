@@ -20,7 +20,7 @@ export interface LibVlcPlayerViewRef {
    */
   readonly stop: () => Promise<void>;
   /**
-   * Changes position of the current player
+   * Sets the position of the current player
    *
    * @param position - Must be a float between `0` and `1`
    *
@@ -53,6 +53,7 @@ export interface MediaInfo {
 export interface Slave {
   source: NonNullable<LibVlcSource>;
   type: "audio" | "subtitle";
+  selected?: boolean;
 }
 
 export interface Tracks {
@@ -175,12 +176,9 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * <LibVlcPlayerView
    *    slaves={[
    *      {
-   *        source: "file://path/to/audio.aac",
-   *        type: "audio",
-   *      },
-   *      {
    *        source: "file://path/to/subtitle.srt",
    *        type: "subtitle",
+   *        selected: true
    *      },
    *    ]}
    * />
@@ -194,9 +192,9 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * ```tsx
    * <LibVlcPlayerView
    *    tracks={{
-   *      audio: 1,
-   *      video: 2,
-   *      subtitle: -1,
+   *      audio: 0,
+   *      video: 1,
+   *      subtitle: 2,
    *    }}
    * />
    * ```

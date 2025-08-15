@@ -200,30 +200,26 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    func addPlayerSlave(_ slave: Slave) {
-        let source = slave.source
-        let type = slave.type
-        let slaveType = type == "subtitle" ?
-            VLCMediaPlaybackSlaveType.subtitle :
-            VLCMediaPlaybackSlaveType.audio
-        let selected = false
-
-        guard let url = URL(string: source) else {
-            let error = ["error": "Invalid slave, \(type) could not be added"]
-            onEncounteredError(error)
-            return
-        }
-
-        mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
-    }
-
     func addPlayerSlaves() {
-        // Add in this specific order, otherwise subtitle slaves will be missing
-        slaves?.filter { $0.type == "subtitle" }.forEach { addPlayerSlave($0) }
-        slaves?.filter { $0.type == "audio" }.forEach { addPlayerSlave($0) }
+        for slave in slaves {
+            let source = slave.source
+            let type = slave.type
+            let slaveType = type == "subtitle" ?
+                VLCMediaPlaybackSlaveType.subtitle :
+                VLCMediaPlaybackSlaveType.audio
+            let selected = slave.selected ?? false
+
+            guard let url = URL(string: source) else {
+                let error = ["error": "Invalid slave, \(type) could not be added"]
+                onEncounteredError(error)
+                continue
+            }
+
+            mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
+        }
     }
 
-    var slaves: [Slave]? {
+    var slaves: [Slave] = .init() {
         didSet {
             addPlayerSlaves()
         }

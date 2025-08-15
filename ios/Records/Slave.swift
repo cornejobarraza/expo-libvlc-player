@@ -6,4 +6,7 @@ struct Slave: Record {
 
     @Field
     var type: String = ""
+
+    @Field
+    var selected: Bool? = false
 }
