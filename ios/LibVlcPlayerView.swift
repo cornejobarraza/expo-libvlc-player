@@ -42,6 +42,7 @@ class LibVlcPlayerView: ExpoView {
 
     deinit {
         MediaPlayerManager.shared.unregisterPlayerView(self)
+        destroyPlayer()
     }
 
     override func layoutSubviews() {
@@ -254,7 +255,6 @@ class LibVlcPlayerView: ExpoView {
             userVolume = newVolume
 
             mediaPlayer?.audio?.volume = Int32(newVolume)
-            MediaPlayerManager.shared.setAppropriateAudioSession()
         }
     }
 

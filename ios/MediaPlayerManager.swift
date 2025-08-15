@@ -17,13 +17,10 @@ class MediaPlayerManager {
 
     func registerPlayerView(_ view: LibVlcPlayerView) {
         playerViews.add(view)
-        setAppropriateAudioSession()
     }
 
     func unregisterPlayerView(_ view: LibVlcPlayerView) {
         playerViews.remove(view)
-        setAppropriateAudioSession()
-        view.destroyPlayer()
     }
 
     func onAppBackground() {

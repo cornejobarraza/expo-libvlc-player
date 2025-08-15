@@ -103,6 +103,7 @@ class LibVlcPlayerModule : Module() {
 
                 OnViewDestroys { view: LibVlcPlayerView ->
                     MediaPlayerManager.unregisterPlayerView(view)
+                    view.destroyPlayer()
                 }
 
                 OnViewDidUpdateProps { view: LibVlcPlayerView ->

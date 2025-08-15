@@ -25,13 +25,10 @@ object MediaPlayerManager {
 
     fun registerPlayerView(view: LibVlcPlayerView) {
         playerViews.find { it.get() == view } ?: run { playerViews.add(WeakReference(view)) }
-        audioFocusManager.updateAudioFocus()
     }
 
     fun unregisterPlayerView(view: LibVlcPlayerView) {
         playerViews.removeAll { it.get() == view }
-        audioFocusManager.updateAudioFocus()
-        view.destroyPlayer()
     }
 
     fun onAppBackground() {

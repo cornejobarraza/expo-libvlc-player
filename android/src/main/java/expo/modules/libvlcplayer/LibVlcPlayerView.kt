@@ -305,7 +305,6 @@ class LibVlcPlayerView(
             userVolume = volume
 
             mediaPlayer?.setVolume(volume)
-            MediaPlayerManager.audioFocusManager.updateAudioFocus()
 
             field = value
         }
