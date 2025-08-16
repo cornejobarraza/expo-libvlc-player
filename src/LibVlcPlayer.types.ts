@@ -31,9 +31,23 @@ export interface LibVlcPlayerViewRef {
 
 export type LibVlcSource = string | number | null;
 
+export type SlaveType = "audio" | "subtitle";
+
+export interface Slave {
+  source: NonNullable<LibVlcSource>;
+  type: SlaveType;
+  selected?: boolean;
+}
+
 export interface Track {
   id: number;
   name: string;
+}
+
+export interface Tracks {
+  audio?: number;
+  video?: number;
+  subtitle?: number;
 }
 
 export interface MediaTracks {
@@ -48,18 +62,6 @@ export interface MediaInfo {
   tracks: MediaTracks;
   duration: number;
   seekable: boolean;
-}
-
-export interface Slave {
-  source: NonNullable<LibVlcSource>;
-  type: "audio" | "subtitle";
-  selected?: boolean;
-}
-
-export interface Tracks {
-  audio?: number;
-  video?: number;
-  subtitle?: number;
 }
 
 export type AudioMixingMode =
@@ -159,12 +161,8 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    *
    * Sets the VLC options to initialize the player with
    *
-   * @example
-   * ```tsx
-   * <LibVlcPlayerView
-   *    options={["--network-caching=1000"]}
-   * />
-   * ```
+   * @example ["--network-caching=1000"]
+   *
    * @default []
    */
   options?: string[];
@@ -183,6 +181,8 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    *    ]}
    * />
    * ```
+   *
+   * @default []
    */
   slaves?: Slave[];
   /**
@@ -198,6 +198,8 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    *    }}
    * />
    * ```
+   *
+   * @default undefined
    */
   tracks?: Tracks;
   /**
@@ -240,6 +242,8 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Sets the player aspect ratio. Must be a valid string or `null` to reset to default
    *
    * @example "16:9"
+   *
+   * @default undefined
    */
   aspectRatio?: string | null;
   /**
@@ -289,7 +293,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   onPositionChanged?: (event: Position) => void;
   /**
-   * Called after the first playing event
+   * Called after the first playing player event
    */
   onFirstPlay?: (event: MediaInfo) => void;
   /**

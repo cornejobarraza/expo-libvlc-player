@@ -111,7 +111,7 @@ See the [Example App](<example/app/(tabs)/index.tsx>) for additional usage.
 
 ### Player props
 
-The `LibVlcPlayerView` extends React Native `ViewProps` and implements the following props:
+The `LibVlcPlayerView` extends React Native `ViewProps` and implements the following:
 
 | Prop               | Description                                                                        | Default     |
 | ------------------ | ---------------------------------------------------------------------------------- | ----------- |
@@ -125,8 +125,8 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `time`             | Sets the initial player time. Must be an integer in milliseconds                   | `0`         |
 | `repeat`           | Determines whether the player should repeat the media after playback ends          | `false`     |
 | `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`          | `0`         |
-| `aspectRatio`      | Sets the player aspect ratio. Must be a valid string or `null` to reset to default | `undefined` |
-| `audioMixingMode`  | Determines how the player will interact with other audio playing in the system     | `"auto"`    |
+| `aspectRatio`      | Sets the player aspect ratio. Must be a valid string or `null` for default         | `undefined` |
+| `audioMixingMode`  | Determines how the player will interact with other audio in the system             | `"auto"`    |
 | `playInBackground` | Determines whether the player should continue playing in the background            | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                          | `true`      |
 
