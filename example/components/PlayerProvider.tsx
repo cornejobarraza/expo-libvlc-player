@@ -1,4 +1,9 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
 
 interface PlayerContextProps {
   show: boolean;
@@ -11,7 +16,7 @@ export const usePlayer = () => {
   const context = useContext(PlayerContext);
 
   if (!context) {
-    throw new Error("usePlayer must be used within an PlayerProvider");
+    throw new Error("usePlayer must be used within a PlayerProvider");
   }
 
   return context;

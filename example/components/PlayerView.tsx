@@ -1,11 +1,11 @@
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Slider from "@react-native-community/slider";
 import {
-  Error,
   LibVlcPlayerView,
   LibVlcPlayerViewRef,
-  MediaInfo,
-  Position,
+  type Error,
+  type MediaInfo,
+  type Position,
 } from "expo-libvlc-player";
 import { unlockAsync } from "expo-screen-orientation";
 import { getThumbnailAsync } from "expo-video-thumbnails";
@@ -231,9 +231,8 @@ const PlayerView = () => {
           options={VLC_OPTIONS}
           volume={volume}
           mute={muted}
-          repeat={repeat !== false}
+          repeat={repeat}
           {...playerEvents}
-          autoplay={false}
         />
       </View>
       <View style={styles.controls}>
