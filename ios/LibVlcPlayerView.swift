@@ -18,7 +18,7 @@ class LibVlcPlayerView: ExpoView {
 
     var mediaLength: Int32 = 0
     private var userVolume: Int = maxPlayerVolume
-    var firstPlay: Bool = true
+    var firstPlay: Bool = false
 
     let onBuffering = EventDispatcher()
     let onPlaying = EventDispatcher()
@@ -77,7 +77,7 @@ class LibVlcPlayerView: ExpoView {
         firstPlay = true
     }
 
-    func setupMediaInfo() {
+    func setFirstPlay() {
         var mediaInfo = MediaInfo()
 
         if let player = mediaPlayer {
@@ -138,12 +138,14 @@ class LibVlcPlayerView: ExpoView {
         }
 
         onFirstPlay(mediaInfo)
+
+        firstPlay = false
     }
 
     func setupPlayer() {
         guard let player = mediaPlayer else { return }
 
-        setupMediaInfo()
+        setFirstPlay()
         setPlayerTracks()
 
         if volume != maxPlayerVolume || mute {
@@ -173,7 +175,6 @@ class LibVlcPlayerView: ExpoView {
         }
 
         time = defaultPlayerTime
-        firstPlay = false
     }
 
     func destroyPlayer() {

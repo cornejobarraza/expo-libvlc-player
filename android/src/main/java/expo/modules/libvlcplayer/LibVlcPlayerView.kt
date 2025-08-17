@@ -43,7 +43,7 @@ class LibVlcPlayerView(
 
     internal var mediaLength: Long = 0L
     internal var userVolume: Int = MAX_PLAYER_VOLUME
-    internal var firstPlay: Boolean = true
+    internal var firstPlay: Boolean = false
 
     internal val onBuffering by EventDispatcher()
     internal val onPlaying by EventDispatcher()
@@ -117,7 +117,7 @@ class LibVlcPlayerView(
         removeAllViews()
     }
 
-    fun setupMediaInfo() {
+    fun setFirstPlay() {
         var mediaInfo = MediaInfo()
 
         mediaPlayer?.let { player ->
@@ -174,12 +174,14 @@ class LibVlcPlayerView(
         }
 
         onFirstPlay(mediaInfo)
+
+        firstPlay = false
     }
 
     fun setupPlayer() {
         mediaPlayer?.let { player ->
             attachPlayer()
-            setupMediaInfo()
+            setFirstPlay()
             setPlayerTracks()
 
             if (volume != MAX_PLAYER_VOLUME || mute) {
@@ -210,7 +212,6 @@ class LibVlcPlayerView(
             }
 
             time = DEFAULT_PLAYER_TIME
-            firstPlay = false
         }
     }
 
