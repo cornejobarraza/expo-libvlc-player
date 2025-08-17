@@ -252,6 +252,7 @@ const PlayerView = () => {
           minimumTrackTintColor="red"
           maximumTrackTintColor="lightgray"
           disabled={!isSeekable}
+          tapToSeek
         />
         <View style={styles.buttons}>
           <Control

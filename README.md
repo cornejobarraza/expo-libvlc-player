@@ -1,13 +1,22 @@
 <p align="center">
-     <img alt="VLC icon" src="https://images.videolan.org/images/VLC-IconSmall.png">
+  <img alt="VLC icon" src="https://images.videolan.org/images/VLC-IconSmall.png">
 </p>
 
 <h1 align="center">LibVLC Player for Expo</h1>
 
 <p align="center">
-     <a href="https://www.npmjs.com/package/expo-libvlc-player" target="_blank">
-          <img alt="npm version" src="https://img.shields.io/npm/v/expo-libvlc-player">
-     </a>
+  <a href="https://www.npmjs.com/package/expo-libvlc-player" target="_blank">
+    <img alt="npm version" src="https://img.shields.io/npm/v/expo-libvlc-player">
+  </a>
+</p>
+
+<p align="center">
+  <img style="height: 600px; margin: 0 8px;" alt="Android example" src="example/assets/android.png">
+  <img style="height: 600px; margin: 0 8px;" alt="iOS example" src="example/assets/ios.png">
+</p>
+
+<p align="center">
+  <i>Screenshots taken from the <a href="example/components/PlayerView.tsx">Example App</a> on Android and iOS</i>
 </p>
 
 ### Supported versions
@@ -98,7 +107,7 @@ return (
 );
 ```
 
-See the [Example App](<example/app/(tabs)/index.tsx>) for additional usage.
+See the [Example App](example/components/PlayerView.tsx) for additional usage.
 
 ### Player methods
 
