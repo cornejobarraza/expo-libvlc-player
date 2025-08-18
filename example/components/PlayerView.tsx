@@ -44,14 +44,14 @@ const MIN_VOLUME_LEVEL = 0;
 const MAX_VOLUME_LEVEL = 100;
 const VOLUME_CHANGE_STEP = 10;
 
-type VolumeChange = "increase" | "decrease";
+type VolumeChangeType = "increase" | "decrease";
 
 const PlayerView = () => {
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [position, setPosition] = useState<number>(MIN_POSITION_VALUE);
   const [duration, setDuration] = useState<number>(DEFAULT_DURATION);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
-  const [muted, setMuted] = useState<boolean>(false);
+  const [mute, setMute] = useState<boolean>(false);
   const [repeat, setRepeat] = useState<boolean>(false);
 
   const [isBuffering, setIsBuffering] = useState<boolean>(false);
@@ -164,7 +164,7 @@ const PlayerView = () => {
 
   const handleRepeatChange = () => setRepeat((prev) => !prev);
 
-  const handleVolumeChange = (type: VolumeChange) => {
+  const handleVolumeChange = (type: VolumeChangeType) => {
     const newVolume =
       type === "increase"
         ? volume + VOLUME_CHANGE_STEP
@@ -178,7 +178,7 @@ const PlayerView = () => {
     setVolume(newVolume);
   };
 
-  const handleMute = () => setMuted((prev) => !prev);
+  const handleMute = () => setMute((prev) => !prev);
 
   const resetPlayerState = () => {
     setPosition(MIN_POSITION_VALUE);
@@ -230,7 +230,7 @@ const PlayerView = () => {
           source={BIG_BUCK_BUNNY}
           options={VLC_OPTIONS}
           volume={volume}
-          mute={muted}
+          mute={mute}
           repeat={repeat}
           {...playerEvents}
         />
@@ -275,20 +275,19 @@ const PlayerView = () => {
             name="volume-down"
             size={18}
             onPress={() => handleVolumeChange("decrease")}
-            disabled={volume === MIN_VOLUME_LEVEL || muted}
+            disabled={volume === MIN_VOLUME_LEVEL}
           />
           <Control
             name="volume-mute"
             size={18}
             onPress={handleMute}
-            disabled={volume === MIN_VOLUME_LEVEL && !muted}
-            selected={muted}
+            selected={mute}
           />
           <Control
             name="volume-up"
             size={18}
             onPress={() => handleVolumeChange("increase")}
-            disabled={volume === MAX_VOLUME_LEVEL || muted}
+            disabled={volume === MAX_VOLUME_LEVEL}
           />
         </View>
         <View style={styles.draggable}>

@@ -302,26 +302,30 @@ class LibVlcPlayerView(
                 onEncounteredError(error)
             }
 
-            val volume = value.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
-            userVolume = volume
+            val newVolume = value.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
+            userVolume = newVolume
 
-            mediaPlayer?.setVolume(volume)
+            mediaPlayer?.let { player ->
+                if (player.getVolume() > MIN_PLAYER_VOLUME) {
+                    player.setVolume(newVolume)
+                }
+            }
 
             field = value
         }
 
     var mute: Boolean = false
         set(value) {
-            if (options.hasAudioOption()) {
+            if (!value && options.hasAudioOption()) {
                 val error = mapOf("error" to "Audio disabled via options")
                 onEncounteredError(error)
             }
 
             val newVolume =
-                if (!value) {
-                    userVolume.coerceIn(PLAYER_VOLUME_STEP, MAX_PLAYER_VOLUME)
-                } else {
+                if (value) {
                     MIN_PLAYER_VOLUME
+                } else {
+                    userVolume
                 }
 
             mediaPlayer?.setVolume(newVolume)

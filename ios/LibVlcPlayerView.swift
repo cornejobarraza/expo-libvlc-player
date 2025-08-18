@@ -255,20 +255,24 @@ class LibVlcPlayerView: ExpoView {
             let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
             userVolume = newVolume
 
-            mediaPlayer?.audio?.volume = Int32(newVolume)
+            if let player = mediaPlayer, let audio = player.audio {
+                if audio.volume > minPlayerVolume {
+                    audio.volume = Int32(newVolume)
+                }
+            }
         }
     }
 
     var mute: Bool = false {
         didSet {
-            if options.hasAudioOption() {
+            if !mute, options.hasAudioOption() {
                 let error = ["error": "Audio disabled via options"]
                 onEncounteredError(error)
             }
 
-            let newVolume = !mute ?
-                max(playerVolumeStep, min(maxPlayerVolume, userVolume)) :
-                minPlayerVolume
+            let newVolume = mute ?
+                minPlayerVolume :
+                userVolume
 
             mediaPlayer?.audio?.volume = Int32(newVolume)
             MediaPlayerManager.shared.setAppropriateAudioSession()
