@@ -7,7 +7,12 @@ import {
   type MediaInfo,
   type Position,
 } from "expo-libvlc-player";
-import { unlockAsync } from "expo-screen-orientation";
+import {
+  addOrientationChangeListener,
+  Orientation,
+  OrientationChangeEvent,
+  unlockAsync,
+} from "expo-screen-orientation";
 import { getThumbnailAsync } from "expo-video-thumbnails";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -47,6 +52,9 @@ const VOLUME_CHANGE_STEP = 10;
 type VolumeChangeType = "increase" | "decrease";
 
 const PlayerView = () => {
+  const [orientation, setOrientation] = useState<Orientation>(
+    Orientation.UNKNOWN,
+  );
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [position, setPosition] = useState<number>(MIN_POSITION_VALUE);
   const [duration, setDuration] = useState<number>(DEFAULT_DURATION);
@@ -64,6 +72,17 @@ const PlayerView = () => {
   const bufferingTimeoutRef = useRef<number | null>(null);
 
   const { show } = usePlayer();
+
+  useEffect(() => {
+    const listener = ({
+      orientationInfo: { orientation },
+    }: OrientationChangeEvent) => setOrientation(orientation);
+    const subscription = addOrientationChangeListener(listener);
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     unlockOrientation();
@@ -190,6 +209,10 @@ const PlayerView = () => {
     setIsSeekable(false);
   };
 
+  const isPortrait =
+    orientation !== Orientation.LANDSCAPE_LEFT &&
+    orientation !== Orientation.LANDSCAPE_RIGHT;
+
   const shouldShowThumbnail =
     !!thumbnail &&
     !isPlaying &&
@@ -198,14 +221,13 @@ const PlayerView = () => {
   if (!show) return null;
 
   return (
-    <View style={styles.player}>
-      <View
-        style={{
-          position: "relative",
-          backgroundColor: "black",
-          aspectRatio: 16 / 9,
-        }}
-      >
+    <View
+      style={{
+        ...styles.player,
+        flexDirection: isPortrait ? "column" : "row",
+      }}
+    >
+      <View style={styles.video}>
         {isBuffering && (
           <ActivityIndicator
             style={{ ...StyleSheet.absoluteFillObject, zIndex: 20 }}
@@ -290,7 +312,7 @@ const PlayerView = () => {
             disabled={volume === MAX_VOLUME_LEVEL}
           />
         </View>
-        <View style={styles.draggable}>
+        <View style={styles.toolbar}>
           <FontAwesome5
             name="grip-lines"
             size={16}
@@ -337,12 +359,18 @@ const Control = ({
 const styles = StyleSheet.create({
   player: {
     width: "75%",
+    borderWidth: 1,
     borderRadius: 8,
     overflow: "hidden",
-    borderWidth: 1,
+  },
+  video: {
+    position: "relative",
+    backgroundColor: "black",
+    aspectRatio: 16 / 9,
   },
   controls: {
     backgroundColor: "white",
+    flexShrink: 1,
     gap: 24,
     paddingVertical: 24,
     paddingHorizontal: 12,
@@ -359,7 +387,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 16,
   },
-  draggable: {
+  toolbar: {
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
