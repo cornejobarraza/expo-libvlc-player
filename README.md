@@ -126,18 +126,18 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | ------------------ | ---------------------------------------------------------------------------------- | ----------- |
 | `source`           | Sets the source of the media to be played                                          |             |
 | `options`          | Sets the VLC options to initialize the player with                                 | `[]`        |
-| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more          | `[]`        |
 | `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more | `undefined` |
-| `volume`           | Sets the player volume. Must be an integer between `0` and `100`                   | `100`       |
-| `mute`             | Sets the player volume to `0` when `true`                                          | `false`     |
-| `rate`             | Sets the player rate. Must be a float between `0` and `1`                          | `1`         |
-| `time`             | Sets the initial player time. Must be an integer in milliseconds                   | `0`         |
-| `repeat`           | Determines whether the player should repeat the media after playback ends          | `false`     |
+| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more          | `[]`        |
 | `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`          | `0`         |
 | `aspectRatio`      | Sets the player aspect ratio. Must be a valid string or `null` for default         | `undefined` |
+| `rate`             | Sets the player rate. Must be a float between `0` and `1`                          | `1`         |
+| `time`             | Sets the initial player time. Must be an integer in milliseconds                   | `0`         |
+| `volume`           | Sets the player volume. Must be an integer between `0` and `100`                   | `100`       |
+| `mute`             | Sets the player volume to `0` when `true`                                          | `false`     |
 | `audioMixingMode`  | Determines how the player will interact with other audio in the system             | `"auto"`    |
 | `playInBackground` | Determines whether the player should continue playing in the background            | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                          | `true`      |
+| `repeat`           | Determines whether the media should repeat once ended                              | `false`     |
 
 #### Callback props
 
@@ -150,7 +150,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onEndReached`       | Called after the `EndReached` player event       |                           |
 | `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`       |
 | `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`    |
-| `onFirstPlay`        | Called after the first playing player event      | [`MediaInfo`](#mediainfo) |
+| `onFirstPlay`        | Called after the first `Playing` player event    | [`MediaInfo`](#mediainfo) |
 | `onBackground`       | Called after the player enters the background    |                           |
 
 ### Player types
@@ -169,9 +169,9 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 ```json
 {
-  "audio": 0,
+  "audio": 1,
   "video": 1,
-  "subtitle": 2
+  "subtitle": -1
 }
 ```
 
@@ -184,7 +184,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
   "tracks": {
     "audio": [
       { "id": -1, "name": "Disable" },
-      { "id": 0, "name": "English 5.1 Surround - [English]" }
+      { "id": 1, "name": "Track 1 - [English]" }
     ],
     "video": [
       { "id": -1, "name": "Disable" },
@@ -192,7 +192,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
     ],
     "subtitle": [
       { "id": -1, "name": "Disable" },
-      { "id": 2, "name": "Track 1 - [Japanese]" }
+      { "id": 1, "name": "Track 1 - [Japanese]" }
     ]
   },
   "duration": 78920,

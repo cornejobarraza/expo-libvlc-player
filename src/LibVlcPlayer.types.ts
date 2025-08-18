@@ -128,18 +128,18 @@ export interface LibVlcPlayerViewNativeProps {
   ref?: React.Ref<LibVlcPlayerViewRef>;
   source?: LibVlcSource;
   options?: string[];
-  slaves?: Slave[];
   tracks?: Tracks;
-  volume?: number;
-  mute?: boolean;
-  rate?: number;
-  time?: number;
-  repeat?: boolean;
+  slaves?: Slave[];
   scale?: number;
   aspectRatio?: string | null;
+  rate?: number;
+  time?: number;
+  volume?: number;
+  mute?: boolean;
   audioMixingMode?: AudioMixingMode;
   playInBackground?: boolean;
   autoplay?: boolean;
+  repeat?: boolean;
   onBuffering?: BufferingListener;
   onPlaying?: PlayingListener;
   onPaused?: PausedListener;
@@ -167,6 +167,23 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   options?: string[];
   /**
+   * Sets the player audio, video and subtitle tracks
+   *
+   * @example
+   * ```tsx
+   * <LibVlcPlayerView
+   *    tracks={{
+   *      audio: 1,
+   *      video: 1,
+   *      subtitle: -1,
+   *    }}
+   * />
+   * ```
+   *
+   * @default undefined
+   */
+  tracks?: Tracks;
+  /**
    * Sets the player audio and subtitle slaves
    *
    * @example
@@ -186,53 +203,6 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   slaves?: Slave[];
   /**
-   * Sets the player audio, video and subtitle tracks
-   *
-   * @example
-   * ```tsx
-   * <LibVlcPlayerView
-   *    tracks={{
-   *      audio: 0,
-   *      video: 1,
-   *      subtitle: 2,
-   *    }}
-   * />
-   * ```
-   *
-   * @default undefined
-   */
-  tracks?: Tracks;
-  /**
-   * Sets the player volume. Must be an integer between `0` and `100`
-   *
-   * @default 100
-   */
-  volume?: number;
-  /**
-   * Sets the player volume to `0` when `true`
-   *
-   * @default false
-   */
-  mute?: boolean;
-  /**
-   * Sets the player rate. Must be a float number
-   *
-   * @default 1
-   */
-  rate?: number;
-  /**
-   * Sets the initial player time. Must be an integer in milliseconds
-   *
-   * @default 0
-   */
-  time?: number;
-  /**
-   * Determines whether the player should repeat the media after playback ends
-   *
-   * @default false
-   */
-  repeat?: boolean;
-  /**
    * Sets the player scaling factor. Must be a float equal or greater than `0`
    *
    * @default 0
@@ -246,6 +216,30 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * @default undefined
    */
   aspectRatio?: string | null;
+  /**
+   * Sets the player rate. Must be a float number
+   *
+   * @default 1
+   */
+  rate?: number;
+  /**
+   * Sets the initial player time. Must be an integer in milliseconds
+   *
+   * @default 0
+   */
+  time?: number;
+  /**
+   * Sets the player volume. Must be an integer between `0` and `100`
+   *
+   * @default 100
+   */
+  volume?: number;
+  /**
+   * Sets the player volume to `0` when `true`
+   *
+   * @default false
+   */
+  mute?: boolean;
   /**
    * Determines how the player will interact with other audio playing in the system
    *
@@ -264,6 +258,12 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * @default true
    */
   autoplay?: boolean;
+  /**
+   * Determines whether the media should repeat once ended
+   *
+   * @default false
+   */
+  repeat?: boolean;
   /**
    * Called after the `Buffering` player event
    */

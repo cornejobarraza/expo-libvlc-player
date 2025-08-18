@@ -202,6 +202,24 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
+    func setPlayerTracks() {
+        guard let player = mediaPlayer else { return }
+
+        let audioTrackIndex = tracks?.audio ?? Int(player.currentAudioTrackIndex)
+        let videoTrackIndex = tracks?.video ?? Int(player.currentVideoTrackIndex)
+        let videoSubTitleIndex = tracks?.subtitle ?? Int(player.currentVideoSubTitleIndex)
+
+        player.currentAudioTrackIndex = Int32(audioTrackIndex)
+        player.currentVideoTrackIndex = Int32(videoTrackIndex)
+        player.currentVideoSubTitleIndex = Int32(videoSubTitleIndex)
+    }
+
+    var tracks: Tracks? {
+        didSet {
+            setPlayerTracks()
+        }
+    }
+
     func addPlayerSlaves() {
         for slave in slaves {
             let source = slave.source
@@ -227,23 +245,32 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    func setPlayerTracks() {
-        guard let player = mediaPlayer else { return }
-
-        let audioTrackIndex = tracks?.audio ?? Int(player.currentAudioTrackIndex)
-        let videoTrackIndex = tracks?.video ?? Int(player.currentVideoTrackIndex)
-        let videoSubTitleIndex = tracks?.subtitle ?? Int(player.currentVideoSubTitleIndex)
-
-        player.currentAudioTrackIndex = Int32(audioTrackIndex)
-        player.currentVideoTrackIndex = Int32(videoTrackIndex)
-        player.currentVideoSubTitleIndex = Int32(videoSubTitleIndex)
-    }
-
-    var tracks: Tracks? {
+    var scale: Float = defaultPlayerScale {
         didSet {
-            setPlayerTracks()
+            mediaPlayer?.scaleFactor = scale
         }
     }
+
+    var aspectRatio: String? {
+        didSet {
+            guard let aspectRatio = aspectRatio else {
+                mediaPlayer?.videoAspectRatio = nil
+                return
+            }
+
+            aspectRatio.withCString { cString in
+                mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+            }
+        }
+    }
+
+    var rate: Float = defaultPlayerRate {
+        didSet {
+            mediaPlayer?.rate = rate
+        }
+    }
+
+    var time: Int = defaultPlayerTime
 
     var volume: Int = maxPlayerVolume {
         didSet {
@@ -265,7 +292,7 @@ class LibVlcPlayerView: ExpoView {
 
     var mute: Bool = false {
         didSet {
-            if !mute, options.hasAudioOption() {
+            if options.hasAudioOption(), !mute {
                 let error = ["error": "Audio disabled via options"]
                 onEncounteredError(error)
             }
@@ -276,42 +303,6 @@ class LibVlcPlayerView: ExpoView {
 
             mediaPlayer?.audio?.volume = Int32(newVolume)
             MediaPlayerManager.shared.setAppropriateAudioSession()
-        }
-    }
-
-    var rate: Float = defaultPlayerRate {
-        didSet {
-            mediaPlayer?.rate = rate
-        }
-    }
-
-    var time: Int = defaultPlayerTime
-
-    var shouldRepeat: Bool = false {
-        didSet {
-            if options.hasRepeatOption() {
-                let error = ["error": "Repeat enabled via options"]
-                onEncounteredError(error)
-            }
-        }
-    }
-
-    var scale: Float = defaultPlayerScale {
-        didSet {
-            mediaPlayer?.scaleFactor = scale
-        }
-    }
-
-    var aspectRatio: String? {
-        didSet {
-            guard let aspectRatio = aspectRatio else {
-                mediaPlayer?.videoAspectRatio = nil
-                return
-            }
-
-            aspectRatio.withCString { cString in
-                mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
-            }
         }
     }
 
@@ -328,6 +319,15 @@ class LibVlcPlayerView: ExpoView {
     }
 
     var autoplay: Bool = true
+
+    var shouldRepeat: Bool = false {
+        didSet {
+            if options.hasRepeatOption() {
+                let error = ["error": "Repeat enabled via options"]
+                onEncounteredError(error)
+            }
+        }
+    }
 
     func play() {
         mediaPlayer?.play()

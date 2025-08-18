@@ -53,20 +53,20 @@ class LibVlcPlayerModule : Module() {
                     view.options = options ?: ArrayList<String>()
                 }
 
-                Prop("slaves") { view: LibVlcPlayerView, slaves: ArrayList<Slave>? ->
-                    view.slaves = slaves ?: ArrayList<Slave>()
-                }
-
                 Prop("tracks") { view: LibVlcPlayerView, tracks: Tracks? ->
                     view.tracks = tracks
                 }
 
-                Prop("volume") { view: LibVlcPlayerView, volume: Int? ->
-                    view.volume = volume ?: MAX_PLAYER_VOLUME
+                Prop("slaves") { view: LibVlcPlayerView, slaves: ArrayList<Slave>? ->
+                    view.slaves = slaves ?: ArrayList<Slave>()
                 }
 
-                Prop("mute") { view: LibVlcPlayerView, mute: Boolean? ->
-                    view.mute = mute ?: false
+                Prop("scale") { view: LibVlcPlayerView, scale: Float? ->
+                    view.scale = scale ?: DEFAULT_PLAYER_SCALE
+                }
+
+                Prop("aspectRatio") { view: LibVlcPlayerView, aspectRatio: String? ->
+                    view.aspectRatio = aspectRatio
                 }
 
                 Prop("rate") { view: LibVlcPlayerView, rate: Float? ->
@@ -77,16 +77,12 @@ class LibVlcPlayerModule : Module() {
                     view.time = time ?: DEFAULT_PLAYER_TIME
                 }
 
-                Prop("repeat") { view: LibVlcPlayerView, repeat: Boolean? ->
-                    view.repeat = repeat ?: false
+                Prop("volume") { view: LibVlcPlayerView, volume: Int? ->
+                    view.volume = volume ?: MAX_PLAYER_VOLUME
                 }
 
-                Prop("scale") { view: LibVlcPlayerView, scale: Float? ->
-                    view.scale = scale ?: DEFAULT_PLAYER_SCALE
-                }
-
-                Prop("aspectRatio") { view: LibVlcPlayerView, aspectRatio: String? ->
-                    view.aspectRatio = aspectRatio
+                Prop("mute") { view: LibVlcPlayerView, mute: Boolean? ->
+                    view.mute = mute ?: false
                 }
 
                 Prop("audioMixingMode") { view: LibVlcPlayerView, audioMixingMode: AudioMixingMode? ->
@@ -99,6 +95,10 @@ class LibVlcPlayerModule : Module() {
 
                 Prop("autoplay") { view: LibVlcPlayerView, autoplay: Boolean? ->
                     view.autoplay = autoplay ?: true
+                }
+
+                Prop("repeat") { view: LibVlcPlayerView, repeat: Boolean? ->
+                    view.repeat = repeat ?: false
                 }
 
                 OnViewDestroys { view: LibVlcPlayerView ->
