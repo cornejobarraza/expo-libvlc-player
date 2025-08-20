@@ -1,18 +1,18 @@
 import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import FloatingPlayer from "../components/FloatingPlayer";
-import { PlayerProvider } from "../components/PlayerProvider";
+import { FloatingPlayer } from "../components/FloatingPlayer";
+import { FloatingProvider } from "../components/FloatingProvider";
 
 export default function Layout() {
   return (
     <GestureHandlerRootView>
-      <PlayerProvider>
+      <FloatingProvider>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>
         <FloatingPlayer />
-      </PlayerProvider>
+      </FloatingProvider>
     </GestureHandlerRootView>
   );
 }

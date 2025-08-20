@@ -25,8 +25,6 @@ import {
   View,
 } from "react-native";
 
-import { usePlayer } from "./PlayerProvider";
-
 function msToMinutesSeconds(duration: number) {
   const totalSeconds = Math.floor(duration / 1_000);
   const minutes = Math.floor(totalSeconds / 60);
@@ -51,7 +49,11 @@ const VOLUME_CHANGE_STEP = 10;
 
 type VolumeChangeType = "increase" | "decrease";
 
-const PlayerView = () => {
+interface PlayerViewProps {
+  floating?: boolean;
+}
+
+export const PlayerView = ({ floating = true }: PlayerViewProps) => {
   const [orientation, setOrientation] = useState<Orientation>(
     Orientation.UNKNOWN,
   );
@@ -71,8 +73,6 @@ const PlayerView = () => {
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<number | null>(null);
 
-  const { show } = usePlayer();
-
   useEffect(() => {
     const listener = ({
       orientationInfo: { orientation },
@@ -91,12 +91,6 @@ const PlayerView = () => {
   useEffect(() => {
     generateThumbnail();
   }, []);
-
-  useEffect(() => {
-    if (!show) {
-      resetPlayerState();
-    }
-  }, [show]);
 
   const unlockOrientation = async () => await unlockAsync();
 
@@ -218,13 +212,12 @@ const PlayerView = () => {
     !isPlaying &&
     (position === MIN_POSITION_VALUE || isStopped || isBackgrounded);
 
-  if (!show) return null;
-
   return (
     <View
       style={{
         ...styles.player,
         flexDirection: isPortrait ? "column" : "row",
+        borderWidth: floating ? 1 : 0,
       }}
     >
       <View style={styles.video}>
@@ -312,13 +305,15 @@ const PlayerView = () => {
             disabled={volume === MAX_VOLUME_LEVEL}
           />
         </View>
-        <View style={styles.toolbar}>
-          <FontAwesome5
-            name="grip-lines"
-            size={16}
-            color="rgba(0, 0, 0, 0.75)"
-          />
-        </View>
+        {floating && (
+          <View style={styles.toolbar}>
+            <FontAwesome5
+              name="grip-lines"
+              size={16}
+              color="rgba(0, 0, 0, 0.75)"
+            />
+          </View>
+        )}
       </View>
     </View>
   );
@@ -359,7 +354,7 @@ const Control = ({
 const styles = StyleSheet.create({
   player: {
     width: "75%",
-    borderWidth: 1,
+    borderColor: "gray",
     borderRadius: 8,
     overflow: "hidden",
   },
@@ -395,5 +390,3 @@ const styles = StyleSheet.create({
     marginBottom: -16,
   },
 });
-
-export default PlayerView;

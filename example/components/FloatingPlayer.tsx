@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Dimensions, StyleSheet } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -5,7 +6,8 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 
-import PlayerView from "./PlayerView";
+import { useFloating } from "./FloatingProvider";
+import { PlayerView } from "./PlayerView";
 
 function clamp(val: number, min: number, max: number) {
   return Math.min(Math.max(val, min), max);
@@ -17,7 +19,16 @@ const MIN_FINGER_DISTANCE = 1;
 const MAX_TRANSLATE_X = width / 2 - 50;
 const MAX_TRANSLATE_Y = height / 2 - 50;
 
-const FloatingPlayer = () => {
+export const FloatingPlayer = () => {
+  const { open } = useFloating();
+
+  useEffect(() => {
+    if (!open) {
+      translationX.value = 0;
+      translationY.value = 0;
+    }
+  }, [open]);
+
   const translationX = useSharedValue(0);
   const translationY = useSharedValue(0);
   const prevTranslationX = useSharedValue(0);
@@ -50,6 +61,8 @@ const FloatingPlayer = () => {
     })
     .runOnJS(true);
 
+  if (!open) return null;
+
   return (
     <GestureDetector gesture={pan}>
       <Animated.View
@@ -69,5 +82,3 @@ const FloatingPlayer = () => {
     </GestureDetector>
   );
 };
-
-export default FloatingPlayer;
