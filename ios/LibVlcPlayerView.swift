@@ -196,8 +196,6 @@ class LibVlcPlayerView: ExpoView {
         didSet {
             if source != nil {
                 shouldCreate = options != oldValue
-            } else {
-                destroyPlayer()
             }
         }
     }

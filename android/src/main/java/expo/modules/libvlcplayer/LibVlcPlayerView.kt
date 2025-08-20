@@ -243,8 +243,6 @@ class LibVlcPlayerView(
 
             if (source != null) {
                 shouldCreate = value != old
-            } else {
-                destroyPlayer()
             }
 
             field = value

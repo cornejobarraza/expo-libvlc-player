@@ -153,13 +153,13 @@ export interface LibVlcPlayerViewNativeProps {
 
 export interface LibVlcPlayerViewProps extends ViewProps {
   /**
-   * Sets the source of the media to be played
+   * Sets the source of the media to be played. Set to `null` to release the player
    */
   source: LibVlcSource;
   /**
-   * https://wiki.videolan.org/VLC_command-line_help/
-   *
    * Sets the VLC options to initialize the player with
+   *
+   * https://wiki.videolan.org/VLC_command-line_help/
    *
    * @example ["--network-caching=1000"]
    *
@@ -209,7 +209,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   scale?: number;
   /**
-   * Sets the player aspect ratio. Must be a valid string or `null` to reset to default
+   * Sets the player aspect ratio. Must be a valid string or `null` for default
    *
    * @example "16:9"
    *
@@ -217,7 +217,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   aspectRatio?: string | null;
   /**
-   * Sets the player rate. Must be a float number
+   * Sets the player rate. Must be a float equal or greater than `1`
    *
    * @default 1
    */
@@ -235,7 +235,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   volume?: number;
   /**
-   * Sets the player volume to `0` when `true`
+   * Sets the player volume to `0` when `true`. Previous value is set when `false`
    *
    * @default false
    */
@@ -293,7 +293,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   onPositionChanged?: (event: Position) => void;
   /**
-   * Called after the first playing player event
+   * Called after the first `Playing` player event
    */
   onFirstPlay?: (event: MediaInfo) => void;
   /**

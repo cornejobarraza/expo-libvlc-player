@@ -45,11 +45,11 @@ No additional configuration necessary.
 
 #### Black screen issue
 
-On Android, the `libvlcjni` player detaches from the View when the surface is destroyed after switching screens.
+On Android, the `libvlcjni` player detaches from the View when surfaces are destroyed after switching screens.
 
 This causes nothing to be displayed when coming back to the screen as native resources are released automatically.
 
-The current workaround attaches the View when the surface is created but this results in a brief black screen.
+The current workaround attaches the View once surfaces are created but this results in a brief black screen.
 
 ### Configure for iOS
 
@@ -122,22 +122,22 @@ See the [Example App](example/components/PlayerView.tsx) for additional usage.
 
 The `LibVlcPlayerView` extends React Native `ViewProps` and implements the following:
 
-| Prop               | Description                                                                        | Default     |
-| ------------------ | ---------------------------------------------------------------------------------- | ----------- |
-| `source`           | Sets the source of the media to be played                                          |             |
-| `options`          | Sets the VLC options to initialize the player with                                 | `[]`        |
-| `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more | `undefined` |
-| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more          | `[]`        |
-| `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`          | `0`         |
-| `aspectRatio`      | Sets the player aspect ratio. Must be a valid string or `null` for default         | `undefined` |
-| `rate`             | Sets the player rate. Must be a float between `0` and `1`                          | `1`         |
-| `time`             | Sets the initial player time. Must be an integer in milliseconds                   | `0`         |
-| `volume`           | Sets the player volume. Must be an integer between `0` and `100`                   | `100`       |
-| `mute`             | Sets the player volume to `0` when `true`                                          | `false`     |
-| `audioMixingMode`  | Determines how the player will interact with other audio in the system             | `"auto"`    |
-| `playInBackground` | Determines whether the player should continue playing in the background            | `false`     |
-| `autoplay`         | Determines whether the media should autoplay once created                          | `true`      |
-| `repeat`           | Determines whether the media should repeat once ended                              | `false`     |
+| Prop               | Description                                                                                                                       | Default     |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `source`           | Sets the source of the media to be played. Set to `null` to release the player                                                    |             |
+| `options`          | Sets the VLC options to initialize the player with. See the [VLC Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
+| `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more                                                | `undefined` |
+| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
+| `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
+| `aspectRatio`      | Sets the player aspect ratio. Must be a valid string or `null` for default                                                        | `undefined` |
+| `rate`             | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
+| `time`             | Sets the initial player time. Must be an integer in milliseconds                                                                  | `0`         |
+| `volume`           | Sets the player volume. Must be an integer between `0` and `100`                                                                  | `100`       |
+| `mute`             | Sets the player volume to `0` when `true`. Previous value is set when `false`                                                     | `false`     |
+| `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
+| `playInBackground` | Determines whether the player should continue playing in the background                                                           | `false`     |
+| `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
+| `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 
 #### Callback props
 
