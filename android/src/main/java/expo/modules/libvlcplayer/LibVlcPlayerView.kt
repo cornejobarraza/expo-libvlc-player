@@ -119,7 +119,6 @@ class LibVlcPlayerView(
     }
 
     fun destroyPlayer() {
-        media?.release()
         media = null
         mediaPlayer?.release()
         mediaPlayer = null

@@ -80,6 +80,8 @@ class LibVlcPlayerView: ExpoView {
 
     func destroyPlayer() {
         mediaPlayer?.media = nil
+        mediaPlayer?.delegate = nil
+        mediaPlayer?.drawable = nil
         mediaPlayer = nil
     }
 
