@@ -151,7 +151,7 @@ class AudioFocusManager(
                                     pausePlayerIfUnmuted(player)
                                 } else {
                                     val volume = player.getVolume() / 20
-                                    view.userVolume = volume
+                                    view.oldVolume = volume
                                     player.setVolume(volume)
                                 }
                             }
@@ -166,7 +166,7 @@ class AudioFocusManager(
                         playerView.get()?.let { view ->
                             view.mediaPlayer?.let { player ->
                                 if (player.getVolume() > MIN_PLAYER_VOLUME) {
-                                    player.setVolume(view.userVolume)
+                                    player.setVolume(view.oldVolume)
                                 }
                             }
                         }

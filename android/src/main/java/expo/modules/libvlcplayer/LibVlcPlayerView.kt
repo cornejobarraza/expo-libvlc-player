@@ -42,7 +42,7 @@ class LibVlcPlayerView(
     private var shouldCreate: Boolean = false
 
     internal var mediaLength: Long = 0L
-    internal var userVolume: Int = MAX_PLAYER_VOLUME
+    internal var oldVolume: Int = MAX_PLAYER_VOLUME
     internal var firstPlay: Boolean = false
 
     internal val onBuffering by EventDispatcher()
@@ -333,7 +333,7 @@ class LibVlcPlayerView(
             }
 
             val newVolume = value.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
-            userVolume = newVolume
+            oldVolume = newVolume
 
             mediaPlayer?.let { player ->
                 if (player.getVolume() > MIN_PLAYER_VOLUME) {
@@ -355,7 +355,7 @@ class LibVlcPlayerView(
                 if (value) {
                     MIN_PLAYER_VOLUME
                 } else {
-                    userVolume
+                    oldVolume
                 }
 
             mediaPlayer?.setVolume(newVolume)

@@ -17,7 +17,7 @@ class LibVlcPlayerView: ExpoView {
     private var shouldCreate: Bool = false
 
     var mediaLength: Int32 = 0
-    private var userVolume: Int = maxPlayerVolume
+    private var oldVolume: Int = maxPlayerVolume
     var firstPlay: Bool = false
 
     let onBuffering = EventDispatcher()
@@ -295,7 +295,7 @@ class LibVlcPlayerView: ExpoView {
             }
 
             let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
-            userVolume = newVolume
+            oldVolume = newVolume
 
             if let player = mediaPlayer, let audio = player.audio {
                 if audio.volume > minPlayerVolume {
@@ -314,7 +314,7 @@ class LibVlcPlayerView: ExpoView {
 
             let newVolume = mute ?
                 minPlayerVolume :
-                userVolume
+                oldVolume
 
             mediaPlayer?.audio?.volume = Int32(newVolume)
             MediaPlayerManager.shared.setAppropriateAudioSession()
