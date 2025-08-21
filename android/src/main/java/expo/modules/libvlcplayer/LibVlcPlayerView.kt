@@ -231,7 +231,6 @@ class LibVlcPlayerView(
 
     fun setupPlayer() {
         mediaPlayer?.let { player ->
-            attachPlayer()
             setPlayerTracks()
 
             if (volume != MAX_PLAYER_VOLUME || mute) {

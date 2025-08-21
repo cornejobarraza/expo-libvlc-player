@@ -18,6 +18,8 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         if (firstPlay) {
                             attachPlayer()
 
+                            setupPlayer()
+
                             val mediaInfo = getMediaInfo()
 
                             onFirstPlay(mediaInfo)

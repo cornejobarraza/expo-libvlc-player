@@ -11,6 +11,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             onPlaying([:])
 
             if firstPlay {
+                setupPlayer()
+
                 let mediaInfo = getMediaInfo()
 
                 onFirstPlay(mediaInfo)
