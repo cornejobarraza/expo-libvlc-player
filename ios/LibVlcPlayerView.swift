@@ -370,7 +370,7 @@ class LibVlcPlayerView: ExpoView {
     }
 }
 
-extension Array where Element == String {
+private extension Array where Element == String {
     func hasAudioOption() -> Bool {
         let options: Set<String> = [
             "--no-audio", "-no-audio", ":no-audio",

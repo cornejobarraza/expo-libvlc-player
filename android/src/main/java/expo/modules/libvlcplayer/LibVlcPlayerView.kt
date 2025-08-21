@@ -38,10 +38,10 @@ class LibVlcPlayerView(
 
     private var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
-    internal var media: Media? = null
+    private var media: Media? = null
     private var shouldCreate: Boolean = false
 
-    internal var mediaLength: Long = 0L
+    private var mediaLength: Long = 0L
     internal var oldVolume: Int = MAX_PLAYER_VOLUME
     internal var firstPlay: Boolean = false
 
@@ -58,6 +58,8 @@ class LibVlcPlayerView(
 
     init {
         MediaPlayerManager.registerPlayerView(this)
+
+        addPlayerView()
     }
 
     override fun onAttachedToWindow() {
@@ -101,13 +103,21 @@ class LibVlcPlayerView(
         firstPlay = true
     }
 
+    fun addPlayerView() {
+        val parent = playerView.getParent()
+
+        if (parent == null) {
+            addView(playerView)
+        }
+    }
+
     fun attachPlayer() {
         mediaPlayer?.let { player ->
-            if (playerView.getParent() == null) {
-                addView(playerView)
-            }
+            addPlayerView()
 
-            if (!player.getVLCVout().areViewsAttached()) {
+            val attached = player.getVLCVout().areViewsAttached()
+
+            if (!attached) {
                 player.attachViews(playerView, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
             }
         }
@@ -408,7 +418,7 @@ class LibVlcPlayerView(
         }
     }
 
-    internal fun ArrayList<String>.hasAudioOption(): Boolean {
+    private fun ArrayList<String>.hasAudioOption(): Boolean {
         val options =
             setOf(
                 "--no-audio",
