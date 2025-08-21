@@ -34,7 +34,10 @@ class LibVlcPlayerView(
     context: Context,
     appContext: AppContext,
 ) : ExpoView(context, appContext) {
-    private val playerView: VLCVideoLayout = VLCVideoLayout(context)
+    private val playerView: VLCVideoLayout =
+        VLCVideoLayout(context).also {
+            addView(it)
+        }
 
     private var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
@@ -58,8 +61,6 @@ class LibVlcPlayerView(
 
     init {
         MediaPlayerManager.registerPlayerView(this)
-
-        addPlayerView()
     }
 
     override fun onAttachedToWindow() {
@@ -103,17 +104,13 @@ class LibVlcPlayerView(
         firstPlay = true
     }
 
-    fun addPlayerView() {
-        val parent = playerView.getParent()
-
-        if (parent == null) {
-            addView(playerView)
-        }
-    }
-
     fun attachPlayer() {
         mediaPlayer?.let { player ->
-            addPlayerView()
+            val parent = playerView.getParent()
+
+            if (parent == null) {
+                addView(playerView)
+            }
 
             val attached = player.getVLCVout().areViewsAttached()
 
