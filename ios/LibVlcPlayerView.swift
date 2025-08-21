@@ -247,7 +247,9 @@ class LibVlcPlayerView: ExpoView {
 
     var slaves: [Slave] = .init() {
         didSet {
-            addPlayerSlaves()
+            if slaves != oldValue {
+                addPlayerSlaves()
+            }
         }
     }
 

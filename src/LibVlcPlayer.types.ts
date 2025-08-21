@@ -179,9 +179,9 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * ```tsx
    * <LibVlcPlayerView
    *    tracks={{
-   *      audio: 1,
+   *      audio: 0,
    *      video: 1,
-   *      subtitle: -1,
+   *      subtitle: 2,
    *    }}
    * />
    * ```

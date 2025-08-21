@@ -295,8 +295,12 @@ class LibVlcPlayerView(
 
     var slaves: ArrayList<Slave> = ArrayList<Slave>()
         set(value) {
+            val old = field
             field = value
-            addPlayerSlaves()
+
+            if (value != old) {
+                addPlayerSlaves()
+            }
         }
 
     var scale: Float = DEFAULT_PLAYER_SCALE

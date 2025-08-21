@@ -160,9 +160,9 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 ```json
 {
-  "audio": 1,
+  "audio": 0,
   "video": 1,
-  "subtitle": -1
+  "subtitle": 2
 }
 ```
 
@@ -182,7 +182,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 {
   "audio": [
     { "id": -1, "name": "Disable" },
-    { "id": 1, "name": "Track 1 - [English]" }
+    { "id": 0, "name": "Track 1 - [English]" }
   ],
   "video": [
     { "id": -1, "name": "Disable" },
@@ -190,7 +190,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
   ],
   "subtitle": [
     { "id": -1, "name": "Disable" },
-    { "id": 1, "name": "Track 1 - [Japanese]" }
+    { "id": 2, "name": "Track 1 - [Japanese]" }
   ]
 }
 ```
