@@ -245,9 +245,16 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    var slaves: [Slave] = .init() {
-        didSet {
-            if slaves != oldValue {
+    private var _slaves: [Slave] = .init()
+
+    var slaves: [Slave] {
+        get { _slaves }
+        set {
+            let newSlaves = newValue.filter { !_slaves.contains($0) }
+
+            _slaves += newSlaves
+
+            if !newSlaves.isEmpty {
                 addPlayerSlaves()
             }
         }

@@ -276,7 +276,7 @@ class LibVlcPlayerView(
             }
         }
 
-    var options: ArrayList<String> = ArrayList<String>()
+    var options: ArrayList<String> = ArrayList()
         set(value) {
             val old = field
             field = value
@@ -292,12 +292,13 @@ class LibVlcPlayerView(
             setPlayerTracks()
         }
 
-    var slaves: ArrayList<Slave> = ArrayList<Slave>()
+    var slaves: ArrayList<Slave> = ArrayList()
         set(value) {
-            val old = field
-            field = value
+            val newSlaves = value.filter { it !in field }
 
-            if (value != old) {
+            field = field.apply { addAll(newSlaves) }
+
+            if (!newSlaves.isEmpty()) {
                 addPlayerSlaves()
             }
         }
