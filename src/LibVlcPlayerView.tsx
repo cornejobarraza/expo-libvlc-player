@@ -7,6 +7,7 @@ import {
   LibVlcPlayerViewRef,
   type Error,
   type Position,
+  type MediaTracks,
   type MediaInfo,
 } from "./LibVlcPlayer.types";
 import { parseSource } from "./utils/assets";
@@ -41,6 +42,12 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       }
     };
 
+    const onESAdded = ({ nativeEvent }: { nativeEvent: MediaTracks }) => {
+      if (props.onESAdded) {
+        props.onESAdded(nativeEvent);
+      }
+    };
+
     const onFirstPlay = ({ nativeEvent }: { nativeEvent: MediaInfo }) => {
       if (props.onFirstPlay) {
         props.onFirstPlay(nativeEvent);
@@ -58,6 +65,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         }))}
         onEncounteredError={onEncounteredError}
         onPositionChanged={onPositionChanged}
+        onESAdded={onESAdded}
         onFirstPlay={onFirstPlay}
       />
     );

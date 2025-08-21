@@ -27,6 +27,7 @@ class LibVlcPlayerView: ExpoView {
     let onEndReached = EventDispatcher()
     let onEncounteredError = EventDispatcher()
     let onPositionChanged = EventDispatcher()
+    let onESAdded = EventDispatcher()
     let onFirstPlay = EventDispatcher()
     let onBackground = EventDispatcher()
 
@@ -77,8 +78,13 @@ class LibVlcPlayerView: ExpoView {
         firstPlay = true
     }
 
-    func setFirstPlay() {
-        var mediaInfo = MediaInfo()
+    func destroyPlayer() {
+        mediaPlayer?.media = nil
+        mediaPlayer = nil
+    }
+
+    func getMediaTracks() -> MediaTracks {
+        var mediaTracks = MediaTracks()
 
         if let player = mediaPlayer {
             var audioTracks: [Track] = []
@@ -117,35 +123,73 @@ class LibVlcPlayerView: ExpoView {
                 }
             }
 
-            let video = player.videoSize
-            let tracks = MediaTracks(
+            mediaTracks = MediaTracks(
                 audio: audioTracks,
                 video: videoTracks,
                 subtitle: subtitleTracks
             )
+        }
+
+        return mediaTracks
+    }
+
+    func setPlayerTracks() {
+        guard let player = mediaPlayer else { return }
+
+        let audioTrackIndex = tracks?.audio ?? Int(player.currentAudioTrackIndex)
+        let videoTrackIndex = tracks?.video ?? Int(player.currentVideoTrackIndex)
+        let videoSubTitleIndex = tracks?.subtitle ?? Int(player.currentVideoSubTitleIndex)
+
+        player.currentAudioTrackIndex = Int32(audioTrackIndex)
+        player.currentVideoTrackIndex = Int32(videoTrackIndex)
+        player.currentVideoSubTitleIndex = Int32(videoSubTitleIndex)
+    }
+
+    func addPlayerSlaves() {
+        for slave in slaves {
+            let source = slave.source
+            let type = slave.type
+            let slaveType = type == "subtitle" ?
+                VLCMediaPlaybackSlaveType.subtitle :
+                VLCMediaPlaybackSlaveType.audio
+            let selected = slave.selected ?? false
+
+            guard let url = URL(string: source) else {
+                let error = ["error": "Invalid slave, \(type) could not be added"]
+                onEncounteredError(error)
+                continue
+            }
+
+            mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
+        }
+    }
+
+    func getMediaInfo() -> MediaInfo {
+        var mediaInfo = MediaInfo()
+
+        if let player = mediaPlayer {
+            let video = player.videoSize
             let length = player.media?.length.intValue ?? 0
             let seekable = player.isSeekable
+            let mediaTracks = getMediaTracks()
 
             mediaInfo = MediaInfo(
                 width: Int(video.width),
                 height: Int(video.height),
-                tracks: tracks,
-                duration: Double(length),
-                seekable: seekable
+                length: Double(length),
+                seekable: seekable,
+                tracks: mediaTracks,
             )
 
             mediaLength = length
         }
 
-        onFirstPlay(mediaInfo)
-
-        firstPlay = false
+        return mediaInfo
     }
 
     func setupPlayer() {
         guard let player = mediaPlayer else { return }
 
-        setFirstPlay()
         setPlayerTracks()
 
         if volume != maxPlayerVolume || mute {
@@ -177,11 +221,6 @@ class LibVlcPlayerView: ExpoView {
         time = defaultPlayerTime
     }
 
-    func destroyPlayer() {
-        mediaPlayer?.media = nil
-        mediaPlayer = nil
-    }
-
     var source: String? {
         didSet {
             if source != nil {
@@ -200,40 +239,9 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    func setPlayerTracks() {
-        guard let player = mediaPlayer else { return }
-
-        let audioTrackIndex = tracks?.audio ?? Int(player.currentAudioTrackIndex)
-        let videoTrackIndex = tracks?.video ?? Int(player.currentVideoTrackIndex)
-        let videoSubTitleIndex = tracks?.subtitle ?? Int(player.currentVideoSubTitleIndex)
-
-        player.currentAudioTrackIndex = Int32(audioTrackIndex)
-        player.currentVideoTrackIndex = Int32(videoTrackIndex)
-        player.currentVideoSubTitleIndex = Int32(videoSubTitleIndex)
-    }
-
     var tracks: Tracks? {
         didSet {
             setPlayerTracks()
-        }
-    }
-
-    func addPlayerSlaves() {
-        for slave in slaves {
-            let source = slave.source
-            let type = slave.type
-            let slaveType = type == "subtitle" ?
-                VLCMediaPlaybackSlaveType.subtitle :
-                VLCMediaPlaybackSlaveType.audio
-            let selected = slave.selected ?? false
-
-            guard let url = URL(string: source) else {
-                let error = ["error": "Invalid slave, \(type) could not be added"]
-                onEncounteredError(error)
-                continue
-            }
-
-            mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
         }
     }
 

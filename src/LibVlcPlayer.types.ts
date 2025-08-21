@@ -59,9 +59,9 @@ export interface MediaTracks {
 export interface MediaInfo {
   width: number;
   height: number;
-  tracks: MediaTracks;
-  duration: number;
+  length: number;
   seekable: boolean;
+  tracks: MediaTracks;
 }
 
 export type AudioMixingMode =
@@ -114,6 +114,11 @@ export type Position = { position: number };
 /**
  * @hidden
  */
+export type ESAddedListener = (event: { nativeEvent: MediaTracks }) => void;
+
+/**
+ * @hidden
+ */
 export type FirstPlayListener = (event: { nativeEvent: MediaInfo }) => void;
 
 /**
@@ -147,6 +152,7 @@ export interface LibVlcPlayerViewNativeProps {
   onEndReached?: EndReachedListener;
   onEncounteredError?: EncounteredErrorListener;
   onPositionChanged?: PositionChangedListener;
+  onESAdded?: ESAddedListener;
   onFirstPlay?: FirstPlayListener;
   onBackground?: BackgroundListener;
 }
@@ -292,6 +298,10 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Called after the `PositionChanged` player event
    */
   onPositionChanged?: (event: Position) => void;
+  /**
+   * Called after the `ESAdded` player event
+   */
+  onESAdded?: (event: MediaTracks) => void;
   /**
    * Called after the first `Playing` player event
    */

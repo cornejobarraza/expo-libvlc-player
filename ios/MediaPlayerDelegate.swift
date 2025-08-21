@@ -11,7 +11,11 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             onPlaying([:])
 
             if firstPlay {
-                setupPlayer()
+                let mediaInfo = getMediaInfo()
+
+                onFirstPlay(mediaInfo)
+
+                firstPlay = false
             }
 
             MediaPlayerManager.shared.setAppropriateAudioSession()
@@ -34,6 +38,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         case .error:
             let error = ["error": "Player encountered an error"]
             onEncounteredError(error)
+        case .esAdded:
+            let mediaTracks = getMediaTracks()
+            onESAdded(mediaTracks)
         default:
             break
         }

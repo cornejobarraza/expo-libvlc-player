@@ -25,8 +25,8 @@ import {
   View,
 } from "react-native";
 
-function msToMinutesSeconds(duration: number) {
-  const totalSeconds = Math.floor(duration / 1_000);
+function msToMinutesSeconds(length: number) {
+  const totalSeconds = Math.floor(length / 1_000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = (totalSeconds % 60).toString().padStart(2, "0");
   return `${minutes}:${seconds}`;
@@ -38,7 +38,7 @@ const VLC_OPTIONS = ["--network-caching=1000"];
 
 const THUMBNAIL_TIME = 27_000;
 const BUFFERING_DELAY = 1_000;
-const DEFAULT_DURATION = 0;
+const DEFAULT_LENGTH = 0;
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 1;
@@ -59,7 +59,8 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
   );
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [position, setPosition] = useState<number>(MIN_POSITION_VALUE);
-  const [duration, setDuration] = useState<number>(DEFAULT_DURATION);
+  const [length, setLength] = useState<number>(DEFAULT_LENGTH);
+  const [seekable, setSeekable] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
   const [mute, setMute] = useState<boolean>(false);
   const [repeat, setRepeat] = useState<boolean>(false);
@@ -68,7 +69,6 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isStopped, setIsStopped] = useState<boolean>(false);
   const [isBackgrounded, setIsBackgrounded] = useState<boolean>(false);
-  const [isSeekable, setIsSeekable] = useState<boolean>(false);
 
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<number | null>(null);
@@ -150,9 +150,9 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
       setPosition(position);
       setIsBuffering(false);
     },
-    onFirstPlay: ({ duration, seekable }: MediaInfo) => {
-      setDuration(duration);
-      setIsSeekable(seekable);
+    onFirstPlay: ({ length, seekable }: MediaInfo) => {
+      setLength(length);
+      setSeekable(seekable);
     },
     onBackground: () => {
       setIsBackgrounded(true);
@@ -195,12 +195,12 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
 
   const resetPlayerState = () => {
     setPosition(MIN_POSITION_VALUE);
-    setDuration(DEFAULT_DURATION);
+    setLength(DEFAULT_LENGTH);
+    setSeekable(false);
     setIsBuffering(false);
     setIsPlaying(false);
     setIsStopped(false);
     setIsBackgrounded(false);
-    setIsSeekable(false);
   };
 
   const isPortrait =
@@ -251,10 +251,10 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
         />
       </View>
       <View style={styles.controls}>
-        <View style={styles.duration}>
-          <Text>{msToMinutesSeconds(position * duration)}</Text>
+        <View style={styles.length}>
+          <Text>{msToMinutesSeconds(position * length)}</Text>
           <Text>
-            {duration > DEFAULT_DURATION ? msToMinutesSeconds(duration) : "N/A"}
+            {length > DEFAULT_LENGTH ? msToMinutesSeconds(length) : "N/A"}
           </Text>
         </View>
         <Slider
@@ -265,7 +265,7 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
           thumbTintColor="darkred"
           minimumTrackTintColor="red"
           maximumTrackTintColor="lightgray"
-          disabled={!isSeekable}
+          disabled={!seekable}
           tapToSeek
         />
         <View style={styles.buttons}>
@@ -281,7 +281,7 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
           <Control
             name="redo"
             onPress={handleRepeatChange}
-            disabled={duration <= DEFAULT_DURATION}
+            disabled={length <= DEFAULT_LENGTH}
             selected={repeat}
           />
         </View>
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     paddingHorizontal: 12,
   },
-  duration: {
+  length: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 8,

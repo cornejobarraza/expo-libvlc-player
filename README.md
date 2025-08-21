@@ -141,29 +141,20 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 #### Callback props
 
-| Prop                 | Description                                      | Payload                   |
-| -------------------- | ------------------------------------------------ | ------------------------- |
-| `onBuffering`        | Called after the `Buffering` player event        |                           |
-| `onPlaying`          | Called after the `Playing` player event          |                           |
-| `onPaused`           | Called after the `Paused` player event           |                           |
-| `onStopped`          | Called after the `Stopped` player event          |                           |
-| `onEndReached`       | Called after the `EndReached` player event       |                           |
-| `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`       |
-| `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`    |
-| `onFirstPlay`        | Called after the first `Playing` player event    | [`MediaInfo`](#mediainfo) |
-| `onBackground`       | Called after the player enters the background    |                           |
+| Prop                 | Description                                      | Payload                       |
+| -------------------- | ------------------------------------------------ | ----------------------------- |
+| `onBuffering`        | Called after the `Buffering` player event        |                               |
+| `onPlaying`          | Called after the `Playing` player event          |                               |
+| `onPaused`           | Called after the `Paused` player event           |                               |
+| `onStopped`          | Called after the `Stopped` player event          |                               |
+| `onEndReached`       | Called after the `EndReached` player event       |                               |
+| `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`           |
+| `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`        |
+| `onESAdded`          | Called after the `ESAdded` player event          | [`MediaTracks`](#mediatracks) |
+| `onFirstPlay`        | Called after the first `Playing` player event    | [`MediaInfo`](#mediainfo)     |
+| `onBackground`       | Called after the player enters the background    |                               |
 
 ### Player types
-
-#### `Slave`
-
-```json
-{
-  "source": "file://path/to/subtitle.srt",
-  "type": "subtitle",
-  "selected": true
-}
-```
 
 #### `Tracks`
 
@@ -175,28 +166,44 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 }
 ```
 
+#### `Slave`
+
+```json
+{
+  "source": "file://path/to/subtitle.srt",
+  "type": "subtitle",
+  "selected": true
+}
+```
+
+#### `MediaTracks`
+
+```json
+{
+  "audio": [
+    { "id": -1, "name": "Disable" },
+    { "id": 1, "name": "Track 1 - [English]" }
+  ],
+  "video": [
+    { "id": -1, "name": "Disable" },
+    { "id": 1, "name": "Track 1" }
+  ],
+  "subtitle": [
+    { "id": -1, "name": "Disable" },
+    { "id": 1, "name": "Track 1 - [Japanese]" }
+  ]
+}
+```
+
 #### `MediaInfo`
 
 ```json
 {
   "width": 320,
   "height": 176,
-  "tracks": {
-    "audio": [
-      { "id": -1, "name": "Disable" },
-      { "id": 1, "name": "Track 1 - [English]" }
-    ],
-    "video": [
-      { "id": -1, "name": "Disable" },
-      { "id": 1, "name": "Track 1" }
-    ],
-    "subtitle": [
-      { "id": -1, "name": "Disable" },
-      { "id": 1, "name": "Track 1 - [Japanese]" }
-    ]
-  },
-  "duration": 78920,
-  "seekable": true
+  "length": 78920,
+  "seekable": true,
+  "tracks": MediaTracks,
 }
 ```
 

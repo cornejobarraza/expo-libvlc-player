@@ -52,6 +52,7 @@ class LibVlcPlayerView(
     internal val onEndReached by EventDispatcher()
     internal val onEncounteredError by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
+    internal val onESAdded by EventDispatcher<MediaTracks>()
     internal val onFirstPlay by EventDispatcher<MediaInfo>()
     internal val onBackground by EventDispatcher()
 
@@ -117,8 +118,17 @@ class LibVlcPlayerView(
         removeAllViews()
     }
 
-    fun setFirstPlay() {
-        var mediaInfo = MediaInfo()
+    fun destroyPlayer() {
+        media?.release()
+        media = null
+        mediaPlayer?.release()
+        mediaPlayer = null
+        libVLC?.release()
+        libVLC = null
+    }
+
+    fun getMediaTracks(): MediaTracks {
+        var mediaTracks = MediaTracks()
 
         mediaPlayer?.let { player ->
             val audioTracks = mutableListOf<Track>()
@@ -145,13 +155,55 @@ class LibVlcPlayerView(
                 subtitleTracks.add(trackObj)
             }
 
-            val video = player.getCurrentVideoTrack()
-            val tracks =
+            mediaTracks =
                 MediaTracks(
                     audio = audioTracks,
                     video = videoTracks,
                     subtitle = subtitleTracks,
                 )
+        }
+
+        return mediaTracks
+    }
+
+    fun setPlayerTracks() {
+        mediaPlayer?.let { player ->
+            val audioTrack = tracks?.audio ?: player.getAudioTrack()
+            val videoTrack = tracks?.video ?: player.getVideoTrack()
+            val spuTrack = tracks?.subtitle ?: player.getSpuTrack()
+
+            player.setAudioTrack(audioTrack)
+            player.setVideoTrack(videoTrack)
+            player.setSpuTrack(spuTrack)
+        }
+    }
+
+    fun addPlayerSlaves() {
+        slaves.forEach { slave ->
+            val type = slave.type
+            val slaveType =
+                if (type == "subtitle") {
+                    IMedia.Slave.Type.Subtitle
+                } else {
+                    IMedia.Slave.Type.Audio
+                }
+            val source = slave.source
+            val selected = slave.selected ?: false
+
+            try {
+                mediaPlayer?.addSlave(slaveType, Uri.parse(source), selected)
+            } catch (_: Exception) {
+                val error = mapOf("error" to "Invalid slave, $type could not be added")
+                onEncounteredError(error)
+            }
+        }
+    }
+
+    fun getMediaInfo(): MediaInfo {
+        var mediaInfo = MediaInfo()
+
+        mediaPlayer?.let { player ->
+            val video = player.getCurrentVideoTrack()
             val pLength = player.getLength()
             val length =
                 if (pLength != -1L) {
@@ -160,28 +212,26 @@ class LibVlcPlayerView(
                     0L
                 }
             val seekable = player.isSeekable()
+            val mediaTracks = getMediaTracks()
 
             mediaInfo =
                 MediaInfo(
                     width = video?.width ?: 0,
                     height = video?.height ?: 0,
-                    tracks = tracks,
-                    duration = length.toDouble(),
+                    length = length.toDouble(),
                     seekable = seekable,
+                    tracks = mediaTracks,
                 )
 
             mediaLength = length
         }
 
-        onFirstPlay(mediaInfo)
-
-        firstPlay = false
+        return mediaInfo
     }
 
     fun setupPlayer() {
         mediaPlayer?.let { player ->
             attachPlayer()
-            setFirstPlay()
             setPlayerTracks()
 
             if (volume != MAX_PLAYER_VOLUME || mute) {
@@ -215,106 +265,64 @@ class LibVlcPlayerView(
         }
     }
 
-    fun destroyPlayer() {
-        media?.release()
-        media = null
-        mediaPlayer?.release()
-        mediaPlayer = null
-        libVLC?.release()
-        libVLC = null
-    }
-
     var source: String? = null
         set(value) {
             val old = field
+            field = value
 
             if (value != null) {
                 shouldCreate = value != old
             } else {
                 destroyPlayer()
             }
-
-            field = value
         }
 
     var options: ArrayList<String> = ArrayList<String>()
         set(value) {
             val old = field
+            field = value
 
             if (source != null) {
                 shouldCreate = value != old
             }
-
-            field = value
         }
-
-    fun setPlayerTracks() {
-        mediaPlayer?.let { player ->
-            val audioTrack = tracks?.audio ?: player.getAudioTrack()
-            val videoTrack = tracks?.video ?: player.getVideoTrack()
-            val spuTrack = tracks?.subtitle ?: player.getSpuTrack()
-
-            player.setAudioTrack(audioTrack)
-            player.setVideoTrack(videoTrack)
-            player.setSpuTrack(spuTrack)
-        }
-    }
 
     var tracks: Tracks? = null
         set(value) {
-            setPlayerTracks()
             field = value
+            setPlayerTracks()
         }
-
-    fun addPlayerSlaves() {
-        slaves.forEach { slave ->
-            val type = slave.type
-            val slaveType =
-                if (type == "subtitle") {
-                    IMedia.Slave.Type.Subtitle
-                } else {
-                    IMedia.Slave.Type.Audio
-                }
-            val source = slave.source
-            val selected = slave.selected ?: false
-
-            try {
-                mediaPlayer?.addSlave(slaveType, Uri.parse(source), selected)
-            } catch (_: Exception) {
-                val error = mapOf("error" to "Invalid slave, $type could not be added")
-                onEncounteredError(error)
-            }
-        }
-    }
 
     var slaves: ArrayList<Slave> = ArrayList<Slave>()
         set(value) {
-            addPlayerSlaves()
             field = value
+            addPlayerSlaves()
         }
 
     var scale: Float = DEFAULT_PLAYER_SCALE
         set(value) {
-            mediaPlayer?.setScale(value)
             field = value
+            mediaPlayer?.setScale(value)
         }
 
     var aspectRatio: String? = null
         set(value) {
-            mediaPlayer?.setAspectRatio(value)
             field = value
+            mediaPlayer?.setAspectRatio(value)
         }
 
     var rate: Float = DEFAULT_PLAYER_RATE
         set(value) {
-            mediaPlayer?.setRate(value)
             field = value
+            mediaPlayer?.setRate(value)
         }
 
     var time: Int = DEFAULT_PLAYER_TIME
 
     var volume: Int = MAX_PLAYER_VOLUME
         set(value) {
+            field = value
+
             if (options.hasAudioOption()) {
                 val error = mapOf("error" to "Audio disabled via options")
                 onEncounteredError(error)
@@ -328,12 +336,12 @@ class LibVlcPlayerView(
                     player.setVolume(newVolume)
                 }
             }
-
-            field = value
         }
 
     var mute: Boolean = false
         set(value) {
+            field = value
+
             if (options.hasAudioOption() && !value) {
                 val error = mapOf("error" to "Audio disabled via options")
                 onEncounteredError(error)
@@ -348,32 +356,30 @@ class LibVlcPlayerView(
 
             mediaPlayer?.setVolume(newVolume)
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-            field = value
         }
 
     var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO
         set(value) {
-            MediaPlayerManager.audioFocusManager.updateAudioFocus()
             field = value
+            MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
     var playInBackground: Boolean = false
         set(value) {
-            MediaPlayerManager.audioFocusManager.updateAudioFocus()
             field = value
+            MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
     var autoplay: Boolean = true
 
     var repeat: Boolean = false
         set(value) {
+            field = value
+
             if (options.hasRepeatOption()) {
                 val error = mapOf("error" to "Repeat enabled via options")
                 onEncounteredError(error)
             }
-
-            field = value
         }
 
     fun play() {

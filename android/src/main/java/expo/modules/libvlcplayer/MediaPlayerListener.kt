@@ -16,7 +16,13 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         onPlaying(mapOf())
 
                         if (firstPlay) {
-                            setupPlayer()
+                            attachPlayer()
+
+                            val mediaInfo = getMediaInfo()
+
+                            onFirstPlay(mediaInfo)
+
+                            firstPlay = false
                         }
 
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
@@ -54,6 +60,11 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     Event.PositionChanged -> {
                         val position = mapOf("position" to player.getPosition())
                         onPositionChanged(position)
+                    }
+
+                    Event.ESAdded -> {
+                        val mediaTracks = getMediaTracks()
+                        onESAdded(mediaTracks)
                     }
                 }
             },
