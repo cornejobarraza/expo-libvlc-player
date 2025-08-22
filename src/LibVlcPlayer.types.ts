@@ -31,23 +31,21 @@ export interface LibVlcPlayerViewRef {
 
 export type LibVlcSource = string | number | null;
 
-export type SlaveType = "audio" | "subtitle";
+export interface Tracks {
+  audio?: number;
+  video?: number;
+  subtitle?: number;
+}
 
 export interface Slave {
   source: NonNullable<LibVlcSource>;
-  type: SlaveType;
+  type: "audio" | "subtitle";
   selected?: boolean;
 }
 
 export interface Track {
   id: number;
   name: string;
-}
-
-export interface Tracks {
-  audio?: number;
-  video?: number;
-  subtitle?: number;
 }
 
 export interface MediaTracks {

@@ -126,8 +126,8 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | `source`           | Sets the source of the media to be played. Set to `null` to release the player                                                    |             |
 | `options`          | Sets the VLC options to initialize the player with. See the [VLC Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
-| `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more                                                | `undefined` |
-| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
+| `tracks`           | Sets the player audio, video and subtitle tracks object. See [`Tracks`](#tracks) for more                                         | `undefined` |
+| `slaves`           | Sets the player audio and subtitle slaves array. See [`Slave`](#slave) for more                                                   | `[]`        |
 | `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
 | `aspectRatio`      | Sets the player aspect ratio. Must be a valid string or `null` for default                                                        | `undefined` |
 | `rate`             | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
@@ -158,52 +158,52 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 #### `Tracks`
 
-```json
+```ts
 {
-  "audio": 0,
-  "video": 1,
-  "subtitle": 2
+  audio: number;
+  video: number;
+  subtitle: number;
 }
 ```
 
 #### `Slave`
 
-```json
+```ts
 {
-  "source": "file://path/to/subtitle.srt",
-  "type": "subtitle",
-  "selected": true
+  source: string | number;
+  type: "audio" | "subtitle";
+  selected: boolean;
+}
+```
+
+#### `Track`
+
+```ts
+{
+  id: number;
+  name: string;
 }
 ```
 
 #### `MediaTracks`
 
-```json
+```ts
 {
-  "audio": [
-    { "id": -1, "name": "Disable" },
-    { "id": 0, "name": "Track 1 - [English]" }
-  ],
-  "video": [
-    { "id": -1, "name": "Disable" },
-    { "id": 1, "name": "Track 1" }
-  ],
-  "subtitle": [
-    { "id": -1, "name": "Disable" },
-    { "id": 2, "name": "Track 1 - [Japanese]" }
-  ]
+  audio: Track[];
+  video: Track[];
+  subtitle: Track[];
 }
 ```
 
 #### `MediaInfo`
 
-```jsonc
+```ts
 {
-  "width": 320,
-  "height": 176,
-  "length": 78920,
-  "seekable": true,
-  "tracks": /* MediaTracks */
+  width: number;
+  height: number;
+  length: number;
+  seekable: boolean;
+  tracks: MediaTracks;
 }
 ```
 
