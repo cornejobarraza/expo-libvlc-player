@@ -41,8 +41,10 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             let error = ["error": "Player encountered an error"]
             onEncounteredError(error)
         case .esAdded:
-            let mediaTracks = getMediaTracks()
-            onESAdded(mediaTracks)
+            if !firstPlay {
+                let mediaTracks = getMediaTracks()
+                onESAdded(mediaTracks)
+            }
         default:
             break
         }
