@@ -20,7 +20,7 @@
     "libvlc",
     "player",
     "expo-libvlc-player",
-    "ExpoLibVlcPlayer"
+    "ExpoLibvlcPlayer"
   ],
   "repository": "https://github.com/cornejobarraza/expo-libvlc-player",
   "bugs": {
