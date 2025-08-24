@@ -56,11 +56,14 @@ class LibVlcPlayerView: ExpoView {
         }
 
         destroyPlayer()
+
+        guard let source = source else { return }
+
         mediaPlayer = VLCMediaPlayer(options: options)
         mediaPlayer!.drawable = playerView
         mediaPlayer!.delegate = self
 
-        guard let source = source, let url = URL(string: source) else {
+        guard let url = URL(string: source) else {
             let error = ["error": "Invalid source, media could not be set"]
             onEncounteredError(error)
             return
@@ -83,6 +86,37 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer?.delegate = nil
         mediaPlayer?.drawable = nil
         mediaPlayer = nil
+    }
+
+    func setPlayerTracks() {
+        if let player = mediaPlayer {
+            let audioTrackIndex = tracks?.audio ?? Int(player.currentAudioTrackIndex)
+            let videoTrackIndex = tracks?.video ?? Int(player.currentVideoTrackIndex)
+            let videoSubTitleIndex = tracks?.subtitle ?? Int(player.currentVideoSubTitleIndex)
+
+            player.currentAudioTrackIndex = Int32(audioTrackIndex)
+            player.currentVideoTrackIndex = Int32(videoTrackIndex)
+            player.currentVideoSubTitleIndex = Int32(videoSubTitleIndex)
+        }
+    }
+
+    func addPlayerSlaves() {
+        for slave in slaves {
+            let source = slave.source
+            let type = slave.type
+            let slaveType = type == "subtitle" ?
+                VLCMediaPlaybackSlaveType.subtitle :
+                VLCMediaPlaybackSlaveType.audio
+            let selected = slave.selected ?? false
+
+            guard let url = URL(string: source) else {
+                let error = ["error": "Invalid slave, \(type) could not be added"]
+                onEncounteredError(error)
+                continue
+            }
+
+            mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
+        }
     }
 
     func getMediaTracks() -> MediaTracks {
@@ -135,37 +169,6 @@ class LibVlcPlayerView: ExpoView {
         return mediaTracks
     }
 
-    func setPlayerTracks() {
-        guard let player = mediaPlayer else { return }
-
-        let audioTrackIndex = tracks?.audio ?? Int(player.currentAudioTrackIndex)
-        let videoTrackIndex = tracks?.video ?? Int(player.currentVideoTrackIndex)
-        let videoSubTitleIndex = tracks?.subtitle ?? Int(player.currentVideoSubTitleIndex)
-
-        player.currentAudioTrackIndex = Int32(audioTrackIndex)
-        player.currentVideoTrackIndex = Int32(videoTrackIndex)
-        player.currentVideoSubTitleIndex = Int32(videoSubTitleIndex)
-    }
-
-    func addPlayerSlaves() {
-        for slave in slaves {
-            let source = slave.source
-            let type = slave.type
-            let slaveType = type == "subtitle" ?
-                VLCMediaPlaybackSlaveType.subtitle :
-                VLCMediaPlaybackSlaveType.audio
-            let selected = slave.selected ?? false
-
-            guard let url = URL(string: source) else {
-                let error = ["error": "Invalid slave, \(type) could not be added"]
-                onEncounteredError(error)
-                continue
-            }
-
-            mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
-        }
-    }
-
     func getMediaInfo() -> MediaInfo {
         var mediaInfo = MediaInfo()
 
@@ -190,54 +193,48 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func setupPlayer() {
-        guard let player = mediaPlayer else { return }
+        if let player = mediaPlayer {
+            setPlayerTracks()
 
-        setPlayerTracks()
+            if volume != maxPlayerVolume || mute {
+                let newVolume = mute ?
+                    minPlayerVolume :
+                    volume
 
-        if volume != maxPlayerVolume || mute {
-            let newVolume = mute ?
-                minPlayerVolume :
-                volume
-
-            player.audio?.volume = Int32(newVolume)
-        }
-
-        if rate != defaultPlayerRate {
-            player.rate = rate
-        }
-
-        if time != defaultPlayerTime {
-            player.time = VLCTime(int: Int32(time))
-        }
-
-        if scale != defaultPlayerScale {
-            player.scaleFactor = scale
-        }
-
-        if let aspectRatio = aspectRatio {
-            aspectRatio.withCString { cString in
-                player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+                player.audio?.volume = Int32(newVolume)
             }
-        }
 
-        time = defaultPlayerTime
+            if rate != defaultPlayerRate {
+                player.rate = rate
+            }
+
+            if time != defaultPlayerTime {
+                player.time = VLCTime(int: Int32(time))
+            }
+
+            if scale != defaultPlayerScale {
+                player.scaleFactor = scale
+            }
+
+            if let aspectRatio = aspectRatio {
+                aspectRatio.withCString { cString in
+                    player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+                }
+            }
+
+            time = defaultPlayerTime
+        }
     }
 
     var source: String? {
         didSet {
-            if source != nil {
-                shouldCreate = source != oldValue
-            } else {
-                destroyPlayer()
-            }
+            shouldCreate = source != oldValue
         }
     }
 
     var options: [String] = .init() {
         didSet {
-            if source != nil {
-                shouldCreate = options != oldValue
-            }
+            shouldCreate = options != oldValue
         }
     }
 
@@ -270,13 +267,12 @@ class LibVlcPlayerView: ExpoView {
 
     var aspectRatio: String? {
         didSet {
-            guard let aspectRatio = aspectRatio else {
+            if let aspectRatio = aspectRatio {
+                aspectRatio.withCString { cString in
+                    mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+                }
+            } else {
                 mediaPlayer?.videoAspectRatio = nil
-                return
-            }
-
-            aspectRatio.withCString { cString in
-                mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
             }
         }
     }
@@ -359,13 +355,12 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func seek(_ position: Float) {
-        guard let player = mediaPlayer else { return }
-
-        if player.isSeekable {
-            player.position = position
-        } else {
-            let time = position * Float(mediaLength)
-            self.time = Int(time)
+        if let player = mediaPlayer {
+            if player.isSeekable {
+                player.position = position
+            } else {
+                time = Int(position * Float(mediaLength))
+            }
         }
     }
 }

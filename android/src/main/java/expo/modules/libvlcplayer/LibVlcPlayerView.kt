@@ -17,6 +17,7 @@ import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.interfaces.IMedia
 import org.videolan.libvlc.util.DisplayManager
 import org.videolan.libvlc.util.VLCVideoLayout
+import java.net.URI
 
 const val DEFAULT_PLAYER_RATE: Float = 1f
 const val DEFAULT_PLAYER_TIME: Int = 0
@@ -81,18 +82,24 @@ class LibVlcPlayerView(
         }
 
         destroyPlayer()
+
+        val source = source ?: return
+
         libVLC = LibVLC(context, options)
         mediaPlayer = MediaPlayer(libVLC)
         setMediaPlayerListener()
 
         try {
-            media = Media(libVLC, Uri.parse(source))
-            mediaPlayer!!.setMedia(media)
-            media!!.release()
+            URI(source)
         } catch (_: Exception) {
             val error = mapOf("error" to "Invalid source, media could not be set")
             onEncounteredError(error)
+            return
         }
+
+        media = Media(libVLC, Uri.parse(source))
+        mediaPlayer!!.setMedia(media)
+        media!!.release()
 
         addPlayerSlaves()
 
@@ -133,6 +140,42 @@ class LibVlcPlayerView(
         libVLC = null
     }
 
+    fun setPlayerTracks() {
+        mediaPlayer?.let { player ->
+            val audioTrack = tracks?.audio ?: player.getAudioTrack()
+            val videoTrack = tracks?.video ?: player.getVideoTrack()
+            val spuTrack = tracks?.subtitle ?: player.getSpuTrack()
+
+            player.setAudioTrack(audioTrack)
+            player.setVideoTrack(videoTrack)
+            player.setSpuTrack(spuTrack)
+        }
+    }
+
+    fun addPlayerSlaves() {
+        slaves.forEach { slave ->
+            val source = slave.source
+            val type = slave.type
+            val slaveType =
+                if (type == "subtitle") {
+                    IMedia.Slave.Type.Subtitle
+                } else {
+                    IMedia.Slave.Type.Audio
+                }
+            val selected = slave.selected ?: false
+
+            try {
+                URI(source)
+            } catch (_: Exception) {
+                val error = mapOf("error" to "Invalid slave, $type could not be added")
+                onEncounteredError(error)
+                return@forEach
+            }
+
+            mediaPlayer?.addSlave(slaveType, Uri.parse(source), selected)
+        }
+    }
+
     fun getMediaTracks(): MediaTracks {
         var mediaTracks = MediaTracks()
 
@@ -170,39 +213,6 @@ class LibVlcPlayerView(
         }
 
         return mediaTracks
-    }
-
-    fun setPlayerTracks() {
-        mediaPlayer?.let { player ->
-            val audioTrack = tracks?.audio ?: player.getAudioTrack()
-            val videoTrack = tracks?.video ?: player.getVideoTrack()
-            val spuTrack = tracks?.subtitle ?: player.getSpuTrack()
-
-            player.setAudioTrack(audioTrack)
-            player.setVideoTrack(videoTrack)
-            player.setSpuTrack(spuTrack)
-        }
-    }
-
-    fun addPlayerSlaves() {
-        slaves.forEach { slave ->
-            val type = slave.type
-            val slaveType =
-                if (type == "subtitle") {
-                    IMedia.Slave.Type.Subtitle
-                } else {
-                    IMedia.Slave.Type.Audio
-                }
-            val source = slave.source
-            val selected = slave.selected ?: false
-
-            try {
-                mediaPlayer?.addSlave(slaveType, Uri.parse(source), selected)
-            } catch (_: Exception) {
-                val error = mapOf("error" to "Invalid slave, $type could not be added")
-                onEncounteredError(error)
-            }
-        }
     }
 
     fun getMediaInfo(): MediaInfo {
@@ -274,22 +284,14 @@ class LibVlcPlayerView(
         set(value) {
             val old = field
             field = value
-
-            if (value != null) {
-                shouldCreate = value != old
-            } else {
-                destroyPlayer()
-            }
+            shouldCreate = value != old
         }
 
     var options: ArrayList<String> = ArrayList()
         set(value) {
             val old = field
             field = value
-
-            if (source != null) {
-                shouldCreate = value != old
-            }
+            shouldCreate = value != old
         }
 
     var tracks: Tracks? = null
@@ -409,8 +411,7 @@ class LibVlcPlayerView(
             if (player.isSeekable()) {
                 player.setPosition(position)
             } else {
-                val time = position * mediaLength.toFloat()
-                this.time = time.toInt()
+                time = (position * mediaLength.toFloat()).toInt()
             }
         }
     }

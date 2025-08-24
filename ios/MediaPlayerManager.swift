@@ -27,12 +27,12 @@ class MediaPlayerManager {
         for view in playerViews.allObjects {
             view.onBackground([:])
 
-            guard let player = view.mediaPlayer else { continue }
+            if let player = view.mediaPlayer {
+                let shouldPause = !view.playInBackground && player.isPlaying
 
-            let shouldPause = !view.playInBackground && player.isPlaying
-
-            if shouldPause {
-                player.pause()
+                if shouldPause {
+                    player.pause()
+                }
             }
         }
     }
@@ -49,8 +49,11 @@ class MediaPlayerManager {
         var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession.categoryOptions
 
         let isOutputtingAudio = playerViews.allObjects.contains { view in
-            guard let player = view.mediaPlayer, let audio = player.audio else { return false }
-            return player.isPlaying && audio.volume > minPlayerVolume
+            if let player = view.mediaPlayer, let audio = player.audio {
+                return player.isPlaying && audio.volume > minPlayerVolume
+            } else {
+                return false
+            }
         }
 
         let shouldMixOverride = audioMixingMode == .mixWithOthers

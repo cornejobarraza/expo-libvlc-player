@@ -30,8 +30,11 @@ class AudioFocusManager(
             }
 
     private fun playerRequiresFocus(player: MediaPlayer?): Boolean {
-        val mPlayer = player ?: return false
-        return mPlayer.isPlaying() && mPlayer.getVolume() > MIN_PLAYER_VOLUME
+        if (player != null) {
+            return player.isPlaying() && player.getVolume() > MIN_PLAYER_VOLUME
+        } else {
+            return false
+        }
     }
 
     private fun findAudioMixingMode(): AudioMixingMode {
@@ -177,9 +180,11 @@ class AudioFocusManager(
     }
 
     private fun pausePlayerIfUnmuted(player: MediaPlayer?) {
-        player?.let { mPlayer ->
-            if (mPlayer.getVolume() > MIN_PLAYER_VOLUME) {
-                mPlayer.pause()
+        if (player != null) {
+            val unmuted = player.getVolume() > MIN_PLAYER_VOLUME
+
+            if (unmuted) {
+                player.pause()
             }
         }
     }
