@@ -41,5 +41,5 @@ repositories {
 
 dependencies {
     implementation "com.facebook.react:react-native:+"
-    implementation "org.videolan.android:libvlc-all:3.6.2"
+    implementation "org.videolan.android:libvlc-all:3.6.3"
 }
