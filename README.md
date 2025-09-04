@@ -211,8 +211,8 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 This project is not affiliated with, endorsed by, or officially supported by VideoLAN. The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with the following **LibVLC** bindings:
 
-- `libvlcjni v3.6.2` for Android
-- `MobileVLCKit v3.6.0` for iOS
+- `libvlcjni` for Android
+- `MobileVLCKit` for iOS
 
 For official VLC products and support, please visit [videolan.org](https://www.videolan.org/).
 
