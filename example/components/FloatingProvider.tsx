@@ -6,8 +6,8 @@ import React, {
 } from "react";
 
 interface FloatingContextProps {
-  open: boolean;
-  toggle: () => void;
+  showFloating: boolean;
+  toggleFloating: () => void;
 }
 
 const FloatingContext = createContext<FloatingContextProps | null>(null);
@@ -23,15 +23,15 @@ export const useFloating = () => {
 };
 
 export const FloatingProvider = ({ children }: { children: ReactNode }) => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [showFloating, setShowFloating] = useState<boolean>(false);
 
-  const toggle = () => setOpen((prev) => !prev);
+  const toggleFloating = () => setShowFloating((prev) => !prev);
 
   return (
     <FloatingContext.Provider
       value={{
-        open,
-        toggle,
+        showFloating,
+        toggleFloating,
       }}
     >
       {children}

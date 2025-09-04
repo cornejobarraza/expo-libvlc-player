@@ -1,41 +1,53 @@
 import { useState } from "react";
-import { Text, StyleSheet, Button, SafeAreaView, View } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  Button,
+  SafeAreaView,
+  View,
+  ScrollView,
+} from "react-native";
 
 import { useFloating } from "../../components/FloatingProvider";
 import { PlayerView } from "../../components/PlayerView";
 
 export default function HomeTab() {
-  const [show, setShow] = useState<boolean>(false);
+  const [showEmbedded, setShowEmbedded] = useState<boolean>(false);
 
-  const { open, toggle } = useFloating();
+  const { showFloating, toggleFloating } = useFloating();
+
+  const toggleEmbedded = () => setShowEmbedded((prev) => !prev);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text>Player can be toggled from this tab</Text>
-      {show && !open && <PlayerView floating={false} />}
-      <View style={styles.buttons}>
-        {!show && (
-          <Button
-            title={`${!open ? "Open" : "Close"} Floating`}
-            onPress={toggle}
-          />
-        )}
-        {!open && (
-          <Button
-            title={`${!show ? "Show" : "Hide"} Embedded`}
-            onPress={() => setShow((prev) => !prev)}
-          />
-        )}
-      </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text>Player can be toggled from this tab</Text>
+        {showEmbedded && !showFloating && <PlayerView />}
+        <View style={styles.buttons}>
+          {!showEmbedded && (
+            <Button
+              title={`${!showFloating ? "Open" : "Close"} Floating`}
+              onPress={toggleFloating}
+            />
+          )}
+          {!showFloating && (
+            <Button
+              title={`${!showEmbedded ? "Show" : "Hide"} Embedded`}
+              onPress={toggleEmbedded}
+            />
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingVertical: 24,
     gap: 24,
   },
   buttons: {

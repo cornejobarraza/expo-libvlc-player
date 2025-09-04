@@ -20,14 +20,14 @@ const MAX_TRANSLATE_X = width / 2 - 50;
 const MAX_TRANSLATE_Y = height / 2 - 50;
 
 export const FloatingPlayer = () => {
-  const { open } = useFloating();
+  const { showFloating } = useFloating();
 
   useEffect(() => {
-    if (!open) {
+    if (!showFloating) {
       translationX.value = 0;
       translationY.value = 0;
     }
-  }, [open]);
+  }, [showFloating]);
 
   const translationX = useSharedValue(0);
   const translationY = useSharedValue(0);
@@ -61,7 +61,7 @@ export const FloatingPlayer = () => {
     })
     .runOnJS(true);
 
-  if (!open) return null;
+  if (!showFloating) return null;
 
   return (
     <GestureDetector gesture={pan}>
@@ -77,7 +77,7 @@ export const FloatingPlayer = () => {
           },
         ]}
       >
-        <PlayerView />
+        <PlayerView floating />
       </Animated.View>
     </GestureDetector>
   );

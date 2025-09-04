@@ -7,30 +7,19 @@ import {
   type MediaInfo,
   type Position,
 } from "expo-libvlc-player";
-import {
-  addOrientationChangeListener,
-  Orientation,
-  OrientationChangeEvent,
-  unlockAsync,
-} from "expo-screen-orientation";
-import { getThumbnailAsync } from "expo-video-thumbnails";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Image,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 
-function msToMinutesSeconds(length: number) {
-  const totalSeconds = Math.floor(length / 1_000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = (totalSeconds % 60).toString().padStart(2, "0");
-  return `${minutes}:${seconds}`;
-}
+import { PlayerControl } from "./PlayerControl";
+import { useMediaThumbnail } from "../hooks/useMediaThumbnail";
+import { usePortraitMode } from "../hooks/usePortraitMode";
 
 const BIG_BUCK_BUNNY =
   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
@@ -47,17 +36,20 @@ const MIN_VOLUME_LEVEL = 0;
 const MAX_VOLUME_LEVEL = 100;
 const VOLUME_CHANGE_STEP = 10;
 
-type VolumeChangeType = "increase" | "decrease";
-
 interface PlayerViewProps {
   floating?: boolean;
 }
 
-export const PlayerView = ({ floating = true }: PlayerViewProps) => {
-  const [orientation, setOrientation] = useState<Orientation>(
-    Orientation.UNKNOWN,
-  );
-  const [thumbnail, setThumbnail] = useState<string | null>(null);
+type VolumeChangeType = "increase" | "decrease";
+
+function msToMinutesSeconds(length: number) {
+  const totalSeconds = Math.floor(length / 1_000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
+}
+
+export const PlayerView = ({ floating = false }: PlayerViewProps) => {
   const [position, setPosition] = useState<number>(MIN_POSITION_VALUE);
   const [length, setLength] = useState<number>(DEFAULT_LENGTH);
   const [seekable, setSeekable] = useState<boolean>(false);
@@ -73,38 +65,9 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    const listener = ({
-      orientationInfo: { orientation },
-    }: OrientationChangeEvent) => setOrientation(orientation);
-    const subscription = addOrientationChangeListener(listener);
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    unlockOrientation();
-  }, []);
-
-  useEffect(() => {
-    generateThumbnail();
-  }, []);
-
-  const unlockOrientation = async () => await unlockAsync();
-
-  const generateThumbnail = async () => {
-    try {
-      const { uri } = await getThumbnailAsync(BIG_BUCK_BUNNY, {
-        time: THUMBNAIL_TIME,
-      });
-
-      setThumbnail(uri);
-    } catch {
-      setThumbnail(null);
-    }
-  };
+  const media = { url: BIG_BUCK_BUNNY, time: THUMBNAIL_TIME };
+  const thumbnail = useMediaThumbnail(media);
+  const portrait = usePortraitMode();
 
   const playerEvents = {
     onBuffering: () => {
@@ -203,10 +166,6 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
     setIsBackgrounded(false);
   };
 
-  const isPortrait =
-    orientation !== Orientation.LANDSCAPE_LEFT &&
-    orientation !== Orientation.LANDSCAPE_RIGHT;
-
   const shouldShowThumbnail =
     !!thumbnail &&
     !isPlaying &&
@@ -216,7 +175,7 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
     <View
       style={{
         ...styles.player,
-        flexDirection: isPortrait ? "column" : "row",
+        flexDirection: portrait ? "column" : "row",
         borderWidth: floating ? 1 : 0,
       }}
     >
@@ -242,7 +201,7 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
         <LibVlcPlayerView
           ref={playerViewRef}
           style={{ height: "100%" }}
-          source={BIG_BUCK_BUNNY}
+          source={media.url}
           options={VLC_OPTIONS}
           volume={volume}
           mute={mute}
@@ -269,37 +228,37 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
           tapToSeek
         />
         <View style={styles.buttons}>
-          <Control
-            name={!isPlaying ? "play" : "pause"}
+          <PlayerControl
+            icon={!isPlaying ? "play" : "pause"}
             onPress={handlePlayPause}
           />
-          <Control
-            name="stop"
+          <PlayerControl
+            icon="stop"
             onPress={handleStopPlayer}
             disabled={isStopped}
           />
-          <Control
-            name="redo"
+          <PlayerControl
+            icon="redo"
             onPress={handleRepeatChange}
             disabled={length <= DEFAULT_LENGTH}
             selected={repeat}
           />
         </View>
         <View style={styles.buttons}>
-          <Control
-            name="volume-down"
+          <PlayerControl
+            icon="volume-down"
             size={18}
             onPress={() => handleVolumeChange("decrease")}
             disabled={volume === MIN_VOLUME_LEVEL}
           />
-          <Control
-            name="volume-mute"
+          <PlayerControl
+            icon="volume-mute"
             size={18}
             onPress={handleMute}
             selected={mute}
           />
-          <Control
-            name="volume-up"
+          <PlayerControl
+            icon="volume-up"
             size={18}
             onPress={() => handleVolumeChange("increase")}
             disabled={volume === MAX_VOLUME_LEVEL}
@@ -316,38 +275,6 @@ export const PlayerView = ({ floating = true }: PlayerViewProps) => {
         )}
       </View>
     </View>
-  );
-};
-
-interface ControlButtonProps {
-  name: string;
-  size?: number;
-  onPress: () => void;
-  disabled?: boolean;
-  selected?: boolean;
-}
-
-const Control = ({
-  name,
-  size = 16,
-  onPress,
-  disabled,
-  selected = false,
-}: ControlButtonProps) => {
-  return (
-    <TouchableOpacity
-      style={{
-        backgroundColor: !disabled ? (!selected ? "black" : "darkred") : "gray",
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 4,
-      }}
-      onPress={onPress}
-      activeOpacity={0.75}
-      disabled={disabled}
-    >
-      <FontAwesome5 name={name} color="white" size={size} />
-    </TouchableOpacity>
   );
 };
 
