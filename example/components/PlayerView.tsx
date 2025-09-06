@@ -1,5 +1,6 @@
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Slider from "@react-native-community/slider";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import {
   LibVlcPlayerView,
   LibVlcPlayerViewRef,
@@ -83,16 +84,19 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
       );
     },
     onPlaying: () => {
+      activateKeepAwakeAsync();
       setIsBuffering(false);
       setIsPlaying(true);
       setIsStopped(false);
     },
     onPaused: () => {
+      deactivateKeepAwake();
       setIsBuffering(false);
       setIsPlaying(false);
       setIsStopped(false);
     },
     onStopped: () => {
+      deactivateKeepAwake();
       setPosition(MIN_POSITION_VALUE);
       setIsBuffering(false);
       setIsPlaying(false);
@@ -157,6 +161,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
   const handleMute = () => setMute((prev) => !prev);
 
   const resetPlayerState = () => {
+    deactivateKeepAwake();
     setPosition(MIN_POSITION_VALUE);
     setLength(DEFAULT_LENGTH);
     setSeekable(false);
