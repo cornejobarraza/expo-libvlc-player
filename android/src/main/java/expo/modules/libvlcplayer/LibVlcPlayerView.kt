@@ -103,9 +103,7 @@ class LibVlcPlayerView(
 
         addPlayerSlaves()
 
-        if (autoplay) {
-            mediaPlayer!!.play()
-        }
+        mediaPlayer!!.play()
 
         shouldCreate = false
         firstPlay = true
@@ -302,7 +300,7 @@ class LibVlcPlayerView(
 
     var slaves: ArrayList<Slave> = ArrayList()
         set(value) {
-            val newSlaves = value.filter { it !in field }
+            val newSlaves = value.filter { slave -> slave !in field }
 
             field = field.apply { addAll(newSlaves) }
 
@@ -383,6 +381,15 @@ class LibVlcPlayerView(
         }
 
     var autoplay: Boolean = true
+        set(value) {
+            field = value
+
+            options.removeStartPausedOption()
+
+            if (!value) {
+                options.add("--start-paused")
+            }
+        }
 
     var repeat: Boolean = false
         set(value) {
@@ -395,7 +402,13 @@ class LibVlcPlayerView(
         }
 
     fun play() {
-        mediaPlayer?.play()
+        mediaPlayer?.let { player ->
+            if (options.hasStartPausedOption()) {
+                player.play()
+            }
+
+            player.play()
+        }
     }
 
     fun pause() {
@@ -424,7 +437,7 @@ class LibVlcPlayerView(
                 ":no-audio",
             )
 
-        return this.any { it in options }
+        return this.any { option -> option in options }
     }
 
     internal fun ArrayList<String>.hasRepeatOption(): Boolean {
@@ -435,10 +448,32 @@ class LibVlcPlayerView(
                 ":input-repeat=",
             )
 
-        return this.any { arg ->
-            options.any { option ->
-                arg.startsWith(option)
+        return this.any { option ->
+            options.any { value ->
+                option.startsWith(value)
             }
         }
+    }
+
+    internal fun ArrayList<String>.hasStartPausedOption(): Boolean {
+        val options =
+            setOf(
+                "--start-paused",
+                "-start-paused",
+                ":start-paused",
+            )
+
+        return this.any { option -> option in options }
+    }
+
+    internal fun ArrayList<String>.removeStartPausedOption() {
+        val options =
+            setOf(
+                "--start-paused",
+                "-start-paused",
+                ":start-paused",
+            )
+
+        this.removeAll(options)
     }
 }

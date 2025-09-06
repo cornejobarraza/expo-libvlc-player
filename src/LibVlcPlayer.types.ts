@@ -251,7 +251,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   audioMixingMode?: AudioMixingMode;
   /**
-   * Determines whether the player should continue playing after entering the background
+   * Determines whether the media should continue playing after entering the background
    *
    * @default false
    */

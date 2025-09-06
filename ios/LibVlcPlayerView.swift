@@ -73,9 +73,7 @@ class LibVlcPlayerView: ExpoView {
 
         addPlayerSlaves()
 
-        if autoplay {
-            mediaPlayer!.play()
-        }
+        mediaPlayer!.play()
 
         shouldCreate = false
         firstPlay = true
@@ -249,7 +247,7 @@ class LibVlcPlayerView: ExpoView {
     var slaves: [Slave] {
         get { _slaves }
         set {
-            let newSlaves = newValue.filter { !_slaves.contains($0) }
+            let newSlaves = newValue.filter { slave in !_slaves.contains(slave) }
 
             _slaves += newSlaves
 
@@ -331,7 +329,15 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    var autoplay: Bool = true
+    var autoplay: Bool = true {
+        didSet {
+            options.removeStartPausedOption()
+
+            if !autoplay {
+                options.append("--start-paused")
+            }
+        }
+    }
 
     var shouldRepeat: Bool = false {
         didSet {
@@ -343,7 +349,13 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func play() {
-        mediaPlayer?.play()
+        if let player = mediaPlayer {
+            if options.hasStartPausedOption() {
+                player.play()
+            }
+
+            player.play()
+        }
     }
 
     func pause() {
@@ -367,24 +379,52 @@ class LibVlcPlayerView: ExpoView {
 
 private extension Array where Element == String {
     func hasAudioOption() -> Bool {
-        let options: Set<String> = [
-            "--no-audio", "-no-audio", ":no-audio",
+        let options = [
+            "--no-audio",
+            "-no-audio",
+            ":no-audio",
         ]
 
-        return contains { arg in options.contains(arg) }
+        return contains { option in options.contains(option) }
     }
 }
 
 extension Array where Element == String {
     func hasRepeatOption() -> Bool {
-        let options: Set<String> = [
-            "--input-repeat=", "-input-repeat=", ":input-repeat=",
+        let options = [
+            "--input-repeat=",
+            "-input-repeat=",
+            ":input-repeat=",
         ]
 
-        return contains { arg in
-            options.contains { option in
-                arg.hasPrefix(option)
+        return contains { option in
+            options.contains { value in
+                option.hasPrefix(value)
             }
         }
+    }
+}
+
+extension Array where Element == String {
+    func hasStartPausedOption() -> Bool {
+        let options = [
+            "--start-paused",
+            "-start-paused",
+            ":start-paused",
+        ]
+
+        return contains { option in options.contains(option) }
+    }
+}
+
+extension Array where Element == String {
+    mutating func removeStartPausedOption() {
+        let options = [
+            "--start-paused",
+            "-start-paused",
+            ":start-paused",
+        ]
+
+        removeAll { option in options.contains(option) }
     }
 }
