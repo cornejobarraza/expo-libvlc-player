@@ -1,9 +1,9 @@
 {
   "platforms": [
-    "apple",
+    "ios",
     "android"
   ],
-  "apple": {
+  "ios": {
     "modules": [
       "LibVlcPlayerModule"
     ]
