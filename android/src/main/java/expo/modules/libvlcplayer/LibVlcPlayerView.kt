@@ -381,6 +381,16 @@ class LibVlcPlayerView(
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
+    var repeat: Boolean = false
+        set(value) {
+            field = value
+
+            if (options.hasRepeatOption()) {
+                val error = mapOf("error" to "Repeat enabled via options")
+                onEncounteredError(error)
+            }
+        }
+
     var playInBackground: Boolean = false
         set(value) {
             field = value
@@ -395,16 +405,6 @@ class LibVlcPlayerView(
 
             if (!value) {
                 options.add("--start-paused")
-            }
-        }
-
-    var repeat: Boolean = false
-        set(value) {
-            field = value
-
-            if (options.hasRepeatOption()) {
-                val error = mapOf("error" to "Repeat enabled via options")
-                onEncounteredError(error)
             }
         }
 

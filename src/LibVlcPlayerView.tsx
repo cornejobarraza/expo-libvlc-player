@@ -9,8 +9,8 @@ import {
   type Error,
   type Position,
   type MediaTracks,
-  type QuestionDialog,
   type MediaInfo,
+  type QuestionDialog,
 } from "./LibVlcPlayer.types";
 import { parseSource } from "./utils/assets";
 import { convertNativeProps } from "./utils/props";

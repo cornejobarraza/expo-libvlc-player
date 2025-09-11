@@ -335,6 +335,15 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
+    var shouldRepeat: Bool = false {
+        didSet {
+            if options.hasRepeatOption() {
+                let error = ["error": "Repeat enabled via options"]
+                onEncounteredError(error)
+            }
+        }
+    }
+
     var playInBackground: Bool = false {
         didSet {
             MediaPlayerManager.shared.setAppropriateAudioSession()
@@ -347,15 +356,6 @@ class LibVlcPlayerView: ExpoView {
 
             if !autoplay {
                 options.append("--start-paused")
-            }
-        }
-    }
-
-    var shouldRepeat: Bool = false {
-        didSet {
-            if options.hasRepeatOption() {
-                let error = ["error": "Repeat enabled via options"]
-                onEncounteredError(error)
             }
         }
     }

@@ -57,6 +57,16 @@ export interface Slave {
   selected?: boolean;
 }
 
+export type AudioMixingMode =
+  | "mixWithOthers"
+  | "duckOthers"
+  | "auto"
+  | "doNotMix";
+
+export interface NativeEvent<T> {
+  nativeEvent: T;
+}
+
 export interface Track {
   id: number;
   name: string;
@@ -76,14 +86,12 @@ export interface MediaInfo {
   tracks: MediaTracks;
 }
 
-export type AudioMixingMode =
-  | "mixWithOthers"
-  | "duckOthers"
-  | "auto"
-  | "doNotMix";
-
-export interface NativeEvent<T> {
-  nativeEvent: T;
+export interface QuestionDialog {
+  title: string;
+  text: string;
+  cancelText?: string;
+  action1Text?: string;
+  action2Text?: string;
 }
 
 /**
@@ -135,14 +143,6 @@ type ESAddedListener = (event: NativeEvent<MediaTracks>) => void;
  */
 type DialogDisplayListener = (event: NativeEvent<QuestionDialog>) => void;
 
-export interface QuestionDialog {
-  title: string;
-  text: string;
-  cancelText?: string;
-  action1Text?: string;
-  action2Text?: string;
-}
-
 /**
  * @hidden
  */
@@ -169,9 +169,9 @@ export interface LibVlcPlayerViewNativeProps {
   volume?: number;
   mute?: boolean;
   audioMixingMode?: AudioMixingMode;
+  repeat?: boolean;
   playInBackground?: boolean;
   autoplay?: boolean;
-  repeat?: boolean;
   onBuffering?: BufferingListener;
   onPlaying?: PlayingListener;
   onPaused?: PausedListener;
@@ -281,7 +281,13 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   audioMixingMode?: AudioMixingMode;
   /**
-   * Determines whether the media should continue playing after entering the background
+   * Determines whether the media should repeat once ended
+   *
+   * @default false
+   */
+  repeat?: boolean;
+  /**
+   * Determines whether the media should continue playing in the background
    *
    * @default false
    */
@@ -292,12 +298,6 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * @default true
    */
   autoplay?: boolean;
-  /**
-   * Determines whether the media should repeat once ended
-   *
-   * @default false
-   */
-  repeat?: boolean;
   /**
    * Called after the `Buffering` player event
    */
