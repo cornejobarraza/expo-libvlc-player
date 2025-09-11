@@ -111,14 +111,14 @@ See the [Example App](example/components/PlayerView.tsx) for additional usage.
 
 ### Player methods
 
-| Method                       | Description                                                                       |
-| ---------------------------- | --------------------------------------------------------------------------------- |
-| `play()`                     | Starts playback of the current player                                             |
-| `pause()`                    | Pauses playback of the current player                                             |
-| `stop()`                     | Stops playback of the current player                                              |
-| `seek(position: number)`     | Sets the position of the current player. Must be a float between `0` and `1`      |
-| `postAction(action: number)` | Posts an answer to the current `Dialog` when displayed. Must be either `1` or `2` |
-| `dismiss()`                  | Dismisses the current `Dialog` when displayed                                     |
+| Method                       | Description                                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------------------ |
+| `play()`                     | Starts playback of the current player                                                            |
+| `pause()`                    | Pauses playback of the current player                                                            |
+| `stop()`                     | Stops playback of the current player                                                             |
+| `seek(position: number)`     | Sets the position of the current player. Must be a float between `0` and `1`                     |
+| `postAction(action: number)` | Posts an answer to a [`QuestionDialog`](#questiondialog). Must be an integer between `1` and `2` |
+| `dismiss()`                  | Dismisses a [`QuestionDialog`](#questiondialog)                                                  |
 
 ### Player props
 
@@ -143,19 +143,19 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 #### Callback props
 
-| Prop                 | Description                                      | Payload                       |
-| -------------------- | ------------------------------------------------ | ----------------------------- |
-| `onBuffering`        | Called after the `Buffering` player event        |                               |
-| `onPlaying`          | Called after the `Playing` player event          |                               |
-| `onPaused`           | Called after the `Paused` player event           |                               |
-| `onStopped`          | Called after the `Stopped` player event          |                               |
-| `onEndReached`       | Called after the `EndReached` player event       |                               |
-| `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`           |
-| `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`        |
-| `onESAdded`          | Called after the `ESAdded` player event          | [`MediaTracks`](#mediatracks) |
-| `onDialogDisplay`    | Called after a `QuestionDialog` is displayed     | [`Dialog`](#dialog)           |
-| `onFirstPlay`        | Called after the first `Playing` player event    | [`MediaInfo`](#mediainfo)     |
-| `onBackground`       | Called after the player enters the background    |                               |
+| Prop                 | Description                                      | Payload                             |
+| -------------------- | ------------------------------------------------ | ----------------------------------- |
+| `onBuffering`        | Called after the `Buffering` player event        |                                     |
+| `onPlaying`          | Called after the `Playing` player event          |                                     |
+| `onPaused`           | Called after the `Paused` player event           |                                     |
+| `onStopped`          | Called after the `Stopped` player event          |                                     |
+| `onEndReached`       | Called after the `EndReached` player event       |                                     |
+| `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`                 |
+| `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`              |
+| `onESAdded`          | Called after the `ESAdded` player event          | [`MediaTracks`](#mediatracks)       |
+| `onDialogDisplay`    | Called after a `QuestionDialog` is displayed     | [`QuestionDialog`](#questiondialog) |
+| `onFirstPlay`        | Called after the first `Playing` player event    | [`MediaInfo`](#mediainfo)           |
+| `onBackground`       | Called after the player enters the background    |                                     |
 
 ### Player types
 
@@ -198,7 +198,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 }
 ```
 
-#### `Dialog`
+#### `QuestionDialog`
 
 ```ts
 {

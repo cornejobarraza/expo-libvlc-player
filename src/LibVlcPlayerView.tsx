@@ -9,7 +9,7 @@ import {
   type Error,
   type Position,
   type MediaTracks,
-  type Dialog,
+  type QuestionDialog,
   type MediaInfo,
 } from "./LibVlcPlayer.types";
 import { parseSource } from "./utils/assets";
@@ -50,7 +50,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       }
     };
 
-    const onDialogDisplay = ({ nativeEvent }: NativeEvent<Dialog>) => {
+    const onDialogDisplay = ({ nativeEvent }: NativeEvent<QuestionDialog>) => {
       if (props.onDialogDisplay) {
         props.onDialogDisplay(nativeEvent);
       }

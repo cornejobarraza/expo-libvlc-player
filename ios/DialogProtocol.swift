@@ -25,7 +25,7 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
     ) {
         reference = dialogReference
 
-        let dialog = Dialog(
+        let dialog = QuestionDialog(
             title: title,
             text: message,
             cancelText: cancel,

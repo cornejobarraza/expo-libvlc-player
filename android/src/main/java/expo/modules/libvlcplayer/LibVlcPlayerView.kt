@@ -6,12 +6,13 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
 import expo.modules.libvlcplayer.enums.AudioMixingMode
-import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
+import expo.modules.libvlcplayer.records.QuestionDialog
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Track
 import expo.modules.libvlcplayer.records.Tracks
+import org.videolan.libvlc.Dialog
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
@@ -19,7 +20,6 @@ import org.videolan.libvlc.interfaces.IMedia
 import org.videolan.libvlc.util.DisplayManager
 import org.videolan.libvlc.util.VLCVideoLayout
 import java.net.URI
-import org.videolan.libvlc.Dialog as VLCDialog
 
 const val DEFAULT_PLAYER_RATE: Float = 1f
 const val DEFAULT_PLAYER_TIME: Int = 0
@@ -45,7 +45,7 @@ class LibVlcPlayerView(
     internal var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
     private var media: Media? = null
-    internal var question: VLCDialog.QuestionDialog? = null
+    internal var question: Dialog.QuestionDialog? = null
 
     internal var mediaLength: Long = 0L
     internal var oldVolume: Int = MAX_PLAYER_VOLUME
@@ -61,7 +61,7 @@ class LibVlcPlayerView(
     internal val onEncounteredError by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
     internal val onESAdded by EventDispatcher<MediaTracks>()
-    internal val onDialogDisplay by EventDispatcher<Dialog>()
+    internal val onDialogDisplay by EventDispatcher<QuestionDialog>()
     internal val onFirstPlay by EventDispatcher<MediaInfo>()
     internal val onBackground by EventDispatcher()
 

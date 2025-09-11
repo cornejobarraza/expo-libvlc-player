@@ -1,21 +1,21 @@
 package expo.modules.libvlcplayer
 
-import expo.modules.libvlcplayer.records.Dialog
-import org.videolan.libvlc.Dialog as VLCDialog
+import expo.modules.libvlcplayer.records.QuestionDialog
+import org.videolan.libvlc.Dialog
 
 fun LibVlcPlayerView.setDialogCallbacks() {
-    VLCDialog.setCallbacks(
+    Dialog.setCallbacks(
         libVLC!!,
-        object : VLCDialog.Callbacks {
-            override fun onDisplay(dialog: VLCDialog.ErrorMessage) {}
+        object : Dialog.Callbacks {
+            override fun onDisplay(dialog: Dialog.ErrorMessage) {}
 
-            override fun onDisplay(dialog: VLCDialog.LoginDialog) {}
+            override fun onDisplay(dialog: Dialog.LoginDialog) {}
 
-            override fun onDisplay(dialog: VLCDialog.QuestionDialog) {
+            override fun onDisplay(dialog: Dialog.QuestionDialog) {
                 question = dialog
 
                 val dialog =
-                    Dialog(
+                    QuestionDialog(
                         title = dialog.getTitle(),
                         text = dialog.getText(),
                         cancelText = dialog.getCancelText(),
@@ -26,13 +26,13 @@ fun LibVlcPlayerView.setDialogCallbacks() {
                 onDialogDisplay(dialog)
             }
 
-            override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
+            override fun onDisplay(dialog: Dialog.ProgressDialog) {}
 
-            override fun onCanceled(dialog: VLCDialog) {
+            override fun onCanceled(dialog: Dialog) {
                 question = null
             }
 
-            override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
+            override fun onProgressUpdate(dialog: Dialog.ProgressDialog) {}
         },
     )
 }

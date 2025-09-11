@@ -28,15 +28,15 @@ export interface LibVlcPlayerViewRef {
    */
   readonly seek: (position: number) => Promise<void>;
   /**
-   * Posts an answer to the current `Dialog` when displayed
+   * Posts an answer to a `QuestionDialog`
    *
-   * @param action - Must be either `1` or `2`
+   * @param action - Must be an integer between `1` and `2`
    *
    * @returns A promise which resolves to `void`
    */
   readonly postAction: (action: 1 | 2) => Promise<void>;
   /**
-   * Dismisses the current `Dialog` when displayed
+   * Dismisses a `QuestionDialog`
    *
    * @returns A promise which resolves to `void`
    */
@@ -133,9 +133,9 @@ type ESAddedListener = (event: NativeEvent<MediaTracks>) => void;
 /**
  * @hidden
  */
-type DialogDisplayListener = (event: NativeEvent<Dialog>) => void;
+type DialogDisplayListener = (event: NativeEvent<QuestionDialog>) => void;
 
-export interface Dialog {
+export interface QuestionDialog {
   title: string;
   text: string;
   cancelText?: string;
@@ -333,7 +333,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
   /**
    * Called after a `QuestionDialog` is displayed
    */
-  onDialogDisplay?: (event: Dialog) => void;
+  onDialogDisplay?: (event: QuestionDialog) => void;
   /**
    * Called after the first `Playing` player event
    */
