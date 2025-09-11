@@ -8,6 +8,7 @@ private let endReachedEvent = "onEndReached"
 private let encounteredErrorEvent = "onEncounteredError"
 private let positionChangedEvent = "onPositionChanged"
 private let esAddedEvent = "onESAdded"
+private let dialogDisplayEvent = "onDialogDisplay"
 private let firstPlayEvent = "onFirstPlay"
 private let backgroundEvent = "onBackground"
 
@@ -20,6 +21,7 @@ let playerEvents = [
     encounteredErrorEvent,
     positionChangedEvent,
     esAddedEvent,
+    dialogDisplayEvent,
     firstPlayEvent,
     backgroundEvent,
 ]
@@ -109,6 +111,14 @@ public class LibVlcPlayerModule: Module {
 
             AsyncFunction("seek") { (view: LibVlcPlayerView, position: Float) in
                 view.seek(position)
+            }
+
+            AsyncFunction("postAction") { (view: LibVlcPlayerView, action: Int) in
+                view.postAction(action)
+            }
+
+            AsyncFunction("dismiss") { (view: LibVlcPlayerView) in
+                view.dismiss()
             }
         }
 

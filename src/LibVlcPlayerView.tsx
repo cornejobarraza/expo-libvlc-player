@@ -1,10 +1,17 @@
 import { requireNativeView } from "expo";
-import { forwardRef, type ComponentType } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  type ComponentType,
+} from "react";
+import { Alert, AlertButton } from "react-native";
 
 import {
   LibVlcPlayerViewNativeProps,
   LibVlcPlayerViewProps,
   LibVlcPlayerViewRef,
+  type NativeEvent,
   type Error,
   type Position,
   type MediaTracks,
@@ -19,8 +26,11 @@ const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
 let loggedRenderingChildrenWarning: boolean = false;
 
 const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
-  (props, ref) => {
+  (props, forwardedRef) => {
     const nativeProps = convertNativeProps(props);
+    const ref = useRef<LibVlcPlayerViewRef | null>(null);
+
+    useImperativeHandle(forwardedRef, () => ref.current!);
 
     // @ts-expect-error
     if (nativeProps.children && !loggedRenderingChildrenWarning) {
@@ -30,25 +40,25 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       loggedRenderingChildrenWarning = true;
     }
 
-    const onEncounteredError = ({ nativeEvent }: { nativeEvent: Error }) => {
+    const onEncounteredError = ({ nativeEvent }: NativeEvent<Error>) => {
       if (props.onEncounteredError) {
         props.onEncounteredError(nativeEvent);
       }
     };
 
-    const onPositionChanged = ({ nativeEvent }: { nativeEvent: Position }) => {
+    const onPositionChanged = ({ nativeEvent }: NativeEvent<Position>) => {
       if (props.onPositionChanged) {
         props.onPositionChanged(nativeEvent);
       }
     };
 
-    const onESAdded = ({ nativeEvent }: { nativeEvent: MediaTracks }) => {
+    const onESAdded = ({ nativeEvent }: NativeEvent<MediaTracks>) => {
       if (props.onESAdded) {
         props.onESAdded(nativeEvent);
       }
     };
 
-    const onFirstPlay = ({ nativeEvent }: { nativeEvent: MediaInfo }) => {
+    const onFirstPlay = ({ nativeEvent }: NativeEvent<MediaInfo>) => {
       if (props.onFirstPlay) {
         props.onFirstPlay(nativeEvent);
       }
@@ -66,6 +76,27 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         onEncounteredError={onEncounteredError}
         onPositionChanged={onPositionChanged}
         onESAdded={onESAdded}
+        onDialogDisplay={({ nativeEvent: dialog }) => {
+          const alertButtons: AlertButton[] = [
+            {
+              text: dialog.action1Text,
+              onPress: () => ref.current?.postAction(1),
+            },
+            {
+              text: dialog.action2Text,
+              onPress: () => ref.current?.postAction(2),
+            },
+            {
+              text: dialog.cancelText,
+              onPress: () => ref.current?.dismiss(),
+              style: "cancel",
+            },
+          ];
+
+          const visibleButtons = alertButtons.filter((button) => button.text);
+
+          Alert.alert(dialog.title, dialog.text, visibleButtons);
+        }}
         onFirstPlay={onFirstPlay}
       />
     );

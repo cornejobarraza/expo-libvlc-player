@@ -22,7 +22,9 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                             val mediaInfo = getMediaInfo()
 
-                            onFirstPlay(mediaInfo)
+                            if (mediaInfo.length != 0.0) {
+                                onFirstPlay(mediaInfo)
+                            }
 
                             firstPlay = false
                         }
@@ -56,12 +58,24 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                     Event.EncounteredError -> {
                         val error = mapOf("error" to "Player encountered an error")
+
                         onEncounteredError(error)
+
+                        firstPlay = true
                     }
 
                     Event.PositionChanged -> {
                         val position = mapOf("position" to player.getPosition())
+
                         onPositionChanged(position)
+
+                        if (mediaLength == 0L) {
+                            val mediaInfo = getMediaInfo()
+
+                            if (mediaInfo.length != 0.0) {
+                                onFirstPlay(mediaInfo)
+                            }
+                        }
                     }
 
                     Event.ESAdded -> {

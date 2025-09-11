@@ -27,6 +27,20 @@ export interface LibVlcPlayerViewRef {
    * @returns A promise which resolves to `void`
    */
   readonly seek: (position: number) => Promise<void>;
+  /**
+   * Posts an answer to the current `Dialog` when displayed
+   *
+   * @param action - Must be either `1` or `2`
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly postAction: (action: 1 | 2) => Promise<void>;
+  /**
+   * Dismisses the current `Dialog` when displayed
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly dismiss: () => Promise<void>;
 }
 
 export type LibVlcSource = string | number | null;
@@ -68,65 +82,80 @@ export type AudioMixingMode =
   | "auto"
   | "doNotMix";
 
-/**
- * @hidden
- */
-export type BufferingListener = () => void;
+export interface NativeEvent<T> {
+  nativeEvent: T;
+}
 
 /**
  * @hidden
  */
-export type PlayingListener = () => void;
+type BufferingListener = () => void;
 
 /**
  * @hidden
  */
-export type PausedListener = () => void;
+type PlayingListener = () => void;
 
 /**
  * @hidden
  */
-export type StoppedListener = () => void;
+type PausedListener = () => void;
 
 /**
  * @hidden
  */
-export type EndReachedListener = () => void;
+type StoppedListener = () => void;
 
 /**
  * @hidden
  */
-export type EncounteredErrorListener = (event: { nativeEvent: Error }) => void;
+type EndReachedListener = () => void;
+
+/**
+ * @hidden
+ */
+type EncounteredErrorListener = (event: NativeEvent<Error>) => void;
 
 export type Error = { error: string };
 
 /**
  * @hidden
  */
-export type PositionChangedListener = (event: {
-  nativeEvent: Position;
-}) => void;
+type PositionChangedListener = (event: NativeEvent<Position>) => void;
 
 export type Position = { position: number };
 
 /**
  * @hidden
  */
-export type ESAddedListener = (event: { nativeEvent: MediaTracks }) => void;
+type ESAddedListener = (event: NativeEvent<MediaTracks>) => void;
 
 /**
  * @hidden
  */
-export type FirstPlayListener = (event: { nativeEvent: MediaInfo }) => void;
+type DialogDisplayListener = (event: NativeEvent<Dialog>) => void;
 
 /**
  * @hidden
  */
-export type BackgroundListener = () => void;
+interface Dialog {
+  title: string;
+  text: string;
+  cancelText?: string;
+  action1Text?: string;
+  action2Text?: string;
+}
 
 /**
  * @hidden
  */
+type FirstPlayListener = (event: NativeEvent<MediaInfo>) => void;
+
+/**
+ * @hidden
+ */
+type BackgroundListener = () => void;
+
 export interface LibVlcPlayerViewNativeProps {
   ref?: React.Ref<LibVlcPlayerViewRef>;
   source?: LibVlcSource;
@@ -151,6 +180,7 @@ export interface LibVlcPlayerViewNativeProps {
   onEncounteredError?: EncounteredErrorListener;
   onPositionChanged?: PositionChangedListener;
   onESAdded?: ESAddedListener;
+  onDialogDisplay?: DialogDisplayListener;
   onFirstPlay?: FirstPlayListener;
   onBackground?: BackgroundListener;
 }

@@ -61,6 +61,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
   const [isBuffering, setIsBuffering] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isStopped, setIsStopped] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
   const [isBackgrounded, setIsBackgrounded] = useState<boolean>(false);
 
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
@@ -110,7 +111,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
         message.includes("player") || message.includes("media");
 
       if (hasToReset) {
-        resetPlayerState();
+        handleErrorState();
       }
     },
     onPositionChanged: ({ position }: Position) => {
@@ -135,6 +136,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
   const handlePlayPause = () => {
     playerViewRef.current?.[!isPlaying ? "play" : "pause"]();
     setIsBackgrounded(false);
+    setIsError(false);
   };
 
   const handleStopPlayer = () => {
@@ -160,7 +162,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
 
   const handleMute = () => setMute((prev) => !prev);
 
-  const resetPlayerState = () => {
+  const handleErrorState = () => {
     deactivateKeepAwake();
     setPosition(MIN_POSITION_VALUE);
     setLength(DEFAULT_LENGTH);
@@ -168,6 +170,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
     setIsBuffering(false);
     setIsPlaying(false);
     setIsStopped(false);
+    setIsError(true);
     setIsBackgrounded(false);
   };
 
@@ -206,7 +209,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
         <LibVlcPlayerView
           ref={playerViewRef}
           style={{ height: "100%" }}
-          source={media.url}
+          source={!isError ? media.url : null}
           options={VLC_OPTIONS}
           volume={volume}
           mute={mute}

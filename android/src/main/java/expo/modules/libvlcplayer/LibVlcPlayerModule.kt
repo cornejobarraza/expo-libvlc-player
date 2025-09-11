@@ -14,6 +14,7 @@ private const val END_REACHED_EVENT = "onEndReached"
 private const val ENCOUNTERED_ERROR_EVENT = "onEncounteredError"
 private const val POSITION_CHANGED_EVENT = "onPositionChanged"
 private const val ES_ADDED_EVENT = "onESAdded"
+private const val DIALOG_DISPLAY_EVENT = "onDialogDisplay"
 private const val FIRST_PLAY_EVENT = "onFirstPlay"
 private const val BACKGROUND_EVENT = "onBackground"
 
@@ -27,6 +28,7 @@ val playerEvents =
         ENCOUNTERED_ERROR_EVENT,
         POSITION_CHANGED_EVENT,
         ES_ADDED_EVENT,
+        DIALOG_DISPLAY_EVENT,
         FIRST_PLAY_EVENT,
         BACKGROUND_EVENT,
     )
@@ -126,6 +128,14 @@ class LibVlcPlayerModule : Module() {
 
                 AsyncFunction("seek") { view: LibVlcPlayerView, position: Float ->
                     view.seek(position)
+                }
+
+                AsyncFunction("postAction") { view: LibVlcPlayerView, action: Int ->
+                    view.postAction(action)
+                }
+
+                AsyncFunction("dismiss") { view: LibVlcPlayerView ->
+                    view.dismiss()
                 }
             }
 

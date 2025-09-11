@@ -6,6 +6,7 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
 import expo.modules.libvlcplayer.enums.AudioMixingMode
+import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Slave
@@ -18,6 +19,7 @@ import org.videolan.libvlc.interfaces.IMedia
 import org.videolan.libvlc.util.DisplayManager
 import org.videolan.libvlc.util.VLCVideoLayout
 import java.net.URI
+import org.videolan.libvlc.Dialog as VLCDialog
 
 const val DEFAULT_PLAYER_RATE: Float = 1f
 const val DEFAULT_PLAYER_TIME: Int = 0
@@ -40,13 +42,15 @@ class LibVlcPlayerView(
             addView(it)
         }
 
-    private var libVLC: LibVLC? = null
+    internal var libVLC: LibVLC? = null
     internal var mediaPlayer: MediaPlayer? = null
     private var media: Media? = null
-    private var shouldCreate: Boolean = false
+    internal var question: VLCDialog.QuestionDialog? = null
 
-    private var mediaLength: Long = 0L
+    internal var mediaLength: Long = 0L
     internal var oldVolume: Int = MAX_PLAYER_VOLUME
+
+    private var shouldCreate: Boolean = false
     internal var firstPlay: Boolean = false
 
     internal val onBuffering by EventDispatcher()
@@ -57,6 +61,7 @@ class LibVlcPlayerView(
     internal val onEncounteredError by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
     internal val onESAdded by EventDispatcher<MediaTracks>()
+    internal val onDialogDisplay by EventDispatcher<Dialog>()
     internal val onFirstPlay by EventDispatcher<MediaInfo>()
     internal val onBackground by EventDispatcher()
 
@@ -86,6 +91,7 @@ class LibVlcPlayerView(
         val source = source ?: return
 
         libVLC = LibVLC(context, options)
+        setDialogCallbacks()
         mediaPlayer = MediaPlayer(libVLC)
         setMediaPlayerListener()
 
@@ -105,8 +111,8 @@ class LibVlcPlayerView(
 
         mediaPlayer!!.play()
 
-        shouldCreate = false
         firstPlay = true
+        shouldCreate = false
     }
 
     fun attachPlayer() {
@@ -131,6 +137,7 @@ class LibVlcPlayerView(
     }
 
     fun destroyPlayer() {
+        question = null
         media = null
         mediaPlayer?.release()
         mediaPlayer = null
@@ -427,6 +434,14 @@ class LibVlcPlayerView(
                 time = (position * mediaLength.toFloat()).toInt()
             }
         }
+    }
+
+    fun postAction(action: Int) {
+        question?.postAction(action)
+    }
+
+    fun dismiss() {
+        question?.dismiss()
     }
 
     private fun ArrayList<String>.hasAudioOption(): Boolean {

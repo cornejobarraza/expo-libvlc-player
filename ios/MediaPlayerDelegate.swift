@@ -14,7 +14,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
                     let mediaInfo = getMediaInfo()
 
-                    onFirstPlay(mediaInfo)
+                    if mediaInfo.length != 0.0 {
+                        onFirstPlay(mediaInfo)
+                    }
 
                     firstPlay = false
                 }
@@ -38,7 +40,10 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 }
             case .error:
                 let error = ["error": "Player encountered an error"]
+
                 onEncounteredError(error)
+
+                firstPlay = true
             case .esAdded:
                 if !firstPlay {
                     let mediaTracks = getMediaTracks()
@@ -53,7 +58,16 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     func mediaPlayerTimeChanged(_: Notification) {
         if let player = mediaPlayer {
             let position = ["position": player.position]
+
             onPositionChanged(position)
+
+            if mediaLength == 0 {
+                let mediaInfo = getMediaInfo()
+
+                if mediaInfo.length != 0.0 {
+                    onFirstPlay(mediaInfo)
+                }
+            }
         }
     }
 }

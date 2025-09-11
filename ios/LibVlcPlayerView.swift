@@ -10,14 +10,19 @@ let minPlayerVolume: Int = 0
 let maxPlayerVolume: Int = 100
 let playerVolumeStep: Int = 10
 
+let dialogCustomUI: Bool = true
+
 class LibVlcPlayerView: ExpoView {
     private let playerView = UIView()
 
     var mediaPlayer: VLCMediaPlayer?
-    private var shouldCreate: Bool = false
+    var question: VLCDialogProvider?
+    var reference: NSValue?
 
     var mediaLength: Int32 = 0
     private var oldVolume: Int = maxPlayerVolume
+
+    private var shouldCreate: Bool = false
     var firstPlay: Bool = false
 
     let onBuffering = EventDispatcher()
@@ -28,6 +33,7 @@ class LibVlcPlayerView: ExpoView {
     let onEncounteredError = EventDispatcher()
     let onPositionChanged = EventDispatcher()
     let onESAdded = EventDispatcher()
+    let onDialogDisplay = EventDispatcher()
     let onFirstPlay = EventDispatcher()
     let onBackground = EventDispatcher()
 
@@ -63,6 +69,10 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer!.drawable = playerView
         mediaPlayer!.delegate = self
 
+        let library = mediaPlayer!.libraryInstance
+        question = VLCDialogProvider(library: library, customUI: dialogCustomUI)
+        question!.customRenderer = self
+
         guard let url = URL(string: source) else {
             let error = ["error": "Invalid source, media could not be set"]
             onEncounteredError(error)
@@ -75,11 +85,13 @@ class LibVlcPlayerView: ExpoView {
 
         mediaPlayer!.play()
 
-        shouldCreate = false
         firstPlay = true
+        shouldCreate = false
     }
 
     func destroyPlayer() {
+        reference = nil
+        question = nil
         mediaPlayer?.media = nil
         mediaPlayer?.delegate = nil
         mediaPlayer?.drawable = nil
@@ -373,6 +385,18 @@ class LibVlcPlayerView: ExpoView {
             } else {
                 time = Int(position * Float(mediaLength))
             }
+        }
+    }
+
+    func postAction(_ action: Int) {
+        if let questionDialog = question, let dialogReference = reference {
+            questionDialog.postAction(Int32(action), forDialogReference: dialogReference)
+        }
+    }
+
+    func dismiss() {
+        if let questionDialog = question, let dialogReference = reference {
+            questionDialog.dismissDialog(withReference: dialogReference)
         }
     }
 }

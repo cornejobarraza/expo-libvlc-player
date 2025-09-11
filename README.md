@@ -111,12 +111,14 @@ See the [Example App](example/components/PlayerView.tsx) for additional usage.
 
 ### Player methods
 
-| Method                   | Description                                                                  |
-| ------------------------ | ---------------------------------------------------------------------------- |
-| `play()`                 | Starts playback of the current player                                        |
-| `pause()`                | Pauses playback of the current player                                        |
-| `stop()`                 | Stops playback of the current player                                         |
-| `seek(position: number)` | Sets the position of the current player. Must be a float between `0` and `1` |
+| Method                       | Description                                                                       |
+| ---------------------------- | --------------------------------------------------------------------------------- |
+| `play()`                     | Starts playback of the current player                                             |
+| `pause()`                    | Pauses playback of the current player                                             |
+| `stop()`                     | Stops playback of the current player                                              |
+| `seek(position: number)`     | Sets the position of the current player. Must be a float between `0` and `1`      |
+| `postAction(action: number)` | Posts an answer to the current `Dialog` when displayed. Must be either `1` or `2` |
+| `dismiss()`                  | Dismisses the current `Dialog` when displayed                                     |
 
 ### Player props
 
