@@ -135,10 +135,7 @@ type ESAddedListener = (event: NativeEvent<MediaTracks>) => void;
  */
 type DialogDisplayListener = (event: NativeEvent<Dialog>) => void;
 
-/**
- * @hidden
- */
-interface Dialog {
+export interface Dialog {
   title: string;
   text: string;
   cancelText?: string;
@@ -156,6 +153,9 @@ type FirstPlayListener = (event: NativeEvent<MediaInfo>) => void;
  */
 type BackgroundListener = () => void;
 
+/**
+ * @hidden
+ */
 export interface LibVlcPlayerViewNativeProps {
   ref?: React.Ref<LibVlcPlayerViewRef>;
   source?: LibVlcSource;
@@ -330,6 +330,10 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Called after the `ESAdded` player event
    */
   onESAdded?: (event: MediaTracks) => void;
+  /**
+   * Called after a `QuestionDialog` is displayed
+   */
+  onDialogDisplay?: (event: Dialog) => void;
   /**
    * Called after the first `Playing` player event
    */

@@ -4,14 +4,13 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import {
   LibVlcPlayerView,
   LibVlcPlayerViewRef,
-  type Error,
-  type MediaInfo,
-  type Position,
+  type LibVlcPlayerViewProps,
 } from "expo-libvlc-player";
 import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  AlertButton,
   Image,
   StyleSheet,
   Text,
@@ -71,7 +70,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
   const thumbnail = useMediaThumbnail(media);
   const portrait = usePortraitMode();
 
-  const playerEvents = {
+  const playerEvents: Partial<LibVlcPlayerViewProps> = {
     onBuffering: () => {
       setIsBuffering(true);
 
@@ -103,8 +102,8 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
       setIsPlaying(false);
       setIsStopped(true);
     },
-    onEncounteredError: ({ error }: Error) => {
-      Alert.alert("An error occurred", error);
+    onEncounteredError: ({ error }) => {
+      Alert.alert("Something went wrong", error);
 
       const message = error.toLowerCase();
       const hasToReset =
@@ -114,11 +113,38 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
         handleErrorState();
       }
     },
-    onPositionChanged: ({ position }: Position) => {
+    onPositionChanged: ({ position }) => {
       setPosition(position);
       setIsBuffering(false);
     },
-    onFirstPlay: ({ length, seekable }: MediaInfo) => {
+    onDialogDisplay: ({
+      title,
+      text,
+      action1Text,
+      action2Text,
+      cancelText,
+    }) => {
+      const alertButtons: AlertButton[] = [
+        {
+          text: action1Text,
+          onPress: () => playerViewRef.current?.postAction(1),
+        },
+        {
+          text: action2Text,
+          onPress: () => playerViewRef.current?.postAction(2),
+        },
+        {
+          text: cancelText,
+          onPress: () => playerViewRef.current?.dismiss(),
+          style: "cancel",
+        },
+      ];
+
+      const visibleButtons = alertButtons.filter((button) => button.text);
+
+      Alert.alert(title, text, visibleButtons);
+    },
+    onFirstPlay: ({ length, seekable }) => {
       setLength(length);
       setSeekable(seekable);
     },
