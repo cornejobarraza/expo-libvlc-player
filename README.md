@@ -163,9 +163,9 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 ```ts
 {
-  audio: number;
-  video: number;
-  subtitle: number;
+  audio?: number;
+  video?: number;
+  subtitle?: number;
 }
 ```
 
@@ -175,7 +175,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 {
   source: string | number;
   type: "audio" | "subtitle";
-  selected: boolean;
+  selected?: boolean;
 }
 ```
 
