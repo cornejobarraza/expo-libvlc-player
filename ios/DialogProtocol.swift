@@ -2,17 +2,33 @@ import MobileVLCKit
 
 extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
     func showError(
-        withTitle _: String,
-        message _: String
-    ) {}
+        withTitle title: String,
+        message: String
+    ) {
+        let dialog = Dialog(
+            title: title,
+            text: message,
+        )
+
+        onDialogDisplay(dialog)
+    }
 
     func showLogin(
-        withTitle _: String,
-        message _: String,
+        withTitle title: String,
+        message: String,
         defaultUsername _: String?,
         askingForStorage _: Bool,
-        withReference _: NSValue
-    ) {}
+        withReference reference: NSValue
+    ) {
+        vlcDialogRef = reference
+
+        let dialog = Dialog(
+            title: title,
+            text: message,
+        )
+
+        onDialogDisplay(dialog)
+    }
 
     func showQuestion(
         withTitle title: String,
@@ -21,11 +37,11 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
         cancel: String?,
         action1String: String?,
         action2String: String?,
-        withReference dialogReference: NSValue
+        withReference reference: NSValue
     ) {
-        reference = dialogReference
+        vlcDialogRef = reference
 
-        let dialog = QuestionDialog(
+        let dialog = Dialog(
             title: title,
             text: message,
             cancelText: cancel,
@@ -51,8 +67,5 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
         position _: Float
     ) {}
 
-    func cancelDialog(withReference _: NSValue) {
-        reference = nil
-        question = nil
-    }
+    func cancelDialog(withReference _: NSValue) {}
 }

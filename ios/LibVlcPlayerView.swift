@@ -16,8 +16,8 @@ class LibVlcPlayerView: ExpoView {
     private let playerView = UIView()
 
     var mediaPlayer: VLCMediaPlayer?
-    var question: VLCDialogProvider?
-    var reference: NSValue?
+    var vlcDialog: VLCDialogProvider?
+    var vlcDialogRef: NSValue?
 
     var mediaLength: Int32 = 0
     private var oldVolume: Int = maxPlayerVolume
@@ -70,8 +70,8 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer!.delegate = self
 
         let library = mediaPlayer!.libraryInstance
-        question = VLCDialogProvider(library: library, customUI: dialogCustomUI)
-        question!.customRenderer = self
+        vlcDialog = VLCDialogProvider(library: library, customUI: dialogCustomUI)
+        vlcDialog!.customRenderer = self
 
         guard let url = URL(string: source) else {
             let error = ["error": "Invalid source, media could not be set"]
@@ -90,8 +90,8 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func destroyPlayer() {
-        reference = nil
-        question = nil
+        vlcDialogRef = nil
+        vlcDialog = nil
         mediaPlayer?.media = nil
         mediaPlayer?.delegate = nil
         mediaPlayer?.drawable = nil
@@ -389,14 +389,16 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func postAction(_ action: Int) {
-        if let questionDialog = question, let dialogReference = reference {
-            questionDialog.postAction(Int32(action), forDialogReference: dialogReference)
+        if let dialog = vlcDialog, let reference = vlcDialogRef {
+            dialog.postAction(Int32(action), forDialogReference: reference)
+            vlcDialogRef = nil
         }
     }
 
     func dismiss() {
-        if let questionDialog = question, let dialogReference = reference {
-            questionDialog.dismissDialog(withReference: dialogReference)
+        if let dialog = vlcDialog, let reference = vlcDialogRef {
+            dialog.dismissDialog(withReference: reference)
+            vlcDialogRef = nil
         }
     }
 }

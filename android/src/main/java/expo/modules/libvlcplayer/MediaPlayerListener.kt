@@ -57,7 +57,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     }
 
                     Event.EncounteredError -> {
-                        val error = mapOf("error" to "Player encountered an error")
+                        val error = mapOf("error" to "Media player encountered an error")
 
                         onEncounteredError(error)
 

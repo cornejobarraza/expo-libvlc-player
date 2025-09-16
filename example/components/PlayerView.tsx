@@ -25,6 +25,9 @@ const BIG_BUCK_BUNNY =
   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 const VLC_OPTIONS = ["--network-caching=1000"];
 
+const PLAYER_ERROR_MESSAGE = "Media player encountered an error";
+const MEDIA_ERROR_MESSAGE = "Invalid source, media could not be set";
+
 const THUMBNAIL_TIME = 27_000;
 const BUFFERING_DELAY = 1_000;
 const DEFAULT_LENGTH = 0;
@@ -103,11 +106,10 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
       setIsStopped(true);
     },
     onEncounteredError: ({ error }) => {
-      Alert.alert("Something went wrong", error);
+      console.error(error);
 
-      const message = error.toLowerCase();
       const hasToReset =
-        message.includes("player") || message.includes("media");
+        error === PLAYER_ERROR_MESSAGE || error === MEDIA_ERROR_MESSAGE;
 
       if (hasToReset) {
         handleErrorState();

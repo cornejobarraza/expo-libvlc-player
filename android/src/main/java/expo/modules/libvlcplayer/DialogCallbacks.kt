@@ -1,21 +1,41 @@
 package expo.modules.libvlcplayer
 
-import expo.modules.libvlcplayer.records.QuestionDialog
-import org.videolan.libvlc.Dialog
+import expo.modules.libvlcplayer.records.Dialog
+import org.videolan.libvlc.Dialog as VLCDialog
 
 fun LibVlcPlayerView.setDialogCallbacks() {
-    Dialog.setCallbacks(
+    VLCDialog.setCallbacks(
         libVLC!!,
-        object : Dialog.Callbacks {
-            override fun onDisplay(dialog: Dialog.ErrorMessage) {}
-
-            override fun onDisplay(dialog: Dialog.LoginDialog) {}
-
-            override fun onDisplay(dialog: Dialog.QuestionDialog) {
-                question = dialog
+        object : VLCDialog.Callbacks {
+            override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
+                vlcDialog = dialog
 
                 val dialog =
-                    QuestionDialog(
+                    Dialog(
+                        title = dialog.getTitle(),
+                        text = dialog.getText(),
+                    )
+
+                onDialogDisplay(dialog)
+            }
+
+            override fun onDisplay(dialog: VLCDialog.LoginDialog) {
+                vlcDialog = dialog
+
+                val dialog =
+                    Dialog(
+                        title = dialog.getTitle(),
+                        text = dialog.getText(),
+                    )
+
+                onDialogDisplay(dialog)
+            }
+
+            override fun onDisplay(dialog: VLCDialog.QuestionDialog) {
+                vlcDialog = dialog
+
+                val dialog =
+                    Dialog(
                         title = dialog.getTitle(),
                         text = dialog.getText(),
                         cancelText = dialog.getCancelText(),
@@ -26,13 +46,11 @@ fun LibVlcPlayerView.setDialogCallbacks() {
                 onDialogDisplay(dialog)
             }
 
-            override fun onDisplay(dialog: Dialog.ProgressDialog) {}
+            override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
 
-            override fun onCanceled(dialog: Dialog) {
-                question = null
-            }
+            override fun onCanceled(dialog: VLCDialog) {}
 
-            override fun onProgressUpdate(dialog: Dialog.ProgressDialog) {}
+            override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
         },
     )
 }

@@ -39,7 +39,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     player.play()
                 }
             case .error:
-                let error = ["error": "Player encountered an error"]
+                let error = ["error": "Media player encountered an error"]
 
                 onEncounteredError(error)
 

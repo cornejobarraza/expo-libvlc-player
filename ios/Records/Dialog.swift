@@ -1,6 +1,6 @@
 import ExpoModulesCore
 
-struct QuestionDialog: Record {
+struct Dialog: Record {
     @Field
     var title: String = ""
 
