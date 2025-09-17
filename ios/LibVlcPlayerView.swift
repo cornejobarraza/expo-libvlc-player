@@ -65,6 +65,10 @@ class LibVlcPlayerView: ExpoView {
 
         guard let source = source else { return }
 
+        if autoplay {
+            options.removeStartPausedOption()
+        }
+
         mediaPlayer = VLCMediaPlayer(options: options)
         mediaPlayer!.drawable = playerView
         mediaPlayer!.delegate = self
@@ -352,8 +356,6 @@ class LibVlcPlayerView: ExpoView {
 
     var autoplay: Bool = true {
         didSet {
-            options.removeStartPausedOption()
-
             if !autoplay {
                 options.append("--start-paused")
             }

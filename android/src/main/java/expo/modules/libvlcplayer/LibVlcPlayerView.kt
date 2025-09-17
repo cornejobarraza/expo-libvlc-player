@@ -90,6 +90,10 @@ class LibVlcPlayerView(
 
         val source = source ?: return
 
+        if (autoplay) {
+            options.removeStartPausedOption()
+        }
+
         libVLC = LibVLC(context, options)
         setDialogCallbacks()
         mediaPlayer = MediaPlayer(libVLC)
@@ -400,8 +404,6 @@ class LibVlcPlayerView(
     var autoplay: Boolean = true
         set(value) {
             field = value
-
-            options.removeStartPausedOption()
 
             if (!value) {
                 options.add("--start-paused")
