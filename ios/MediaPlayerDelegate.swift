@@ -5,9 +5,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         if let player = mediaPlayer {
             switch player.state {
             case .buffering:
-                onBuffering([:])
+                onBuffering()
             case .playing:
-                onPlaying([:])
+                onPlaying()
 
                 if firstPlay {
                     setupPlayer()
@@ -23,13 +23,13 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
                 MediaPlayerManager.shared.setAppropriateAudioSession()
             case .paused:
-                onPaused([:])
+                onPaused()
             case .stopped:
-                onStopped([:])
+                onStopped()
 
                 firstPlay = true
             case .ended:
-                onEndReached([:])
+                onEndReached()
 
                 player.stop()
 

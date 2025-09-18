@@ -53,17 +53,17 @@ class LibVlcPlayerView(
     private var shouldCreate: Boolean = false
     internal var firstPlay: Boolean = false
 
-    internal val onBuffering by EventDispatcher()
-    internal val onPlaying by EventDispatcher()
-    internal val onPaused by EventDispatcher()
-    internal val onStopped by EventDispatcher()
-    internal val onEndReached by EventDispatcher()
+    internal val onBuffering by EventDispatcher<Unit>()
+    internal val onPlaying by EventDispatcher<Unit>()
+    internal val onPaused by EventDispatcher<Unit>()
+    internal val onStopped by EventDispatcher<Unit>()
+    internal val onEndReached by EventDispatcher<Unit>()
     internal val onEncounteredError by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
     internal val onESAdded by EventDispatcher<MediaTracks>()
     internal val onDialogDisplay by EventDispatcher<Dialog>()
     internal val onFirstPlay by EventDispatcher<MediaInfo>()
-    internal val onBackground by EventDispatcher()
+    internal val onBackground by EventDispatcher<Unit>()
 
     init {
         MediaPlayerManager.registerPlayerView(this)

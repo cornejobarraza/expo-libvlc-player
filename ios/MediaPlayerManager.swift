@@ -21,7 +21,7 @@ class MediaPlayerManager {
 
     func onAppBackground() {
         for view in playerViews.allObjects {
-            view.onBackground([:])
+            view.onBackground()
 
             if let player = view.mediaPlayer {
                 let shouldPause = !view.playInBackground && player.isPlaying

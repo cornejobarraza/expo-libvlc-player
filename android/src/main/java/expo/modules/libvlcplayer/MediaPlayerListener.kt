@@ -9,11 +9,11 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
             EventListener { event ->
                 when (event.type) {
                     Event.Buffering -> {
-                        onBuffering(mapOf())
+                        onBuffering(Unit)
                     }
 
                     Event.Playing -> {
-                        onPlaying(mapOf())
+                        onPlaying(Unit)
 
                         if (firstPlay) {
                             attachPlayer()
@@ -33,11 +33,11 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     }
 
                     Event.Paused -> {
-                        onPaused(mapOf())
+                        onPaused(Unit)
                     }
 
                     Event.Stopped -> {
-                        onStopped(mapOf())
+                        onStopped(Unit)
 
                         detachPlayer()
 
@@ -45,7 +45,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     }
 
                     Event.EndReached -> {
-                        onEndReached(mapOf())
+                        onEndReached(Unit)
 
                         player.stop()
 
