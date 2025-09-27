@@ -12,6 +12,7 @@ private const val PAUSED_EVENT = "onPaused"
 private const val STOPPED_EVENT = "onStopped"
 private const val END_REACHED_EVENT = "onEndReached"
 private const val ENCOUNTERED_ERROR_EVENT = "onEncounteredError"
+private const val TIME_CHANGED_EVENT = "onTimeChanged"
 private const val POSITION_CHANGED_EVENT = "onPositionChanged"
 private const val ES_ADDED_EVENT = "onESAdded"
 private const val DIALOG_DISPLAY_EVENT = "onDialogDisplay"
@@ -26,6 +27,7 @@ val playerEvents =
         STOPPED_EVENT,
         END_REACHED_EVENT,
         ENCOUNTERED_ERROR_EVENT,
+        TIME_CHANGED_EVENT,
         POSITION_CHANGED_EVENT,
         ES_ADDED_EVENT,
         DIALOG_DISPLAY_EVENT,
@@ -126,8 +128,8 @@ class LibVlcPlayerModule : Module() {
                     view.stop()
                 }
 
-                AsyncFunction("seek") { view: LibVlcPlayerView, position: Float ->
-                    view.seek(position)
+                AsyncFunction("seek") { view: LibVlcPlayerView, value: Double, type: String? ->
+                    view.seek(value, type ?: "position")
                 }
 
                 AsyncFunction("postAction") { view: LibVlcPlayerView, action: Int ->

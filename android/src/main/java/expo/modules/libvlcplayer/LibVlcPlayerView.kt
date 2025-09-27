@@ -59,6 +59,7 @@ class LibVlcPlayerView(
     internal val onStopped by EventDispatcher<Unit>()
     internal val onEndReached by EventDispatcher<Unit>()
     internal val onEncounteredError by EventDispatcher()
+    internal val onTimeChanged by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
     internal val onESAdded by EventDispatcher<MediaTracks>()
     internal val onDialogDisplay by EventDispatcher<Dialog>()
@@ -428,12 +429,19 @@ class LibVlcPlayerView(
         mediaPlayer?.stop()
     }
 
-    fun seek(position: Float) {
+    fun seek(
+        value: Double,
+        type: String,
+    ) {
         mediaPlayer?.let { player ->
             if (player.isSeekable()) {
-                player.setPosition(position)
+                if (type == "position") {
+                    player.setPosition(value.toFloat())
+                } else {
+                    player.setTime(value.toLong())
+                }
             } else {
-                time = (position * mediaLength.toFloat()).toInt()
+                time = (value.toLong() * mediaLength).toInt()
             }
         }
     }

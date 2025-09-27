@@ -111,14 +111,14 @@ See the [Example App](example/components/PlayerView.tsx) for additional usage.
 
 ### Player methods
 
-| Method                       | Description                                                                  |
-| ---------------------------- | ---------------------------------------------------------------------------- |
-| `play()`                     | Starts playback of the current player                                        |
-| `pause()`                    | Pauses playback of the current player                                        |
-| `stop()`                     | Stops playback of the current player                                         |
-| `seek(position: number)`     | Sets the position of the current player. Must be a float between `0` and `1` |
-| `postAction(action: number)` | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`   |
-| `dismiss()`                  | Dismisses a [`Dialog`](#dialog)                                              |
+| Method                                             | Description                                                                                                                   |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `play()`                                           | Starts playback of the current player                                                                                         |
+| `pause()`                                          | Pauses playback of the current player                                                                                         |
+| `stop()`                                           | Stops playback of the current player                                                                                          |
+| `seek(value: number, type?: "position" \| "time")` | Sets the position or time of the current player. Must be a number equal or greater than `0` and type defaults to `"position"` |
+| `postAction(action: number)`                       | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                                    |
+| `dismiss()`                                        | Dismisses a [`Dialog`](#dialog)                                                                                               |
 
 ### Player props
 
@@ -151,6 +151,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onStopped`          | Called after the `Stopped` player event          |                               |
 | `onEndReached`       | Called after the `EndReached` player event       |                               |
 | `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`           |
+| `onTimeChanged`      | Called after the `TimeChanged` player event      | `{ time: number }`            |
 | `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`        |
 | `onESAdded`          | Called after the `ESAdded` player event          | [`MediaTracks`](#mediatracks) |
 | `onDialogDisplay`    | Called after a `Dialog` needs to be displayed    | [`Dialog`](#dialog)           |

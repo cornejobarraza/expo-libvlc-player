@@ -30,12 +30,8 @@ const MEDIA_ERROR_MESSAGE = "Invalid source, media could not be set";
 
 const THUMBNAIL_TIME = 27_000;
 const BUFFERING_DELAY = 1_000;
-const DEFAULT_LENGTH = 0;
 
-const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 1;
-
-const MIN_VOLUME_LEVEL = 0;
 const MAX_VOLUME_LEVEL = 100;
 const VOLUME_CHANGE_STEP = 10;
 
@@ -53,8 +49,8 @@ function msToMinutesSeconds(length: number) {
 }
 
 export const PlayerView = ({ floating = false }: PlayerViewProps) => {
-  const [position, setPosition] = useState<number>(MIN_POSITION_VALUE);
-  const [length, setLength] = useState<number>(DEFAULT_LENGTH);
+  const [position, setPosition] = useState<number>(0);
+  const [length, setLength] = useState<number>(0);
   const [seekable, setSeekable] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
   const [mute, setMute] = useState<boolean>(false);
@@ -88,20 +84,17 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
     },
     onPlaying: () => {
       activateKeepAwakeAsync();
-      setIsBuffering(false);
       setIsPlaying(true);
       setIsStopped(false);
     },
     onPaused: () => {
       deactivateKeepAwake();
-      setIsBuffering(false);
       setIsPlaying(false);
       setIsStopped(false);
     },
     onStopped: () => {
       deactivateKeepAwake();
-      setPosition(MIN_POSITION_VALUE);
-      setIsBuffering(false);
+      setPosition(0);
       setIsPlaying(false);
       setIsStopped(true);
     },
@@ -115,10 +108,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
         handleErrorState();
       }
     },
-    onPositionChanged: ({ position }) => {
-      setPosition(position);
-      setIsBuffering(false);
-    },
+    onPositionChanged: ({ position }) => setPosition(position),
     onDialogDisplay: ({
       title,
       text,
@@ -155,9 +145,9 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
     },
   };
 
-  const handleSlidingComplete = (position: number) => {
-    playerViewRef.current?.seek(position);
-    setPosition(position);
+  const handleSlidingComplete = (value: number) => {
+    playerViewRef.current?.seek(value);
+    setPosition(value);
     setIsBackgrounded(false);
   };
 
@@ -180,8 +170,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
         ? volume + VOLUME_CHANGE_STEP
         : volume - VOLUME_CHANGE_STEP;
 
-    const hasValidVolume =
-      newVolume >= MIN_VOLUME_LEVEL && newVolume <= MAX_VOLUME_LEVEL;
+    const hasValidVolume = newVolume >= 0 && newVolume <= MAX_VOLUME_LEVEL;
 
     if (!hasValidVolume) return;
 
@@ -192,8 +181,8 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
 
   const handleErrorState = () => {
     deactivateKeepAwake();
-    setPosition(MIN_POSITION_VALUE);
-    setLength(DEFAULT_LENGTH);
+    setPosition(0);
+    setLength(0);
     setSeekable(false);
     setIsBuffering(false);
     setIsPlaying(false);
@@ -205,7 +194,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
   const shouldShowThumbnail =
     !!thumbnail &&
     !isPlaying &&
-    (position === MIN_POSITION_VALUE || isStopped || isBackgrounded);
+    (position === 0 || isStopped || isBackgrounded);
 
   return (
     <View
@@ -248,14 +237,11 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
       <View style={styles.controls}>
         <View style={styles.length}>
           <Text>{msToMinutesSeconds(position * length)}</Text>
-          <Text>
-            {length > DEFAULT_LENGTH ? msToMinutesSeconds(length) : "N/A"}
-          </Text>
+          <Text>{length > 0 ? msToMinutesSeconds(length) : "N/A"}</Text>
         </View>
         <Slider
           value={position}
           onSlidingComplete={handleSlidingComplete}
-          minimumValue={MIN_POSITION_VALUE}
           maximumValue={MAX_POSITION_VALUE}
           thumbTintColor="darkred"
           minimumTrackTintColor="red"
@@ -276,7 +262,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
           <PlayerControl
             icon="redo"
             onPress={handleRepeatChange}
-            disabled={length <= DEFAULT_LENGTH}
+            disabled={length <= 0}
             selected={repeat}
           />
         </View>
@@ -285,7 +271,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
             icon="volume-down"
             size={18}
             onPress={() => handleVolumeChange("decrease")}
-            disabled={volume === MIN_VOLUME_LEVEL}
+            disabled={volume === 0}
           />
           <PlayerControl
             icon="volume-mute"

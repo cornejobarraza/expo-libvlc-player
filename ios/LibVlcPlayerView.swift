@@ -31,6 +31,7 @@ class LibVlcPlayerView: ExpoView {
     let onStopped = EventDispatcher()
     let onEndReached = EventDispatcher()
     let onEncounteredError = EventDispatcher()
+    let onTimeChanged = EventDispatcher()
     let onPositionChanged = EventDispatcher()
     let onESAdded = EventDispatcher()
     let onDialogDisplay = EventDispatcher()
@@ -380,12 +381,16 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer?.stop()
     }
 
-    func seek(_ position: Float) {
+    func seek(_ value: Double, _ type: String) {
         if let player = mediaPlayer {
             if player.isSeekable {
-                player.position = position
+                if type == "position" {
+                    player.position = Float(value)
+                } else {
+                    player.time = VLCTime(int: Int32(value))
+                }
             } else {
-                time = Int(position * Float(mediaLength))
+                time = Int(Int32(value) * mediaLength)
             }
         }
     }

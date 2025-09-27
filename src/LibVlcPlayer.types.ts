@@ -20,13 +20,14 @@ export interface LibVlcPlayerViewRef {
    */
   readonly stop: () => Promise<void>;
   /**
-   * Sets the position of the current player
+   * Sets the position or time of the current player
    *
-   * @param position - Must be a float between `0` and `1`
+   * @param value - Must be a number equal or greater than `0`
+   * @param type - Defaults to `"position"`
    *
    * @returns A promise which resolves to `void`
    */
-  readonly seek: (position: number) => Promise<void>;
+  readonly seek: (value: number, type?: "position" | "time") => Promise<void>;
   /**
    * Posts an answer to a `Dialog`
    *
@@ -129,6 +130,13 @@ export type Error = { error: string };
 /**
  * @hidden
  */
+type TimeChangedListener = (event: NativeEvent<Time>) => void;
+
+export type Time = { time: number };
+
+/**
+ * @hidden
+ */
 type PositionChangedListener = (event: NativeEvent<Position>) => void;
 
 export type Position = { position: number };
@@ -178,6 +186,7 @@ export interface LibVlcPlayerViewNativeProps {
   onStopped?: StoppedListener;
   onEndReached?: EndReachedListener;
   onEncounteredError?: EncounteredErrorListener;
+  onTimeChanged?: TimeChangedListener;
   onPositionChanged?: PositionChangedListener;
   onESAdded?: ESAddedListener;
   onDialogDisplay?: DialogDisplayListener;
@@ -322,6 +331,10 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Called after the `EncounteredError` player event
    */
   onEncounteredError?: (event: Error) => void;
+  /**
+   * Called after the `TimeChanged` player event
+   */
+  onTimeChanged?: (event: Time) => void;
   /**
    * Called after the `PositionChanged` player event
    */
