@@ -57,6 +57,10 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
     func mediaPlayerTimeChanged(_: Notification) {
         if let player = mediaPlayer {
+            let time = ["time": player.time.intValue]
+
+            onTimeChanged(time)
+
             let position = ["position": player.position]
 
             onPositionChanged(position)

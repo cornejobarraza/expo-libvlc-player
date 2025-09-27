@@ -11,7 +11,7 @@ export function useMediaThumbnail({ url, time }: MediaThumbnailProps) {
 
   useEffect(() => {
     generateThumbnail();
-  }, []);
+  }, [url, time]);
 
   const generateThumbnail = async () => {
     try {

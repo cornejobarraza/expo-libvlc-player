@@ -64,6 +64,12 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         firstPlay = true
                     }
 
+                    Event.TimeChanged -> {
+                        val time = mapOf("time" to player.getTime().toInt())
+
+                        onTimeChanged(time)
+                    }
+
                     Event.PositionChanged -> {
                         val position = mapOf("position" to player.getPosition())
 

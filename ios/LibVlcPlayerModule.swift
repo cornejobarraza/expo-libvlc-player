@@ -6,6 +6,7 @@ private let pausedEvent = "onPaused"
 private let stoppedEvent = "onStopped"
 private let endReachedEvent = "onEndReached"
 private let encounteredErrorEvent = "onEncounteredError"
+private let timeChangedEvent = "onTimeChanged"
 private let positionChangedEvent = "onPositionChanged"
 private let esAddedEvent = "onESAdded"
 private let dialogDisplayEvent = "onDialogDisplay"
@@ -19,6 +20,7 @@ let playerEvents = [
     stoppedEvent,
     endReachedEvent,
     encounteredErrorEvent,
+    timeChangedEvent,
     positionChangedEvent,
     esAddedEvent,
     dialogDisplayEvent,
@@ -109,8 +111,8 @@ public class LibVlcPlayerModule: Module {
                 view.stop()
             }
 
-            AsyncFunction("seek") { (view: LibVlcPlayerView, position: Float) in
-                view.seek(position)
+            AsyncFunction("seek") { (view: LibVlcPlayerView, value: Double, type: String?) in
+                view.seek(value, type ?? "position")
             }
 
             AsyncFunction("postAction") { (view: LibVlcPlayerView, action: Int) in
