@@ -441,7 +441,7 @@ class LibVlcPlayerView(
                     player.setTime(value.toLong())
                 }
             } else {
-                time = (value.toLong() * mediaLength).toInt()
+                time = (value * mediaLength.toDouble()).toInt()
             }
         }
     }
