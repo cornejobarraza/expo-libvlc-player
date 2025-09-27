@@ -31,7 +31,6 @@ const MEDIA_ERROR_MESSAGE = "Invalid source, media could not be set";
 const THUMBNAIL_TIME = 27_000;
 const BUFFERING_DELAY = 1_000;
 
-const MAX_POSITION_VALUE = 1;
 const MAX_VOLUME_LEVEL = 100;
 const VOLUME_CHANGE_STEP = 10;
 
@@ -49,7 +48,7 @@ function msToMinutesSeconds(length: number) {
 }
 
 export const PlayerView = ({ floating = false }: PlayerViewProps) => {
-  const [position, setPosition] = useState<number>(0);
+  const [time, setTime] = useState<number>(0);
   const [length, setLength] = useState<number>(0);
   const [seekable, setSeekable] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
@@ -60,7 +59,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isStopped, setIsStopped] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
-  const [isBackgrounded, setIsBackgrounded] = useState<boolean>(false);
+  const [inBackground, setInBackground] = useState<boolean>(false);
 
   const playerViewRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingTimeoutRef = useRef<number | null>(null);
@@ -94,7 +93,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
     },
     onStopped: () => {
       deactivateKeepAwake();
-      setPosition(0);
+      setTime(0);
       setIsPlaying(false);
       setIsStopped(true);
     },
@@ -108,7 +107,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
         handleErrorState();
       }
     },
-    onPositionChanged: ({ position }) => setPosition(position),
+    onTimeChanged: ({ time }) => setTime(time),
     onDialogDisplay: ({
       title,
       text,
@@ -141,25 +140,25 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
       setSeekable(seekable);
     },
     onBackground: () => {
-      setIsBackgrounded(true);
+      setInBackground(true);
     },
   };
 
   const handleSlidingComplete = (value: number) => {
-    playerViewRef.current?.seek(value);
-    setPosition(value);
-    setIsBackgrounded(false);
+    playerViewRef.current?.seek(value, "time");
+    setTime(value);
+    setInBackground(false);
   };
 
   const handlePlayPause = () => {
     playerViewRef.current?.[!isPlaying ? "play" : "pause"]();
-    setIsBackgrounded(false);
+    setInBackground(false);
     setIsError(false);
   };
 
   const handleStopPlayer = () => {
     playerViewRef.current?.stop();
-    setIsBackgrounded(false);
+    setInBackground(false);
   };
 
   const handleRepeatChange = () => setRepeat((prev) => !prev);
@@ -181,20 +180,18 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
 
   const handleErrorState = () => {
     deactivateKeepAwake();
-    setPosition(0);
+    setTime(0);
     setLength(0);
     setSeekable(false);
     setIsBuffering(false);
     setIsPlaying(false);
     setIsStopped(false);
     setIsError(true);
-    setIsBackgrounded(false);
+    setInBackground(false);
   };
 
   const shouldShowThumbnail =
-    !!thumbnail &&
-    !isPlaying &&
-    (position === 0 || isStopped || isBackgrounded);
+    !!thumbnail && !isPlaying && (time === 0 || isStopped || inBackground);
 
   return (
     <View
@@ -236,13 +233,13 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
       </View>
       <View style={styles.controls}>
         <View style={styles.length}>
-          <Text>{msToMinutesSeconds(position * length)}</Text>
+          <Text>{msToMinutesSeconds(time)}</Text>
           <Text>{length > 0 ? msToMinutesSeconds(length) : "N/A"}</Text>
         </View>
         <Slider
-          value={position}
+          value={time}
           onSlidingComplete={handleSlidingComplete}
-          maximumValue={MAX_POSITION_VALUE}
+          maximumValue={length}
           thumbTintColor="darkred"
           minimumTrackTintColor="red"
           maximumTrackTintColor="lightgray"
