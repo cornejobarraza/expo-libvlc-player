@@ -441,7 +441,11 @@ class LibVlcPlayerView(
                     player.setTime(value.toLong())
                 }
             } else {
-                time = (value * mediaLength.toDouble()).toInt()
+                if (type == "position") {
+                    time = (value * mediaLength.toDouble()).toInt()
+                } else {
+                    time = value.toInt()
+                }
             }
         }
     }

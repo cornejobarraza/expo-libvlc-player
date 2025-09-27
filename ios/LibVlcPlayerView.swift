@@ -390,7 +390,11 @@ class LibVlcPlayerView: ExpoView {
                     player.time = VLCTime(int: Int32(value))
                 }
             } else {
-                time = Int(value * Double(mediaLength))
+                if type == "position" {
+                    time = Int(value * Double(mediaLength))
+                } else {
+                    time = Int(value)
+                }
             }
         }
     }
