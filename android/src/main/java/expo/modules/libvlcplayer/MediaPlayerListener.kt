@@ -22,9 +22,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                             val mediaInfo = getMediaInfo()
 
-                            if (mediaInfo.length != 0.0) {
-                                onFirstPlay(mediaInfo)
-                            }
+                            onFirstPlay(mediaInfo)
 
                             firstPlay = false
                         }
@@ -42,6 +40,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         detachPlayer()
 
                         firstPlay = true
+                        firstPosition = true
                     }
 
                     Event.EndReached -> {
@@ -62,6 +61,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         onEncounteredError(error)
 
                         firstPlay = true
+                        firstPosition = true
                     }
 
                     Event.TimeChanged -> {
@@ -75,18 +75,21 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                         onPositionChanged(position)
 
-                        if (mediaLength == 0L) {
-                            val mediaInfo = getMediaInfo()
+                        if (firstPosition) {
+                            if (mediaLength == 0L) {
+                                val mediaInfo = getMediaInfo()
 
-                            if (mediaInfo.length != 0.0) {
                                 onFirstPlay(mediaInfo)
                             }
+
+                            firstPosition = false
                         }
                     }
 
                     Event.ESAdded -> {
                         if (!firstPlay) {
                             val mediaTracks = getMediaTracks()
+
                             onESAdded(mediaTracks)
                         }
                     }

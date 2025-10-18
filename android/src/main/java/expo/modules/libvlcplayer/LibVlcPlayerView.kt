@@ -52,6 +52,7 @@ class LibVlcPlayerView(
 
     private var shouldCreate: Boolean = false
     internal var firstPlay: Boolean = false
+    internal var firstPosition: Boolean = false
 
     internal val onBuffering by EventDispatcher<Unit>()
     internal val onPlaying by EventDispatcher<Unit>()
@@ -116,8 +117,9 @@ class LibVlcPlayerView(
 
         mediaPlayer!!.play()
 
-        firstPlay = true
         shouldCreate = false
+        firstPlay = true
+        firstPosition = true
     }
 
     fun attachPlayer() {

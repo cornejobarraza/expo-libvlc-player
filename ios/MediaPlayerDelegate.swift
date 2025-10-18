@@ -14,9 +14,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
                     let mediaInfo = getMediaInfo()
 
-                    if mediaInfo.length != 0.0 {
-                        onFirstPlay(mediaInfo)
-                    }
+                    onFirstPlay(mediaInfo)
 
                     firstPlay = false
                 }
@@ -28,6 +26,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 onStopped()
 
                 firstPlay = true
+                firstPosition = true
             case .ended:
                 onEndReached()
 
@@ -44,9 +43,11 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 onEncounteredError(error)
 
                 firstPlay = true
+                firstPosition = true
             case .esAdded:
                 if !firstPlay {
                     let mediaTracks = getMediaTracks()
+
                     onESAdded(mediaTracks)
                 }
             default:
@@ -65,12 +66,14 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
             onPositionChanged(position)
 
-            if mediaLength == 0 {
-                let mediaInfo = getMediaInfo()
+            if firstPosition {
+                if mediaLength == 0 {
+                    let mediaInfo = getMediaInfo()
 
-                if mediaInfo.length != 0.0 {
                     onFirstPlay(mediaInfo)
                 }
+
+                firstPosition = false
             }
         }
     }
