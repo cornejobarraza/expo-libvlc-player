@@ -45,11 +45,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 firstPlay = true
                 firstPosition = true
             case .esAdded:
-                if !firstPlay {
-                    let mediaTracks = getMediaTracks()
+                let mediaTracks = getMediaTracks()
 
-                    onESAdded(mediaTracks)
-                }
+                onESAdded(mediaTracks)
             default:
                 break
             }

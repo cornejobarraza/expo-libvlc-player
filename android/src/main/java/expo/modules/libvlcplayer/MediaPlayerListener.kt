@@ -87,11 +87,9 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     }
 
                     Event.ESAdded -> {
-                        if (!firstPlay) {
-                            val mediaTracks = getMediaTracks()
+                        val mediaTracks = getMediaTracks()
 
-                            onESAdded(mediaTracks)
-                        }
+                        onESAdded(mediaTracks)
                     }
                 }
             },
