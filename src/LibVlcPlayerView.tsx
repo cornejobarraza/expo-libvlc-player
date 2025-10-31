@@ -14,6 +14,7 @@ import {
   type Dialog,
 } from "./LibVlcPlayer.types";
 import { parseSource } from "./utils/assets";
+import { converNativeEvent } from "./utils/events";
 import { convertNativeProps } from "./utils/props";
 
 const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
@@ -33,38 +34,50 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       loggedRenderingChildrenWarning = true;
     }
 
-    const onEncounteredError = ({ nativeEvent }: NativeEvent<Error>) => {
+    const onEncounteredError = (event: NativeEvent<Error>) => {
       if (props.onEncounteredError) {
+        const nativeEvent = converNativeEvent(event);
+
         props.onEncounteredError(nativeEvent);
       }
     };
 
-    const onTimeChanged = ({ nativeEvent }: NativeEvent<Time>) => {
+    const onTimeChanged = (event: NativeEvent<Time>) => {
       if (props.onTimeChanged) {
+        const nativeEvent = converNativeEvent(event);
+
         props.onTimeChanged(nativeEvent);
       }
     };
 
-    const onPositionChanged = ({ nativeEvent }: NativeEvent<Position>) => {
+    const onPositionChanged = (event: NativeEvent<Position>) => {
       if (props.onPositionChanged) {
+        const nativeEvent = converNativeEvent(event);
+
         props.onPositionChanged(nativeEvent);
       }
     };
 
-    const onESAdded = ({ nativeEvent }: NativeEvent<MediaTracks>) => {
+    const onESAdded = (event: NativeEvent<MediaTracks>) => {
       if (props.onESAdded) {
+        const nativeEvent = converNativeEvent(event);
+
         props.onESAdded(nativeEvent);
       }
     };
 
-    const onDialogDisplay = ({ nativeEvent }: NativeEvent<Dialog>) => {
+    const onDialogDisplay = (event: NativeEvent<Dialog>) => {
       if (props.onDialogDisplay) {
+        const nativeEvent = converNativeEvent(event);
+
         props.onDialogDisplay(nativeEvent);
       }
     };
 
-    const onFirstPlay = ({ nativeEvent }: NativeEvent<MediaInfo>) => {
+    const onFirstPlay = (event: NativeEvent<MediaInfo>) => {
       if (props.onFirstPlay) {
+        const nativeEvent = converNativeEvent(event);
+
         props.onFirstPlay(nativeEvent);
       }
     };

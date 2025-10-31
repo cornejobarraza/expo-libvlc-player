@@ -64,9 +64,15 @@ export type AudioMixingMode =
   | "auto"
   | "doNotMix";
 
-export interface NativeEvent<T> {
-  nativeEvent: T;
+export interface NativeEventProps {
+  target: number;
 }
+
+export interface NativeEvent<T> {
+  nativeEvent: T & NativeEventProps;
+}
+
+export type LibVlcEvent<T> = Omit<T & NativeEventProps, "target">;
 
 export interface Track {
   id: number;
