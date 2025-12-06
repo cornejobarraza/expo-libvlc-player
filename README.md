@@ -47,7 +47,7 @@ No additional configuration necessary.
 
 On Android, the `libvlcjni` player detaches from the View when surfaces are destroyed after switching screens.
 
-This causes nothing to be displayed when coming back to the screen as native resources are released automatically.
+This causes nothing to be displayed when coming back to the player as native resources are released automatically.
 
 The current workaround attaches the View once surfaces are created but this results in a brief black screen.
 
@@ -62,6 +62,14 @@ On iOS, the `MobileVLCKit` player seems to interact with the local network when 
 Starting in iOS 14, a clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
 
 https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy#Essentials
+
+#### Audio playback issue
+
+On iOS, the `MobileVLCKit` player experiences a small audio delay when resuming or muting media playback.
+
+This might be related to the internal clock used by the library core causing inaccurate position/time values.
+
+https://code.videolan.org/videolan/VLCKit/-/issues/233
 
 ### Configuration in app config
 
