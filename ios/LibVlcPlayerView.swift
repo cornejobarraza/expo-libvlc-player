@@ -312,17 +312,13 @@ class LibVlcPlayerView: ExpoView {
             let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
             oldVolume = newVolume
 
-            if let player = mediaPlayer, let audio = player.audio {
-                if audio.volume > minPlayerVolume {
-                    audio.volume = Int32(newVolume)
-                }
-            }
+            mediaPlayer?.audio?.volume = Int32(newVolume)
         }
     }
 
     var mute: Bool = false {
         didSet {
-            if options.hasAudioOption(), !mute {
+            if options.hasAudioOption() {
                 let error = ["error": "Audio disabled via options"]
                 onEncounteredError(error)
             }

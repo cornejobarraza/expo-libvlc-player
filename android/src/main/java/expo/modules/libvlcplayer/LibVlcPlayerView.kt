@@ -355,18 +355,14 @@ class LibVlcPlayerView(
             val newVolume = value.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
             oldVolume = newVolume
 
-            mediaPlayer?.let { player ->
-                if (player.getVolume() > MIN_PLAYER_VOLUME) {
-                    player.setVolume(newVolume)
-                }
-            }
+            mediaPlayer?.setVolume(newVolume)
         }
 
     var mute: Boolean = false
         set(value) {
             field = value
 
-            if (options.hasAudioOption() && !value) {
+            if (options.hasAudioOption()) {
                 val error = mapOf("error" to "Audio disabled via options")
                 onEncounteredError(error)
             }
