@@ -355,7 +355,9 @@ class LibVlcPlayerView(
             val newVolume = value.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
             oldVolume = newVolume
 
-            mediaPlayer?.setVolume(newVolume)
+            if (!mute) {
+                mediaPlayer?.setVolume(newVolume)
+            }
         }
 
     var mute: Boolean = false

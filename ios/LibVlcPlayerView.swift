@@ -312,7 +312,9 @@ class LibVlcPlayerView: ExpoView {
             let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
             oldVolume = newVolume
 
-            mediaPlayer?.audio?.volume = Int32(newVolume)
+            if !mute {
+                mediaPlayer?.audio?.volume = Int32(newVolume)
+            }
         }
     }
 
