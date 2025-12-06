@@ -22,6 +22,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 MediaPlayerManager.shared.setAppropriateAudioSession()
             case .paused:
                 onPaused()
+
+                MediaPlayerManager.shared.setAppropriateAudioSession()
             case .stopped:
                 onStopped()
 
