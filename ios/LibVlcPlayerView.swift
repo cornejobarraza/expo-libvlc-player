@@ -24,7 +24,7 @@ class LibVlcPlayerView: ExpoView {
 
     private var shouldCreate: Bool = false
     var firstPlay: Bool = false
-    var firstPosition: Bool = false
+    var firstTime: Bool = false
 
     let onBuffering = EventDispatcher()
     let onPlaying = EventDispatcher()
@@ -93,7 +93,7 @@ class LibVlcPlayerView: ExpoView {
 
         shouldCreate = false
         firstPlay = true
-        firstPosition = true
+        firstTime = true
     }
 
     func destroyPlayer() {
