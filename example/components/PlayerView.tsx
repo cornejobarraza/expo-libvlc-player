@@ -131,9 +131,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
         },
       ];
 
-      const visibleButtons = alertButtons.filter((button) => button.text);
-
-      Alert.alert(title, text, visibleButtons);
+      Alert.alert(title, text, alertButtons);
     },
     onFirstPlay: ({ length, seekable }) => {
       setLength(length);
