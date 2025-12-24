@@ -21,11 +21,11 @@
 
 ### Supported versions
 
-| Platform     | Version |
-| ------------ | ------- |
-| React Native | 0.79    |
-| Android      | 7+      |
-| iOS          | 15.1+   |
+| Platform             | Version |
+| -------------------- | ------- |
+| React Native         | 0.79    |
+| Android / Android TV | 7+      |
+| iOS / Apple TV       | 15.1+   |
 
 ### Installation
 
@@ -70,6 +70,14 @@ On iOS, the `MobileVLCKit` player experiences a small audio delay when resuming 
 This might be related to the internal clock used by the library core causing inaccurate position/time values.
 
 https://code.videolan.org/videolan/VLCKit/-/issues/233
+
+### Configure for TV
+
+Set the `EXPO_TV` environment variable, and run prebuild to make the TV modifications to the project.
+
+```
+EXPO_TV=1 npx expo prebuild --clean
+```
 
 ### Configuration in app config
 
