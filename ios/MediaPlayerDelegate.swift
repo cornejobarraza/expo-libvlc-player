@@ -1,4 +1,8 @@
-import MobileVLCKit
+#if os(tvOS)
+    import TVVLCKit
+#else
+    import MobileVLCKit
+#endif
 
 extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     func mediaPlayerStateChanged(_: Notification) {

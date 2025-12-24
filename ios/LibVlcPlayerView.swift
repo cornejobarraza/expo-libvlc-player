@@ -1,5 +1,9 @@
 import ExpoModulesCore
-import MobileVLCKit
+#if os(tvOS)
+    import TVVLCKit
+#else
+    import MobileVLCKit
+#endif
 import UIKit
 
 let defaultPlayerRate: Float = 1.0
