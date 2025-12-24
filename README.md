@@ -57,7 +57,7 @@ Run `npx pod-install` after installing the npm package.
 
 #### Local network privacy
 
-On iOS, the `MobileVLCKit` player seems to interact with the local network when playing media from external sources.
+On iOS, the `VLCKit` player seems to interact with the local network when playing media from external sources.
 
 Starting in iOS 14, a clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
 
@@ -65,7 +65,7 @@ https://developer.apple.com/documentation/technotes/tn3179-understanding-local-n
 
 #### Audio playback issue
 
-On iOS, the `MobileVLCKit` player experiences a small audio delay when resuming or muting media playback.
+On iOS, the `VLCKit` player experiences a small audio delay when resuming or muting media playback.
 
 This might be related to the internal clock used by the library core causing inaccurate position/time values.
 
@@ -243,8 +243,8 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 This project is not affiliated with, endorsed by, or officially supported by VideoLAN. The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with the following **LibVLC** bindings:
 
-- `libvlcjni` for Android
-- `MobileVLCKit` for iOS
+- `libvlcjni` for Android / Android TV
+- `VLCKit` for iOS / Apple TV
 
 For official VLC products and support, please visit [videolan.org](https://www.videolan.org/).
 
