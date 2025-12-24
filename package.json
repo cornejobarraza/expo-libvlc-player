@@ -1,6 +1,6 @@
 {
   "name": "expo-libvlc-player",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "LibVLC Player for Expo",
   "main": "build/index.js",
   "types": "build/index.d.ts",
