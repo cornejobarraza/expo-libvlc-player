@@ -29,6 +29,14 @@ export interface LibVlcPlayerViewRef {
    */
   readonly seek: (value: number, type?: "position" | "time") => Promise<void>;
   /**
+   * Starts or stops recording the current media
+   *
+   * @param path - Must be a valid string or `null`
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly record: (path: string | null) => Promise<void>;
+  /**
    * Posts an answer to a `Dialog`
    *
    * @param action - Must be an integer of `1` or `2`
@@ -93,6 +101,11 @@ export interface MediaInfo {
   tracks: MediaTracks;
 }
 
+export interface Recording {
+  path: string | null;
+  isRecording: boolean;
+}
+
 export interface Dialog {
   title: string;
   text: string;
@@ -126,31 +139,36 @@ type StoppedListener = () => void;
  */
 type EndReachedListener = () => void;
 
-/**
- * @hidden
- */
-type EncounteredErrorListener = (event: NativeEvent<Error>) => void;
-
 export type Error = { error: string };
 
 /**
  * @hidden
  */
-type TimeChangedListener = (event: NativeEvent<Time>) => void;
+type EncounteredErrorListener = (event: NativeEvent<Error>) => void;
 
 export type Time = { time: number };
 
 /**
  * @hidden
  */
-type PositionChangedListener = (event: NativeEvent<Position>) => void;
+type TimeChangedListener = (event: NativeEvent<Time>) => void;
 
 export type Position = { position: number };
 
 /**
  * @hidden
  */
+type PositionChangedListener = (event: NativeEvent<Position>) => void;
+
+/**
+ * @hidden
+ */
 type ESAddedListener = (event: NativeEvent<MediaTracks>) => void;
+
+/**
+ * @hidden
+ */
+type RecordChangedListener = (event: NativeEvent<Recording>) => void;
 
 /**
  * @hidden
@@ -195,6 +213,7 @@ export interface LibVlcPlayerViewNativeProps {
   onTimeChanged?: TimeChangedListener;
   onPositionChanged?: PositionChangedListener;
   onESAdded?: ESAddedListener;
+  onRecordChanged?: RecordChangedListener;
   onDialogDisplay?: DialogDisplayListener;
   onFirstPlay?: FirstPlayListener;
   onBackground?: BackgroundListener;
@@ -349,6 +368,10 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Called after the `ESAdded` player event
    */
   onESAdded?: (event: MediaTracks) => void;
+  /**
+   * Called after the `RecordChanged` player event
+   */
+  onRecordChanged?: (event: Recording) => void;
   /**
    * Called after a `Dialog` needs to be displayed
    */

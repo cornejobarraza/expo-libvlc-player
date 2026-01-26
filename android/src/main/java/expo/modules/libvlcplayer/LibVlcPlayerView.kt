@@ -9,6 +9,7 @@ import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
+import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Track
 import expo.modules.libvlcplayer.records.Tracks
@@ -63,6 +64,7 @@ class LibVlcPlayerView(
     internal val onTimeChanged by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
     internal val onESAdded by EventDispatcher<MediaTracks>()
+    internal val onRecordChanged by EventDispatcher<Recording>()
     internal val onDialogDisplay by EventDispatcher<Dialog>()
     internal val onFirstPlay by EventDispatcher<MediaInfo>()
     internal val onBackground by EventDispatcher<Unit>()
@@ -112,9 +114,7 @@ class LibVlcPlayerView(
         media = Media(libVLC, Uri.parse(source))
         mediaPlayer!!.setMedia(media)
         media!!.release()
-
         addPlayerSlaves()
-
         mediaPlayer!!.play()
 
         shouldCreate = false
@@ -349,6 +349,7 @@ class LibVlcPlayerView(
 
             if (options.hasAudioOption()) {
                 val error = mapOf("error" to "Audio disabled via options")
+
                 onEncounteredError(error)
             }
 
@@ -366,6 +367,7 @@ class LibVlcPlayerView(
 
             if (options.hasAudioOption()) {
                 val error = mapOf("error" to "Audio disabled via options")
+
                 onEncounteredError(error)
             }
 
@@ -392,6 +394,7 @@ class LibVlcPlayerView(
 
             if (options.hasRepeatOption()) {
                 val error = mapOf("error" to "Repeat enabled via options")
+
                 onEncounteredError(error)
             }
         }
@@ -446,6 +449,28 @@ class LibVlcPlayerView(
                 } else {
                     time = value.toInt()
                 }
+            }
+        }
+    }
+
+    fun record(path: String?) {
+        mediaPlayer?.let { player ->
+            if (!player.isPlaying()) {
+                return
+            }
+
+            if (path != null) {
+                val success = player.record(path)
+
+                if (!success) {
+                    val error = mapOf("error" to "Invalid path, media could not be recorded")
+
+                    onEncounteredError(error)
+
+                    player.record(null)
+                }
+            } else {
+                player.record(null)
             }
         }
     }

@@ -12,6 +12,7 @@ import {
   type MediaTracks,
   type MediaInfo,
   type Dialog,
+  type Recording,
 } from "./LibVlcPlayer.types";
 import { parseSource } from "./utils/assets";
 import { converNativeEvent } from "./utils/events";
@@ -66,6 +67,14 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       }
     };
 
+    const onRecordChanged = (event: NativeEvent<Recording>) => {
+      if (props.onRecordChanged) {
+        const nativeEvent = converNativeEvent(event);
+
+        props.onRecordChanged(nativeEvent);
+      }
+    };
+
     const onDialogDisplay = (event: NativeEvent<Dialog>) => {
       if (props.onDialogDisplay) {
         const nativeEvent = converNativeEvent(event);
@@ -95,6 +104,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         onTimeChanged={onTimeChanged}
         onPositionChanged={onPositionChanged}
         onESAdded={onESAdded}
+        onRecordChanged={onRecordChanged}
         onDialogDisplay={onDialogDisplay}
         onFirstPlay={onFirstPlay}
       />

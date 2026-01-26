@@ -82,4 +82,26 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             onPositionChanged(position)
         }
     }
+
+    func mediaPlayerStartedRecording(_: VLCMediaPlayer) {
+        var recording = Recording()
+
+        recording = Recording(
+            path: nil,
+            isRecording: true,
+        )
+
+        onRecordChanged(recording)
+    }
+
+    func mediaPlayer(_: VLCMediaPlayer, recordingStoppedAtPath path: String) {
+        var recording = Recording()
+
+        recording = Recording(
+            path: path,
+            isRecording: false,
+        )
+
+        onRecordChanged(recording)
+    }
 }

@@ -1,5 +1,6 @@
 package expo.modules.libvlcplayer
 
+import expo.modules.libvlcplayer.records.Recording
 import org.videolan.libvlc.MediaPlayer.Event
 import org.videolan.libvlc.MediaPlayer.EventListener
 
@@ -93,6 +94,21 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         val mediaTracks = getMediaTracks()
 
                         onESAdded(mediaTracks)
+                    }
+
+                    Event.RecordChanged -> {
+                        var recording = Recording()
+
+                        val path = event.getRecordPath()
+                        val isRecording = event.getRecording()
+
+                        recording =
+                            Recording(
+                                path = path,
+                                isRecording = isRecording,
+                            )
+
+                        onRecordChanged(recording)
                     }
                 }
             },

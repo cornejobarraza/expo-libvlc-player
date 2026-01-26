@@ -39,6 +39,7 @@ class LibVlcPlayerView: ExpoView {
     let onTimeChanged = EventDispatcher()
     let onPositionChanged = EventDispatcher()
     let onESAdded = EventDispatcher()
+    let onRecordChanged = EventDispatcher()
     let onDialogDisplay = EventDispatcher()
     let onFirstPlay = EventDispatcher()
     let onBackground = EventDispatcher()
@@ -90,9 +91,7 @@ class LibVlcPlayerView: ExpoView {
         }
 
         mediaPlayer!.media = VLCMedia(url: url)
-
         addPlayerSlaves()
-
         mediaPlayer!.play()
 
         shouldCreate = false
@@ -310,6 +309,7 @@ class LibVlcPlayerView: ExpoView {
         didSet {
             if options.hasAudioOption() {
                 let error = ["error": "Audio disabled via options"]
+
                 onEncounteredError(error)
             }
 
@@ -326,6 +326,7 @@ class LibVlcPlayerView: ExpoView {
         didSet {
             if options.hasAudioOption() {
                 let error = ["error": "Audio disabled via options"]
+
                 onEncounteredError(error)
             }
 
@@ -348,6 +349,7 @@ class LibVlcPlayerView: ExpoView {
         didSet {
             if options.hasRepeatOption() {
                 let error = ["error": "Repeat enabled via options"]
+
                 onEncounteredError(error)
             }
         }
@@ -399,6 +401,25 @@ class LibVlcPlayerView: ExpoView {
                 } else {
                     time = Int(value)
                 }
+            }
+        }
+    }
+
+    func record(_ path: String?) {
+        if let player = mediaPlayer, player.isPlaying {
+            if let path = path {
+                // https://code.videolan.org/videolan/VLCKit/-/issues/394
+                let success = !player.startRecording(atPath: path)
+
+                if !success {
+                    let error = ["error": "Invalid path, media could not be recorded"]
+
+                    onEncounteredError(error)
+
+                    player.stopRecording()
+                }
+            } else {
+                player.stopRecording()
             }
         }
     }

@@ -9,6 +9,7 @@ private let encounteredErrorEvent = "onEncounteredError"
 private let timeChangedEvent = "onTimeChanged"
 private let positionChangedEvent = "onPositionChanged"
 private let esAddedEvent = "onESAdded"
+private let recordChangedEvent = "onRecordChanged"
 private let dialogDisplayEvent = "onDialogDisplay"
 private let firstPlayEvent = "onFirstPlay"
 private let backgroundEvent = "onBackground"
@@ -23,6 +24,7 @@ let playerEvents = [
     timeChangedEvent,
     positionChangedEvent,
     esAddedEvent,
+    recordChangedEvent,
     dialogDisplayEvent,
     firstPlayEvent,
     backgroundEvent,
@@ -113,6 +115,10 @@ public class LibVlcPlayerModule: Module {
 
             AsyncFunction("seek") { (view: LibVlcPlayerView, value: Double, type: String?) in
                 view.seek(value, type ?? "position")
+            }
+
+            AsyncFunction("record") { (view: LibVlcPlayerView, path: String?) in
+                view.record(path)
             }
 
             AsyncFunction("postAction") { (view: LibVlcPlayerView, action: Int) in
