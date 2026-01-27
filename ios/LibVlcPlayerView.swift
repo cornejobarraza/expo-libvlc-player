@@ -16,6 +16,12 @@ let playerVolumeStep: Int = 10
 
 let dialogCustomUI: Bool = true
 
+enum ResizeMode: String {
+    case contain
+    case cover
+    case fill
+}
+
 class LibVlcPlayerView: ExpoView {
     private let playerView = UIView()
 
@@ -60,7 +66,13 @@ class LibVlcPlayerView: ExpoView {
     }
 
     override func layoutSubviews() {
+        super.layoutSubviews()
         playerView.frame = bounds
+
+        // Reapply resize mode when view size changes (e.g., rotation)
+        if mediaPlayer != nil {
+            applyResizeMode()
+        }
     }
 
     func createPlayer() {
@@ -203,7 +215,7 @@ class LibVlcPlayerView: ExpoView {
                 height: Int(video.height),
                 length: Double(length),
                 seekable: seekable,
-                tracks: mediaTracks,
+                tracks: mediaTracks
             )
 
             mediaLength = length
@@ -232,15 +244,21 @@ class LibVlcPlayerView: ExpoView {
                 player.time = VLCTime(int: Int32(time))
             }
 
-            if scale != defaultPlayerScale {
-                player.scaleFactor = scale
-            }
+            // Apply scale and aspectRatio only if contentFit is contain (default)
+            // Otherwise, applyResizeMode() will manage these settings
+            if contentFit == .contain {
+                if scale != defaultPlayerScale {
+                    player.scaleFactor = scale
+                }
 
-            if let aspectRatio = aspectRatio {
-                aspectRatio.withCString { cString in
-                    player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+                if let aspectRatio = aspectRatio {
+                    aspectRatio.withCString { cString in
+                        player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+                    }
                 }
             }
+
+            applyResizeMode()
 
             time = defaultPlayerTime
         }
@@ -281,18 +299,84 @@ class LibVlcPlayerView: ExpoView {
 
     var scale: Float = defaultPlayerScale {
         didSet {
-            mediaPlayer?.scaleFactor = scale
+            // Only apply scale directly if contentFit is contain (default)
+            // Otherwise, contentFit manages scaleFactor
+            if contentFit == .contain {
+                mediaPlayer?.scaleFactor = scale
+            }
         }
     }
 
     var aspectRatio: String? {
         didSet {
-            if let aspectRatio = aspectRatio {
-                aspectRatio.withCString { cString in
-                    mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+            // Only apply aspectRatio directly if contentFit is contain (default)
+            // Otherwise, contentFit manages videoAspectRatio
+            if contentFit == .contain {
+                if let aspectRatio = aspectRatio {
+                    aspectRatio.withCString { cString in
+                        mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+                    }
+                } else {
+                    mediaPlayer?.videoAspectRatio = nil
+                }
+            }
+        }
+    }
+
+    var contentFit: ResizeMode = .contain {
+        didSet {
+            applyResizeMode()
+        }
+    }
+
+    func applyResizeMode() {
+        guard let player = mediaPlayer else { return }
+
+        // Clear previous settings first to avoid conflicts
+        player.videoAspectRatio = nil
+        player.videoCropGeometry = nil
+        player.scaleFactor = 0.0
+
+        // Guard against invalid bounds - will be reapplied in layoutSubviews when bounds are set
+        guard bounds.width > 0, bounds.height > 0 else { return }
+
+        switch contentFit {
+        case .contain:
+            // Already cleared above, nothing more needed
+            break
+
+        case .cover:
+            // Aspect fill - video fills view, may crop edges
+            let videoSize = player.videoSize
+            guard videoSize.width > 0, videoSize.height > 0 else {
+                // Video not ready yet, will be applied on esAdded or in setupPlayer()
+                return
+            }
+
+            let viewAspect = bounds.width / bounds.height
+            let videoAspect = videoSize.width / videoSize.height
+
+            if videoAspect > viewAspect {
+                // Video is wider - crop width
+                let cropWidth = Int(videoSize.height * viewAspect)
+                let cropGeometry = "\(cropWidth):\(Int(videoSize.height))"
+                cropGeometry.withCString { cString in
+                    player.videoCropGeometry = UnsafeMutablePointer(mutating: cString)
                 }
             } else {
-                mediaPlayer?.videoAspectRatio = nil
+                // Video is taller - crop height
+                let cropHeight = Int(videoSize.width / viewAspect)
+                let cropGeometry = "\(Int(videoSize.width)):\(cropHeight)"
+                cropGeometry.withCString { cString in
+                    player.videoCropGeometry = UnsafeMutablePointer(mutating: cString)
+                }
+            }
+
+        case .fill:
+            // Stretch to fill - ignore aspect ratio
+            let aspectRatio = "\(Int(bounds.width)):\(Int(bounds.height))"
+            aspectRatio.withCString { cString in
+                player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
             }
         }
     }

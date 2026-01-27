@@ -11,7 +11,7 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
     ) {
         let dialog = Dialog(
             title: title,
-            text: message,
+            text: message
         )
 
         onDialogDisplay(dialog)
@@ -28,7 +28,7 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
 
         let dialog = Dialog(
             title: title,
-            text: message,
+            text: message
         )
 
         onDialogDisplay(dialog)

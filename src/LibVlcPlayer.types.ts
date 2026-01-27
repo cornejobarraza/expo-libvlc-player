@@ -196,6 +196,7 @@ export interface LibVlcPlayerViewNativeProps {
   slaves?: Slave[];
   scale?: number;
   aspectRatio?: string | null;
+  contentFit?: "contain" | "cover" | "fill";
   rate?: number;
   time?: number;
   volume?: number;
@@ -284,6 +285,15 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * @default undefined
    */
   aspectRatio?: string | null;
+  /**
+   * Sets how the video content should be resized to fit its container.
+   * Valid options are `contain`, `cover`, or `fill`.
+   *
+   * @example "cover"
+   *
+   * @default "contain"
+   */
+  contentFit?: "contain" | "cover" | "fill";
   /**
    * Sets the player rate. Must be a float equal or greater than `1`
    *

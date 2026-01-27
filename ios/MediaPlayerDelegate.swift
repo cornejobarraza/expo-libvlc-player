@@ -53,6 +53,10 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             case .esAdded:
                 let mediaTracks = getMediaTracks()
 
+                // Reapply resize mode now that video tracks are available
+                // This handles the case where contentFit=cover was set before video size was known
+                applyResizeMode()
+
                 onESAdded(mediaTracks)
             default:
                 break

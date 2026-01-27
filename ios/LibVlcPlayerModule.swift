@@ -65,6 +65,14 @@ public class LibVlcPlayerModule: Module {
                 view.aspectRatio = aspectRatio
             }
 
+            Prop("contentFit") { (view: LibVlcPlayerView, contentFit: String?) in
+                if let contentFit = contentFit, let mode = ResizeMode(rawValue: contentFit) {
+                    view.contentFit = mode
+                } else {
+                    view.contentFit = .contain
+                }
+            }
+
             Prop("rate") { (view: LibVlcPlayerView, rate: Float?) in
                 view.rate = rate ?? defaultPlayerRate
             }

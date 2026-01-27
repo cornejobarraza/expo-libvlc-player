@@ -54,6 +54,9 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
   const [volume, setVolume] = useState<number>(MAX_VOLUME_LEVEL);
   const [mute, setMute] = useState<boolean>(false);
   const [repeat, setRepeat] = useState<boolean>(false);
+  const [contentFit, setContentFit] = useState<"contain" | "cover" | "fill">(
+    "contain",
+  );
 
   const [isBuffering, setIsBuffering] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -176,6 +179,14 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
 
   const handleMute = () => setMute((prev) => !prev);
 
+  const handleContentFitChange = () => {
+    setContentFit((prev) => {
+      if (prev === "contain") return "cover";
+      if (prev === "cover") return "fill";
+      return "contain";
+    });
+  };
+
   const handleErrorState = () => {
     deactivateKeepAwake();
     setTime(0);
@@ -220,12 +231,13 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
         )}
         <LibVlcPlayerView
           ref={playerViewRef}
-          style={{ height: "100%" }}
+          style={{ width: "100%", height: "100%" }}
           source={!isError ? media.url : null}
           options={VLC_OPTIONS}
           volume={volume}
           mute={mute}
           repeat={repeat}
+          contentFit={contentFit}
           {...playerEvents}
         />
       </View>
@@ -281,6 +293,14 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
             disabled={volume === MAX_VOLUME_LEVEL}
           />
         </View>
+        <View style={styles.buttons}>
+          <PlayerControl
+            icon="expand"
+            size={18}
+            onPress={handleContentFitChange}
+          />
+          <Text style={styles.contentFitLabel}>{contentFit}</Text>
+        </View>
         {floating && (
           <View style={styles.toolbar}>
             <FontAwesome5
@@ -305,7 +325,7 @@ const styles = StyleSheet.create({
   video: {
     position: "relative",
     backgroundColor: "black",
-    aspectRatio: 16 / 9,
+    aspectRatio: 1,
   },
   controls: {
     backgroundColor: "white",
@@ -332,5 +352,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: -16,
+  },
+  contentFitLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    color: "gray",
   },
 });
