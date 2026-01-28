@@ -16,6 +16,7 @@ private const val TIME_CHANGED_EVENT = "onTimeChanged"
 private const val POSITION_CHANGED_EVENT = "onPositionChanged"
 private const val ES_ADDED_EVENT = "onESAdded"
 private const val RECORD_CHANGED_EVENT = "onRecordChanged"
+private const val SNAPSHOT_TAKEN_EVENT = "onSnapshotTaken"
 private const val DIALOG_DISPLAY_EVENT = "onDialogDisplay"
 private const val FIRST_PLAY_EVENT = "onFirstPlay"
 private const val BACKGROUND_EVENT = "onBackground"
@@ -32,6 +33,7 @@ val playerEvents =
         POSITION_CHANGED_EVENT,
         ES_ADDED_EVENT,
         RECORD_CHANGED_EVENT,
+        SNAPSHOT_TAKEN_EVENT,
         DIALOG_DISPLAY_EVENT,
         FIRST_PLAY_EVENT,
         BACKGROUND_EVENT,
@@ -136,6 +138,10 @@ class LibVlcPlayerModule : Module() {
 
                 AsyncFunction("record") { view: LibVlcPlayerView, path: String? ->
                     view.record(path)
+                }
+
+                AsyncFunction("snapshot") { view: LibVlcPlayerView, path: String ->
+                    view.snapshot(path)
                 }
 
                 AsyncFunction("postAction") { view: LibVlcPlayerView, action: Int ->

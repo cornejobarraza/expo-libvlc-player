@@ -60,7 +60,6 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                     Event.EncounteredError -> {
                         val error = mapOf("error" to "Media player encountered an error")
-
                         onEncounteredError(error)
 
                         firstPlay = true
@@ -69,7 +68,6 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                     Event.TimeChanged -> {
                         val time = mapOf("time" to player.getTime().toInt())
-
                         onTimeChanged(time)
 
                         if (firstTime) {
@@ -86,13 +84,11 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                     Event.PositionChanged -> {
                         val position = mapOf("position" to player.getPosition())
-
                         onPositionChanged(position)
                     }
 
                     Event.ESAdded -> {
                         val mediaTracks = getMediaTracks()
-
                         onESAdded(mediaTracks)
                     }
 

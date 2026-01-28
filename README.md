@@ -133,7 +133,8 @@ See the [Example App](example/components/PlayerView.tsx) for additional usage.
 | `pause()`                                          | Pauses playback of the current player                                                                                         |
 | `stop()`                                           | Stops playback of the current player                                                                                          |
 | `seek(value: number, type?: "position" \| "time")` | Sets the position or time of the current player. Must be a number equal or greater than `0` and type defaults to `"position"` |
-| `record(path: string \| null)`                     | Starts or stops recording the current media. Must be a valid string or `null`                                                 |
+| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid string                                                           |
+| `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid string                                                                 |
 | `postAction(action: number)`                       | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                                    |
 | `dismiss()`                                        | Dismisses a [`Dialog`](#dialog)                                                                                               |
 
@@ -172,6 +173,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`        |
 | `onESAdded`          | Called after the `ESAdded` player event          | [`MediaTracks`](#mediatracks) |
 | `onRecordChanged`    | Called after the `RecordChanged` player event    | [`Recording`](#recording)     |
+| `onSnapshotTaken`    | Called after a media snapshot is taken           | `{ path: string }`            |
 | `onDialogDisplay`    | Called after a `Dialog` needs to be displayed    | [`Dialog`](#dialog)           |
 | `onFirstPlay`        | Called after the player first playing event      | [`MediaInfo`](#mediainfo)     |
 | `onBackground`       | Called after the player enters the background    |                               |

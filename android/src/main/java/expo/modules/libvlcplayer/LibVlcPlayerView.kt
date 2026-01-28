@@ -1,7 +1,13 @@
 package expo.modules.libvlcplayer
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.view.PixelCopy
+import android.view.Surface
+import android.view.TextureView
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
@@ -19,7 +25,11 @@ import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.interfaces.IMedia
 import org.videolan.libvlc.util.DisplayManager
 import org.videolan.libvlc.util.VLCVideoLayout
+import java.io.File
+import java.io.FileOutputStream
 import java.net.URI
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import org.videolan.libvlc.Dialog as VLCDialog
 
 const val DEFAULT_PLAYER_RATE: Float = 1f
@@ -65,6 +75,7 @@ class LibVlcPlayerView(
     internal val onPositionChanged by EventDispatcher()
     internal val onESAdded by EventDispatcher<MediaTracks>()
     internal val onRecordChanged by EventDispatcher<Recording>()
+    internal val onSnapshotTaken by EventDispatcher()
     internal val onDialogDisplay by EventDispatcher<Dialog>()
     internal val onFirstPlay by EventDispatcher<MediaInfo>()
     internal val onBackground by EventDispatcher<Unit>()
@@ -349,7 +360,6 @@ class LibVlcPlayerView(
 
             if (options.hasAudioOption()) {
                 val error = mapOf("error" to "Audio disabled via options")
-
                 onEncounteredError(error)
             }
 
@@ -367,7 +377,6 @@ class LibVlcPlayerView(
 
             if (options.hasAudioOption()) {
                 val error = mapOf("error" to "Audio disabled via options")
-
                 onEncounteredError(error)
             }
 
@@ -394,7 +403,6 @@ class LibVlcPlayerView(
 
             if (options.hasRepeatOption()) {
                 val error = mapOf("error" to "Repeat enabled via options")
-
                 onEncounteredError(error)
             }
         }
@@ -463,14 +471,54 @@ class LibVlcPlayerView(
                 val success = player.record(path)
 
                 if (!success) {
-                    val error = mapOf("error" to "Invalid path, media could not be recorded")
-
+                    val error = mapOf("error" to "Media could not be recorded")
                     onEncounteredError(error)
 
                     player.record(null)
                 }
             } else {
                 player.record(null)
+            }
+        }
+    }
+
+    fun snapshot(path: String) {
+        mediaPlayer?.let { player ->
+            try {
+                val textureView = playerView.findViewById<TextureView>(org.videolan.R.id.texture_video) ?: throw Exception()
+
+                val video = player.getCurrentVideoTrack()
+                val width = video.width ?: 0
+                val height = video.height ?: 0
+
+                val surface = Surface(textureView.surfaceTexture)
+                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+
+                PixelCopy.request(
+                    surface,
+                    bitmap,
+                    { copyResult ->
+                        if (copyResult != PixelCopy.SUCCESS) {
+                            throw Exception()
+                        }
+
+                        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'")
+                        val timestamp = Calendar.getInstance().time
+                        val snapshotPath = path + "/vlc-snapshot-${simpleDateFormat.format(timestamp)}.jpg"
+                        val file = File(snapshotPath)
+
+                        FileOutputStream(file).use { stream ->
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                        }
+
+                        val path = mapOf("path" to snapshotPath)
+                        onSnapshotTaken(path)
+                    },
+                    Handler(Looper.getMainLooper()),
+                )
+            } catch (_: Exception) {
+                val error = mapOf("error" to "Media snapshot could not be taken")
+                onEncounteredError(error)
             }
         }
     }

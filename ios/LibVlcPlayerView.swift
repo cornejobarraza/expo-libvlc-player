@@ -40,6 +40,7 @@ class LibVlcPlayerView: ExpoView {
     let onPositionChanged = EventDispatcher()
     let onESAdded = EventDispatcher()
     let onRecordChanged = EventDispatcher()
+    let onSnapshotTaken = EventDispatcher()
     let onDialogDisplay = EventDispatcher()
     let onFirstPlay = EventDispatcher()
     let onBackground = EventDispatcher()
@@ -309,7 +310,6 @@ class LibVlcPlayerView: ExpoView {
         didSet {
             if options.hasAudioOption() {
                 let error = ["error": "Audio disabled via options"]
-
                 onEncounteredError(error)
             }
 
@@ -326,7 +326,6 @@ class LibVlcPlayerView: ExpoView {
         didSet {
             if options.hasAudioOption() {
                 let error = ["error": "Audio disabled via options"]
-
                 onEncounteredError(error)
             }
 
@@ -349,7 +348,6 @@ class LibVlcPlayerView: ExpoView {
         didSet {
             if options.hasRepeatOption() {
                 let error = ["error": "Repeat enabled via options"]
-
                 onEncounteredError(error)
             }
         }
@@ -412,8 +410,7 @@ class LibVlcPlayerView: ExpoView {
                 let success = !player.startRecording(atPath: path)
 
                 if !success {
-                    let error = ["error": "Invalid path, media could not be recorded"]
-
+                    let error = ["error": "Media could not be recorded"]
                     onEncounteredError(error)
 
                     player.stopRecording()
@@ -421,6 +418,26 @@ class LibVlcPlayerView: ExpoView {
             } else {
                 player.stopRecording()
             }
+        }
+    }
+
+    func snapshot(_ path: String) {
+        if let player = mediaPlayer {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
+            let snapshotPath = path + "/vlc-snapshot-\(dateFormatter.string(from: Date())).jpg"
+
+            let video = player.videoSize
+            let width = Int32(video.width)
+            let height = Int32(video.height)
+
+            player.saveVideoSnapshot(at: snapshotPath, withWidth: width, andHeight: height)
+
+            let path = ["path": snapshotPath]
+            onSnapshotTaken(path)
+        } else {
+            let error = ["error": "Media snapshot could not be taken"]
+            onEncounteredError(error)
         }
     }
 

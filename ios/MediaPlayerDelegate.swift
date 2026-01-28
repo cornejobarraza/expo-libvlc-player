@@ -45,14 +45,12 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 }
             case .error:
                 let error = ["error": "Media player encountered an error"]
-
                 onEncounteredError(error)
 
                 firstPlay = true
                 firstTime = true
             case .esAdded:
                 let mediaTracks = getMediaTracks()
-
                 onESAdded(mediaTracks)
             default:
                 break
@@ -63,7 +61,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     func mediaPlayerTimeChanged(_: Notification) {
         if let player = mediaPlayer {
             let time = ["time": player.time.intValue]
-
             onTimeChanged(time)
 
             if firstTime {
@@ -78,7 +75,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             }
 
             let position = ["position": player.position]
-
             onPositionChanged(position)
         }
     }

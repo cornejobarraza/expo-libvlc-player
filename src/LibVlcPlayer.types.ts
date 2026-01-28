@@ -31,11 +31,19 @@ export interface LibVlcPlayerViewRef {
   /**
    * Starts or stops recording the current media
    *
-   * @param path - Must be a valid string or `null`
+   * @param path - Must be a valid string
    *
    * @returns A promise which resolves to `void`
    */
-  readonly record: (path: string | null) => Promise<void>;
+  readonly record: (path?: string) => Promise<void>;
+  /**
+   * Takes a snapshot of the current media
+   *
+   * @param path - Must be a valid string
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly snapshot: (path: string) => Promise<void>;
   /**
    * Posts an answer to a `Dialog`
    *
@@ -170,6 +178,13 @@ type ESAddedListener = (event: NativeEvent<MediaTracks>) => void;
  */
 type RecordChangedListener = (event: NativeEvent<Recording>) => void;
 
+export type Snapshot = { path: string };
+
+/**
+ * @hidden
+ */
+type SnapshotTakenListener = (event: NativeEvent<Snapshot>) => void;
+
 /**
  * @hidden
  */
@@ -214,6 +229,7 @@ export interface LibVlcPlayerViewNativeProps {
   onPositionChanged?: PositionChangedListener;
   onESAdded?: ESAddedListener;
   onRecordChanged?: RecordChangedListener;
+  onSnapshotTaken?: SnapshotTakenListener;
   onDialogDisplay?: DialogDisplayListener;
   onFirstPlay?: FirstPlayListener;
   onBackground?: BackgroundListener;
@@ -372,6 +388,10 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Called after the `RecordChanged` player event
    */
   onRecordChanged?: (event: Recording) => void;
+  /**
+   * Called after a media snapshot is taken
+   */
+  onSnapshotTaken?: (event: Snapshot) => void;
   /**
    * Called after a `Dialog` needs to be displayed
    */

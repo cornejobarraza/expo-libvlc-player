@@ -5,14 +5,15 @@ import {
   LibVlcPlayerViewNativeProps,
   LibVlcPlayerViewProps,
   LibVlcPlayerViewRef,
-  type NativeEvent,
-  type Error,
-  type Time,
-  type Position,
-  type MediaTracks,
-  type MediaInfo,
   type Dialog,
+  type Error,
+  type MediaInfo,
+  type MediaTracks,
+  type NativeEvent,
+  type Position,
   type Recording,
+  type Snapshot,
+  type Time,
 } from "./LibVlcPlayer.types";
 import { parseSource } from "./utils/assets";
 import { converNativeEvent } from "./utils/events";
@@ -38,7 +39,6 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
     const onEncounteredError = (event: NativeEvent<Error>) => {
       if (props.onEncounteredError) {
         const nativeEvent = converNativeEvent(event);
-
         props.onEncounteredError(nativeEvent);
       }
     };
@@ -46,7 +46,6 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
     const onTimeChanged = (event: NativeEvent<Time>) => {
       if (props.onTimeChanged) {
         const nativeEvent = converNativeEvent(event);
-
         props.onTimeChanged(nativeEvent);
       }
     };
@@ -54,7 +53,6 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
     const onPositionChanged = (event: NativeEvent<Position>) => {
       if (props.onPositionChanged) {
         const nativeEvent = converNativeEvent(event);
-
         props.onPositionChanged(nativeEvent);
       }
     };
@@ -62,7 +60,6 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
     const onESAdded = (event: NativeEvent<MediaTracks>) => {
       if (props.onESAdded) {
         const nativeEvent = converNativeEvent(event);
-
         props.onESAdded(nativeEvent);
       }
     };
@@ -70,15 +67,20 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
     const onRecordChanged = (event: NativeEvent<Recording>) => {
       if (props.onRecordChanged) {
         const nativeEvent = converNativeEvent(event);
-
         props.onRecordChanged(nativeEvent);
+      }
+    };
+
+    const onSnapshotTaken = (event: NativeEvent<Snapshot>) => {
+      if (props.onSnapshotTaken) {
+        const nativeEvent = converNativeEvent(event);
+        props.onSnapshotTaken(nativeEvent);
       }
     };
 
     const onDialogDisplay = (event: NativeEvent<Dialog>) => {
       if (props.onDialogDisplay) {
         const nativeEvent = converNativeEvent(event);
-
         props.onDialogDisplay(nativeEvent);
       }
     };
@@ -86,7 +88,6 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
     const onFirstPlay = (event: NativeEvent<MediaInfo>) => {
       if (props.onFirstPlay) {
         const nativeEvent = converNativeEvent(event);
-
         props.onFirstPlay(nativeEvent);
       }
     };
@@ -105,6 +106,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         onPositionChanged={onPositionChanged}
         onESAdded={onESAdded}
         onRecordChanged={onRecordChanged}
+        onSnapshotTaken={onSnapshotTaken}
         onDialogDisplay={onDialogDisplay}
         onFirstPlay={onFirstPlay}
       />

@@ -10,6 +10,7 @@ private let timeChangedEvent = "onTimeChanged"
 private let positionChangedEvent = "onPositionChanged"
 private let esAddedEvent = "onESAdded"
 private let recordChangedEvent = "onRecordChanged"
+private let snapshotTakenEvent = "onSnapshotTaken"
 private let dialogDisplayEvent = "onDialogDisplay"
 private let firstPlayEvent = "onFirstPlay"
 private let backgroundEvent = "onBackground"
@@ -25,6 +26,7 @@ let playerEvents = [
     positionChangedEvent,
     esAddedEvent,
     recordChangedEvent,
+    snapshotTakenEvent,
     dialogDisplayEvent,
     firstPlayEvent,
     backgroundEvent,
@@ -119,6 +121,10 @@ public class LibVlcPlayerModule: Module {
 
             AsyncFunction("record") { (view: LibVlcPlayerView, path: String?) in
                 view.record(path)
+            }
+
+            AsyncFunction("snapshot") { (view: LibVlcPlayerView, path: String) in
+                view.snapshot(path)
             }
 
             AsyncFunction("postAction") { (view: LibVlcPlayerView, action: Int) in
