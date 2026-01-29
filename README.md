@@ -155,8 +155,8 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `volume`           | Sets the player volume. Must be an integer between `0` and `100`                                                                  | `100`       |
 | `mute`             | Sets the player volume to `0` when `true`. Previous value is set when `false`                                                     | `false`     |
 | `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
-| `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 | `playInBackground` | Determines whether the media should continue playing in the background                                                            | `false`     |
+| `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
 
 #### Callback props
@@ -169,13 +169,14 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onStopped`          | Called after the `Stopped` player event          |                               |
 | `onEndReached`       | Called after the `EndReached` player event       |                               |
 | `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`           |
+| `onDialogDisplay`    | Called after a `Dialog` needs to be displayed    | [`Dialog`](#dialog)           |
 | `onTimeChanged`      | Called after the `TimeChanged` player event      | `{ time: number }`            |
 | `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`        |
 | `onESAdded`          | Called after the `ESAdded` player event          | [`MediaTracks`](#mediatracks) |
 | `onRecordChanged`    | Called after the `RecordChanged` player event    | [`Recording`](#recording)     |
 | `onSnapshotTaken`    | Called after a media snapshot is taken           | `{ path: string }`            |
-| `onDialogDisplay`    | Called after a `Dialog` needs to be displayed    | [`Dialog`](#dialog)           |
 | `onFirstPlay`        | Called after the player first playing event      | [`MediaInfo`](#mediainfo)     |
+| `onForeground`       | Called after the player enters the foreground    |                               |
 | `onBackground`       | Called after the player enters the background    |                               |
 
 ### Player types
@@ -197,6 +198,27 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
   source: string | number;
   type: "audio" | "subtitle";
   selected?: boolean;
+}
+```
+
+#### `Dialog`
+
+```ts
+{
+  title: string;
+  text: string;
+  cancelText?: string;
+  action1Text?: string;
+  action2Text?: string;
+}
+```
+
+#### `Recording`
+
+```ts
+{
+  path: string | null;
+  isRecording: boolean;
 }
 ```
 
@@ -228,27 +250,6 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
   length: number;
   seekable: boolean;
   tracks: MediaTracks;
-}
-```
-
-#### `Recording`
-
-```ts
-{
-  path: string | null;
-  isRecording: boolean;
-}
-```
-
-#### `Dialog`
-
-```ts
-{
-  title: string;
-  text: string;
-  cancelText?: string;
-  action1Text?: string;
-  action2Text?: string;
 }
 ```
 

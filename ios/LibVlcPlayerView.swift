@@ -36,13 +36,14 @@ class LibVlcPlayerView: ExpoView {
     let onStopped = EventDispatcher()
     let onEndReached = EventDispatcher()
     let onEncounteredError = EventDispatcher()
+    let onDialogDisplay = EventDispatcher()
     let onTimeChanged = EventDispatcher()
     let onPositionChanged = EventDispatcher()
     let onESAdded = EventDispatcher()
     let onRecordChanged = EventDispatcher()
     let onSnapshotTaken = EventDispatcher()
-    let onDialogDisplay = EventDispatcher()
     let onFirstPlay = EventDispatcher()
+    let onForeground = EventDispatcher()
     let onBackground = EventDispatcher()
 
     required init(appContext: AppContext? = nil) {
@@ -344,18 +345,18 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
+    var playInBackground: Bool = false {
+        didSet {
+            MediaPlayerManager.shared.setAppropriateAudioSession()
+        }
+    }
+
     var shouldRepeat: Bool = false {
         didSet {
             if options.hasRepeatOption() {
                 let error = ["error": "Repeat enabled via options"]
                 onEncounteredError(error)
             }
-        }
-    }
-
-    var playInBackground: Bool = false {
-        didSet {
-            MediaPlayerManager.shared.setAppropriateAudioSession()
         }
     }
 

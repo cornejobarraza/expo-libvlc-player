@@ -90,6 +90,19 @@ export interface NativeEvent<T> {
 
 export type LibVlcEvent<T> = Omit<T & NativeEventProps, "target">;
 
+export interface Dialog {
+  title: string;
+  text: string;
+  cancelText?: string;
+  action1Text?: string;
+  action2Text?: string;
+}
+
+export interface Recording {
+  path: string | null;
+  isRecording: boolean;
+}
+
 export interface Track {
   id: number;
   name: string;
@@ -107,19 +120,6 @@ export interface MediaInfo {
   length: number;
   seekable: boolean;
   tracks: MediaTracks;
-}
-
-export interface Recording {
-  path: string | null;
-  isRecording: boolean;
-}
-
-export interface Dialog {
-  title: string;
-  text: string;
-  cancelText?: string;
-  action1Text?: string;
-  action2Text?: string;
 }
 
 /**
@@ -198,6 +198,11 @@ type FirstPlayListener = (event: NativeEvent<MediaInfo>) => void;
 /**
  * @hidden
  */
+type ForegroundListener = () => void;
+
+/**
+ * @hidden
+ */
 type BackgroundListener = () => void;
 
 /**
@@ -216,8 +221,8 @@ export interface LibVlcPlayerViewNativeProps {
   volume?: number;
   mute?: boolean;
   audioMixingMode?: AudioMixingMode;
-  repeat?: boolean;
   playInBackground?: boolean;
+  repeat?: boolean;
   autoplay?: boolean;
   onBuffering?: BufferingListener;
   onPlaying?: PlayingListener;
@@ -225,13 +230,14 @@ export interface LibVlcPlayerViewNativeProps {
   onStopped?: StoppedListener;
   onEndReached?: EndReachedListener;
   onEncounteredError?: EncounteredErrorListener;
+  onDialogDisplay?: DialogDisplayListener;
   onTimeChanged?: TimeChangedListener;
   onPositionChanged?: PositionChangedListener;
   onESAdded?: ESAddedListener;
   onRecordChanged?: RecordChangedListener;
   onSnapshotTaken?: SnapshotTakenListener;
-  onDialogDisplay?: DialogDisplayListener;
   onFirstPlay?: FirstPlayListener;
+  onForeground?: ForegroundListener;
   onBackground?: BackgroundListener;
 }
 
@@ -331,17 +337,17 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   audioMixingMode?: AudioMixingMode;
   /**
-   * Determines whether the media should repeat once ended
-   *
-   * @default false
-   */
-  repeat?: boolean;
-  /**
    * Determines whether the media should continue playing in the background
    *
    * @default false
    */
   playInBackground?: boolean;
+  /**
+   * Determines whether the media should repeat once ended
+   *
+   * @default false
+   */
+  repeat?: boolean;
   /**
    * Determines whether the media should autoplay once created
    *
@@ -373,6 +379,10 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   onEncounteredError?: (event: Error) => void;
   /**
+   * Called after a `Dialog` needs to be displayed
+   */
+  onDialogDisplay?: (event: Dialog) => void;
+  /**
    * Called after the `TimeChanged` player event
    */
   onTimeChanged?: (event: Time) => void;
@@ -393,13 +403,13 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   onSnapshotTaken?: (event: Snapshot) => void;
   /**
-   * Called after a `Dialog` needs to be displayed
-   */
-  onDialogDisplay?: (event: Dialog) => void;
-  /**
    * Called after the player first playing event
    */
   onFirstPlay?: (event: MediaInfo) => void;
+  /**
+   * Called after the player enters the foreground
+   */
+  onForeground?: () => void;
   /**
    * Called after the player enters the background
    */

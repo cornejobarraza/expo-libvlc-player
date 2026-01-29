@@ -43,6 +43,13 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       }
     };
 
+    const onDialogDisplay = (event: NativeEvent<Dialog>) => {
+      if (props.onDialogDisplay) {
+        const nativeEvent = converNativeEvent(event);
+        props.onDialogDisplay(nativeEvent);
+      }
+    };
+
     const onTimeChanged = (event: NativeEvent<Time>) => {
       if (props.onTimeChanged) {
         const nativeEvent = converNativeEvent(event);
@@ -78,13 +85,6 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       }
     };
 
-    const onDialogDisplay = (event: NativeEvent<Dialog>) => {
-      if (props.onDialogDisplay) {
-        const nativeEvent = converNativeEvent(event);
-        props.onDialogDisplay(nativeEvent);
-      }
-    };
-
     const onFirstPlay = (event: NativeEvent<MediaInfo>) => {
       if (props.onFirstPlay) {
         const nativeEvent = converNativeEvent(event);
@@ -102,12 +102,12 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
           source: parseSource(slave.source)!,
         }))}
         onEncounteredError={onEncounteredError}
+        onDialogDisplay={onDialogDisplay}
         onTimeChanged={onTimeChanged}
         onPositionChanged={onPositionChanged}
         onESAdded={onESAdded}
         onRecordChanged={onRecordChanged}
         onSnapshotTaken={onSnapshotTaken}
-        onDialogDisplay={onDialogDisplay}
         onFirstPlay={onFirstPlay}
       />
     );

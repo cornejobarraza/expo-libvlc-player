@@ -71,13 +71,14 @@ class LibVlcPlayerView(
     internal val onStopped by EventDispatcher<Unit>()
     internal val onEndReached by EventDispatcher<Unit>()
     internal val onEncounteredError by EventDispatcher()
+    internal val onDialogDisplay by EventDispatcher<Dialog>()
     internal val onTimeChanged by EventDispatcher()
     internal val onPositionChanged by EventDispatcher()
     internal val onESAdded by EventDispatcher<MediaTracks>()
     internal val onRecordChanged by EventDispatcher<Recording>()
     internal val onSnapshotTaken by EventDispatcher()
-    internal val onDialogDisplay by EventDispatcher<Dialog>()
     internal val onFirstPlay by EventDispatcher<MediaInfo>()
+    internal val onForeground by EventDispatcher<Unit>()
     internal val onBackground by EventDispatcher<Unit>()
 
     init {
@@ -397,6 +398,12 @@ class LibVlcPlayerView(
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
+    var playInBackground: Boolean = false
+        set(value) {
+            field = value
+            MediaPlayerManager.audioFocusManager.updateAudioFocus()
+        }
+
     var repeat: Boolean = false
         set(value) {
             field = value
@@ -405,12 +412,6 @@ class LibVlcPlayerView(
                 val error = mapOf("error" to "Repeat enabled via options")
                 onEncounteredError(error)
             }
-        }
-
-    var playInBackground: Boolean = false
-        set(value) {
-            field = value
-            MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
     var autoplay: Boolean = true

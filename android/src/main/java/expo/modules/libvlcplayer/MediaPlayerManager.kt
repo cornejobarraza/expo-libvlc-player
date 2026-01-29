@@ -31,7 +31,15 @@ object MediaPlayerManager {
         playerViews.removeAll { it.get() == view }
     }
 
-    fun onAppBackground() {
+    fun onPlayerForeground() {
+        playerViews.forEach { playerView ->
+            playerView.get()?.let { view ->
+                view.onForeground(Unit)
+            }
+        }
+    }
+
+    fun onPlayerBackground() {
         playerViews.forEach { playerView ->
             playerView.get()?.let { view ->
                 view.onBackground(Unit)

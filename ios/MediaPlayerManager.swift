@@ -19,7 +19,13 @@ class MediaPlayerManager {
         playerViews.remove(view)
     }
 
-    func onAppBackground() {
+    func onPlayerForeground() {
+        for view in playerViews.allObjects {
+            view.onForeground()
+        }
+    }
+
+    func onPlayerBackground() {
         for view in playerViews.allObjects {
             view.onBackground()
 

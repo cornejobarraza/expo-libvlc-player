@@ -12,13 +12,14 @@ private const val PAUSED_EVENT = "onPaused"
 private const val STOPPED_EVENT = "onStopped"
 private const val END_REACHED_EVENT = "onEndReached"
 private const val ENCOUNTERED_ERROR_EVENT = "onEncounteredError"
+private const val DIALOG_DISPLAY_EVENT = "onDialogDisplay"
 private const val TIME_CHANGED_EVENT = "onTimeChanged"
 private const val POSITION_CHANGED_EVENT = "onPositionChanged"
 private const val ES_ADDED_EVENT = "onESAdded"
 private const val RECORD_CHANGED_EVENT = "onRecordChanged"
 private const val SNAPSHOT_TAKEN_EVENT = "onSnapshotTaken"
-private const val DIALOG_DISPLAY_EVENT = "onDialogDisplay"
 private const val FIRST_PLAY_EVENT = "onFirstPlay"
+private const val FOREROUND_EVENT = "onForeground"
 private const val BACKGROUND_EVENT = "onBackground"
 
 val playerEvents =
@@ -29,13 +30,14 @@ val playerEvents =
         STOPPED_EVENT,
         END_REACHED_EVENT,
         ENCOUNTERED_ERROR_EVENT,
+        DIALOG_DISPLAY_EVENT,
         TIME_CHANGED_EVENT,
         POSITION_CHANGED_EVENT,
         ES_ADDED_EVENT,
         RECORD_CHANGED_EVENT,
         SNAPSHOT_TAKEN_EVENT,
-        DIALOG_DISPLAY_EVENT,
         FIRST_PLAY_EVENT,
+        FOREROUND_EVENT,
         BACKGROUND_EVENT,
     )
 
@@ -99,12 +101,12 @@ class LibVlcPlayerModule : Module() {
                     view.audioMixingMode = audioMixingMode ?: AudioMixingMode.AUTO
                 }
 
-                Prop("repeat") { view: LibVlcPlayerView, repeat: Boolean? ->
-                    view.repeat = repeat ?: false
-                }
-
                 Prop("playInBackground") { view: LibVlcPlayerView, playInBackground: Boolean? ->
                     view.playInBackground = playInBackground ?: false
+                }
+
+                Prop("repeat") { view: LibVlcPlayerView, repeat: Boolean? ->
+                    view.repeat = repeat ?: false
                 }
 
                 Prop("autoplay") { view: LibVlcPlayerView, autoplay: Boolean? ->
@@ -153,8 +155,12 @@ class LibVlcPlayerModule : Module() {
                 }
             }
 
+            OnActivityEntersForeground {
+                MediaPlayerManager.onPlayerForeground()
+            }
+
             OnActivityEntersBackground {
-                MediaPlayerManager.onAppBackground()
+                MediaPlayerManager.onPlayerBackground()
             }
         }
 }

@@ -6,13 +6,14 @@ private let pausedEvent = "onPaused"
 private let stoppedEvent = "onStopped"
 private let endReachedEvent = "onEndReached"
 private let encounteredErrorEvent = "onEncounteredError"
+private let dialogDisplayEvent = "onDialogDisplay"
 private let timeChangedEvent = "onTimeChanged"
 private let positionChangedEvent = "onPositionChanged"
 private let esAddedEvent = "onESAdded"
 private let recordChangedEvent = "onRecordChanged"
 private let snapshotTakenEvent = "onSnapshotTaken"
-private let dialogDisplayEvent = "onDialogDisplay"
 private let firstPlayEvent = "onFirstPlay"
+private let foregroundEvent = "onForeground"
 private let backgroundEvent = "onBackground"
 
 let playerEvents = [
@@ -22,13 +23,14 @@ let playerEvents = [
     stoppedEvent,
     endReachedEvent,
     encounteredErrorEvent,
+    dialogDisplayEvent,
     timeChangedEvent,
     positionChangedEvent,
     esAddedEvent,
     recordChangedEvent,
     snapshotTakenEvent,
-    dialogDisplayEvent,
     firstPlayEvent,
+    foregroundEvent,
     backgroundEvent,
 ]
 
@@ -87,12 +89,12 @@ public class LibVlcPlayerModule: Module {
                 view.audioMixingMode = audioMixingMode ?? .auto
             }
 
-            Prop("repeat") { (view: LibVlcPlayerView, shouldRepeat: Bool?) in
-                view.shouldRepeat = shouldRepeat ?? false
-            }
-
             Prop("playInBackground") { (view: LibVlcPlayerView, playInBackground: Bool?) in
                 view.playInBackground = playInBackground ?? false
+            }
+
+            Prop("repeat") { (view: LibVlcPlayerView, shouldRepeat: Bool?) in
+                view.shouldRepeat = shouldRepeat ?? false
             }
 
             Prop("autoplay") { (view: LibVlcPlayerView, autoplay: Bool?) in
@@ -136,8 +138,12 @@ public class LibVlcPlayerModule: Module {
             }
         }
 
+        OnAppEntersForeground {
+            MediaPlayerManager.shared.onPlayerForeground()
+        }
+
         OnAppEntersBackground {
-            MediaPlayerManager.shared.onAppBackground()
+            MediaPlayerManager.shared.onPlayerBackground()
         }
     }
 }

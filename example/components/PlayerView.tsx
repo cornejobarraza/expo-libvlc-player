@@ -107,7 +107,6 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
         handleErrorState();
       }
     },
-    onTimeChanged: ({ time }) => setTime(time),
     onDialogDisplay: ({
       title,
       text,
@@ -133,6 +132,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
 
       Alert.alert(title, text, alertButtons);
     },
+    onTimeChanged: ({ time }) => setTime(time),
     onFirstPlay: ({ length, seekable }) => {
       setLength(length);
       setSeekable(seekable);
