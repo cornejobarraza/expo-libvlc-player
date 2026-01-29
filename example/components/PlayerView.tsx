@@ -143,7 +143,7 @@ export const PlayerView = ({ floating = false }: PlayerViewProps) => {
   };
 
   const handleSlidingComplete = (value: number) => {
-    playerViewRef.current?.seek(value, "time");
+    playerViewRef.current?.seek(value);
     setTime(value);
     setInBackground(false);
   };

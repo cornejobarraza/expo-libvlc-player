@@ -116,7 +116,7 @@ public class LibVlcPlayerModule: Module {
             }
 
             AsyncFunction("seek") { (view: LibVlcPlayerView, value: Double, type: String?) in
-                view.seek(value, type ?? "position")
+                view.seek(value, type ?? "time")
             }
 
             AsyncFunction("record") { (view: LibVlcPlayerView, path: String?) in

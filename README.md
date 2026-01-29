@@ -29,7 +29,7 @@
 
 ### Installation
 
-Add the package to your npm dependencies
+Add the package to your npm dependencies.
 
 ```
 npm install expo-libvlc-player
@@ -67,7 +67,7 @@ https://developer.apple.com/documentation/technotes/tn3179-understanding-local-n
 
 On iOS, the `VLCKit` player experiences a small audio delay when resuming or muting media playback.
 
-This might be related to the internal clock used by the library core causing inaccurate position/time values.
+This might be related to the internal clock used by the library core causing inaccurate time values.
 
 https://code.videolan.org/videolan/VLCKit/-/issues/233
 
@@ -127,16 +127,16 @@ See the [Example App](example/components/PlayerView.tsx) for additional usage.
 
 ### Player methods
 
-| Method                                             | Description                                                                                                                   |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `play()`                                           | Starts playback of the current player                                                                                         |
-| `pause()`                                          | Pauses playback of the current player                                                                                         |
-| `stop()`                                           | Stops playback of the current player                                                                                          |
-| `seek(value: number, type?: "position" \| "time")` | Sets the position or time of the current player. Must be a number equal or greater than `0` and type defaults to `"position"` |
-| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid string                                                           |
-| `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid string                                                                 |
-| `postAction(action: number)`                       | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                                    |
-| `dismiss()`                                        | Dismisses a [`Dialog`](#dialog)                                                                                               |
+| Method                                             | Description                                                                                                            |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `play()`                                           | Starts playback of the current player                                                                                  |
+| `pause()`                                          | Pauses playback of the current player                                                                                  |
+| `stop()`                                           | Stops playback of the current player                                                                                   |
+| `seek(value: number, type?: "time" \| "position")` | Sets the time or position of the current player. Must be a number equal or greater than `0`, type defaults to `"time"` |
+| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid string                                                    |
+| `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid string                                                          |
+| `postAction(action: number)`                       | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                             |
+| `dismiss()`                                        | Dismisses a [`Dialog`](#dialog)                                                                                        |
 
 ### Player props
 

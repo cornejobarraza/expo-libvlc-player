@@ -20,14 +20,14 @@ export interface LibVlcPlayerViewRef {
    */
   readonly stop: () => Promise<void>;
   /**
-   * Sets the position or time of the current player
+   * Sets the time or position of the current player
    *
    * @param value - Must be a number equal or greater than `0`
-   * @param type - Defaults to `"position"`
+   * @param type - Defaults to `"time"`
    *
    * @returns A promise which resolves to `void`
    */
-  readonly seek: (value: number, type?: "position" | "time") => Promise<void>;
+  readonly seek: (value: number, type?: "time" | "position") => Promise<void>;
   /**
    * Starts or stops recording the current media
    *
