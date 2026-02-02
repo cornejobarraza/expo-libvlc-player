@@ -35,7 +35,7 @@
     "@eslint/js": "^9.30.0",
     "@types/react": "~19.0.0",
     "eslint": "^9.30.0",
-    "expo": "~53.0.25",
+    "expo": "~53.0.26",
     "expo-module-scripts": "^4.1.6",
     "globals": "^16.2.0",
     "husky": "^9.1.7",
