@@ -1,0 +1,151 @@
+import { LibVlcPlayerView, LibVlcPlayerViewRef } from "expo-libvlc-player";
+import { StatusBar } from "expo-status-bar";
+import { useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+import { IconSymbol } from "./components/IconSymbol";
+
+export default function App() {
+  const [buffering, setBuffering] = useState<boolean>(false);
+  const [playing, setPlaying] = useState<boolean>(true);
+  const [time, setTime] = useState<number>(0);
+  const [volume, setVolume] = useState<number>(100);
+
+  const playerRef = useRef<LibVlcPlayerViewRef | null>(null);
+  const bufferingRef = useRef<NodeJS.Timeout | null>(null);
+
+  return (
+    <View style={styles.app}>
+      <StatusBar style="light" />
+      <Text style={styles.title}>Big Buck Bunny</Text>
+      <View style={styles.container}>
+        {buffering && (
+          <ActivityIndicator
+            style={styles.buffering}
+            color="#f1f1f1"
+            size="large"
+          />
+        )}
+        <TouchableOpacity
+          style={styles.playback}
+          onPress={() => playerRef.current?.[!playing ? "play" : "pause"]()}
+        />
+        <LibVlcPlayerView
+          ref={playerRef}
+          style={styles.player}
+          source="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          volume={volume}
+          onBuffering={() => {
+            setBuffering(true);
+
+            if (bufferingRef.current) {
+              clearTimeout(bufferingRef.current);
+            }
+
+            bufferingRef.current = setTimeout(() => setBuffering(false), 1_000);
+          }}
+          onPlaying={() => setPlaying(true)}
+          onPaused={() => setPlaying(false)}
+          onStopped={() => setPlaying(false)}
+          onEncounteredError={() => Alert.alert("Something went wrong")}
+          onTimeChanged={({ time }) => setTime(time)}
+          audioMixingMode="doNotMix"
+        />
+      </View>
+      <View style={styles.buttons}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => playerRef.current?.seek(time - 5_000)}
+        >
+          <IconSymbol color="#f1f1f1" name="backward.fill" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setVolume((prev) => prev - 10)}
+          disabled={volume === 0}
+        >
+          <IconSymbol color="#f1f1f1" name="speaker.1.fill" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => playerRef.current?.[!playing ? "play" : "pause"]()}
+        >
+          <IconSymbol
+            color="#f1f1f1"
+            name={!playing ? "play.fill" : "pause.fill"}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => playerRef.current?.stop()}
+        >
+          <IconSymbol color="#f1f1f1" name="stop.fill" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setVolume((prev) => prev + 10)}
+          disabled={volume === 100}
+        >
+          <IconSymbol color="#f1f1f1" name="speaker.3.fill" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => playerRef.current?.seek(time + 5_000)}
+        >
+          <IconSymbol color="#f1f1f1" name="forward.fill" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  app: {
+    flex: 1,
+    backgroundColor: "#0f0f0f",
+    justifyContent: "center",
+    gap: 20,
+    padding: 24,
+  },
+  title: {
+    color: "#f1f1f1",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  container: {
+    position: "relative",
+    aspectRatio: 16 / 9,
+  },
+  buffering: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 9998,
+  },
+  playback: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "transparent",
+    zIndex: 9999,
+  },
+  player: {
+    backgroundColor: "black",
+    height: "100%",
+    borderRadius: 12,
+  },
+  buttons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 16,
+  },
+  button: {
+    backgroundColor: "#272727",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+});

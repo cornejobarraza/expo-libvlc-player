@@ -2,8 +2,8 @@
   "expo": {
     "name": "expo-libvlc-player-example",
     "slug": "expo-libvlc-player-example",
-    "scheme": "expo-libvlc-player-example",
     "version": "1.0.0",
+    "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -24,6 +24,6 @@
       "edgeToEdgeEnabled": true,
       "package": "expo.modules.libvlcplayer.example"
     },
-    "plugins": ["../app.plugin.js", "expo-router"]
+    "plugins": ["../app.plugin.js"]
   }
 }
