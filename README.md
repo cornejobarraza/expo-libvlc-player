@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <i>Screenshots taken from the <a href="example/components/PlayerView.tsx">Example App</a> on Android and iOS</i>
+  <i>Screenshots taken from the <a href="example/App.tsx">Example App</a> on Android and iOS</i>
 </p>
 
 ### Supported versions
@@ -123,7 +123,7 @@ return (
 );
 ```
 
-See the [Example App](example/components/PlayerView.tsx) for additional usage.
+See the [Example App](example/App.tsx) for additional usage.
 
 ### Player methods
 
