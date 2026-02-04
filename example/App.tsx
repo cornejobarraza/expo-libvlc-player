@@ -54,9 +54,8 @@ export default function App() {
           onPlaying={() => setPlaying(true)}
           onPaused={() => setPlaying(false)}
           onStopped={() => setPlaying(false)}
-          onEncounteredError={() => Alert.alert("Something went wrong")}
+          onEncounteredError={({ error }) => Alert.alert(error)}
           onTimeChanged={({ time }) => setTime(time)}
-          audioMixingMode="doNotMix"
         />
       </View>
       <View style={styles.buttons}>
