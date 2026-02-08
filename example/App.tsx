@@ -21,6 +21,16 @@ export default function App() {
   const playerRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingRef = useRef<NodeJS.Timeout | null>(null);
 
+  const handleBuffering = () => {
+    setBuffering(true);
+
+    if (bufferingRef.current) {
+      clearTimeout(bufferingRef.current);
+    }
+
+    bufferingRef.current = setTimeout(() => setBuffering(false), 1_000);
+  };
+
   return (
     <View style={styles.app}>
       <StatusBar style="light" />
@@ -42,15 +52,7 @@ export default function App() {
           style={styles.player}
           source="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
           volume={volume}
-          onBuffering={() => {
-            setBuffering(true);
-
-            if (bufferingRef.current) {
-              clearTimeout(bufferingRef.current);
-            }
-
-            bufferingRef.current = setTimeout(() => setBuffering(false), 1_000);
-          }}
+          onBuffering={handleBuffering}
           onPlaying={() => setPlaying(true)}
           onPaused={() => setPlaying(false)}
           onStopped={() => setPlaying(false)}
@@ -128,7 +130,6 @@ const styles = StyleSheet.create({
   },
   playback: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "transparent",
     zIndex: 9999,
   },
   player: {
