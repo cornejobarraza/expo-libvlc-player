@@ -38,6 +38,10 @@ public class LibVlcPlayerModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ExpoLibVlcPlayer")
 
+        AsyncFunction("triggerAlert") { () in
+            LocalNetworkAlert.shared.triggerLocalNetworkPrivacyAlert()
+        }
+
         OnDestroy {
             MediaPlayerManager.shared.onModuleDestroyed()
         }

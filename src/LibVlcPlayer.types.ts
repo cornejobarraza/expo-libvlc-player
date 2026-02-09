@@ -1,5 +1,7 @@
 import type { ViewProps } from "react-native";
 
+export type LibVlcPlayerModuleEvents = {};
+
 export interface LibVlcPlayerViewRef {
   /**
    * Starts playback of the current player
@@ -31,7 +33,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Starts or stops recording the current media
    *
-   * @param path - Must be a valid string
+   * @param path - Must be a valid string or `undefined` to stop recording
    *
    * @returns A promise which resolves to `void`
    */

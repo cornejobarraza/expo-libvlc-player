@@ -47,9 +47,9 @@ No additional configuration necessary.
 
 On Android, the `libvlcjni` player detaches from the View when surfaces are destroyed after switching screens.
 
-This causes nothing to be displayed when coming back to the player as native resources are released automatically.
-
 The current workaround attaches the View once surfaces are created but this results in a brief black screen.
+
+https://code.videolan.org/videolan/vlc-android/-/issues/1495
 
 ### Configure for iOS
 
@@ -61,7 +61,7 @@ On iOS, the `VLCKit` player seems to interact with the local network when playin
 
 Starting in iOS 14, a clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
 
-https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy#Essentials
+https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy
 
 #### Audio playback issue
 
@@ -123,9 +123,23 @@ return (
 );
 ```
 
+Manually attempt to trigger the local network privacy alert on iOS:
+
+```tsx
+import LibVlcPlayerModule from "expo-libvlc-player";
+
+await LibVlcPlayerModule.triggerAlert();
+```
+
 See the [Example App](example/App.tsx) for additional usage.
 
-### Player methods
+### Module methods
+
+| Method           | Description                                                |
+| ---------------- | ---------------------------------------------------------- |
+| `triggerAlert()` | Attempts to trigger the local network privacy alert on iOS |
+
+### View methods
 
 | Method                                             | Description                                                                                                            |
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -133,12 +147,12 @@ See the [Example App](example/App.tsx) for additional usage.
 | `pause()`                                          | Pauses playback of the current player                                                                                  |
 | `stop()`                                           | Stops playback of the current player                                                                                   |
 | `seek(value: number, type?: "time" \| "position")` | Sets the time or position of the current player. Must be a number equal or greater than `0`, type defaults to `"time"` |
-| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid string                                                    |
+| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid string or `undefined` to stop recording                   |
 | `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid string                                                          |
 | `postAction(action: number)`                       | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                             |
 | `dismiss()`                                        | Dismisses a [`Dialog`](#dialog)                                                                                        |
 
-### Player props
+### View props
 
 The `LibVlcPlayerView` extends React Native `ViewProps` and implements the following:
 
@@ -159,7 +173,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
 
-#### Callback props
+#### Callbacks
 
 | Prop                 | Description                                      | Payload                       |
 | -------------------- | ------------------------------------------------ | ----------------------------- |
@@ -179,7 +193,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onForeground`       | Called after the player enters the foreground    |                               |
 | `onBackground`       | Called after the player enters the background    |                               |
 
-### Player types
+### Types
 
 #### `Tracks`
 
@@ -264,7 +278,7 @@ For official VLC products and support, please visit [videolan.org](https://www.v
 
 ## Credits
 
-This library is heavily inspired by existing projects such as [expo-video](https://github.com/expo/expo/tree/main/packages/expo-video) and [react-native-vlc-media-player](https://github.com/razorRun/react-native-vlc-media-player).
+This library is inspired by existing projects such as [expo-video](https://github.com/expo/expo/tree/main/packages/expo-video) and [react-native-vlc-media-player](https://github.com/razorRun/react-native-vlc-media-player).
 
 ## Contributing
 
