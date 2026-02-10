@@ -38,12 +38,20 @@ public class LibVlcPlayerModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ExpoLibVlcPlayer")
 
-        AsyncFunction("triggerAlert") { () in
+        AsyncFunction("triggerAlert") {
             LocalNetworkManager.shared.triggerLocalNetworkPrivacyAlert()
         }
 
         OnDestroy {
             MediaPlayerManager.shared.onModuleDestroy()
+        }
+
+        OnAppEntersForeground {
+            MediaPlayerManager.shared.onModuleForeground()
+        }
+
+        OnAppEntersBackground {
+            MediaPlayerManager.shared.onModuleBackground()
         }
 
         View(LibVlcPlayerView.self) {
@@ -140,14 +148,6 @@ public class LibVlcPlayerModule: Module {
             AsyncFunction("dismiss") { (view: LibVlcPlayerView) in
                 view.dismiss()
             }
-        }
-
-        OnAppEntersForeground {
-            MediaPlayerManager.shared.onModuleForeground()
-        }
-
-        OnAppEntersBackground {
-            MediaPlayerManager.shared.onModuleBackground()
         }
     }
 }

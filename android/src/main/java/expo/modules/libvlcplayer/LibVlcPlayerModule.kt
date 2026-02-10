@@ -54,6 +54,14 @@ class LibVlcPlayerModule : Module() {
                 MediaPlayerManager.onModuleDestroy()
             }
 
+            OnActivityEntersForeground {
+                MediaPlayerManager.onModuleForeground()
+            }
+
+            OnActivityEntersBackground {
+                MediaPlayerManager.onModuleBackground()
+            }
+
             View(LibVlcPlayerView::class) {
                 Events(playerEvents)
 
@@ -153,14 +161,6 @@ class LibVlcPlayerModule : Module() {
                 AsyncFunction("dismiss") { view: LibVlcPlayerView ->
                     view.dismiss()
                 }
-            }
-
-            OnActivityEntersForeground {
-                MediaPlayerManager.onModuleForeground()
-            }
-
-            OnActivityEntersBackground {
-                MediaPlayerManager.onModuleBackground()
             }
         }
 }
