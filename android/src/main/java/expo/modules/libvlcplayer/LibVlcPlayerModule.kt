@@ -19,7 +19,7 @@ private const val ES_ADDED_EVENT = "onESAdded"
 private const val RECORD_CHANGED_EVENT = "onRecordChanged"
 private const val SNAPSHOT_TAKEN_EVENT = "onSnapshotTaken"
 private const val FIRST_PLAY_EVENT = "onFirstPlay"
-private const val FOREROUND_EVENT = "onForeground"
+private const val FOREGROUND_EVENT = "onForeground"
 private const val BACKGROUND_EVENT = "onBackground"
 
 val playerEvents =
@@ -37,7 +37,7 @@ val playerEvents =
         RECORD_CHANGED_EVENT,
         SNAPSHOT_TAKEN_EVENT,
         FIRST_PLAY_EVENT,
-        FOREROUND_EVENT,
+        FOREGROUND_EVENT,
         BACKGROUND_EVENT,
     )
 
@@ -47,11 +47,11 @@ class LibVlcPlayerModule : Module() {
             Name("ExpoLibVlcPlayer")
 
             OnCreate {
-                MediaPlayerManager.onModuleCreated(appContext)
+                MediaPlayerManager.onModuleCreate(appContext)
             }
 
             OnDestroy {
-                MediaPlayerManager.onModuleDestroyed()
+                MediaPlayerManager.onModuleDestroy()
             }
 
             View(LibVlcPlayerView::class) {
@@ -156,11 +156,11 @@ class LibVlcPlayerModule : Module() {
             }
 
             OnActivityEntersForeground {
-                MediaPlayerManager.onPlayerForeground()
+                MediaPlayerManager.onModuleForeground()
             }
 
             OnActivityEntersBackground {
-                MediaPlayerManager.onPlayerBackground()
+                MediaPlayerManager.onModuleBackground()
             }
         }
 }

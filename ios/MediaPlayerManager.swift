@@ -5,12 +5,6 @@ class MediaPlayerManager {
 
     let playerViews = NSHashTable<LibVlcPlayerView>.weakObjects()
 
-    func onModuleDestroyed() {
-        for view in playerViews.allObjects {
-            view.destroyPlayer()
-        }
-    }
-
     func registerPlayerView(_ view: LibVlcPlayerView) {
         playerViews.add(view)
     }
@@ -19,13 +13,19 @@ class MediaPlayerManager {
         playerViews.remove(view)
     }
 
-    func onPlayerForeground() {
+    func onModuleDestroy() {
+        for view in playerViews.allObjects {
+            view.destroyPlayer()
+        }
+    }
+
+    func onModuleForeground() {
         for view in playerViews.allObjects {
             view.onForeground()
         }
     }
 
-    func onPlayerBackground() {
+    func onModuleBackground() {
         for view in playerViews.allObjects {
             view.onBackground()
 

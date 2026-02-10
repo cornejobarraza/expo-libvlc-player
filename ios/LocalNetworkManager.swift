@@ -1,5 +1,5 @@
-class LocalNetworkAlert {
-    static let shared = LocalNetworkAlert()
+class LocalNetworkManager {
+    static let shared = LocalNetworkManager()
 
     /// Attempts to trigger the local network privacy alert.
     ///

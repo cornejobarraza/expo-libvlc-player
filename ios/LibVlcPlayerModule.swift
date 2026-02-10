@@ -39,11 +39,11 @@ public class LibVlcPlayerModule: Module {
         Name("ExpoLibVlcPlayer")
 
         AsyncFunction("triggerAlert") { () in
-            LocalNetworkAlert.shared.triggerLocalNetworkPrivacyAlert()
+            LocalNetworkManager.shared.triggerLocalNetworkPrivacyAlert()
         }
 
         OnDestroy {
-            MediaPlayerManager.shared.onModuleDestroyed()
+            MediaPlayerManager.shared.onModuleDestroy()
         }
 
         View(LibVlcPlayerView.self) {
@@ -143,11 +143,11 @@ public class LibVlcPlayerModule: Module {
         }
 
         OnAppEntersForeground {
-            MediaPlayerManager.shared.onPlayerForeground()
+            MediaPlayerManager.shared.onModuleForeground()
         }
 
         OnAppEntersBackground {
-            MediaPlayerManager.shared.onPlayerBackground()
+            MediaPlayerManager.shared.onModuleBackground()
         }
     }
 }
