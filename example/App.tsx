@@ -43,10 +43,6 @@ export default function App() {
             size="large"
           />
         )}
-        <TouchableOpacity
-          style={styles.playback}
-          onPress={() => playerRef.current?.[!playing ? "play" : "pause"]()}
-        />
         <LibVlcPlayerView
           ref={playerRef}
           style={styles.player}
@@ -125,10 +121,6 @@ const styles = StyleSheet.create({
     aspectRatio: 16 / 9,
   },
   buffering: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 9998,
-  },
-  playback: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 9999,
   },
