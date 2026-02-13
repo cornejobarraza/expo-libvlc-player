@@ -2,6 +2,7 @@ package expo.modules.libvlcplayer
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +13,7 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
 import expo.modules.libvlcplayer.enums.AudioMixingMode
+import expo.modules.libvlcplayer.enums.VideoContentFit
 import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
@@ -200,6 +202,61 @@ class LibVlcPlayerView(
         }
     }
 
+    fun setContentFit() {
+        mediaPlayer?.let { player ->
+            val textureView = playerView.findViewById<TextureView>(org.videolan.R.id.texture_video) ?: return
+            val video = player.getCurrentVideoTrack() ?: return
+
+            val viewWidth = playerView.width.toFloat()
+            val viewHeight = playerView.height.toFloat()
+
+            val videoWidth = video.width.toFloat()
+            val videoHeight = video.height.toFloat()
+
+            val viewAspect = viewWidth / viewHeight
+            val videoAspect = videoWidth / videoHeight
+
+            val pivotX = viewWidth / 2f
+            val pivotY = viewHeight / 2f
+
+            val matrix = Matrix()
+
+            when (contentFit) {
+                VideoContentFit.CONTAIN -> {
+                    // No scale required
+                }
+
+                VideoContentFit.COVER -> {
+                    val scale =
+                        if (videoAspect > viewAspect) {
+                            videoAspect / viewAspect
+                        } else {
+                            viewAspect / videoAspect
+                        }
+
+                    matrix.setScale(scale, scale, pivotX, pivotY)
+                }
+
+                VideoContentFit.FILL -> {
+                    var scaleX = 1f
+                    var scaleY = 1f
+
+                    if (videoAspect > viewAspect) {
+                        scaleX = 1f
+                        scaleY = videoAspect / viewAspect
+                    } else {
+                        scaleX = viewAspect / videoAspect
+                        scaleY = 1f
+                    }
+
+                    matrix.setScale(scaleX, scaleY, pivotX, pivotY)
+                }
+            }
+
+            textureView.setTransform(matrix)
+        }
+    }
+
     fun getMediaTracks(): MediaTracks {
         var mediaTracks = MediaTracks()
 
@@ -273,16 +330,15 @@ class LibVlcPlayerView(
         mediaPlayer?.let { player ->
             setPlayerTracks()
 
-            if (volume != MAX_PLAYER_VOLUME || mute) {
-                val newVolume =
-                    if (mute) {
-                        MIN_PLAYER_VOLUME
-                    } else {
-                        volume
-                    }
-
-                player.setVolume(newVolume)
+            if (scale != DEFAULT_PLAYER_SCALE) {
+                player.setScale(scale)
             }
+
+            if (aspectRatio != null) {
+                player.setAspectRatio(aspectRatio)
+            }
+
+            setContentFit()
 
             if (rate != DEFAULT_PLAYER_RATE) {
                 player.setRate(rate)
@@ -292,12 +348,15 @@ class LibVlcPlayerView(
                 player.setTime(time.toLong())
             }
 
-            if (scale != DEFAULT_PLAYER_SCALE) {
-                player.setScale(scale)
-            }
+            if (volume != MAX_PLAYER_VOLUME || mute) {
+                val newVolume =
+                    if (mute) {
+                        MIN_PLAYER_VOLUME
+                    } else {
+                        volume
+                    }
 
-            if (aspectRatio != null) {
-                player.setAspectRatio(aspectRatio)
+                player.setVolume(newVolume)
             }
 
             time = DEFAULT_PLAYER_TIME
@@ -345,6 +404,12 @@ class LibVlcPlayerView(
         set(value) {
             field = value
             mediaPlayer?.setAspectRatio(value)
+        }
+
+    var contentFit: VideoContentFit = VideoContentFit.CONTAIN
+        set(value) {
+            field = value
+            setContentFit()
         }
 
     var rate: Float = DEFAULT_PLAYER_RATE
@@ -487,13 +552,10 @@ class LibVlcPlayerView(
         mediaPlayer?.let { player ->
             try {
                 val textureView = playerView.findViewById<TextureView>(org.videolan.R.id.texture_video) ?: throw Exception()
-
-                val video = player.getCurrentVideoTrack()
-                val width = video.width ?: 0
-                val height = video.height ?: 0
+                val video = player.getCurrentVideoTrack() ?: throw Exception()
 
                 val surface = Surface(textureView.surfaceTexture)
-                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
 
                 PixelCopy.request(
                     surface,

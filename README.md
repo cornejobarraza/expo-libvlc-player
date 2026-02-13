@@ -117,7 +117,7 @@ return (
   <View style={{ aspectRatio: 16 / 9 }}>
     <LibVlcPlayerView
       style={{ height: "100%" }}
-      source="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      source="https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov"
     />
   </View>
 );
@@ -164,6 +164,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `slaves`           | Sets the player audio and subtitle slaves array. See [`Slave`](#slave) for more                                                   | `[]`        |
 | `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
 | `aspectRatio`      | Sets the player aspect ratio. Must be a valid string or `null` for default                                                        | `undefined` |
+| `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
 | `rate`             | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
 | `time`             | Sets the initial player time. Must be an integer in milliseconds                                                                  | `0`         |
 | `volume`           | Sets the player volume. Must be an integer between `0` and `100`                                                                  | `100`       |

@@ -141,6 +141,49 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
+    func setContentFit() {
+        if let player = mediaPlayer {
+            let view = playerView.bounds.size
+            let video = player.videoSize
+
+            let viewAspect = view.width / view.height
+            let videoAspect = video.width / video.height
+
+            var transform: CGAffineTransform = .identity
+
+            switch contentFit {
+            case .contain:
+                // No transform required
+                break
+            case .cover:
+                var scale = 1.0
+
+                if videoAspect > viewAspect {
+                    scale = videoAspect / viewAspect
+                } else {
+                    scale = viewAspect / videoAspect
+                }
+
+                transform = CGAffineTransform(scaleX: scale, y: scale)
+            case .fill:
+                var scaleX = 1.0
+                var scaleY = 1.0
+
+                if videoAspect > viewAspect {
+                    scaleX = 1.0
+                    scaleY = videoAspect / viewAspect
+                } else {
+                    scaleX = viewAspect / videoAspect
+                    scaleY = 1.0
+                }
+
+                transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
+            }
+
+            playerView.transform = transform
+        }
+    }
+
     func getMediaTracks() -> MediaTracks {
         var mediaTracks = MediaTracks()
 
@@ -218,13 +261,17 @@ class LibVlcPlayerView: ExpoView {
         if let player = mediaPlayer {
             setPlayerTracks()
 
-            if volume != maxPlayerVolume || mute {
-                let newVolume = mute ?
-                    minPlayerVolume :
-                    volume
-
-                player.audio?.volume = Int32(newVolume)
+            if scale != defaultPlayerScale {
+                player.scaleFactor = scale
             }
+
+            if let aspectRatio = aspectRatio {
+                aspectRatio.withCString { cString in
+                    player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
+                }
+            }
+
+            setContentFit()
 
             if rate != defaultPlayerRate {
                 player.rate = rate
@@ -234,14 +281,12 @@ class LibVlcPlayerView: ExpoView {
                 player.time = VLCTime(int: Int32(time))
             }
 
-            if scale != defaultPlayerScale {
-                player.scaleFactor = scale
-            }
+            if volume != maxPlayerVolume || mute {
+                let newVolume = mute ?
+                    minPlayerVolume :
+                    volume
 
-            if let aspectRatio = aspectRatio {
-                aspectRatio.withCString { cString in
-                    player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
-                }
+                player.audio?.volume = Int32(newVolume)
             }
 
             time = defaultPlayerTime
@@ -296,6 +341,12 @@ class LibVlcPlayerView: ExpoView {
             } else {
                 mediaPlayer?.videoAspectRatio = nil
             }
+        }
+    }
+
+    var contentFit: VideoContentFit = .contain {
+        didSet {
+            setContentFit()
         }
     }
 
