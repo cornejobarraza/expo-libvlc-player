@@ -164,6 +164,7 @@ class LibVlcPlayerView(
         mediaPlayer = null
         libVLC?.release()
         libVLC = null
+        removeAllViews()
     }
 
     fun setPlayerTracks() {

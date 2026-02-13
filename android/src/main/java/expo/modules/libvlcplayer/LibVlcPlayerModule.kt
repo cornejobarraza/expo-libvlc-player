@@ -126,13 +126,14 @@ class LibVlcPlayerModule : Module() {
                     view.autoplay = autoplay ?: true
                 }
 
-                OnViewDestroys { view: LibVlcPlayerView ->
-                    MediaPlayerManager.unregisterPlayerView(view)
-                    view.destroyPlayer()
-                }
-
                 OnViewDidUpdateProps { view: LibVlcPlayerView ->
                     view.createPlayer()
+                }
+
+                OnViewDestroys { view: LibVlcPlayerView ->
+                    MediaPlayerManager.unregisterPlayerView(view)
+
+                    view.destroyPlayer()
                 }
 
                 AsyncFunction("play") { view: LibVlcPlayerView ->
