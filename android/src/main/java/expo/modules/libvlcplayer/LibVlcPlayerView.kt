@@ -367,14 +367,20 @@ class LibVlcPlayerView(
         set(value) {
             val old = field
             field = value
-            shouldCreate = value != old
+
+            if (!shouldCreate) {
+                shouldCreate = value != old
+            }
         }
 
     var options: ArrayList<String> = ArrayList()
         set(value) {
             val old = field
             field = value
-            shouldCreate = value != old
+
+            if (!shouldCreate) {
+                shouldCreate = value != old
+            }
         }
 
     var tracks: Tracks? = null

@@ -49,10 +49,10 @@ class LibVlcPlayerView: ExpoView {
     required init(appContext: AppContext? = nil) {
         super.init(appContext: appContext)
 
-        MediaPlayerManager.shared.registerPlayerView(self)
-
-        clipsToBounds = true
         playerView.backgroundColor = .black
+        clipsToBounds = true
+
+        MediaPlayerManager.shared.registerPlayerView(self)
         addSubview(playerView)
     }
 
@@ -62,6 +62,8 @@ class LibVlcPlayerView: ExpoView {
     }
 
     override func layoutSubviews() {
+        super.layoutSubviews()
+
         playerView.frame = bounds
     }
 
@@ -295,13 +297,17 @@ class LibVlcPlayerView: ExpoView {
 
     var source: String? {
         didSet {
-            shouldCreate = source != oldValue
+            if !shouldCreate {
+                shouldCreate = source != oldValue
+            }
         }
     }
 
     var options: [String] = .init() {
         didSet {
-            shouldCreate = options != oldValue
+            if !shouldCreate {
+                shouldCreate = options != oldValue
+            }
         }
     }
 
