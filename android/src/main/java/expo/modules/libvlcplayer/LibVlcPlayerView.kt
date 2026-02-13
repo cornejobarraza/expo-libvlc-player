@@ -243,11 +243,9 @@ class LibVlcPlayerView(
                     var scaleY = 1f
 
                     if (videoAspect > viewAspect) {
-                        scaleX = 1f
                         scaleY = videoAspect / viewAspect
                     } else {
                         scaleX = viewAspect / videoAspect
-                        scaleY = 1f
                     }
 
                     matrix.setScale(scaleX, scaleY, pivotX, pivotY)

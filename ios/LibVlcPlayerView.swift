@@ -158,13 +158,9 @@ class LibVlcPlayerView: ExpoView {
                 // No transform required
                 break
             case .cover:
-                var scale = 1.0
-
-                if videoAspect > viewAspect {
-                    scale = videoAspect / viewAspect
-                } else {
-                    scale = viewAspect / videoAspect
-                }
+                var scale = videoAspect > viewAspect ?
+                    videoAspect / viewAspect :
+                    viewAspect / videoAspect
 
                 transform = CGAffineTransform(scaleX: scale, y: scale)
             case .fill:
@@ -172,11 +168,9 @@ class LibVlcPlayerView: ExpoView {
                 var scaleY = 1.0
 
                 if videoAspect > viewAspect {
-                    scaleX = 1.0
                     scaleY = videoAspect / viewAspect
                 } else {
                     scaleX = viewAspect / videoAspect
-                    scaleY = 1.0
                 }
 
                 transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
