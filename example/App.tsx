@@ -50,7 +50,7 @@ export default function App() {
         <LibVlcPlayerView
           ref={playerRef}
           style={styles.player}
-          source="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          source="https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov"
           volume={volume}
           onBuffering={handleBuffering}
           onPlaying={() => setPlaying(true)}

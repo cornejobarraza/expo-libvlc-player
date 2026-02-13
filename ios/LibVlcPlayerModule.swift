@@ -81,6 +81,10 @@ public class LibVlcPlayerModule: Module {
                 view.aspectRatio = aspectRatio
             }
 
+            Prop("contentFit") { (view: LibVlcPlayerView, contentFit: VideoContentFit?) in
+                view.contentFit = contentFit ?? .contain
+            }
+
             Prop("rate") { (view: LibVlcPlayerView, rate: Float?) in
                 view.rate = rate ?? defaultPlayerRate
             }
