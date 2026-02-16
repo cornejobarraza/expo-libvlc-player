@@ -55,33 +55,33 @@ class LibVlcPlayerView(
             addView(it)
         }
 
-    internal var libVLC: LibVLC? = null
-    internal var mediaPlayer: MediaPlayer? = null
+    var libVLC: LibVLC? = null
+    var mediaPlayer: MediaPlayer? = null
     private var media: Media? = null
-    internal var vlcDialog: VLCDialog? = null
+    var vlcDialog: VLCDialog? = null
 
-    internal var mediaLength: Long = 0L
-    internal var oldVolume: Int = MAX_PLAYER_VOLUME
+    var mediaLength: Long = 0L
+    var oldVolume: Int = MAX_PLAYER_VOLUME
 
     private var shouldCreate: Boolean = false
-    internal var firstPlay: Boolean = false
-    internal var firstTime: Boolean = false
+    var firstPlay: Boolean = false
+    var firstTime: Boolean = false
 
-    internal val onBuffering by EventDispatcher<Unit>()
-    internal val onPlaying by EventDispatcher<Unit>()
-    internal val onPaused by EventDispatcher<Unit>()
-    internal val onStopped by EventDispatcher<Unit>()
-    internal val onEndReached by EventDispatcher<Unit>()
-    internal val onEncounteredError by EventDispatcher()
-    internal val onDialogDisplay by EventDispatcher<Dialog>()
-    internal val onTimeChanged by EventDispatcher()
-    internal val onPositionChanged by EventDispatcher()
-    internal val onESAdded by EventDispatcher<MediaTracks>()
-    internal val onRecordChanged by EventDispatcher<Recording>()
-    internal val onSnapshotTaken by EventDispatcher()
-    internal val onFirstPlay by EventDispatcher<MediaInfo>()
-    internal val onForeground by EventDispatcher<Unit>()
-    internal val onBackground by EventDispatcher<Unit>()
+    val onBuffering by EventDispatcher<Unit>()
+    val onPlaying by EventDispatcher<Unit>()
+    val onPaused by EventDispatcher<Unit>()
+    val onStopped by EventDispatcher<Unit>()
+    val onEndReached by EventDispatcher<Unit>()
+    val onEncounteredError by EventDispatcher()
+    val onDialogDisplay by EventDispatcher<Dialog>()
+    val onTimeChanged by EventDispatcher()
+    val onPositionChanged by EventDispatcher()
+    val onESAdded by EventDispatcher<MediaTracks>()
+    val onRecordChanged by EventDispatcher<Recording>()
+    val onSnapshotTaken by EventDispatcher()
+    val onFirstPlay by EventDispatcher<MediaInfo>()
+    val onForeground by EventDispatcher<Unit>()
+    val onBackground by EventDispatcher<Unit>()
 
     init {
         MediaPlayerManager.registerPlayerView(this)
@@ -98,6 +98,8 @@ class LibVlcPlayerView(
 
         detachPlayer()
     }
+
+    fun getTextureView(): TextureView? = playerView.findViewById(org.videolan.R.id.texture_video)
 
     fun createPlayer() {
         if (!shouldCreate) {
@@ -205,50 +207,53 @@ class LibVlcPlayerView(
 
     fun setContentFit() {
         mediaPlayer?.let { player ->
-            val textureView = playerView.findViewById<TextureView>(org.videolan.R.id.texture_video) ?: return
-            val video = player.getCurrentVideoTrack() ?: return
-
-            val viewWidth = playerView.width.toFloat()
-            val viewHeight = playerView.height.toFloat()
-
-            val videoWidth = video.width.toFloat()
-            val videoHeight = video.height.toFloat()
-
-            val viewAspect = viewWidth / viewHeight
-            val videoAspect = videoWidth / videoHeight
-
-            val pivotX = viewWidth / 2f
-            val pivotY = viewHeight / 2f
+            val textureView = getTextureView() ?: return
 
             val matrix = Matrix()
 
-            when (contentFit) {
-                VideoContentFit.CONTAIN -> {
-                    // No scale required
-                }
+            val video = player.getCurrentVideoTrack()
 
-                VideoContentFit.COVER -> {
-                    val scale =
-                        if (videoAspect > viewAspect) {
-                            videoAspect / viewAspect
-                        } else {
-                            viewAspect / videoAspect
-                        }
+            if (video != null) {
+                val viewWidth = playerView.width.toFloat()
+                val viewHeight = playerView.height.toFloat()
 
-                    matrix.setScale(scale, scale, pivotX, pivotY)
-                }
+                val videoWidth = video.width.toFloat()
+                val videoHeight = video.height.toFloat()
 
-                VideoContentFit.FILL -> {
-                    var scaleX = 1f
-                    var scaleY = 1f
+                val viewAspect = viewWidth / viewHeight
+                val videoAspect = videoWidth / videoHeight
 
-                    if (videoAspect > viewAspect) {
-                        scaleY = videoAspect / viewAspect
-                    } else {
-                        scaleX = viewAspect / videoAspect
+                val pivotX = viewWidth / 2f
+                val pivotY = viewHeight / 2f
+
+                when (contentFit) {
+                    VideoContentFit.CONTAIN -> {
+                        // No scale required
                     }
 
-                    matrix.setScale(scaleX, scaleY, pivotX, pivotY)
+                    VideoContentFit.COVER -> {
+                        val scale =
+                            if (videoAspect > viewAspect) {
+                                videoAspect / viewAspect
+                            } else {
+                                viewAspect / videoAspect
+                            }
+
+                        matrix.setScale(scale, scale, pivotX, pivotY)
+                    }
+
+                    VideoContentFit.FILL -> {
+                        var scaleX = 1f
+                        var scaleY = 1f
+
+                        if (videoAspect > viewAspect) {
+                            scaleY = videoAspect / viewAspect
+                        } else {
+                            scaleX = viewAspect / videoAspect
+                        }
+
+                        matrix.setScale(scaleX, scaleY, pivotX, pivotY)
+                    }
                 }
             }
 
@@ -556,7 +561,7 @@ class LibVlcPlayerView(
     fun snapshot(path: String) {
         mediaPlayer?.let { player ->
             try {
-                val textureView = playerView.findViewById<TextureView>(org.videolan.R.id.texture_video) ?: throw Exception()
+                val textureView = getTextureView() ?: throw Exception()
                 val video = player.getCurrentVideoTrack() ?: throw Exception()
 
                 val surface = Surface(textureView.surfaceTexture)
@@ -620,7 +625,7 @@ class LibVlcPlayerView(
         return this.any { option -> option in options }
     }
 
-    internal fun ArrayList<String>.hasRepeatOption(): Boolean {
+    fun ArrayList<String>.hasRepeatOption(): Boolean {
         val options =
             setOf(
                 "--input-repeat=",
@@ -635,7 +640,7 @@ class LibVlcPlayerView(
         }
     }
 
-    internal fun ArrayList<String>.hasStartPausedOption(): Boolean {
+    private fun ArrayList<String>.hasStartPausedOption(): Boolean {
         val options =
             setOf(
                 "--start-paused",
@@ -646,7 +651,7 @@ class LibVlcPlayerView(
         return this.any { option -> option in options }
     }
 
-    internal fun ArrayList<String>.removeStartPausedOption() {
+    private fun ArrayList<String>.removeStartPausedOption() {
         val options =
             setOf(
                 "--start-paused",

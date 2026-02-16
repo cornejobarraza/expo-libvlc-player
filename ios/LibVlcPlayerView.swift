@@ -145,35 +145,37 @@ class LibVlcPlayerView: ExpoView {
 
     func setContentFit() {
         if let player = mediaPlayer {
+            var transform: CGAffineTransform = .identity
+
             let view = playerView.bounds.size
             let video = player.videoSize
 
-            let viewAspect = view.width / view.height
-            let videoAspect = video.width / video.height
+            if video != .zero {
+                let viewAspect = view.width / view.height
+                let videoAspect = video.width / video.height
 
-            var transform: CGAffineTransform = .identity
+                switch contentFit {
+                case .contain:
+                    // No transform required
+                    break
+                case .cover:
+                    let scale = videoAspect > viewAspect ?
+                        videoAspect / viewAspect :
+                        viewAspect / videoAspect
 
-            switch contentFit {
-            case .contain:
-                // No transform required
-                break
-            case .cover:
-                var scale = videoAspect > viewAspect ?
-                    videoAspect / viewAspect :
-                    viewAspect / videoAspect
+                    transform = CGAffineTransform(scaleX: scale, y: scale)
+                case .fill:
+                    var scaleX = 1.0
+                    var scaleY = 1.0
 
-                transform = CGAffineTransform(scaleX: scale, y: scale)
-            case .fill:
-                var scaleX = 1.0
-                var scaleY = 1.0
+                    if videoAspect > viewAspect {
+                        scaleY = videoAspect / viewAspect
+                    } else {
+                        scaleX = viewAspect / videoAspect
+                    }
 
-                if videoAspect > viewAspect {
-                    scaleY = videoAspect / viewAspect
-                } else {
-                    scaleX = viewAspect / videoAspect
+                    transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
                 }
-
-                transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
             }
 
             playerView.transform = transform
@@ -533,7 +535,7 @@ extension Array where Element == String {
     }
 }
 
-extension Array where Element == String {
+private extension Array where Element == String {
     func hasStartPausedOption() -> Bool {
         let options = [
             "--start-paused",
@@ -545,7 +547,7 @@ extension Array where Element == String {
     }
 }
 
-extension Array where Element == String {
+private extension Array where Element == String {
     mutating func removeStartPausedOption() {
         let options = [
             "--start-paused",

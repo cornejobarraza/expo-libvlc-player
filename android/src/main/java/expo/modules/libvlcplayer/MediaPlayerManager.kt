@@ -7,7 +7,7 @@ import java.lang.ref.WeakReference
 object MediaPlayerManager {
     lateinit var audioFocusManager: AudioFocusManager
 
-    internal var playerViews: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
+    var playerViews: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
 
     fun registerPlayerView(view: LibVlcPlayerView) {
         playerViews.find { it.get() == view } ?: run { playerViews.add(WeakReference(view)) }
