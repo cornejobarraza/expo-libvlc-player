@@ -188,9 +188,8 @@ class LibVlcPlayerView: ExpoView {
 
             if let audios = player.audioTrackNames as? [String] {
                 if let audioIndexes = player.audioTrackIndexes as? [NSNumber] {
-                    for (index, trackName) in audios.enumerated() {
-                        let trackId = audioIndexes[index].intValue
-                        let track = Track(id: trackId, name: trackName)
+                    for (index, trackName) in zip(audioIndexes, audios) {
+                        let track = Track(id: index.intValue, name: trackName)
                         audioTracks.append(track)
                     }
                 }
@@ -200,9 +199,8 @@ class LibVlcPlayerView: ExpoView {
 
             if let videos = player.videoTrackNames as? [String] {
                 if let videoIndexes = player.videoTrackIndexes as? [NSNumber] {
-                    for (index, trackName) in videos.enumerated() {
-                        let trackId = videoIndexes[index].intValue
-                        let track = Track(id: trackId, name: trackName)
+                    for (index, trackName) in zip(videoIndexes, videos) {
+                        let track = Track(id: index.intValue, name: trackName)
                         videoTracks.append(track)
                     }
                 }
@@ -212,9 +210,8 @@ class LibVlcPlayerView: ExpoView {
 
             if let subtitles = player.videoSubTitlesNames as? [String] {
                 if let subtitleIndexes = player.videoSubTitlesIndexes as? [NSNumber] {
-                    for (index, trackName) in subtitles.enumerated() {
-                        let trackId = subtitleIndexes[index].intValue
-                        let track = Track(id: trackId, name: trackName)
+                    for (index, trackName) in zip(subtitleIndexes, subtitles) {
+                        let track = Track(id: index.intValue, name: trackName)
                         subtitleTracks.append(track)
                     }
                 }
