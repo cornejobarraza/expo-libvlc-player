@@ -43,33 +43,9 @@ For bare React Native projects, you must ensure that you have [installed and con
 
 No additional configuration necessary.
 
-#### Black screen issue
-
-On Android, the `libvlcjni` player detaches from the View when surfaces are destroyed after switching screens.
-
-The current workaround attaches the View once surfaces are created but this results in a brief black screen.
-
-https://code.videolan.org/videolan/vlc-android/-/issues/1495
-
 ### Configure for iOS
 
 Run `npx pod-install` after installing the npm package.
-
-#### Local network privacy
-
-On iOS, the `VLCKit` player seems to interact with the local network when playing media from external sources.
-
-Starting in iOS 14, a clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
-
-https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy
-
-#### Audio playback issue
-
-On iOS, the `VLCKit` player experiences a small audio delay when resuming or muting media playback.
-
-This might be related to the internal clock used by the library core causing inaccurate time values.
-
-https://code.videolan.org/videolan/VLCKit/-/issues/233
 
 ### Configure for TV
 
@@ -267,6 +243,32 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
   tracks: MediaTracks;
 }
 ```
+
+## Known issues
+
+#### Black screen
+
+On Android, the `libvlcjni` player detaches from the View when its surface is destroyed after switching screens.
+
+The current workaround attaches the View once a surface is created but this causes a brief black screen.
+
+https://code.videolan.org/videolan/vlc-android/-/issues/1495
+
+#### Local network
+
+On iOS, the `VLCKit` player seems to interact with the local network when playing media from external sources.
+
+A clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
+
+https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy
+
+#### Audio delay
+
+On iOS, the `VLCKit` player experiences a small audio delay when resuming or muting media playback.
+
+This might be related to the internal clock used by the library core causing inaccurate time values.
+
+https://code.videolan.org/videolan/VLCKit/-/issues/233
 
 ## Disclaimer
 
