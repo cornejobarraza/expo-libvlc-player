@@ -31,6 +31,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             case .stopped:
                 onStopped()
 
+                MediaPlayerManager.shared.setAppropriateAudioSession()
+
                 firstPlay = true
                 firstTime = true
             case .ended:
@@ -46,6 +48,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             case .error:
                 let error = ["error": "Media player encountered an error"]
                 onEncounteredError(error)
+
+                MediaPlayerManager.shared.setAppropriateAudioSession()
 
                 firstPlay = true
                 firstTime = true
@@ -70,6 +74,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     // MediaInfo fallback
                     onFirstPlay(mediaInfo)
                 }
+
+                MediaPlayerManager.shared.setAppropriateAudioSession()
 
                 firstTime = false
             }

@@ -369,6 +369,7 @@ class LibVlcPlayerView: ExpoView {
 
             if !mute {
                 mediaPlayer?.audio?.volume = Int32(newVolume)
+                MediaPlayerManager.shared.setAppropriateAudioSession()
             }
         }
     }
@@ -395,11 +396,7 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    var playInBackground: Bool = false {
-        didSet {
-            MediaPlayerManager.shared.setAppropriateAudioSession()
-        }
-    }
+    var playInBackground: Bool = false
 
     var shouldRepeat: Bool = false {
         didSet {

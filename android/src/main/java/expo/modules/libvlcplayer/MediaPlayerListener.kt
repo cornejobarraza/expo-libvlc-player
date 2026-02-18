@@ -42,6 +42,8 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                         detachPlayer()
 
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
                         firstPlay = true
                         firstTime = true
                     }
@@ -62,6 +64,8 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         val error = mapOf("error" to "Media player encountered an error")
                         onEncounteredError(error)
 
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
                         firstPlay = true
                         firstTime = true
                     }
@@ -77,6 +81,8 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                                 // MediaInfo fallback
                                 onFirstPlay(mediaInfo)
                             }
+
+                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
 
                             firstTime = false
                         }

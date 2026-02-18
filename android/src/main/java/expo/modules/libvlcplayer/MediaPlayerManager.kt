@@ -24,7 +24,9 @@ object MediaPlayerManager {
 
     fun onModuleDestroy() {
         playerViews.forEach { playerView ->
-            playerView.get()?.destroyPlayer()
+            playerView.get()?.let { view ->
+                view.destroyPlayer()
+            }
         }
     }
 

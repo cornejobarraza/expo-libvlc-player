@@ -54,9 +54,8 @@ class LibVlcPlayerModule : Module() {
             Name("ExpoLibVlcPlayer")
 
             AsyncFunction("checkBatteryOptimization") {
-                val powerManager = context.applicationContext.getSystemService(Context.POWER_SERVICE) as? PowerManager
-                val packageName = context.applicationContext.packageName
-                return@AsyncFunction powerManager?.isIgnoringBatteryOptimizations(packageName) == false
+                val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                return@AsyncFunction powerManager?.isIgnoringBatteryOptimizations(context.packageName) == false
             }
 
             OnCreate {

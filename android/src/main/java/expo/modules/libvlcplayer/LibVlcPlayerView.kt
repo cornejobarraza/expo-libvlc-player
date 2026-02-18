@@ -61,7 +61,6 @@ class LibVlcPlayerView(
     var vlcDialog: VLCDialog? = null
 
     var mediaLength: Long = 0L
-    var oldVolume: Int = MAX_PLAYER_VOLUME
 
     private var shouldCreate: Boolean = false
     var firstPlay: Boolean = false
@@ -440,10 +439,11 @@ class LibVlcPlayerView(
             }
 
             val newVolume = value.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
-            oldVolume = newVolume
+            MediaPlayerManager.audioFocusManager.oldVolume = newVolume
 
             if (!mute) {
                 mediaPlayer?.setVolume(newVolume)
+                MediaPlayerManager.audioFocusManager.updateAudioFocus()
             }
         }
 
@@ -460,7 +460,7 @@ class LibVlcPlayerView(
                 if (value) {
                     MIN_PLAYER_VOLUME
                 } else {
-                    oldVolume
+                    MediaPlayerManager.audioFocusManager.oldVolume
                 }
 
             mediaPlayer?.setVolume(newVolume)
@@ -470,13 +470,13 @@ class LibVlcPlayerView(
     var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO
         set(value) {
             field = value
+            MediaPlayerManager.audioFocusManager.currentMixingMode = value
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
     var playInBackground: Boolean = false
         set(value) {
             field = value
-            MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
     var repeat: Boolean = false
