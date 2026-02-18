@@ -1,3 +1,4 @@
+import { useKeepAwake } from "expo-keep-awake";
 import { LibVlcPlayerView, LibVlcPlayerViewRef } from "expo-libvlc-player";
 import { StatusBar } from "expo-status-bar";
 import { useRef, useState } from "react";
@@ -20,6 +21,8 @@ export default function App() {
 
   const playerRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingRef = useRef<NodeJS.Timeout | null>(null);
+
+  useKeepAwake();
 
   const handleBuffering = () => {
     setBuffering(true);
@@ -52,7 +55,7 @@ export default function App() {
           onPlaying={() => setPlaying(true)}
           onPaused={() => setPlaying(false)}
           onStopped={() => setPlaying(false)}
-          onEncounteredError={({ error }) => Alert.alert(error)}
+          onEncounteredError={({ error }) => Alert.alert("Error", error)}
           onTimeChanged={({ time }) => setTime(time)}
         />
       </View>

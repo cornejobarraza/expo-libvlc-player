@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
-    "expo": "~53.0.26",
+    "expo": "~53.0.27",
+    "expo-font": "~13.3.2",
+    "expo-keep-awake": "~14.1.4",
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.5",
     "expo-system-ui": "~5.0.11",

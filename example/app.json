@@ -24,6 +24,9 @@
       "edgeToEdgeEnabled": true,
       "package": "expo.modules.libvlcplayer.example"
     },
-    "plugins": ["../app.plugin.js"]
+    "plugins": [
+      "../app.plugin.js",
+      "expo-font"
+    ]
   }
 }
