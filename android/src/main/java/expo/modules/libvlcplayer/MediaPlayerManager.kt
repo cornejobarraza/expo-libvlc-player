@@ -1,7 +1,6 @@
 package expo.modules.libvlcplayer
 
 import expo.modules.kotlin.AppContext
-import expo.modules.kotlin.exception.Exceptions
 import java.lang.ref.WeakReference
 
 object MediaPlayerManager {
@@ -18,8 +17,6 @@ object MediaPlayerManager {
     }
 
     fun onModuleCreate(appContext: AppContext) {
-        val context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
-
         if (!this::audioFocusManager.isInitialized) {
             audioFocusManager = AudioFocusManager(appContext)
         }

@@ -352,6 +352,8 @@ export interface LibVlcPlayerViewProps extends ViewProps {
   /**
    * Determines whether the media should continue playing in the background
    *
+   * @note Battery optimization must be disabled on Android
+   *
    * @default false
    */
   playInBackground?: boolean;

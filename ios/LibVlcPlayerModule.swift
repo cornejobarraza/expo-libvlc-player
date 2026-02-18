@@ -38,7 +38,7 @@ public class LibVlcPlayerModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ExpoLibVlcPlayer")
 
-        AsyncFunction("triggerAlert") {
+        AsyncFunction("triggerNetworkAlert") {
             LocalNetworkManager.shared.triggerLocalNetworkPrivacyAlert()
         }
 

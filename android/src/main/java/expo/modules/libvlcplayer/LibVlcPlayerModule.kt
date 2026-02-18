@@ -1,5 +1,8 @@
 package expo.modules.libvlcplayer
 
+import android.content.Context
+import android.os.PowerManager
+import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.libvlcplayer.enums.AudioMixingMode
@@ -43,9 +46,18 @@ val playerEvents =
     )
 
 class LibVlcPlayerModule : Module() {
+    private val context: Context
+        get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
+
     override fun definition() =
         ModuleDefinition {
             Name("ExpoLibVlcPlayer")
+
+            AsyncFunction("checkBatteryOptimization") {
+                val powerManager = context.applicationContext.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                val packageName = context.applicationContext.packageName
+                return@AsyncFunction powerManager?.isIgnoringBatteryOptimizations(packageName) == false
+            }
 
             OnCreate {
                 MediaPlayerManager.onModuleCreate(appContext)

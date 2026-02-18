@@ -99,34 +99,43 @@ return (
 );
 ```
 
-Manually attempt to trigger the local network privacy alert on iOS:
+Check whether battery optimization is enabled on Android:
 
 ```tsx
 import LibVlcPlayerModule from "expo-libvlc-player";
 
-await LibVlcPlayerModule.triggerAlert();
+await LibVlcPlayerModule.checkBatteryOptimization();
+```
+
+Trigger the local network privacy alert on iOS:
+
+```tsx
+import LibVlcPlayerModule from "expo-libvlc-player";
+
+await LibVlcPlayerModule.triggerNetworkAlert();
 ```
 
 See the [Example App](example/App.tsx) for additional usage.
 
 ### Module methods
 
-| Method           | Description                                                |
-| ---------------- | ---------------------------------------------------------- |
-| `triggerAlert()` | Attempts to trigger the local network privacy alert on iOS |
+| Method                       | Description                                                          | Returns            |
+| ---------------------------- | -------------------------------------------------------------------- | ------------------ |
+| `checkBatteryOptimization()` | Attempts to check whether battery optimization is enabled on Android | `Promise<boolean>` |
+| `triggerNetworkAlert()`      | Attempts to trigger the local network privacy alert on iOS           | `Promise<void>`    |
 
 ### View methods
 
-| Method                                             | Description                                                                                                            |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `play()`                                           | Starts playback of the current player                                                                                  |
-| `pause()`                                          | Pauses playback of the current player                                                                                  |
-| `stop()`                                           | Stops playback of the current player                                                                                   |
-| `seek(value: number, type?: "time" \| "position")` | Sets the time or position of the current player. Must be a number equal or greater than `0`, type defaults to `"time"` |
-| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid string or `undefined` to stop recording                   |
-| `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid string                                                          |
-| `postAction(action: number)`                       | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                             |
-| `dismiss()`                                        | Dismisses a [`Dialog`](#dialog)                                                                                        |
+| Method                                             | Description                                                                                                            | Returns         |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------- |
+| `play()`                                           | Starts playback of the current player                                                                                  | `Promise<void>` |
+| `pause()`                                          | Pauses playback of the current player                                                                                  | `Promise<void>` |
+| `stop()`                                           | Stops playback of the current player                                                                                   | `Promise<void>` |
+| `seek(value: number, type?: "time" \| "position")` | Sets the time or position of the current player. Must be a number equal or greater than `0`, type defaults to `"time"` | `Promise<void>` |
+| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid string or `undefined` to stop recording                   | `Promise<void>` |
+| `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid string                                                          | `Promise<void>` |
+| `postAction(action: number)`                       | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                             | `Promise<void>` |
+| `dismiss()`                                        | Dismisses a [`Dialog`](#dialog)                                                                                        | `Promise<void>` |
 
 ### View props
 
@@ -146,7 +155,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `volume`           | Sets the player volume. Must be an integer between `0` and `100`                                                                  | `100`       |
 | `mute`             | Sets the player volume to `0` when `true`. Previous value is set when `false`                                                     | `false`     |
 | `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
-| `playInBackground` | Determines whether the media should continue playing in the background                                                            | `false`     |
+| `playInBackground` | Determines whether the media should continue playing in the background. Battery optimization must be disabled on Android          | `false`     |
 | `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
 
