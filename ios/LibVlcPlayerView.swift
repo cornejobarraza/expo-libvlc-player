@@ -64,6 +64,8 @@ class LibVlcPlayerView: ExpoView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
+        setContentFit()
+
         playerView.frame = bounds
     }
 
@@ -265,8 +267,6 @@ class LibVlcPlayerView: ExpoView {
                     player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
                 }
             }
-
-            setContentFit()
 
             if rate != defaultPlayerRate {
                 player.rate = rate

@@ -71,9 +71,10 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 if mediaLength == 0 {
                     let mediaInfo = getMediaInfo()
 
-                    // MediaInfo fallback
                     onFirstPlay(mediaInfo)
                 }
+
+                setContentFit()
 
                 MediaPlayerManager.shared.setAppropriateAudioSession()
 

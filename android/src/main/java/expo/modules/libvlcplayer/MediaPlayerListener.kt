@@ -78,9 +78,10 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                             if (mediaLength == 0L) {
                                 val mediaInfo = getMediaInfo()
 
-                                // MediaInfo fallback
                                 onFirstPlay(mediaInfo)
                             }
+
+                            setContentFit()
 
                             MediaPlayerManager.audioFocusManager.updateAudioFocus()
 

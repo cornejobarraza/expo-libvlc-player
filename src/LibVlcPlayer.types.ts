@@ -212,7 +212,7 @@ type BackgroundListener = () => void;
 /**
  * @hidden
  */
-export interface LibVlcPlayerViewNativeProps {
+export interface LibVlcPlayerViewNativeProps extends ViewProps {
   ref?: React.Ref<LibVlcPlayerViewRef>;
   source?: LibVlcSource;
   options?: string[];

@@ -50,6 +50,7 @@ export default function App() {
           ref={playerRef}
           style={styles.player}
           source="https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov"
+          aspectRatio="16:9"
           volume={volume}
           onBuffering={handleBuffering}
           onPlaying={() => setPlaying(true)}
@@ -121,7 +122,6 @@ const styles = StyleSheet.create({
   },
   container: {
     position: "relative",
-    aspectRatio: 16 / 9,
   },
   buffering: {
     ...StyleSheet.absoluteFillObject,
@@ -129,7 +129,6 @@ const styles = StyleSheet.create({
   },
   player: {
     backgroundColor: "black",
-    height: "100%",
     borderRadius: 12,
   },
   buttons: {

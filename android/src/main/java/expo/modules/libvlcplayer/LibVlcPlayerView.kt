@@ -98,6 +98,18 @@ class LibVlcPlayerView(
         detachPlayer()
     }
 
+    override fun onLayout(
+        changed: Boolean,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+    ) {
+        super.onLayout(changed, left, top, right, bottom)
+
+        setContentFit()
+    }
+
     fun getTextureView(): TextureView? = playerView.findViewById(org.videolan.R.id.texture_video)
 
     fun createPlayer() {
@@ -340,8 +352,6 @@ class LibVlcPlayerView(
             if (aspectRatio != null) {
                 player.setAspectRatio(aspectRatio)
             }
-
-            setContentFit()
 
             if (rate != DEFAULT_PLAYER_RATE) {
                 player.setRate(rate)

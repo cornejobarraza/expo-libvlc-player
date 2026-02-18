@@ -90,12 +90,7 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 import { LibVlcPlayerView } from "expo-libvlc-player";
 
 return (
-  <View style={{ aspectRatio: 16 / 9 }}>
-    <LibVlcPlayerView
-      style={{ height: "100%" }}
-      source="https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov"
-    />
-  </View>
+  <LibVlcPlayerView source="https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov" />
 );
 ```
 
