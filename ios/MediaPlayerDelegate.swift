@@ -23,14 +23,17 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     firstPlay = false
                 }
 
+                MediaPlayerManager.shared.activateKeepAwake()
                 MediaPlayerManager.shared.setAppropriateAudioSession()
             case .paused:
                 onPaused()
 
+                MediaPlayerManager.shared.deactivateKeepAwake()
                 MediaPlayerManager.shared.setAppropriateAudioSession()
             case .stopped:
                 onStopped()
 
+                MediaPlayerManager.shared.deactivateKeepAwake()
                 MediaPlayerManager.shared.setAppropriateAudioSession()
 
                 firstPlay = true
@@ -49,6 +52,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 let error = ["error": "Media player encountered an error"]
                 onEncounteredError(error)
 
+                MediaPlayerManager.shared.deactivateKeepAwake()
                 MediaPlayerManager.shared.setAppropriateAudioSession()
 
                 firstPlay = true

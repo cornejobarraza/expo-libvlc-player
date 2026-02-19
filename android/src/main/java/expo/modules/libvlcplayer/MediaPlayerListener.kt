@@ -28,12 +28,14 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                             firstPlay = false
                         }
 
+                        MediaPlayerManager.keepAwakeManager.activateKeepAwake()
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
                     }
 
                     Event.Paused -> {
                         onPaused(Unit)
 
+                        MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
                     }
 
@@ -42,6 +44,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                         detachPlayer()
 
+                        MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
 
                         firstPlay = true
@@ -64,6 +67,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         val error = mapOf("error" to "Media player encountered an error")
                         onEncounteredError(error)
 
+                        MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
 
                         firstPlay = true

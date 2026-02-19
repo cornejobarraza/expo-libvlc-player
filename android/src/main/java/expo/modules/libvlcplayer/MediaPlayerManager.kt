@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference
 
 object MediaPlayerManager {
     lateinit var audioFocusManager: AudioFocusManager
+    lateinit var keepAwakeManager: KeepAwakeManager
 
     var playerViews: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
 
@@ -19,6 +20,10 @@ object MediaPlayerManager {
     fun onModuleCreate(appContext: AppContext) {
         if (!this::audioFocusManager.isInitialized) {
             audioFocusManager = AudioFocusManager(appContext)
+        }
+
+        if (!this::keepAwakeManager.isInitialized) {
+            keepAwakeManager = KeepAwakeManager(appContext)
         }
     }
 
