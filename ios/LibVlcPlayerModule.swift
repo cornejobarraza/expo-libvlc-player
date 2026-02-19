@@ -58,63 +58,93 @@ public class LibVlcPlayerModule: Module {
             Events(playerEvents)
 
             Prop("source") { (view: LibVlcPlayerView, source: String?) in
-                view.source = source
+                if source != view.source {
+                    view.source = source
+                }
             }
 
             Prop("options") { (view: LibVlcPlayerView, options: [String]?) in
-                view.options = options ?? [String]()
+                if options != view.options {
+                    view.options = options ?? [String]()
+                }
             }
 
             Prop("tracks") { (view: LibVlcPlayerView, tracks: Tracks?) in
-                view.tracks = tracks
+                if tracks != view.tracks {
+                    view.tracks = tracks
+                }
             }
 
             Prop("slaves") { (view: LibVlcPlayerView, slaves: [Slave]?) in
-                view.slaves = slaves ?? [Slave]()
+                if slaves != view.slaves {
+                    view.slaves = slaves ?? [Slave]()
+                }
             }
 
             Prop("scale") { (view: LibVlcPlayerView, scale: Float?) in
-                view.scale = scale ?? defaultPlayerScale
+                if scale != view.scale {
+                    view.scale = scale ?? defaultPlayerScale
+                }
             }
 
             Prop("aspectRatio") { (view: LibVlcPlayerView, aspectRatio: String?) in
-                view.aspectRatio = aspectRatio
+                if aspectRatio != view.aspectRatio {
+                    view.aspectRatio = aspectRatio
+                }
             }
 
             Prop("contentFit") { (view: LibVlcPlayerView, contentFit: VideoContentFit?) in
-                view.contentFit = contentFit ?? .contain
+                if contentFit != view.contentFit {
+                    view.contentFit = contentFit ?? .contain
+                }
             }
 
             Prop("rate") { (view: LibVlcPlayerView, rate: Float?) in
-                view.rate = rate ?? defaultPlayerRate
+                if rate != view.rate {
+                    view.rate = rate ?? defaultPlayerRate
+                }
             }
 
             Prop("time") { (view: LibVlcPlayerView, time: Int?) in
-                view.time = time ?? defaultPlayerTime
+                if time != view.time {
+                    view.time = time ?? defaultPlayerTime
+                }
             }
 
             Prop("volume") { (view: LibVlcPlayerView, volume: Int?) in
-                view.volume = volume ?? maxPlayerVolume
+                if volume != view.volume {
+                    view.volume = volume ?? maxPlayerVolume
+                }
             }
 
             Prop("mute") { (view: LibVlcPlayerView, mute: Bool?) in
-                view.mute = mute ?? false
+                if mute != view.mute {
+                    view.mute = mute ?? false
+                }
             }
 
             Prop("audioMixingMode") { (view: LibVlcPlayerView, audioMixingMode: AudioMixingMode?) in
-                view.audioMixingMode = audioMixingMode ?? .auto
+                if audioMixingMode != view.audioMixingMode {
+                    view.audioMixingMode = audioMixingMode ?? .auto
+                }
             }
 
             Prop("playInBackground") { (view: LibVlcPlayerView, playInBackground: Bool?) in
-                view.playInBackground = playInBackground ?? false
+                if playInBackground != view.playInBackground {
+                    view.playInBackground = playInBackground ?? false
+                }
             }
 
             Prop("repeat") { (view: LibVlcPlayerView, shouldRepeat: Bool?) in
-                view.shouldRepeat = shouldRepeat ?? false
+                if shouldRepeat != view.shouldRepeat {
+                    view.shouldRepeat = shouldRepeat ?? false
+                }
             }
 
             Prop("autoplay") { (view: LibVlcPlayerView, autoplay: Bool?) in
-                view.autoplay = autoplay ?? true
+                if autoplay != view.autoplay {
+                    view.autoplay = autoplay ?? true
+                }
             }
 
             OnViewDidUpdateProps { (view: LibVlcPlayerView) in

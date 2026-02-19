@@ -289,13 +289,17 @@ class LibVlcPlayerView: ExpoView {
 
     var source: String? {
         didSet {
-            shouldCreate = source != oldValue
+            if !shouldCreate {
+                shouldCreate = source != oldValue
+            }
         }
     }
 
     var options: [String] = .init() {
         didSet {
-            shouldCreate = options != oldValue
+            if !shouldCreate {
+                shouldCreate = options != oldValue
+            }
         }
     }
 
