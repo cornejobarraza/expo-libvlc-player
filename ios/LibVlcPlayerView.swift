@@ -49,11 +49,11 @@ class LibVlcPlayerView: ExpoView {
     required init(appContext: AppContext? = nil) {
         super.init(appContext: appContext)
 
-        playerView.backgroundColor = .black
         clipsToBounds = true
+        playerView.backgroundColor = .black
+        addSubview(playerView)
 
         MediaPlayerManager.shared.registerPlayerView(self)
-        addSubview(playerView)
     }
 
     deinit {
@@ -61,12 +61,10 @@ class LibVlcPlayerView: ExpoView {
         destroyPlayer()
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-
-        setContentFit()
-
-        playerView.frame = bounds
+    override var bounds: CGRect {
+        didSet {
+            playerView.frame = bounds
+        }
     }
 
     func createPlayer() {
@@ -147,10 +145,11 @@ class LibVlcPlayerView: ExpoView {
 
     func setContentFit() {
         if let player = mediaPlayer {
-            var transform: CGAffineTransform = .identity
-
             let view = playerView.bounds.size
+
             let video = player.videoSize
+
+            var transform: CGAffineTransform = .identity
 
             if video != .zero {
                 let viewAspect = view.width / view.height
@@ -262,8 +261,8 @@ class LibVlcPlayerView: ExpoView {
                 player.scaleFactor = scale
             }
 
-            if let aspectRatio = aspectRatio {
-                aspectRatio.withCString { cString in
+            if let ratio = aspectRatio {
+                ratio.withCString { cString in
                     player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
                 }
             }
@@ -290,17 +289,13 @@ class LibVlcPlayerView: ExpoView {
 
     var source: String? {
         didSet {
-            if !shouldCreate {
-                shouldCreate = source != oldValue
-            }
+            shouldCreate = source != oldValue
         }
     }
 
     var options: [String] = .init() {
         didSet {
-            if !shouldCreate {
-                shouldCreate = options != oldValue
-            }
+            shouldCreate = options != oldValue
         }
     }
 
@@ -333,12 +328,16 @@ class LibVlcPlayerView: ExpoView {
 
     var aspectRatio: String? {
         didSet {
-            if let aspectRatio = aspectRatio {
-                aspectRatio.withCString { cString in
+            if let ratio = aspectRatio {
+                ratio.withCString { cString in
                     mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
                 }
             } else {
                 mediaPlayer?.videoAspectRatio = nil
+            }
+
+            DispatchQueue.main.async {
+                self.setContentFit()
             }
         }
     }

@@ -101,7 +101,6 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
             ...slave,
             source: parseSource(slave.source)!,
           }))}
-          aspectRatio={!props.contentFit ? props.aspectRatio : null}
           onEncounteredError={onEncounteredError}
           onDialogDisplay={onDialogDisplay}
           onTimeChanged={onTimeChanged}
