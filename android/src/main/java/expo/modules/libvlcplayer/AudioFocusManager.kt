@@ -132,29 +132,23 @@ class AudioFocusManager(
     private fun pausePlayerIfUnmuted(player: MediaPlayer?) {
         player?.let { mediaPlayer ->
             if (mediaPlayer.getVolume() > MIN_PLAYER_VOLUME) {
-                appContext.mainQueue.launch {
-                    mediaPlayer.pause()
-                }
+                mediaPlayer.pause()
             }
         }
     }
 
     private fun duckPlayer(player: MediaPlayer?) {
         player?.let { mediaPlayer ->
-            appContext.mainQueue.launch {
-                val volume = mediaPlayer.getVolume() / 20
-                mediaPlayer.setVolume(volume)
-                oldVolume = volume
-            }
+            val volume = mediaPlayer.getVolume() / 2
+            oldVolume = volume
+            mediaPlayer.setVolume(volume)
         }
     }
 
     private fun unduckPlayer(player: MediaPlayer?) {
         player?.let { mediaPlayer ->
             if (mediaPlayer.getVolume() > MIN_PLAYER_VOLUME) {
-                appContext.mainQueue.launch {
-                    mediaPlayer.setVolume(oldVolume)
-                }
+                mediaPlayer.setVolume(oldVolume)
             }
         }
     }
