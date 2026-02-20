@@ -1,4 +1,3 @@
-import { useKeepAwake } from "expo-keep-awake";
 import { LibVlcPlayerView, LibVlcPlayerViewRef } from "expo-libvlc-player";
 import { StatusBar } from "expo-status-bar";
 import { useRef, useState } from "react";
@@ -24,8 +23,6 @@ export default function App() {
 
   const playerRef = useRef<LibVlcPlayerViewRef | null>(null);
   const bufferingRef = useRef<NodeJS.Timeout | null>(null);
-
-  useKeepAwake();
 
   const handleBuffering = () => {
     setBuffering(true);
