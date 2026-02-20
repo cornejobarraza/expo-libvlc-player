@@ -121,8 +121,7 @@ class LibVlcPlayerView(
         try {
             URI(source)
         } catch (_: Exception) {
-            val error = mapOf("error" to "Invalid source, media could not be set")
-            onEncounteredError(error)
+            onEncounteredError(mapOf("error" to "Invalid source, media could not be set"))
             return
         }
 
@@ -195,8 +194,7 @@ class LibVlcPlayerView(
             try {
                 URI(source)
             } catch (_: Exception) {
-                val error = mapOf("error" to "Invalid slave, $type could not be added")
-                onEncounteredError(error)
+                onEncounteredError(mapOf("error" to "Invalid slave, $type could not be added"))
                 return@forEach
             }
 
@@ -425,8 +423,7 @@ class LibVlcPlayerView(
             field = value
 
             if (options.hasAudioOption()) {
-                val error = mapOf("error" to "Audio disabled via options")
-                onEncounteredError(error)
+                onEncounteredError(mapOf("error" to "Audio disabled via options"))
             }
 
             val newVolume = value.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
@@ -443,8 +440,7 @@ class LibVlcPlayerView(
             field = value
 
             if (options.hasAudioOption()) {
-                val error = mapOf("error" to "Audio disabled via options")
-                onEncounteredError(error)
+                onEncounteredError(mapOf("error" to "Audio disabled via options"))
             }
 
             val newVolume =
@@ -475,8 +471,7 @@ class LibVlcPlayerView(
             field = value
 
             if (options.hasRepeatOption()) {
-                val error = mapOf("error" to "Repeat enabled via options")
-                onEncounteredError(error)
+                onEncounteredError(mapOf("error" to "Repeat enabled via options"))
             }
         }
 
@@ -538,8 +533,7 @@ class LibVlcPlayerView(
                 val success = player.record(path)
 
                 if (!success) {
-                    val error = mapOf("error" to "Media could not be recorded")
-                    onEncounteredError(error)
+                    onEncounteredError(mapOf("error" to "Media could not be recorded"))
 
                     player.record(null)
                 }
@@ -575,14 +569,12 @@ class LibVlcPlayerView(
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
                         }
 
-                        val path = mapOf("path" to snapshotPath)
-                        onSnapshotTaken(path)
+                        onSnapshotTaken(mapOf("path" to snapshotPath))
                     },
                     Handler(Looper.getMainLooper()),
                 )
             } catch (_: Exception) {
-                val error = mapOf("error" to "Media snapshot could not be taken")
-                onEncounteredError(error)
+                onEncounteredError(mapOf("error" to "Media snapshot could not be taken"))
             }
         }
     }

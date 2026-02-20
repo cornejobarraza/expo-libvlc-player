@@ -19,7 +19,6 @@ extension MediaPlayerManager {
         let isOutputtingAudio = playerViews.allObjects.contains { view in
             guard let player = view.mediaPlayer else { return false }
             guard let audio = player.audio else { return false }
-
             return player.isPlaying && audio.volume > minPlayerVolume
         }
 

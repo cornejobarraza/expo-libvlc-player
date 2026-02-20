@@ -21,9 +21,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 
                             setupPlayer()
 
-                            val mediaInfo = getMediaInfo()
-
-                            onFirstPlay(mediaInfo)
+                            onFirstPlay(getMediaInfo())
 
                             firstPlay = false
                         }
@@ -64,8 +62,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     }
 
                     Event.EncounteredError -> {
-                        val error = mapOf("error" to "Media player encountered an error")
-                        onEncounteredError(error)
+                        onEncounteredError(mapOf("error" to "Media player encountered an error"))
 
                         MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
@@ -75,14 +72,11 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     }
 
                     Event.TimeChanged -> {
-                        val time = mapOf("time" to player.getTime().toInt())
-                        onTimeChanged(time)
+                        onTimeChanged(mapOf("time" to player.getTime().toInt()))
 
                         if (firstTime) {
                             if (mediaLength == 0L) {
-                                val mediaInfo = getMediaInfo()
-
-                                onFirstPlay(mediaInfo)
+                                onFirstPlay(getMediaInfo())
                             }
 
                             setContentFit()
@@ -94,25 +88,18 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     }
 
                     Event.PositionChanged -> {
-                        val position = mapOf("position" to player.getPosition())
-                        onPositionChanged(position)
+                        onPositionChanged(mapOf("position" to player.getPosition()))
                     }
 
                     Event.ESAdded -> {
-                        val mediaTracks = getMediaTracks()
-                        onESAdded(mediaTracks)
+                        onESAdded(getMediaTracks())
                     }
 
                     Event.RecordChanged -> {
-                        var recording = Recording()
-
-                        val path = event.getRecordPath()
-                        val isRecording = event.getRecording()
-
-                        recording =
+                        val recording =
                             Recording(
-                                path = path,
-                                isRecording = isRecording,
+                                path = event.getRecordPath(),
+                                isRecording = event.getRecording(),
                             )
 
                         onRecordChanged(recording)

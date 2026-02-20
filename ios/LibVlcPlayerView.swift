@@ -90,8 +90,7 @@ class LibVlcPlayerView: ExpoView {
         vlcDialog!.customRenderer = self
 
         guard let url = URL(string: source) else {
-            let error = ["error": "Invalid source, media could not be set"]
-            onEncounteredError(error)
+            onEncounteredError(["error": "Invalid source, media could not be set"])
             return
         }
 
@@ -135,8 +134,7 @@ class LibVlcPlayerView: ExpoView {
             let selected = slave.selected ?? false
 
             guard let url = URL(string: source) else {
-                let error = ["error": "Invalid slave, \(type) could not be added"]
-                onEncounteredError(error)
+                onEncounteredError(["error": "Invalid slave, \(type) could not be added"])
                 continue
             }
 
@@ -350,8 +348,7 @@ class LibVlcPlayerView: ExpoView {
     var volume: Int = maxPlayerVolume {
         didSet {
             if options.hasAudioOption() {
-                let error = ["error": "Audio disabled via options"]
-                onEncounteredError(error)
+                onEncounteredError(["error": "Audio disabled via options"])
             }
 
             let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
@@ -367,8 +364,7 @@ class LibVlcPlayerView: ExpoView {
     var mute: Bool = false {
         didSet {
             if options.hasAudioOption() {
-                let error = ["error": "Audio disabled via options"]
-                onEncounteredError(error)
+                onEncounteredError(["error": "Audio disabled via options"])
             }
 
             let newVolume = mute ?
@@ -391,8 +387,7 @@ class LibVlcPlayerView: ExpoView {
     var shouldRepeat: Bool = false {
         didSet {
             if options.hasRepeatOption() {
-                let error = ["error": "Repeat enabled via options"]
-                onEncounteredError(error)
+                onEncounteredError(["error": "Repeat enabled via options"])
             }
         }
     }
@@ -448,8 +443,7 @@ class LibVlcPlayerView: ExpoView {
                 let success = !player.startRecording(atPath: path)
 
                 if !success {
-                    let error = ["error": "Media could not be recorded"]
-                    onEncounteredError(error)
+                    onEncounteredError(["error": "Media could not be recorded"])
 
                     player.stopRecording()
                 }
@@ -471,11 +465,9 @@ class LibVlcPlayerView: ExpoView {
 
             player.saveVideoSnapshot(at: snapshotPath, withWidth: width, andHeight: height)
 
-            let path = ["path": snapshotPath]
-            onSnapshotTaken(path)
+            onSnapshotTaken(["path": snapshotPath])
         } else {
-            let error = ["error": "Media snapshot could not be taken"]
-            onEncounteredError(error)
+            onEncounteredError(["error": "Media snapshot could not be taken"])
         }
     }
 

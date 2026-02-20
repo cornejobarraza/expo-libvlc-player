@@ -16,9 +16,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 if firstPlay {
                     setupPlayer()
 
-                    let mediaInfo = getMediaInfo()
-
-                    onFirstPlay(mediaInfo)
+                    onFirstPlay(getMediaInfo())
 
                     firstPlay = false
                 }
@@ -49,8 +47,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     player.play()
                 }
             case .error:
-                let error = ["error": "Media player encountered an error"]
-                onEncounteredError(error)
+                onEncounteredError(["error": "Media player encountered an error"])
 
                 MediaPlayerManager.shared.deactivateKeepAwake()
                 MediaPlayerManager.shared.setAppropriateAudioSession()
@@ -58,8 +55,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 firstPlay = true
                 firstTime = true
             case .esAdded:
-                let mediaTracks = getMediaTracks()
-                onESAdded(mediaTracks)
+                onESAdded(getMediaTracks())
             default:
                 break
             }
@@ -68,14 +64,11 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
     func mediaPlayerTimeChanged(_: Notification) {
         if let player = mediaPlayer {
-            let time = ["time": player.time.intValue]
-            onTimeChanged(time)
+            onTimeChanged(["time": player.time.intValue])
 
             if firstTime {
                 if mediaLength == 0 {
-                    let mediaInfo = getMediaInfo()
-
-                    onFirstPlay(mediaInfo)
+                    onFirstPlay(getMediaInfo())
                 }
 
                 setContentFit()
@@ -85,15 +78,12 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 firstTime = false
             }
 
-            let position = ["position": player.position]
-            onPositionChanged(position)
+            onPositionChanged(["position": player.position])
         }
     }
 
     func mediaPlayerStartedRecording(_: VLCMediaPlayer) {
-        var recording = Recording()
-
-        recording = Recording(
+        let recording = Recording(
             path: nil,
             isRecording: true,
         )
@@ -102,9 +92,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     }
 
     func mediaPlayer(_: VLCMediaPlayer, recordingStoppedAtPath path: String) {
-        var recording = Recording()
-
-        recording = Recording(
+        let recording = Recording(
             path: path,
             isRecording: false,
         )
