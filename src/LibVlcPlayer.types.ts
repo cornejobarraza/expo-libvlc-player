@@ -249,6 +249,15 @@ export interface LibVlcPlayerViewNativeProps extends ViewProps {
 export interface LibVlcPlayerViewProps extends ViewProps {
   /**
    * Sets the source of the media to be played. Set to `null` to release the player
+   *
+   * @example
+   *
+   * ```tsx
+   * const BIG_BUCK_BUNNY =
+   *    "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov";
+   *
+   * <LibVlcPlayerView source={BIG_BUCK_BUNNY} />
+   * ```
    */
   source: LibVlcSource;
   /**
@@ -256,7 +265,16 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    *
    * https://wiki.videolan.org/VLC_command-line_help/
    *
-   * @example ["--network-caching=1000"]
+   * @example
+   *
+   * ```tsx
+   * const options = ["--network-caching=1000"];
+   *
+   * <LibVlcPlayerView
+   *    source={BIG_BUCK_BUNNY}
+   *    options={options}
+   * />
+   * ```
    *
    * @default []
    */
@@ -265,13 +283,17 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Sets the player audio, video and subtitle tracks
    *
    * @example
+   *
    * ```tsx
+   * const tracks = {
+   *    audio: 3,
+   *    video: 2,
+   *    subtitle: 1,
+   * };
+   *
    * <LibVlcPlayerView
-   *    tracks={{
-   *      audio: 0,
-   *      video: 1,
-   *      subtitle: 2,
-   *    }}
+   *    source={BIG_BUCK_BUNNY}
+   *    tracks={tracks}
    * />
    * ```
    *
@@ -282,15 +304,17 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Sets the player audio and subtitle slaves
    *
    * @example
+   *
    * ```tsx
+   * const subtitles = [{
+   *    source: "file://path/to/subtitle.srt",
+   *    type: "subtitle",
+   *    selected: true,
+   * }];
+   *
    * <LibVlcPlayerView
-   *    slaves={[
-   *      {
-   *        source: "file://path/to/subtitle.srt",
-   *        type: "subtitle",
-   *        selected: true
-   *      },
-   *    ]}
+   *    source={BIG_BUCK_BUNNY}
+   *    slaves={subtitles}
    * />
    * ```
    *
@@ -345,6 +369,8 @@ export interface LibVlcPlayerViewProps extends ViewProps {
   mute?: boolean;
   /**
    * Determines how the player will interact with other audio playing in the system
+   *
+   * @example "doNotMix"
    *
    * @default "auto"
    */

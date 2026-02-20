@@ -89,9 +89,10 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 ```tsx
 import { LibVlcPlayerView } from "expo-libvlc-player";
 
-return (
-  <LibVlcPlayerView source="https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov" />
-);
+const BIG_BUCK_BUNNY =
+  "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov";
+
+return <LibVlcPlayerView source={BIG_BUCK_BUNNY} />;
 ```
 
 Check whether battery optimization is enabled on Android:
