@@ -13,6 +13,9 @@ import {
 
 import { IconSymbol } from "./components/IconSymbol";
 
+const BIG_BUCK_BUNNY =
+  "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov";
+
 export default function App() {
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(true);
@@ -49,7 +52,7 @@ export default function App() {
         <LibVlcPlayerView
           ref={playerRef}
           style={styles.player}
-          source="https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov"
+          source={BIG_BUCK_BUNNY}
           aspectRatio="16:9"
           volume={volume}
           onBuffering={handleBuffering}

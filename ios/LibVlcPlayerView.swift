@@ -58,6 +58,7 @@ class LibVlcPlayerView: ExpoView {
 
     deinit {
         MediaPlayerManager.shared.unregisterPlayerView(self)
+
         destroyPlayer()
     }
 
@@ -145,7 +146,7 @@ class LibVlcPlayerView: ExpoView {
 
     func setContentFit() {
         if let player = mediaPlayer {
-            let view = playerView.bounds.size
+            let view = playerView.frame.size
 
             let video = player.videoSize
 
@@ -261,12 +262,6 @@ class LibVlcPlayerView: ExpoView {
                 player.scaleFactor = scale
             }
 
-            if let ratio = aspectRatio {
-                ratio.withCString { cString in
-                    player.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
-                }
-            }
-
             if rate != defaultPlayerRate {
                 player.rate = rate
             }
@@ -332,14 +327,6 @@ class LibVlcPlayerView: ExpoView {
 
     var aspectRatio: String? {
         didSet {
-            if let ratio = aspectRatio {
-                ratio.withCString { cString in
-                    mediaPlayer?.videoAspectRatio = UnsafeMutablePointer(mutating: cString)
-                }
-            } else {
-                mediaPlayer?.videoAspectRatio = nil
-            }
-
             DispatchQueue.main.async {
                 self.setContentFit()
             }

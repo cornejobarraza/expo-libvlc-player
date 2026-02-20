@@ -128,8 +128,8 @@ See the [Example App](example/App.tsx) for additional usage.
 | `pause()`                                          | Pauses playback of the current player                                                                                  | `Promise<void>` |
 | `stop()`                                           | Stops playback of the current player                                                                                   | `Promise<void>` |
 | `seek(value: number, type?: "time" \| "position")` | Sets the time or position of the current player. Must be a number equal or greater than `0`, type defaults to `"time"` | `Promise<void>` |
-| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid string or `undefined` to stop recording                   | `Promise<void>` |
-| `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid string                                                          | `Promise<void>` |
+| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid path string or `undefined` to stop recording              | `Promise<void>` |
+| `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid path string                                                     | `Promise<void>` |
 | `postAction(action: number)`                       | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                             | `Promise<void>` |
 | `dismiss()`                                        | Dismisses a [`Dialog`](#dialog)                                                                                        | `Promise<void>` |
 
@@ -144,7 +144,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `tracks`           | Sets the player audio, video and subtitle tracks object. See [`Tracks`](#tracks) for more                                         | `undefined` |
 | `slaves`           | Sets the player audio and subtitle slaves array. See [`Slave`](#slave) for more                                                   | `[]`        |
 | `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
-| `aspectRatio`      | Sets the player aspect ratio. Must be a valid string or `null` for default                                                        | `undefined` |
+| `aspectRatio`      | Sets the player aspect ratio. Must be a valid ratio string                                                                        | `undefined` |
 | `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
 | `rate`             | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
 | `time`             | Sets the initial player time. Must be an integer in milliseconds                                                                  | `0`         |

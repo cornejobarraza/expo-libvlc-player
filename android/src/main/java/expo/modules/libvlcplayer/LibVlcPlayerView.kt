@@ -337,10 +337,6 @@ class LibVlcPlayerView(
                 player.setScale(scale)
             }
 
-            if (aspectRatio != null) {
-                player.setAspectRatio(aspectRatio)
-            }
-
             if (rate != DEFAULT_PLAYER_RATE) {
                 player.setRate(rate)
             }
@@ -404,7 +400,6 @@ class LibVlcPlayerView(
     var aspectRatio: String? = null
         set(value) {
             field = value
-            mediaPlayer?.setAspectRatio(value)
 
             post {
                 setContentFit()
