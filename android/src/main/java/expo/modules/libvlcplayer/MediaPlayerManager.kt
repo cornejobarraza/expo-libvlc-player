@@ -7,7 +7,7 @@ object MediaPlayerManager {
     lateinit var audioFocusManager: AudioFocusManager
     lateinit var keepAwakeManager: KeepAwakeManager
 
-    var playerViews: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
+    val playerViews: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
 
     fun registerPlayerView(view: LibVlcPlayerView) {
         playerViews.find { it.get() == view } ?: run { playerViews.add(WeakReference(view)) }

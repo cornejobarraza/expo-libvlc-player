@@ -89,12 +89,6 @@ public class LibVlcPlayerModule: Module {
                 }
             }
 
-            Prop("aspectRatio") { (view: LibVlcPlayerView, aspectRatio: String?) in
-                if aspectRatio != view.aspectRatio {
-                    view.aspectRatio = aspectRatio
-                }
-            }
-
             Prop("contentFit") { (view: LibVlcPlayerView, contentFit: VideoContentFit?) in
                 if contentFit != view.contentFit {
                     view.contentFit = contentFit ?? .contain

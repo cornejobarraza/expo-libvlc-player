@@ -98,6 +98,17 @@ class LibVlcPlayerView(
         detachPlayer()
     }
 
+    override fun onSizeChanged(
+        w: Int,
+        h: Int,
+        oldw: Int,
+        oldh: Int,
+    ) {
+        super.onSizeChanged(w, h, oldw, oldh)
+
+        setContentFit()
+    }
+
     fun getTextureView(): TextureView? = playerView.findViewById(org.videolan.R.id.texture_video)
 
     fun createPlayer() {
@@ -204,12 +215,12 @@ class LibVlcPlayerView(
 
     fun setContentFit() {
         post {
+            val textureView = getTextureView() ?: return@post
+
+            val matrix = Matrix()
+
             mediaPlayer?.let { player ->
-                val textureView = getTextureView() ?: return@post
-
                 val video = player.getCurrentVideoTrack()
-
-                val matrix = Matrix()
 
                 if (video != null) {
                     val viewWidth = playerView.width.toFloat()
@@ -254,9 +265,9 @@ class LibVlcPlayerView(
                         }
                     }
                 }
-
-                textureView.setTransform(matrix)
             }
+
+            textureView.setTransform(matrix)
         }
     }
 
@@ -400,12 +411,6 @@ class LibVlcPlayerView(
         set(value) {
             field = value
             mediaPlayer?.setScale(value)
-        }
-
-    var aspectRatio: String? = null
-        set(value) {
-            field = value
-            setContentFit()
         }
 
     var contentFit: VideoContentFit = VideoContentFit.CONTAIN

@@ -99,10 +99,6 @@ class LibVlcPlayerModule : Module() {
                     view.scale = scale ?: DEFAULT_PLAYER_SCALE
                 }
 
-                Prop("aspectRatio") { view: LibVlcPlayerView, aspectRatio: String? ->
-                    view.aspectRatio = aspectRatio
-                }
-
                 Prop("contentFit") { view: LibVlcPlayerView, contentFit: VideoContentFit? ->
                     view.contentFit = contentFit ?: VideoContentFit.CONTAIN
                 }
@@ -145,7 +141,6 @@ class LibVlcPlayerModule : Module() {
 
                 OnViewDestroys { view: LibVlcPlayerView ->
                     MediaPlayerManager.unregisterPlayerView(view)
-
                     view.destroyPlayer()
                 }
 

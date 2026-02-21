@@ -58,13 +58,14 @@ class LibVlcPlayerView: ExpoView {
 
     deinit {
         MediaPlayerManager.shared.unregisterPlayerView(self)
-
         destroyPlayer()
     }
 
     override var bounds: CGRect {
         didSet {
+            playerView.transform = .identity
             playerView.frame = bounds
+            setContentFit()
         }
     }
 
@@ -144,12 +145,12 @@ class LibVlcPlayerView: ExpoView {
 
     func setContentFit() {
         DispatchQueue.main.async {
+            let view = self.playerView.frame.size
+
+            var transform: CGAffineTransform = .identity
+
             if let player = self.mediaPlayer {
-                let view = self.playerView.frame.size
-
                 let video = player.videoSize
-
-                var transform: CGAffineTransform = .identity
 
                 if video != .zero {
                     let viewAspect = view.width / view.height
@@ -178,9 +179,9 @@ class LibVlcPlayerView: ExpoView {
                         transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
                     }
                 }
-
-                self.playerView.transform = transform
             }
+
+            self.playerView.transform = transform
         }
     }
 
@@ -324,12 +325,6 @@ class LibVlcPlayerView: ExpoView {
     var scale: Float = defaultPlayerScale {
         didSet {
             mediaPlayer?.scaleFactor = scale
-        }
-    }
-
-    var aspectRatio: String? {
-        didSet {
-            setContentFit()
         }
     }
 

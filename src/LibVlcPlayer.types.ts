@@ -76,6 +76,8 @@ export interface Slave {
   selected?: boolean;
 }
 
+export type VideoAspectRatio = string | number;
+
 export type VideoContentFit = "contain" | "cover" | "fill";
 
 export type AudioMixingMode =
@@ -219,7 +221,7 @@ export interface LibVlcPlayerViewNativeProps extends ViewProps {
   tracks?: Tracks;
   slaves?: Slave[];
   scale?: number;
-  aspectRatio?: string;
+  aspectRatio?: VideoAspectRatio;
   contentFit?: VideoContentFit;
   rate?: number;
   time?: number;
@@ -328,13 +330,13 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   scale?: number;
   /**
-   * Sets the player aspect ratio. Must be a valid ratio string
+   * Sets the player aspect ratio. Must be a valid ratio string or number
    *
    * @example "16:9"
    *
    * @default undefined
    */
-  aspectRatio?: string;
+  aspectRatio?: VideoAspectRatio;
   /**
    * Sets how the video should be scaled to fit in the container
    *

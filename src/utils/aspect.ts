@@ -1,7 +1,9 @@
-const DEFAULT_ASPECT_RATIO = 1 / 1;
+import { VideoAspectRatio } from "../LibVlcPlayer.types";
 
-export function convertAspectRatio(ratio?: string): number {
-  if (ratio !== undefined) {
+export function convertAspectRatio(
+  ratio?: VideoAspectRatio,
+): VideoAspectRatio | undefined {
+  if (typeof ratio === "string") {
     const numbers = ratio.split(":");
 
     if (numbers.length === 2) {
@@ -13,5 +15,5 @@ export function convertAspectRatio(ratio?: string): number {
     }
   }
 
-  return DEFAULT_ASPECT_RATIO;
+  return ratio;
 }
