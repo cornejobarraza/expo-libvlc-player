@@ -23,7 +23,7 @@ class LibVlcPlayerView: ExpoView {
     var vlcDialog: VLCDialogProvider?
     var vlcDialogRef: NSValue?
 
-    var mediaLength: Int32 = 0
+    var mediaLength: Int32?
     private var oldVolume: Int = maxPlayerVolume
 
     private var shouldCreate: Bool = false
@@ -248,7 +248,9 @@ class LibVlcPlayerView: ExpoView {
                 tracks: mediaTracks,
             )
 
-            mediaLength = length
+            mediaLength = length > 0 ?
+                length :
+                nil
         }
 
         return mediaInfo
@@ -428,7 +430,8 @@ class LibVlcPlayerView: ExpoView {
                 }
             } else {
                 if type == "position" {
-                    time = Int(value * Double(mediaLength))
+                    let length = mediaLength ?? 0
+                    time = Int(value * Double(length))
                 } else {
                     time = Int(value)
                 }

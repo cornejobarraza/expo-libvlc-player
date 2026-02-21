@@ -60,7 +60,7 @@ class LibVlcPlayerView(
     private var media: Media? = null
     var vlcDialog: VLCDialog? = null
 
-    var mediaLength: Long = 0L
+    var mediaLength: Long? = null
 
     private var shouldCreate: Boolean = false
     var firstPlay: Boolean = false
@@ -323,7 +323,12 @@ class LibVlcPlayerView(
                     tracks = mediaTracks,
                 )
 
-            mediaLength = length
+            mediaLength =
+                if (length > 0L) {
+                    length
+                } else {
+                    null
+                }
         }
 
         return mediaInfo
@@ -514,7 +519,8 @@ class LibVlcPlayerView(
                 }
             } else {
                 if (type == "position") {
-                    time = (value * mediaLength.toDouble()).toInt()
+                    val length = mediaLength ?: 0L
+                    time = (value * length.toDouble()).toInt()
                 } else {
                     time = value.toInt()
                 }

@@ -75,7 +75,7 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                         onTimeChanged(mapOf("time" to player.getTime().toInt()))
 
                         if (firstTime) {
-                            if (mediaLength == 0L) {
+                            if (mediaLength == null) {
                                 onFirstPlay(getMediaInfo())
                             }
 

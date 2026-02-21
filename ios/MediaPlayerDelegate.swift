@@ -67,7 +67,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             onTimeChanged(["time": player.time.intValue])
 
             if firstTime {
-                if mediaLength == 0 {
+                if mediaLength == nil {
                     onFirstPlay(getMediaInfo())
                 }
 
