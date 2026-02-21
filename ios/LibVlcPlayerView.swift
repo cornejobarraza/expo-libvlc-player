@@ -143,42 +143,44 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func setContentFit() {
-        if let player = mediaPlayer {
-            let view = playerView.frame.size
+        DispatchQueue.main.async {
+            if let player = self.mediaPlayer {
+                let view = self.playerView.frame.size
 
-            let video = player.videoSize
+                let video = player.videoSize
 
-            var transform: CGAffineTransform = .identity
+                var transform: CGAffineTransform = .identity
 
-            if video != .zero {
-                let viewAspect = view.width / view.height
-                let videoAspect = video.width / video.height
+                if video != .zero {
+                    let viewAspect = view.width / view.height
+                    let videoAspect = video.width / video.height
 
-                switch contentFit {
-                case .contain:
-                    // No transform required
-                    break
-                case .cover:
-                    let scale = videoAspect > viewAspect ?
-                        videoAspect / viewAspect :
-                        viewAspect / videoAspect
+                    switch self.contentFit {
+                    case .contain:
+                        // No transform required
+                        break
+                    case .cover:
+                        let scale = videoAspect > viewAspect ?
+                            videoAspect / viewAspect :
+                            viewAspect / videoAspect
 
-                    transform = CGAffineTransform(scaleX: scale, y: scale)
-                case .fill:
-                    var scaleX = 1.0
-                    var scaleY = 1.0
+                        transform = CGAffineTransform(scaleX: scale, y: scale)
+                    case .fill:
+                        var scaleX = 1.0
+                        var scaleY = 1.0
 
-                    if videoAspect > viewAspect {
-                        scaleY = videoAspect / viewAspect
-                    } else {
-                        scaleX = viewAspect / videoAspect
+                        if videoAspect > viewAspect {
+                            scaleY = videoAspect / viewAspect
+                        } else {
+                            scaleX = viewAspect / videoAspect
+                        }
+
+                        transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
                     }
-
-                    transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
                 }
-            }
 
-            playerView.transform = transform
+                self.playerView.transform = transform
+            }
         }
     }
 
@@ -325,9 +327,7 @@ class LibVlcPlayerView: ExpoView {
 
     var aspectRatio: String? {
         didSet {
-            DispatchQueue.main.async {
-                self.setContentFit()
-            }
+            setContentFit()
         }
     }
 

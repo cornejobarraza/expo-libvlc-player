@@ -203,58 +203,60 @@ class LibVlcPlayerView(
     }
 
     fun setContentFit() {
-        mediaPlayer?.let { player ->
-            val textureView = getTextureView() ?: return
+        post {
+            mediaPlayer?.let { player ->
+                val textureView = getTextureView() ?: return@post
 
-            val video = player.getCurrentVideoTrack()
+                val video = player.getCurrentVideoTrack()
 
-            val matrix = Matrix()
+                val matrix = Matrix()
 
-            if (video != null) {
-                val viewWidth = playerView.width.toFloat()
-                val viewHeight = playerView.height.toFloat()
+                if (video != null) {
+                    val viewWidth = playerView.width.toFloat()
+                    val viewHeight = playerView.height.toFloat()
 
-                val videoWidth = video.width.toFloat()
-                val videoHeight = video.height.toFloat()
+                    val videoWidth = video.width.toFloat()
+                    val videoHeight = video.height.toFloat()
 
-                val viewAspect = viewWidth / viewHeight
-                val videoAspect = videoWidth / videoHeight
+                    val viewAspect = viewWidth / viewHeight
+                    val videoAspect = videoWidth / videoHeight
 
-                val pivotX = viewWidth / 2f
-                val pivotY = viewHeight / 2f
+                    val pivotX = viewWidth / 2f
+                    val pivotY = viewHeight / 2f
 
-                when (contentFit) {
-                    VideoContentFit.CONTAIN -> {
-                        // No scale required
-                    }
-
-                    VideoContentFit.COVER -> {
-                        val scale =
-                            if (videoAspect > viewAspect) {
-                                videoAspect / viewAspect
-                            } else {
-                                viewAspect / videoAspect
-                            }
-
-                        matrix.setScale(scale, scale, pivotX, pivotY)
-                    }
-
-                    VideoContentFit.FILL -> {
-                        var scaleX = 1f
-                        var scaleY = 1f
-
-                        if (videoAspect > viewAspect) {
-                            scaleY = videoAspect / viewAspect
-                        } else {
-                            scaleX = viewAspect / videoAspect
+                    when (contentFit) {
+                        VideoContentFit.CONTAIN -> {
+                            // No scale required
                         }
 
-                        matrix.setScale(scaleX, scaleY, pivotX, pivotY)
+                        VideoContentFit.COVER -> {
+                            val scale =
+                                if (videoAspect > viewAspect) {
+                                    videoAspect / viewAspect
+                                } else {
+                                    viewAspect / videoAspect
+                                }
+
+                            matrix.setScale(scale, scale, pivotX, pivotY)
+                        }
+
+                        VideoContentFit.FILL -> {
+                            var scaleX = 1f
+                            var scaleY = 1f
+
+                            if (videoAspect > viewAspect) {
+                                scaleY = videoAspect / viewAspect
+                            } else {
+                                scaleX = viewAspect / videoAspect
+                            }
+
+                            matrix.setScale(scaleX, scaleY, pivotX, pivotY)
+                        }
                     }
                 }
-            }
 
-            textureView.setTransform(matrix)
+                textureView.setTransform(matrix)
+            }
         }
     }
 
@@ -398,10 +400,7 @@ class LibVlcPlayerView(
     var aspectRatio: String? = null
         set(value) {
             field = value
-
-            post {
-                setContentFit()
-            }
+            setContentFit()
         }
 
     var contentFit: VideoContentFit = VideoContentFit.CONTAIN
