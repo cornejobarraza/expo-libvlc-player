@@ -144,7 +144,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `tracks`           | Sets the player audio, video and subtitle tracks object. See [`Tracks`](#tracks) for more                                         | `undefined` |
 | `slaves`           | Sets the player audio and subtitle slaves array. See [`Slave`](#slave) for more                                                   | `[]`        |
 | `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
-| `aspectRatio`      | Sets the player aspect ratio. Must be a valid ratio string or number                                                              | `undefined` |
+| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio string or number                                                           | `undefined` |
 | `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
 | `rate`             | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
 | `time`             | Sets the initial player time. Must be an integer in milliseconds                                                                  | `0`         |

@@ -330,7 +330,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   scale?: number;
   /**
-   * Sets the player aspect ratio. Must be a valid ratio string or number
+   * Sets the container aspect ratio. Must be a valid ratio string or number
    *
    * @example "16:9"
    *
