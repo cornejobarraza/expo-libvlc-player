@@ -50,7 +50,6 @@ export default function App() {
           ref={playerRef}
           style={styles.player}
           source={BIG_BUCK_BUNNY}
-          aspectRatio="16:9"
           volume={volume}
           onBuffering={handleBuffering}
           onPlaying={() => setPlaying(true)}

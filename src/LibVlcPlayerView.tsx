@@ -15,6 +15,7 @@ import {
   type Recording,
   type Snapshot,
   type Time,
+  type VideoAspectRatio,
 } from "./LibVlcPlayer.types";
 import { convertAspectRatio } from "./utils/aspect";
 import { parseSource } from "./utils/assets";
@@ -23,16 +24,19 @@ import { convertNativeEvent } from "./utils/events";
 const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
   requireNativeView("ExpoLibVlcPlayer");
 
+const RENDERING_CHILDREN_WARNING =
+  "The <LibVlcPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the LibVlcPlayer, consider using absolute positioning.";
+
 let loggedRenderingChildrenWarning: boolean = false;
+
+const DEFAULT_ASPECT_RATIO = 16 / 9;
 
 const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
   (props, ref) => {
-    const aspectRatio = useRef<number | undefined>(undefined);
+    const fallbackRatio = useRef<VideoAspectRatio>(DEFAULT_ASPECT_RATIO);
 
     if (props.children && !loggedRenderingChildrenWarning) {
-      console.warn(
-        "The <LibVlcPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the LibVlcPlayer, consider using absolute positioning.",
-      );
+      console.warn(RENDERING_CHILDREN_WARNING);
       loggedRenderingChildrenWarning = true;
     }
 
@@ -99,11 +103,12 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         props.onFirstPlay(nativeEvent);
       }
 
-      aspectRatio.current = nativeEvent.width / nativeEvent.height || undefined;
+      fallbackRatio.current =
+        nativeEvent.width / nativeEvent.height || DEFAULT_ASPECT_RATIO;
     };
 
-    const nilRatio = props.aspectRatio || aspectRatio.current;
-    const nativeRatio = convertAspectRatio(nilRatio);
+    const aspectRatio = props.aspectRatio || fallbackRatio.current;
+    const nativeRatio = convertAspectRatio(aspectRatio);
 
     return (
       <View style={{ aspectRatio: nativeRatio }}>
