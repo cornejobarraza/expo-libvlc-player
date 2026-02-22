@@ -10,26 +10,26 @@ enum AudioMixingMode: String, Enumerable {
     func priority() -> Int {
         switch self {
         case .doNotMix:
-            return 3
+            3
         case .auto:
-            return 2
+            2
         case .duckOthers:
-            return 1
+            1
         case .mixWithOthers:
-            return 0
+            0
         }
     }
 
     func toSessionCategoryOption() -> AVAudioSession.CategoryOptions? {
         switch self {
         case .duckOthers:
-            return .duckOthers
+            .duckOthers
         case .mixWithOthers:
-            return .mixWithOthers
+            .mixWithOthers
         case .doNotMix:
-            return nil
+            nil
         case .auto:
-            return nil
+            nil
         }
     }
 }

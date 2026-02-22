@@ -1,9 +1,9 @@
-apply plugin: "com.android.library"
+apply plugin: 'com.android.library'
 
-group = "expo.modules.libvlcplayer"
-version = "3.4.11"
+group = 'expo.modules.libvlcplayer'
+version = '3.4.11'
 
-def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+def expoModulesCorePlugin = new File(project(':expo-modules-core').projectDir.absolutePath, 'ExpoModulesCorePlugin.gradle')
 apply from: expoModulesCorePlugin
 applyKotlinExpoModulesCorePlugin()
 useCoreDependencies()
@@ -15,21 +15,21 @@ buildscript {
     }
 }
 
-project.android {
-    compileSdkVersion safeExtGet("compileSdkVersion", 35)
-    defaultConfig {
-        minSdkVersion safeExtGet("minSdkVersion", 25)
-        targetSdkVersion safeExtGet("targetSdkVersion", 35)
-    }
-}
-
 android {
-    namespace "expo.modules.libvlcplayer"
+    namespace 'expo.modules.libvlcplayer'
+
+    compileSdkVersion safeExtGet('compileSdkVersion', 35)
+
     defaultConfig {
+        minSdkVersion safeExtGet('minSdkVersion', 24)
+        targetSdkVersion safeExtGet('targetSdkVersion', 35)
+
         versionCode 1
-        versionName "3.4.11"
-        consumerProguardFiles("proguard-rules.pro")
+        versionName '3.4.11'
+
+        consumerProguardFiles('proguard-rules.pro')
     }
+
     lintOptions {
         abortOnError false
     }
@@ -40,6 +40,6 @@ repositories {
 }
 
 dependencies {
-    implementation "com.facebook.react:react-native:+"
-    implementation "org.videolan.android:libvlc-all:3.6.5"
+    implementation 'com.facebook.react:react-android'
+    implementation 'org.videolan.android:libvlc-all:3.6.5'
 }

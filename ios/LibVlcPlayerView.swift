@@ -76,7 +76,7 @@ class LibVlcPlayerView: ExpoView {
 
         destroyPlayer()
 
-        guard let source = source else { return }
+        guard let source else { return }
 
         options.toggleStartPausedOption(autoplay)
 
@@ -428,7 +428,7 @@ class LibVlcPlayerView: ExpoView {
 
     func record(_ path: String?) {
         if let player = mediaPlayer, player.isPlaying {
-            if let path = path {
+            if let path {
                 // https://code.videolan.org/videolan/VLCKit/-/issues/394
                 let success = !player.startRecording(atPath: path)
 
@@ -476,7 +476,7 @@ class LibVlcPlayerView: ExpoView {
     }
 }
 
-private extension Array where Element == String {
+private extension [String] {
     func hasAudioOption() -> Bool {
         let options = [
             "--no-audio",
@@ -488,7 +488,7 @@ private extension Array where Element == String {
     }
 }
 
-extension Array where Element == String {
+extension [String] {
     func hasRepeatOption() -> Bool {
         let options = [
             "--input-repeat=",
@@ -504,7 +504,7 @@ extension Array where Element == String {
     }
 }
 
-private extension Array where Element == String {
+private extension [String] {
     func hasStartPausedOption() -> Bool {
         let options = [
             "--start-paused",
@@ -516,7 +516,7 @@ private extension Array where Element == String {
     }
 }
 
-private extension Array where Element == String {
+private extension [String] {
     mutating func toggleStartPausedOption(_ autoplay: Bool) {
         let options = [
             "--start-paused",
