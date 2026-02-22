@@ -106,7 +106,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
     const nativeRatio = convertAspectRatio(nilRatio);
 
     return (
-      <View style={{ aspectRatio: nativeRatio, alignSelf: "center" }}>
+      <View style={{ aspectRatio: nativeRatio }}>
         <NativeView
           {...props}
           ref={ref}
