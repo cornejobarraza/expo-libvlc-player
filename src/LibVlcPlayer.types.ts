@@ -1,5 +1,6 @@
 import type { ViewProps } from "react-native";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type LibVlcPlayerModuleEvents = {};
 
 export interface LibVlcPlayerViewRef {
