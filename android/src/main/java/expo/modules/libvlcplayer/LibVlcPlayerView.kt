@@ -120,9 +120,7 @@ class LibVlcPlayerView(
 
         val source = source ?: return
 
-        if (autoplay) {
-            options.removeStartPausedOption()
-        }
+        options.toggleStartPausedOption(autoplay)
 
         libVLC = LibVLC(context, options)
         setDialogCallbacks()
@@ -487,10 +485,6 @@ class LibVlcPlayerView(
     var autoplay: Boolean = true
         set(value) {
             field = value
-
-            if (!value) {
-                options.add("--start-paused")
-            }
         }
 
     fun play() {
@@ -644,7 +638,7 @@ class LibVlcPlayerView(
         return this.any { option -> option in options }
     }
 
-    private fun ArrayList<String>.removeStartPausedOption() {
+    private fun ArrayList<String>.toggleStartPausedOption(autoplay: Boolean) {
         val options =
             setOf(
                 "--start-paused",
@@ -653,5 +647,9 @@ class LibVlcPlayerView(
             )
 
         this.removeAll(options)
+
+        if (!autoplay) {
+            this.add("--start-paused")
+        }
     }
 }

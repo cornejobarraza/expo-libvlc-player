@@ -78,9 +78,7 @@ class LibVlcPlayerView: ExpoView {
 
         guard let source = source else { return }
 
-        if autoplay {
-            options.removeStartPausedOption()
-        }
+        options.toggleStartPausedOption(autoplay)
 
         mediaPlayer = VLCMediaPlayer(options: options)
         mediaPlayer!.drawable = playerView
@@ -389,13 +387,7 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    var autoplay: Bool = true {
-        didSet {
-            if !autoplay {
-                options.append("--start-paused")
-            }
-        }
-    }
+    var autoplay: Bool = true
 
     func play() {
         if let player = mediaPlayer {
@@ -525,7 +517,7 @@ private extension Array where Element == String {
 }
 
 private extension Array where Element == String {
-    mutating func removeStartPausedOption() {
+    mutating func toggleStartPausedOption(_ autoplay: Bool) {
         let options = [
             "--start-paused",
             "-start-paused",
@@ -533,5 +525,9 @@ private extension Array where Element == String {
         ]
 
         removeAll { option in options.contains(option) }
+
+        if !autoplay {
+            append("--start-paused")
+        }
     }
 }
