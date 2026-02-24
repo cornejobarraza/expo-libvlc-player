@@ -5,8 +5,10 @@ import android.os.PowerManager
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.enums.VideoContentFit
+import expo.modules.libvlcplayer.managers.MediaPlayerManager
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
 
@@ -83,60 +85,56 @@ class LibVlcPlayerModule : Module() {
                     view.source = source
                 }
 
-                Prop("options") { view: LibVlcPlayerView, options: ArrayList<String>? ->
-                    view.options = options ?: ArrayList<String>()
+                Prop("options", ArrayList<String>()) { view: LibVlcPlayerView, options: ArrayList<String> ->
+                    view.options = options
                 }
 
                 Prop("tracks") { view: LibVlcPlayerView, tracks: Tracks? ->
                     view.tracks = tracks
                 }
 
-                Prop("slaves") { view: LibVlcPlayerView, slaves: ArrayList<Slave>? ->
-                    view.slaves = slaves ?: ArrayList<Slave>()
+                Prop("slaves", ArrayList<Slave>()) { view: LibVlcPlayerView, slaves: ArrayList<Slave> ->
+                    view.slaves = slaves
                 }
 
-                Prop("scale") { view: LibVlcPlayerView, scale: Float? ->
-                    view.scale = scale ?: DEFAULT_PLAYER_SCALE
+                Prop("scale", MediaPlayerConstants.DEFAULT_PLAYER_SCALE) { view: LibVlcPlayerView, scale: Float ->
+                    view.scale = scale
                 }
 
-                Prop("contentFit") { view: LibVlcPlayerView, contentFit: VideoContentFit? ->
-                    view.contentFit = contentFit ?: VideoContentFit.CONTAIN
+                Prop("contentFit", VideoContentFit.CONTAIN) { view: LibVlcPlayerView, contentFit: VideoContentFit ->
+                    view.contentFit = contentFit
                 }
 
-                Prop("rate") { view: LibVlcPlayerView, rate: Float? ->
-                    view.rate = rate ?: DEFAULT_PLAYER_RATE
+                Prop("rate", MediaPlayerConstants.DEFAULT_PLAYER_RATE) { view: LibVlcPlayerView, rate: Float ->
+                    view.rate = rate
                 }
 
-                Prop("time") { view: LibVlcPlayerView, time: Int? ->
-                    view.time = time ?: DEFAULT_PLAYER_TIME
+                Prop("time", MediaPlayerConstants.DEFAULT_PLAYER_TIME) { view: LibVlcPlayerView, time: Int ->
+                    view.time = time
                 }
 
-                Prop("volume") { view: LibVlcPlayerView, volume: Int? ->
-                    view.volume = volume ?: MAX_PLAYER_VOLUME
+                Prop("volume", MediaPlayerConstants.MAX_PLAYER_VOLUME) { view: LibVlcPlayerView, volume: Int ->
+                    view.volume = volume
                 }
 
-                Prop("mute") { view: LibVlcPlayerView, mute: Boolean? ->
-                    view.mute = mute ?: false
+                Prop("mute", false) { view: LibVlcPlayerView, mute: Boolean ->
+                    view.mute = mute
                 }
 
-                Prop("audioMixingMode") { view: LibVlcPlayerView, audioMixingMode: AudioMixingMode? ->
-                    view.audioMixingMode = audioMixingMode ?: AudioMixingMode.AUTO
+                Prop("audioMixingMode", AudioMixingMode.AUTO) { view: LibVlcPlayerView, audioMixingMode: AudioMixingMode ->
+                    view.audioMixingMode = audioMixingMode
                 }
 
-                Prop("playInBackground") { view: LibVlcPlayerView, playInBackground: Boolean? ->
-                    view.playInBackground = playInBackground ?: false
+                Prop("playInBackground", false) { view: LibVlcPlayerView, playInBackground: Boolean ->
+                    view.playInBackground = playInBackground
                 }
 
-                Prop("repeat") { view: LibVlcPlayerView, repeat: Boolean? ->
-                    view.repeat = repeat ?: false
+                Prop("repeat", false) { view: LibVlcPlayerView, repeat: Boolean ->
+                    view.repeat = repeat
                 }
 
-                Prop("autoplay") { view: LibVlcPlayerView, autoplay: Boolean? ->
-                    view.autoplay = autoplay ?: true
-                }
-
-                OnViewDidUpdateProps { view: LibVlcPlayerView ->
-                    view.createPlayer()
+                Prop("autoplay", true) { view: LibVlcPlayerView, autoplay: Boolean ->
+                    view.autoplay = autoplay
                 }
 
                 OnViewDestroys { view: LibVlcPlayerView ->

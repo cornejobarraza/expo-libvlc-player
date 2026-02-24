@@ -10,7 +10,7 @@ class LocalNetworkManager {
     /// This is a ‘best effort’ approach, and it handles errors by ignoring them.
     /// There’s no guarantee that it’ll actually trigger the alert (FB8711182).
 
-    func triggerLocalNetworkPrivacyAlert() {
+    func triggerNetworkAlert() {
         let addresses = selectedLinkLocalIPv6Addresses()
         for address in addresses {
             let sock6 = socket(AF_INET6, SOCK_DGRAM, 0)

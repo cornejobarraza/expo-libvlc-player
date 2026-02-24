@@ -6,15 +6,7 @@ import ExpoModulesCore
 #endif
 import UIKit
 
-let defaultPlayerRate: Float = 1.0
-let defaultPlayerTime: Int = 0
-let defaultPlayerScale: Float = 0.0
-
-let minPlayerVolume: Int = 0
-let maxPlayerVolume: Int = 100
-let playerVolumeStep: Int = 10
-
-let dialogCustomUI: Bool = true
+private let dialogCustomUI: Bool = true
 
 class LibVlcPlayerView: ExpoView {
     private let playerView = UIView()
@@ -24,9 +16,8 @@ class LibVlcPlayerView: ExpoView {
     var vlcDialogRef: NSValue?
 
     var mediaLength: Int32?
-    private var oldVolume: Int = maxPlayerVolume
+    private var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
 
-    private var shouldCreate: Bool = false
     var firstPlay: Bool = false
     var firstTime: Bool = false
 
@@ -70,17 +61,14 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func createPlayer() {
-        if !shouldCreate {
-            return
-        }
-
         destroyPlayer()
 
         guard let source else { return }
 
-        options.toggleStartPausedOption(autoplay)
+        var initOptions = options
+        initOptions.toggleStartPausedOption(autoplay)
 
-        mediaPlayer = VLCMediaPlayer(options: options)
+        mediaPlayer = VLCMediaPlayer(options: initOptions)
         mediaPlayer!.drawable = playerView
         mediaPlayer!.delegate = self
 
@@ -97,7 +85,6 @@ class LibVlcPlayerView: ExpoView {
         addPlayerSlaves()
         mediaPlayer!.play()
 
-        shouldCreate = false
         firstPlay = true
         firstTime = true
     }
@@ -259,43 +246,39 @@ class LibVlcPlayerView: ExpoView {
         if let player = mediaPlayer {
             setPlayerTracks()
 
-            if scale != defaultPlayerScale {
+            if scale != MediaPlayerConstants.defaultPlayerScale {
                 player.scaleFactor = scale
             }
 
-            if rate != defaultPlayerRate {
+            if rate != MediaPlayerConstants.defaultPlayerRate {
                 player.rate = rate
             }
 
-            if time != defaultPlayerTime {
+            if time != MediaPlayerConstants.defaultPlayerTime {
                 player.time = VLCTime(int: Int32(time))
             }
 
-            if volume != maxPlayerVolume || mute {
+            if volume != MediaPlayerConstants.maxPlayerVolume || mute {
                 let newVolume = mute ?
-                    minPlayerVolume :
+                    MediaPlayerConstants.minPlayerVolume :
                     volume
 
                 player.audio?.volume = Int32(newVolume)
             }
 
-            time = defaultPlayerTime
+            time = MediaPlayerConstants.defaultPlayerTime
         }
     }
 
     var source: String? {
         didSet {
-            if !shouldCreate {
-                shouldCreate = source != oldValue
-            }
+            createPlayer()
         }
     }
 
     var options: [String] = .init() {
         didSet {
-            if !shouldCreate {
-                shouldCreate = options != oldValue
-            }
+            createPlayer()
         }
     }
 
@@ -320,7 +303,7 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    var scale: Float = defaultPlayerScale {
+    var scale: Float = MediaPlayerConstants.defaultPlayerScale {
         didSet {
             mediaPlayer?.scaleFactor = scale
         }
@@ -332,60 +315,46 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    var rate: Float = defaultPlayerRate {
+    var rate: Float = MediaPlayerConstants.defaultPlayerRate {
         didSet {
             mediaPlayer?.rate = rate
         }
     }
 
-    var time: Int = defaultPlayerTime
+    var time: Int = MediaPlayerConstants.defaultPlayerTime
 
-    var volume: Int = maxPlayerVolume {
+    var volume: Int = MediaPlayerConstants.maxPlayerVolume {
         didSet {
-            if options.hasAudioOption() {
-                onEncounteredError(["error": "Audio disabled via options"])
-            }
-
-            let newVolume = max(minPlayerVolume, min(maxPlayerVolume, volume))
+            let newVolume = max(MediaPlayerConstants.minPlayerVolume, min(MediaPlayerConstants.maxPlayerVolume, volume))
             oldVolume = newVolume
 
             if !mute {
                 mediaPlayer?.audio?.volume = Int32(newVolume)
-                MediaPlayerManager.shared.setAppropriateAudioSession()
+                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
             }
         }
     }
 
     var mute: Bool = false {
         didSet {
-            if options.hasAudioOption() {
-                onEncounteredError(["error": "Audio disabled via options"])
-            }
-
             let newVolume = mute ?
-                minPlayerVolume :
+                MediaPlayerConstants.minPlayerVolume :
                 oldVolume
 
             mediaPlayer?.audio?.volume = Int32(newVolume)
-            MediaPlayerManager.shared.setAppropriateAudioSession()
+            MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
         }
     }
 
     var audioMixingMode: AudioMixingMode = .auto {
         didSet {
-            MediaPlayerManager.shared.setAppropriateAudioSession()
+            MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
         }
     }
 
     var playInBackground: Bool = false
 
-    var shouldRepeat: Bool = false {
-        didSet {
-            if options.hasRepeatOption() {
-                onEncounteredError(["error": "Repeat enabled via options"])
-            }
-        }
-    }
+    var shouldRepeat: Bool = false
 
     var autoplay: Bool = true
 
@@ -476,32 +445,169 @@ class LibVlcPlayerView: ExpoView {
     }
 }
 
-private extension [String] {
-    func hasAudioOption() -> Bool {
-        let options = [
-            "--no-audio",
-            "-no-audio",
-            ":no-audio",
-        ]
+extension LibVlcPlayerView: VLCMediaPlayerDelegate {
+    func mediaPlayerStateChanged(_: Notification) {
+        if let player = mediaPlayer {
+            switch player.state {
+            case .buffering:
+                onBuffering()
+            case .playing:
+                onPlaying()
 
-        return contains { option in options.contains(option) }
-    }
-}
+                if firstPlay {
+                    setupPlayer()
 
-extension [String] {
-    func hasRepeatOption() -> Bool {
-        let options = [
-            "--input-repeat=",
-            "-input-repeat=",
-            ":input-repeat=",
-        ]
+                    onFirstPlay(getMediaInfo())
 
-        return contains { option in
-            options.contains { value in
-                option.hasPrefix(value)
+                    firstPlay = false
+                }
+
+                MediaPlayerManager.shared.keepAwakeManager.activateKeepAwake()
+                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+            case .paused:
+                onPaused()
+
+                MediaPlayerManager.shared.keepAwakeManager.deactivateKeepAwake()
+                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+            case .stopped:
+                onStopped()
+
+                MediaPlayerManager.shared.keepAwakeManager.deactivateKeepAwake()
+                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+
+                firstPlay = true
+                firstTime = true
+            case .ended:
+                onEndReached()
+
+                player.stop()
+
+                if shouldRepeat {
+                    player.play()
+                }
+            case .error:
+                onEncounteredError(["error": "Media player encountered an error"])
+
+                MediaPlayerManager.shared.keepAwakeManager.deactivateKeepAwake()
+                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+
+                firstPlay = true
+                firstTime = true
+            case .esAdded:
+                onESAdded(getMediaTracks())
+            default:
+                break
             }
         }
     }
+
+    func mediaPlayerTimeChanged(_: Notification) {
+        if let player = mediaPlayer {
+            onTimeChanged(["time": player.time.intValue])
+
+            if firstTime {
+                if mediaLength == nil {
+                    onFirstPlay(getMediaInfo())
+                }
+
+                setContentFit()
+
+                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+
+                firstTime = false
+            }
+
+            onPositionChanged(["position": player.position])
+        }
+    }
+
+    func mediaPlayerStartedRecording(_: VLCMediaPlayer) {
+        let recording = Recording(
+            path: nil,
+            isRecording: true,
+        )
+
+        onRecordChanged(recording)
+    }
+
+    func mediaPlayer(_: VLCMediaPlayer, recordingStoppedAtPath path: String) {
+        let recording = Recording(
+            path: path,
+            isRecording: false,
+        )
+
+        onRecordChanged(recording)
+    }
+}
+
+extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
+    func showError(
+        withTitle title: String,
+        message: String
+    ) {
+        let dialog = Dialog(
+            title: title,
+            text: message,
+        )
+
+        onDialogDisplay(dialog)
+    }
+
+    func showLogin(
+        withTitle title: String,
+        message: String,
+        defaultUsername _: String?,
+        askingForStorage _: Bool,
+        withReference reference: NSValue
+    ) {
+        vlcDialogRef = reference
+
+        let dialog = Dialog(
+            title: title,
+            text: message,
+        )
+
+        onDialogDisplay(dialog)
+    }
+
+    func showQuestion(
+        withTitle title: String,
+        message: String,
+        type _: VLCDialogQuestionType,
+        cancel: String?,
+        action1String: String?,
+        action2String: String?,
+        withReference reference: NSValue
+    ) {
+        vlcDialogRef = reference
+
+        let dialog = Dialog(
+            title: title,
+            text: message,
+            cancelText: cancel,
+            action1Text: action1String,
+            action2Text: action2String
+        )
+
+        onDialogDisplay(dialog)
+    }
+
+    func showProgress(
+        withTitle _: String,
+        message _: String,
+        isIndeterminate _: Bool,
+        position _: Float,
+        cancel _: String?,
+        withReference _: NSValue
+    ) {}
+
+    func updateProgress(
+        withReference _: NSValue,
+        message _: String?,
+        position _: Float
+    ) {}
+
+    func cancelDialog(withReference _: NSValue) {}
 }
 
 private extension [String] {

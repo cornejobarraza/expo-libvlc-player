@@ -1,4 +1,4 @@
-package expo.modules.libvlcplayer
+package expo.modules.libvlcplayer.managers
 
 import android.app.Activity
 import android.view.WindowManager

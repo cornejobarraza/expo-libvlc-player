@@ -39,7 +39,7 @@ public class LibVlcPlayerModule: Module {
         Name("ExpoLibVlcPlayer")
 
         AsyncFunction("triggerNetworkAlert") {
-            LocalNetworkManager.shared.triggerLocalNetworkPrivacyAlert()
+            MediaPlayerManager.shared.localNetworkManager.triggerNetworkAlert()
         }
 
         OnDestroy {
@@ -47,12 +47,12 @@ public class LibVlcPlayerModule: Module {
         }
 
         OnAppEntersForeground {
-            MediaPlayerManager.shared.activateKeepAwake()
+            MediaPlayerManager.shared.keepAwakeManager.activateKeepAwake()
             MediaPlayerManager.shared.onModuleForeground()
         }
 
         OnAppEntersBackground {
-            MediaPlayerManager.shared.deactivateKeepAwake()
+            MediaPlayerManager.shared.keepAwakeManager.deactivateKeepAwake()
             MediaPlayerManager.shared.onModuleBackground()
         }
 
@@ -65,9 +65,9 @@ public class LibVlcPlayerModule: Module {
                 }
             }
 
-            Prop("options") { (view: LibVlcPlayerView, options: [String]?) in
+            Prop("options", [String]()) { (view: LibVlcPlayerView, options: [String]) in
                 if options != view.options {
-                    view.options = options ?? [String]()
+                    view.options = options
                 }
             }
 
@@ -77,74 +77,70 @@ public class LibVlcPlayerModule: Module {
                 }
             }
 
-            Prop("slaves") { (view: LibVlcPlayerView, slaves: [Slave]?) in
+            Prop("slaves", [Slave]()) { (view: LibVlcPlayerView, slaves: [Slave]) in
                 if slaves != view.slaves {
-                    view.slaves = slaves ?? [Slave]()
+                    view.slaves = slaves
                 }
             }
 
-            Prop("scale") { (view: LibVlcPlayerView, scale: Float?) in
+            Prop("scale", MediaPlayerConstants.defaultPlayerScale) { (view: LibVlcPlayerView, scale: Float) in
                 if scale != view.scale {
-                    view.scale = scale ?? defaultPlayerScale
+                    view.scale = scale
                 }
             }
 
-            Prop("contentFit") { (view: LibVlcPlayerView, contentFit: VideoContentFit?) in
+            Prop("contentFit", .contain) { (view: LibVlcPlayerView, contentFit: VideoContentFit) in
                 if contentFit != view.contentFit {
-                    view.contentFit = contentFit ?? .contain
+                    view.contentFit = contentFit
                 }
             }
 
-            Prop("rate") { (view: LibVlcPlayerView, rate: Float?) in
+            Prop("rate", MediaPlayerConstants.defaultPlayerRate) { (view: LibVlcPlayerView, rate: Float) in
                 if rate != view.rate {
-                    view.rate = rate ?? defaultPlayerRate
+                    view.rate = rate
                 }
             }
 
-            Prop("time") { (view: LibVlcPlayerView, time: Int?) in
+            Prop("time", MediaPlayerConstants.defaultPlayerTime) { (view: LibVlcPlayerView, time: Int) in
                 if time != view.time {
-                    view.time = time ?? defaultPlayerTime
+                    view.time = time
                 }
             }
 
-            Prop("volume") { (view: LibVlcPlayerView, volume: Int?) in
+            Prop("volume", MediaPlayerConstants.maxPlayerVolume) { (view: LibVlcPlayerView, volume: Int) in
                 if volume != view.volume {
-                    view.volume = volume ?? maxPlayerVolume
+                    view.volume = volume
                 }
             }
 
-            Prop("mute") { (view: LibVlcPlayerView, mute: Bool?) in
+            Prop("mute", false) { (view: LibVlcPlayerView, mute: Bool) in
                 if mute != view.mute {
-                    view.mute = mute ?? false
+                    view.mute = mute
                 }
             }
 
-            Prop("audioMixingMode") { (view: LibVlcPlayerView, audioMixingMode: AudioMixingMode?) in
+            Prop("audioMixingMode", .auto) { (view: LibVlcPlayerView, audioMixingMode: AudioMixingMode) in
                 if audioMixingMode != view.audioMixingMode {
-                    view.audioMixingMode = audioMixingMode ?? .auto
+                    view.audioMixingMode = audioMixingMode
                 }
             }
 
-            Prop("playInBackground") { (view: LibVlcPlayerView, playInBackground: Bool?) in
+            Prop("playInBackground", false) { (view: LibVlcPlayerView, playInBackground: Bool) in
                 if playInBackground != view.playInBackground {
-                    view.playInBackground = playInBackground ?? false
+                    view.playInBackground = playInBackground
                 }
             }
 
-            Prop("repeat") { (view: LibVlcPlayerView, shouldRepeat: Bool?) in
+            Prop("repeat", false) { (view: LibVlcPlayerView, shouldRepeat: Bool) in
                 if shouldRepeat != view.shouldRepeat {
-                    view.shouldRepeat = shouldRepeat ?? false
+                    view.shouldRepeat = shouldRepeat
                 }
             }
 
-            Prop("autoplay") { (view: LibVlcPlayerView, autoplay: Bool?) in
+            Prop("autoplay", true) { (view: LibVlcPlayerView, autoplay: Bool) in
                 if autoplay != view.autoplay {
-                    view.autoplay = autoplay ?? true
+                    view.autoplay = autoplay
                 }
-            }
-
-            OnViewDidUpdateProps { (view: LibVlcPlayerView) in
-                view.createPlayer()
             }
 
             AsyncFunction("play") { (view: LibVlcPlayerView) in

@@ -2,7 +2,9 @@ import AVFoundation
 import ExpoModulesCore
 import Foundation
 
-extension MediaPlayerManager {
+class AudioSessionManager {
+    static let shared = AudioSessionManager()
+
     private static let managerQueue = DispatchQueue(label: "audioManagerQueue")
 
     func setAppropriateAudioSession() {
@@ -16,10 +18,10 @@ extension MediaPlayerManager {
         let audioMixingMode = findAudioMixingMode()
         var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession.categoryOptions
 
-        let isOutputtingAudio = playerViews.allObjects.contains { view in
+        let isOutputtingAudio = MediaPlayerManager.shared.playerViews.allObjects.contains { view in
             guard let player = view.mediaPlayer else { return false }
             guard let audio = player.audio else { return false }
-            return player.isPlaying && audio.volume > minPlayerVolume
+            return player.isPlaying && audio.volume > MediaPlayerConstants.minPlayerVolume
         }
 
         let shouldMixOverride = audioMixingMode == .mixWithOthers
@@ -58,7 +60,7 @@ extension MediaPlayerManager {
     }
 
     private func findAudioMixingMode() -> AudioMixingMode? {
-        let playingViews = playerViews.allObjects.filter { view in
+        let playingViews = MediaPlayerManager.shared.playerViews.allObjects.filter { view in
             view.mediaPlayer?.isPlaying == true
         }
 

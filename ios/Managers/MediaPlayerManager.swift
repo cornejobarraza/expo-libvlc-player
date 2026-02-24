@@ -3,6 +3,10 @@ import Foundation
 class MediaPlayerManager {
     static let shared = MediaPlayerManager()
 
+    let localNetworkManager = LocalNetworkManager()
+    let audioSessionManager = AudioSessionManager()
+    let keepAwakeManager = KeepAwakeManager()
+
     let playerViews = NSHashTable<LibVlcPlayerView>.weakObjects()
 
     func registerPlayerView(_ view: LibVlcPlayerView) {

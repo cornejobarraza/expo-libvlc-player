@@ -12,8 +12,10 @@ import android.view.TextureView
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
+import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.enums.VideoContentFit
+import expo.modules.libvlcplayer.managers.MediaPlayerManager
 import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
@@ -24,6 +26,8 @@ import expo.modules.libvlcplayer.records.Tracks
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
+import org.videolan.libvlc.MediaPlayer.Event
+import org.videolan.libvlc.MediaPlayer.EventListener
 import org.videolan.libvlc.interfaces.IMedia
 import org.videolan.libvlc.util.DisplayManager
 import org.videolan.libvlc.util.VLCVideoLayout
@@ -33,14 +37,6 @@ import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import org.videolan.libvlc.Dialog as VLCDialog
-
-const val DEFAULT_PLAYER_RATE: Float = 1f
-const val DEFAULT_PLAYER_TIME: Int = 0
-const val DEFAULT_PLAYER_SCALE: Float = 0f
-
-const val MIN_PLAYER_VOLUME: Int = 0
-const val MAX_PLAYER_VOLUME: Int = 100
-const val PLAYER_VOLUME_STEP: Int = 10
 
 private val DISPLAY_MANAGER: DisplayManager? = null
 private val ENABLE_SUBTITLES: Boolean = true
@@ -62,7 +58,6 @@ class LibVlcPlayerView(
 
     var mediaLength: Long? = null
 
-    private var shouldCreate: Boolean = false
     var firstPlay: Boolean = false
     var firstTime: Boolean = false
 
@@ -112,17 +107,14 @@ class LibVlcPlayerView(
     fun getTextureView(): TextureView? = playerView.findViewById(org.videolan.R.id.texture_video)
 
     fun createPlayer() {
-        if (!shouldCreate) {
-            return
-        }
-
         destroyPlayer()
 
         val source = source ?: return
 
-        options.toggleStartPausedOption(autoplay)
+        var initOptions = options
+        initOptions.toggleStartPausedOption(autoplay)
 
-        libVLC = LibVLC(context, options)
+        libVLC = LibVLC(context, initOptions)
         setDialogCallbacks()
         mediaPlayer = MediaPlayer(libVLC)
         setMediaPlayerListener()
@@ -140,7 +132,6 @@ class LibVlcPlayerView(
         addPlayerSlaves()
         mediaPlayer!!.play()
 
-        shouldCreate = false
         firstPlay = true
         firstTime = true
     }
@@ -174,6 +165,164 @@ class LibVlcPlayerView(
         libVLC?.release()
         libVLC = null
         removeAllViews()
+    }
+
+    fun setMediaPlayerListener() {
+        mediaPlayer?.let { player ->
+            player.setEventListener(
+                EventListener { event ->
+                    when (event.type) {
+                        Event.Buffering -> {
+                            onBuffering(Unit)
+                        }
+
+                        Event.Playing -> {
+                            onPlaying(Unit)
+
+                            if (firstPlay) {
+                                attachPlayer()
+
+                                setupPlayer()
+
+                                onFirstPlay(getMediaInfo())
+
+                                firstPlay = false
+                            }
+
+                            MediaPlayerManager.keepAwakeManager.activateKeepAwake()
+                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                        }
+
+                        Event.Paused -> {
+                            onPaused(Unit)
+
+                            MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
+                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                        }
+
+                        Event.Stopped -> {
+                            onStopped(Unit)
+
+                            detachPlayer()
+
+                            MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
+                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                            firstPlay = true
+                            firstTime = true
+                        }
+
+                        Event.EndReached -> {
+                            onEndReached(Unit)
+
+                            player.stop()
+
+                            if (repeat) {
+                                player.play()
+                            }
+                        }
+
+                        Event.EncounteredError -> {
+                            onEncounteredError(mapOf("error" to "Media player encountered an error"))
+
+                            MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
+                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                            firstPlay = true
+                            firstTime = true
+                        }
+
+                        Event.TimeChanged -> {
+                            onTimeChanged(mapOf("time" to player.getTime().toInt()))
+
+                            if (firstTime) {
+                                if (mediaLength == null) {
+                                    onFirstPlay(getMediaInfo())
+                                }
+
+                                setContentFit()
+
+                                MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                                firstTime = false
+                            }
+                        }
+
+                        Event.PositionChanged -> {
+                            onPositionChanged(mapOf("position" to player.getPosition()))
+                        }
+
+                        Event.ESAdded -> {
+                            onESAdded(getMediaTracks())
+                        }
+
+                        Event.RecordChanged -> {
+                            val recording =
+                                Recording(
+                                    path = event.getRecordPath(),
+                                    isRecording = event.getRecording(),
+                                )
+
+                            onRecordChanged(recording)
+                        }
+                    }
+                },
+            )
+        }
+    }
+
+    fun setDialogCallbacks() {
+        libVLC?.let {
+            VLCDialog.setCallbacks(
+                it,
+                object : VLCDialog.Callbacks {
+                    override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
+                        vlcDialog = dialog
+
+                        val dialog =
+                            Dialog(
+                                title = dialog.getTitle(),
+                                text = dialog.getText(),
+                            )
+
+                        onDialogDisplay(dialog)
+                    }
+
+                    override fun onDisplay(dialog: VLCDialog.LoginDialog) {
+                        vlcDialog = dialog
+
+                        val dialog =
+                            Dialog(
+                                title = dialog.getTitle(),
+                                text = dialog.getText(),
+                            )
+
+                        onDialogDisplay(dialog)
+                    }
+
+                    override fun onDisplay(dialog: VLCDialog.QuestionDialog) {
+                        vlcDialog = dialog
+
+                        val dialog =
+                            Dialog(
+                                title = dialog.getTitle(),
+                                text = dialog.getText(),
+                                cancelText = dialog.getCancelText(),
+                                action1Text = dialog.getAction1Text(),
+                                action2Text = dialog.getAction2Text(),
+                            )
+
+                        onDialogDisplay(dialog)
+                    }
+
+                    override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
+
+                    override fun onCanceled(dialog: VLCDialog) {}
+
+                    override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
+                },
+            )
+        }
     }
 
     fun setPlayerTracks() {
@@ -347,22 +496,22 @@ class LibVlcPlayerView(
         mediaPlayer?.let { player ->
             setPlayerTracks()
 
-            if (scale != DEFAULT_PLAYER_SCALE) {
+            if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
                 player.setScale(scale)
             }
 
-            if (rate != DEFAULT_PLAYER_RATE) {
+            if (rate != MediaPlayerConstants.DEFAULT_PLAYER_RATE) {
                 player.setRate(rate)
             }
 
-            if (time != DEFAULT_PLAYER_TIME) {
+            if (time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
                 player.setTime(time.toLong())
             }
 
-            if (volume != MAX_PLAYER_VOLUME || mute) {
+            if (volume != MediaPlayerConstants.MAX_PLAYER_VOLUME || mute) {
                 val newVolume =
                     if (mute) {
-                        MIN_PLAYER_VOLUME
+                        MediaPlayerConstants.MIN_PLAYER_VOLUME
                     } else {
                         volume
                     }
@@ -370,7 +519,7 @@ class LibVlcPlayerView(
                 player.setVolume(newVolume)
             }
 
-            time = DEFAULT_PLAYER_TIME
+            time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
         }
     }
 
@@ -378,14 +527,14 @@ class LibVlcPlayerView(
         set(value) {
             val old = field
             field = value
-            shouldCreate = value != old
+            createPlayer()
         }
 
     var options: ArrayList<String> = ArrayList()
         set(value) {
             val old = field
             field = value
-            shouldCreate = value != old
+            createPlayer()
         }
 
     var tracks: Tracks? = null
@@ -405,7 +554,7 @@ class LibVlcPlayerView(
             }
         }
 
-    var scale: Float = DEFAULT_PLAYER_SCALE
+    var scale: Float = MediaPlayerConstants.DEFAULT_PLAYER_SCALE
         set(value) {
             field = value
             mediaPlayer?.setScale(value)
@@ -417,23 +566,19 @@ class LibVlcPlayerView(
             setContentFit()
         }
 
-    var rate: Float = DEFAULT_PLAYER_RATE
+    var rate: Float = MediaPlayerConstants.DEFAULT_PLAYER_RATE
         set(value) {
             field = value
             mediaPlayer?.setRate(value)
         }
 
-    var time: Int = DEFAULT_PLAYER_TIME
+    var time: Int = MediaPlayerConstants.DEFAULT_PLAYER_TIME
 
-    var volume: Int = MAX_PLAYER_VOLUME
+    var volume: Int = MediaPlayerConstants.MAX_PLAYER_VOLUME
         set(value) {
             field = value
 
-            if (options.hasAudioOption()) {
-                onEncounteredError(mapOf("error" to "Audio disabled via options"))
-            }
-
-            val newVolume = value.coerceIn(MIN_PLAYER_VOLUME, MAX_PLAYER_VOLUME)
+            val newVolume = value.coerceIn(MediaPlayerConstants.MIN_PLAYER_VOLUME, MediaPlayerConstants.MAX_PLAYER_VOLUME)
             MediaPlayerManager.audioFocusManager.oldVolume = newVolume
 
             if (!mute) {
@@ -446,13 +591,9 @@ class LibVlcPlayerView(
         set(value) {
             field = value
 
-            if (options.hasAudioOption()) {
-                onEncounteredError(mapOf("error" to "Audio disabled via options"))
-            }
-
             val newVolume =
                 if (value) {
-                    MIN_PLAYER_VOLUME
+                    MediaPlayerConstants.MIN_PLAYER_VOLUME
                 } else {
                     MediaPlayerManager.audioFocusManager.oldVolume
                 }
@@ -476,10 +617,6 @@ class LibVlcPlayerView(
     var repeat: Boolean = false
         set(value) {
             field = value
-
-            if (options.hasRepeatOption()) {
-                onEncounteredError(mapOf("error" to "Repeat enabled via options"))
-            }
         }
 
     var autoplay: Boolean = true
@@ -598,32 +735,6 @@ class LibVlcPlayerView(
         vlcDialog?.let { dialog ->
             dialog.dismiss()
             vlcDialog = null
-        }
-    }
-
-    private fun ArrayList<String>.hasAudioOption(): Boolean {
-        val options =
-            setOf(
-                "--no-audio",
-                "-no-audio",
-                ":no-audio",
-            )
-
-        return this.any { option -> option in options }
-    }
-
-    fun ArrayList<String>.hasRepeatOption(): Boolean {
-        val options =
-            setOf(
-                "--input-repeat=",
-                "-input-repeat=",
-                ":input-repeat=",
-            )
-
-        return this.any { option ->
-            options.any { value ->
-                option.startsWith(value)
-            }
         }
     }
 

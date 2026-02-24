@@ -1,6 +1,7 @@
-package expo.modules.libvlcplayer
+package expo.modules.libvlcplayer.managers
 
 import expo.modules.kotlin.AppContext
+import expo.modules.libvlcplayer.LibVlcPlayerView
 import java.lang.ref.WeakReference
 
 object MediaPlayerManager {
