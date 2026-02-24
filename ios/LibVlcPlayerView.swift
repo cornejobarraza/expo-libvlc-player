@@ -18,6 +18,7 @@ class LibVlcPlayerView: ExpoView {
     var mediaLength: Int32?
     private var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
 
+    private var shouldCreate: Bool = true
     var firstPlay: Bool = false
     var firstTime: Bool = false
 
@@ -61,6 +62,10 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func createPlayer() {
+        if !shouldCreate {
+            return
+        }
+
         destroyPlayer()
 
         guard let source else { return }
@@ -85,17 +90,19 @@ class LibVlcPlayerView: ExpoView {
         addPlayerSlaves()
         mediaPlayer!.play()
 
+        shouldCreate = false
         firstPlay = true
         firstTime = true
     }
 
     func destroyPlayer() {
-        vlcDialogRef = nil
-        vlcDialog = nil
-        mediaPlayer?.media = nil
-        mediaPlayer?.delegate = nil
         mediaPlayer?.drawable = nil
+        mediaPlayer?.delegate = nil
+        mediaPlayer?.media = nil
         mediaPlayer = nil
+        vlcDialog?.customRenderer = nil
+        vlcDialog = nil
+        vlcDialogRef = nil
     }
 
     func setPlayerTracks() {
@@ -272,13 +279,13 @@ class LibVlcPlayerView: ExpoView {
 
     var source: String? {
         didSet {
-            createPlayer()
+            shouldCreate = true
         }
     }
 
     var options: [String] = .init() {
         didSet {
-            createPlayer()
+            shouldCreate = true
         }
     }
 

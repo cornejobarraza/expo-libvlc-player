@@ -58,6 +58,7 @@ class LibVlcPlayerView(
 
     var mediaLength: Long? = null
 
+    private var shouldCreate: Boolean = true
     var firstPlay: Boolean = false
     var firstTime: Boolean = false
 
@@ -107,6 +108,10 @@ class LibVlcPlayerView(
     fun getTextureView(): TextureView? = playerView.findViewById(org.videolan.R.id.texture_video)
 
     fun createPlayer() {
+        if (!shouldCreate) {
+            return
+        }
+
         destroyPlayer()
 
         val source = source ?: return
@@ -132,6 +137,7 @@ class LibVlcPlayerView(
         addPlayerSlaves()
         mediaPlayer!!.play()
 
+        shouldCreate = false
         firstPlay = true
         firstTime = true
     }
@@ -158,12 +164,12 @@ class LibVlcPlayerView(
     }
 
     fun destroyPlayer() {
-        vlcDialog = null
-        media = null
-        mediaPlayer?.release()
-        mediaPlayer = null
         libVLC?.release()
         libVLC = null
+        mediaPlayer?.release()
+        mediaPlayer = null
+        media = null
+        vlcDialog = null
         removeAllViews()
     }
 
@@ -369,14 +375,14 @@ class LibVlcPlayerView(
         set(value) {
             val old = field
             field = value
-            createPlayer()
+            shouldCreate = true
         }
 
     var options: ArrayList<String> = ArrayList()
         set(value) {
             val old = field
             field = value
-            createPlayer()
+            shouldCreate = true
         }
 
     var tracks: Tracks? = null

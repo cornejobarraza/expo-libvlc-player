@@ -143,6 +143,10 @@ public class LibVlcPlayerModule: Module {
                 }
             }
 
+            OnViewDidUpdateProps { (view: LibVlcPlayerView) in
+                view.createPlayer()
+            }
+
             AsyncFunction("play") { (view: LibVlcPlayerView) in
                 view.play()
             }
