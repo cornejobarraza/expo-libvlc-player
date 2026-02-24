@@ -167,164 +167,6 @@ class LibVlcPlayerView(
         removeAllViews()
     }
 
-    fun setMediaPlayerListener() {
-        mediaPlayer?.let { player ->
-            player.setEventListener(
-                EventListener { event ->
-                    when (event.type) {
-                        Event.Buffering -> {
-                            onBuffering(Unit)
-                        }
-
-                        Event.Playing -> {
-                            onPlaying(Unit)
-
-                            if (firstPlay) {
-                                attachPlayer()
-
-                                setupPlayer()
-
-                                onFirstPlay(getMediaInfo())
-
-                                firstPlay = false
-                            }
-
-                            MediaPlayerManager.keepAwakeManager.activateKeepAwake()
-                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
-                        }
-
-                        Event.Paused -> {
-                            onPaused(Unit)
-
-                            MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
-                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
-                        }
-
-                        Event.Stopped -> {
-                            onStopped(Unit)
-
-                            detachPlayer()
-
-                            MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
-                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-                            firstPlay = true
-                            firstTime = true
-                        }
-
-                        Event.EndReached -> {
-                            onEndReached(Unit)
-
-                            player.stop()
-
-                            if (repeat) {
-                                player.play()
-                            }
-                        }
-
-                        Event.EncounteredError -> {
-                            onEncounteredError(mapOf("error" to "Media player encountered an error"))
-
-                            MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
-                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-                            firstPlay = true
-                            firstTime = true
-                        }
-
-                        Event.TimeChanged -> {
-                            onTimeChanged(mapOf("time" to player.getTime().toInt()))
-
-                            if (firstTime) {
-                                if (mediaLength == null) {
-                                    onFirstPlay(getMediaInfo())
-                                }
-
-                                setContentFit()
-
-                                MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-                                firstTime = false
-                            }
-                        }
-
-                        Event.PositionChanged -> {
-                            onPositionChanged(mapOf("position" to player.getPosition()))
-                        }
-
-                        Event.ESAdded -> {
-                            onESAdded(getMediaTracks())
-                        }
-
-                        Event.RecordChanged -> {
-                            val recording =
-                                Recording(
-                                    path = event.getRecordPath(),
-                                    isRecording = event.getRecording(),
-                                )
-
-                            onRecordChanged(recording)
-                        }
-                    }
-                },
-            )
-        }
-    }
-
-    fun setDialogCallbacks() {
-        libVLC?.let {
-            VLCDialog.setCallbacks(
-                it,
-                object : VLCDialog.Callbacks {
-                    override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
-                        vlcDialog = dialog
-
-                        val dialog =
-                            Dialog(
-                                title = dialog.getTitle(),
-                                text = dialog.getText(),
-                            )
-
-                        onDialogDisplay(dialog)
-                    }
-
-                    override fun onDisplay(dialog: VLCDialog.LoginDialog) {
-                        vlcDialog = dialog
-
-                        val dialog =
-                            Dialog(
-                                title = dialog.getTitle(),
-                                text = dialog.getText(),
-                            )
-
-                        onDialogDisplay(dialog)
-                    }
-
-                    override fun onDisplay(dialog: VLCDialog.QuestionDialog) {
-                        vlcDialog = dialog
-
-                        val dialog =
-                            Dialog(
-                                title = dialog.getTitle(),
-                                text = dialog.getText(),
-                                cancelText = dialog.getCancelText(),
-                                action1Text = dialog.getAction1Text(),
-                                action2Text = dialog.getAction2Text(),
-                            )
-
-                        onDialogDisplay(dialog)
-                    }
-
-                    override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
-
-                    override fun onCanceled(dialog: VLCDialog) {}
-
-                    override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
-                },
-            )
-        }
-    }
-
     fun setPlayerTracks() {
         mediaPlayer?.let { player ->
             val audioTrack = tracks?.audio ?: player.getAudioTrack()
@@ -737,30 +579,188 @@ class LibVlcPlayerView(
             vlcDialog = null
         }
     }
+}
 
-    private fun ArrayList<String>.hasStartPausedOption(): Boolean {
-        val options =
-            setOf(
-                "--start-paused",
-                "-start-paused",
-                ":start-paused",
-            )
+fun LibVlcPlayerView.setMediaPlayerListener() {
+    mediaPlayer?.let { player ->
+        player.setEventListener(
+            EventListener { event ->
+                when (event.type) {
+                    Event.Buffering -> {
+                        onBuffering(Unit)
+                    }
 
-        return this.any { option -> option in options }
+                    Event.Playing -> {
+                        onPlaying(Unit)
+
+                        if (firstPlay) {
+                            attachPlayer()
+
+                            setupPlayer()
+
+                            onFirstPlay(getMediaInfo())
+
+                            firstPlay = false
+                        }
+
+                        MediaPlayerManager.keepAwakeManager.activateKeepAwake()
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                    }
+
+                    Event.Paused -> {
+                        onPaused(Unit)
+
+                        MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                    }
+
+                    Event.Stopped -> {
+                        onStopped(Unit)
+
+                        detachPlayer()
+
+                        MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                        firstPlay = true
+                        firstTime = true
+                    }
+
+                    Event.EndReached -> {
+                        onEndReached(Unit)
+
+                        player.stop()
+
+                        if (repeat) {
+                            player.play()
+                        }
+                    }
+
+                    Event.EncounteredError -> {
+                        onEncounteredError(mapOf("error" to "Media player encountered an error"))
+
+                        MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                        firstPlay = true
+                        firstTime = true
+                    }
+
+                    Event.TimeChanged -> {
+                        onTimeChanged(mapOf("time" to player.getTime().toInt()))
+
+                        if (firstTime) {
+                            if (mediaLength == null) {
+                                onFirstPlay(getMediaInfo())
+                            }
+
+                            setContentFit()
+
+                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                            firstTime = false
+                        }
+                    }
+
+                    Event.PositionChanged -> {
+                        onPositionChanged(mapOf("position" to player.getPosition()))
+                    }
+
+                    Event.ESAdded -> {
+                        onESAdded(getMediaTracks())
+                    }
+
+                    Event.RecordChanged -> {
+                        val recording =
+                            Recording(
+                                path = event.getRecordPath(),
+                                isRecording = event.getRecording(),
+                            )
+
+                        onRecordChanged(recording)
+                    }
+                }
+            },
+        )
     }
+}
 
-    private fun ArrayList<String>.toggleStartPausedOption(autoplay: Boolean) {
-        val options =
-            setOf(
-                "--start-paused",
-                "-start-paused",
-                ":start-paused",
-            )
+fun LibVlcPlayerView.setDialogCallbacks() {
+    libVLC?.let {
+        VLCDialog.setCallbacks(
+            it,
+            object : VLCDialog.Callbacks {
+                override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
+                    vlcDialog = dialog
 
-        this.removeAll(options)
+                    val dialog =
+                        Dialog(
+                            title = dialog.getTitle(),
+                            text = dialog.getText(),
+                        )
 
-        if (!autoplay) {
-            this.add("--start-paused")
-        }
+                    onDialogDisplay(dialog)
+                }
+
+                override fun onDisplay(dialog: VLCDialog.LoginDialog) {
+                    vlcDialog = dialog
+
+                    val dialog =
+                        Dialog(
+                            title = dialog.getTitle(),
+                            text = dialog.getText(),
+                        )
+
+                    onDialogDisplay(dialog)
+                }
+
+                override fun onDisplay(dialog: VLCDialog.QuestionDialog) {
+                    vlcDialog = dialog
+
+                    val dialog =
+                        Dialog(
+                            title = dialog.getTitle(),
+                            text = dialog.getText(),
+                            cancelText = dialog.getCancelText(),
+                            action1Text = dialog.getAction1Text(),
+                            action2Text = dialog.getAction2Text(),
+                        )
+
+                    onDialogDisplay(dialog)
+                }
+
+                override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
+
+                override fun onCanceled(dialog: VLCDialog) {}
+
+                override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
+            },
+        )
+    }
+}
+
+private fun ArrayList<String>.hasStartPausedOption(): Boolean {
+    val options =
+        setOf(
+            "--start-paused",
+            "-start-paused",
+            ":start-paused",
+        )
+
+    return this.any { option -> option in options }
+}
+
+private fun ArrayList<String>.toggleStartPausedOption(autoplay: Boolean) {
+    val options =
+        setOf(
+            "--start-paused",
+            "-start-paused",
+            ":start-paused",
+        )
+
+    this.removeAll(options)
+
+    if (!autoplay) {
+        this.add("--start-paused")
     }
 }
