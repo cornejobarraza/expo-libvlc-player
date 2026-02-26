@@ -310,10 +310,10 @@ class LibVlcPlayerView(
 
         mediaPlayer?.let { player ->
             val video = player.getCurrentVideoTrack()
-            val pLength = player.getLength()
+            val duration = player.getLength()
             val length =
-                if (pLength != -1L) {
-                    pLength
+                if (duration != -1L) {
+                    duration
                 } else {
                     0L
                 }
@@ -514,10 +514,6 @@ class LibVlcPlayerView(
 
     fun record(path: String?) {
         mediaPlayer?.let { player ->
-            if (!player.isPlaying()) {
-                return
-            }
-
             if (path != null) {
                 val success = player.record(path)
 
@@ -563,7 +559,7 @@ class LibVlcPlayerView(
                     Handler(Looper.getMainLooper()),
                 )
             } catch (_: Exception) {
-                onEncounteredError(mapOf("error" to "Media snapshot could not be taken"))
+                onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
             }
         }
     }
@@ -643,13 +639,9 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
                     }
 
                     Event.EncounteredError -> {
-                        onEncounteredError(mapOf("error" to "Media player encountered an error"))
+                        onEncounteredError(mapOf("error" to "Player encountered an error"))
 
-                        MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-                        firstPlay = true
-                        firstTime = true
+                        player.stop()
                     }
 
                     Event.TimeChanged -> {

@@ -403,7 +403,7 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func record(_ path: String?) {
-        if let player = mediaPlayer, player.isPlaying {
+        if let player = mediaPlayer {
             if let path {
                 // https://code.videolan.org/videolan/VLCKit/-/issues/394
                 let success = !player.startRecording(atPath: path)
@@ -421,19 +421,20 @@ class LibVlcPlayerView: ExpoView {
 
     func snapshot(_ path: String) {
         if let player = mediaPlayer {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
-            let snapshotPath = path + "/vlc-snapshot-\(dateFormatter.string(from: Date())).jpg"
-
             let video = player.videoSize
-            let width = Int32(video.width)
-            let height = Int32(video.height)
 
-            player.saveVideoSnapshot(at: snapshotPath, withWidth: width, andHeight: height)
+            if video != .zero {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
+                let snapshotPath = path + "/vlc-snapshot-\(dateFormatter.string(from: Date())).jpg"
 
-            onSnapshotTaken(["path": snapshotPath])
-        } else {
-            onEncounteredError(["error": "Media snapshot could not be taken"])
+                player.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(video.width), andHeight: Int32(video.height))
+
+                onSnapshotTaken(["path": snapshotPath])
+            } else {
+                onEncounteredError(["error": "Snapshot could not be taken"])
+                return
+            }
         }
     }
 
@@ -493,13 +494,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     player.play()
                 }
             case .error:
-                onEncounteredError(["error": "Media player encountered an error"])
+                onEncounteredError(["error": "Player encountered an error"])
 
-                MediaPlayerManager.shared.keepAwakeManager.deactivateKeepAwake()
-                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-
-                firstPlay = true
-                firstTime = true
+                player.stop()
             case .esAdded:
                 onESAdded(getMediaTracks())
             default:
