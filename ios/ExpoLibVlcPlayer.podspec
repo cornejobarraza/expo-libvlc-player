@@ -19,8 +19,8 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'
-  s.ios.dependency 'MobileVLCKit', '3.7.2'
-  s.tvos.dependency 'TVVLCKit', '3.7.2'
+  s.ios.dependency 'MobileVLCKit', '3.7.3'
+  s.tvos.dependency 'TVVLCKit', '3.7.3'
 
   # Swift/Objective-C compatibility
   s.pod_target_xcconfig = {
