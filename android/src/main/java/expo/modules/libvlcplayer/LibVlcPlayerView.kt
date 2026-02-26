@@ -373,14 +373,12 @@ class LibVlcPlayerView(
 
     var source: String? = null
         set(value) {
-            val old = field
             field = value
             shouldCreate = true
         }
 
     var options: MutableList<String> = mutableListOf()
         set(value) {
-            val old = field
             field = value
             shouldCreate = true
         }
