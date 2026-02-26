@@ -378,7 +378,7 @@ class LibVlcPlayerView(
             shouldCreate = true
         }
 
-    var options: ArrayList<String> = ArrayList()
+    var options: MutableList<String> = mutableListOf()
         set(value) {
             val old = field
             field = value
@@ -391,7 +391,7 @@ class LibVlcPlayerView(
             setPlayerTracks()
         }
 
-    var slaves: ArrayList<Slave> = ArrayList()
+    var slaves: MutableList<Slave> = mutableListOf()
         set(value) {
             val newSlaves = value.filter { slave -> slave !in field }
 
@@ -745,7 +745,7 @@ fun LibVlcPlayerView.setDialogCallbacks() {
     }
 }
 
-private fun ArrayList<String>.hasStartPausedOption(): Boolean {
+private fun MutableList<String>.hasStartPausedOption(): Boolean {
     val options =
         setOf(
             "--start-paused",
@@ -753,10 +753,10 @@ private fun ArrayList<String>.hasStartPausedOption(): Boolean {
             ":start-paused",
         )
 
-    return this.any { option -> option in options }
+    return any { it in options }
 }
 
-private fun ArrayList<String>.toggleStartPausedOption(autoplay: Boolean) {
+private fun MutableList<String>.toggleStartPausedOption(autoplay: Boolean) {
     val options =
         setOf(
             "--start-paused",
@@ -764,9 +764,9 @@ private fun ArrayList<String>.toggleStartPausedOption(autoplay: Boolean) {
             ":start-paused",
         )
 
-    this.removeAll(options)
+    removeAll { it in options }
 
     if (!autoplay) {
-        this.add("--start-paused")
+        add("--start-paused")
     }
 }

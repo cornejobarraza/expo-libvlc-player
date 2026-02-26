@@ -65,7 +65,7 @@ public class LibVlcPlayerModule: Module {
                 }
             }
 
-            Prop("options", [String]()) { (view: LibVlcPlayerView, options: [String]) in
+            Prop("options", .init()) { (view: LibVlcPlayerView, options: [String]) in
                 if options != view.options {
                     view.options = options
                 }
@@ -77,7 +77,7 @@ public class LibVlcPlayerModule: Module {
                 }
             }
 
-            Prop("slaves", [Slave]()) { (view: LibVlcPlayerView, slaves: [Slave]) in
+            Prop("slaves", .init()) { (view: LibVlcPlayerView, slaves: [Slave]) in
                 if slaves != view.slaves {
                     view.slaves = slaves
                 }

@@ -140,9 +140,9 @@ class AudioFocusManager(
 
     private fun duckPlayer(player: MediaPlayer?) {
         player?.let { mediaPlayer ->
-            val volume = mediaPlayer.getVolume() / 2
-            oldVolume = volume
-            mediaPlayer.setVolume(volume)
+            val duckVolume = mediaPlayer.getVolume() / 2
+            mediaPlayer.setVolume(duckVolume)
+            oldVolume = duckVolume
         }
     }
 
