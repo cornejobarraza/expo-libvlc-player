@@ -12,39 +12,23 @@ import expo.modules.libvlcplayer.managers.MediaPlayerManager
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
 
-private const val BUFFERING_EVENT = "onBuffering"
-private const val PLAYING_EVENT = "onPlaying"
-private const val PAUSED_EVENT = "onPaused"
-private const val STOPPED_EVENT = "onStopped"
-private const val END_REACHED_EVENT = "onEndReached"
-private const val ENCOUNTERED_ERROR_EVENT = "onEncounteredError"
-private const val DIALOG_DISPLAY_EVENT = "onDialogDisplay"
-private const val TIME_CHANGED_EVENT = "onTimeChanged"
-private const val POSITION_CHANGED_EVENT = "onPositionChanged"
-private const val ES_ADDED_EVENT = "onESAdded"
-private const val RECORD_CHANGED_EVENT = "onRecordChanged"
-private const val SNAPSHOT_TAKEN_EVENT = "onSnapshotTaken"
-private const val FIRST_PLAY_EVENT = "onFirstPlay"
-private const val FOREGROUND_EVENT = "onForeground"
-private const val BACKGROUND_EVENT = "onBackground"
-
-val playerEvents =
+private val PLAYER_EVENTS =
     arrayOf(
-        BUFFERING_EVENT,
-        PLAYING_EVENT,
-        PAUSED_EVENT,
-        STOPPED_EVENT,
-        END_REACHED_EVENT,
-        ENCOUNTERED_ERROR_EVENT,
-        DIALOG_DISPLAY_EVENT,
-        TIME_CHANGED_EVENT,
-        POSITION_CHANGED_EVENT,
-        ES_ADDED_EVENT,
-        RECORD_CHANGED_EVENT,
-        SNAPSHOT_TAKEN_EVENT,
-        FIRST_PLAY_EVENT,
-        FOREGROUND_EVENT,
-        BACKGROUND_EVENT,
+        "onBuffering",
+        "onPlaying",
+        "onPaused",
+        "onStopped",
+        "onEndReached",
+        "onEncounteredError",
+        "onDialogDisplay",
+        "onTimeChanged",
+        "onPositionChanged",
+        "onESAdded",
+        "onRecordChanged",
+        "onSnapshotTaken",
+        "onFirstPlay",
+        "onForeground",
+        "onBackground",
     )
 
 class LibVlcPlayerModule : Module() {
@@ -79,7 +63,7 @@ class LibVlcPlayerModule : Module() {
             }
 
             View(LibVlcPlayerView::class) {
-                Events(playerEvents)
+                Events(PLAYER_EVENTS)
 
                 Prop("source") { view: LibVlcPlayerView, source: String? ->
                     view.source = source

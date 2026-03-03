@@ -1,37 +1,21 @@
 import ExpoModulesCore
 
-private let bufferingEvent = "onBuffering"
-private let playingEvent = "onPlaying"
-private let pausedEvent = "onPaused"
-private let stoppedEvent = "onStopped"
-private let endReachedEvent = "onEndReached"
-private let encounteredErrorEvent = "onEncounteredError"
-private let dialogDisplayEvent = "onDialogDisplay"
-private let timeChangedEvent = "onTimeChanged"
-private let positionChangedEvent = "onPositionChanged"
-private let esAddedEvent = "onESAdded"
-private let recordChangedEvent = "onRecordChanged"
-private let snapshotTakenEvent = "onSnapshotTaken"
-private let firstPlayEvent = "onFirstPlay"
-private let foregroundEvent = "onForeground"
-private let backgroundEvent = "onBackground"
-
-let playerEvents = [
-    bufferingEvent,
-    playingEvent,
-    pausedEvent,
-    stoppedEvent,
-    endReachedEvent,
-    encounteredErrorEvent,
-    dialogDisplayEvent,
-    timeChangedEvent,
-    positionChangedEvent,
-    esAddedEvent,
-    recordChangedEvent,
-    snapshotTakenEvent,
-    firstPlayEvent,
-    foregroundEvent,
-    backgroundEvent,
+private let playerEvents = [
+    "onBuffering",
+    "onPlaying",
+    "onPaused",
+    "onStopped",
+    "onEndReached",
+    "onEncounteredError",
+    "onDialogDisplay",
+    "onTimeChanged",
+    "onPositionChanged",
+    "onESAdded",
+    "onRecordChanged",
+    "onSnapshotTaken",
+    "onFirstPlay",
+    "onForeground",
+    "onBackground",
 ]
 
 public class LibVlcPlayerModule: Module {
