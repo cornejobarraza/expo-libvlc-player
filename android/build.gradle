@@ -1,8 +1,8 @@
 import groovy.json.JsonSlurper
 
 plugins {
-    id 'com.android.library'
-    id 'expo-module-gradle-plugin'
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
 }
 
 def pkg = new JsonSlurper().parse(file("$projectDir/../package.json"))
@@ -11,23 +11,23 @@ group = 'expo.modules.libvlcplayer'
 version = pkg.version
 
 android {
-    namespace 'expo.modules.libvlcplayer'
+  namespace 'expo.modules.libvlcplayer'
 
-    defaultConfig {
-        versionCode 1
-        versionName pkg.version
-        consumerProguardFiles('proguard-rules.pro')
-    }
+  defaultConfig {
+    versionCode 1
+    versionName pkg.version
+    consumerProguardFiles('proguard-rules.pro')
+  }
 
-    lintOptions {
-        abortOnError false
-    }
+  lintOptions {
+    abortOnError false
+  }
 }
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-    implementation 'org.videolan.android:libvlc-all:3.6.5'
+  implementation 'org.videolan.android:libvlc-all:3.6.5'
 }
