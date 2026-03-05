@@ -1,14 +1,14 @@
 class LocalNetworkManager {
     static let shared = LocalNetworkManager()
 
-    /// Attempts to trigger the local network privacy alert.
-    ///
-    /// This builds a list of link-local IPv6 addresses and then creates a connected
-    /// UDP socket to each in turn.  Connecting a UDP socket triggers the local
-    /// network alert without actually sending any traffic.
-    ///
-    /// This is a ‘best effort’ approach, and it handles errors by ignoring them.
-    /// There’s no guarantee that it’ll actually trigger the alert (FB8711182).
+    // Attempts to trigger the local network privacy alert.
+    //
+    // This builds a list of link-local IPv6 addresses and then creates a connected
+    // UDP socket to each in turn.  Connecting a UDP socket triggers the local
+    // network alert without actually sending any traffic.
+    //
+    // This is a ‘best effort’ approach, and it handles errors by ignoring them.
+    // There’s no guarantee that it’ll actually trigger the alert (FB8711182).
 
     func triggerNetworkAlert() {
         let addresses = selectedLinkLocalIPv6Addresses()
@@ -25,20 +25,20 @@ class LocalNetworkManager {
         }
     }
 
-    /// Returns a selection of IPv6 addresses to connect to.
-    ///
-    /// To build this list it:
-    ///
-    /// 1. Finds the IPv6 address of every broadcast-capable interface.
-    ///
-    /// 2. Filters out all the ones that aren’t link-local.
-    ///
-    /// 3. Sets the port number to port 9, that is, the discard service.  Even
-    ///    though the caller won’t actually send any traffic, this ensures that it
-    ///    would be discarded if it were sent.
-    ///
-    /// 4. Creates two copies of each address, and replaces the host part with a
-    ///    random number.
+    // Returns a selection of IPv6 addresses to connect to.
+    //
+    // To build this list it:
+    //
+    // 1. Finds the IPv6 address of every broadcast-capable interface.
+    //
+    // 2. Filters out all the ones that aren’t link-local.
+    //
+    // 3. Sets the port number to port 9, that is, the discard service.  Even
+    //    though the caller won’t actually send any traffic, this ensures that it
+    //    would be discarded if it were sent.
+    //
+    // 4. Creates two copies of each address, and replaces the host part with a
+    //    random number.
 
     private func selectedLinkLocalIPv6Addresses() -> [sockaddr_in6] {
         let r1 = (0 ..< 8).map { _ in UInt8.random(in: 0 ... 255) }
@@ -50,13 +50,13 @@ class LocalNetworkManager {
             .joined())
     }
 
-    /// Replaces the host part of an IPv6 link-local address with the supplied
-    /// value.
-    ///
-    /// In this context, _host part_ refers to the bottom 64-bits of the address,
-    /// that is, the `interface ID` as defined in Section 2.5.6 of [RFC
-    /// 4291](https://tools.ietf.org/html/rfc4291)).  Thus, the host part parameter
-    /// must be exactly 8 bytes.
+    // Replaces the host part of an IPv6 link-local address with the supplied
+    // value.
+    //
+    // In this context, _host part_ refers to the bottom 64-bits of the address,
+    // that is, the `interface ID` as defined in Section 2.5.6 of [RFC
+    // 4291](https://tools.ietf.org/html/rfc4291)).  Thus, the host part parameter
+    // must be exactly 8 bytes.
 
     private func setIPv6LinkLocalAddressHostPart(of address: sockaddr_in6, to hostPart: [UInt8]) -> sockaddr_in6 {
         precondition(hostPart.count == 8)
@@ -67,16 +67,16 @@ class LocalNetworkManager {
         return result
     }
 
-    /// Returns whether the supplied IPv6 address is link-local.
-    ///
-    /// Link-local address have the fe:c0/10 prefix.
+    // Returns whether the supplied IPv6 address is link-local.
+    //
+    // Link-local address have the fe:c0/10 prefix.
 
     private func isIPv6AddressLinkLocal(_ address: sockaddr_in6) -> Bool {
         address.sin6_addr.__u6_addr.__u6_addr8.0 == 0xFE
             && (address.sin6_addr.__u6_addr.__u6_addr8.1 & 0xC0) == 0x80
     }
 
-    /// Returns the IPv6 address of every broadcast-capable interface.
+    // Returns the IPv6 address of every broadcast-capable interface.
 
     private func ipv6AddressesOfBroadcastCapableInterfaces() -> [sockaddr_in6] {
         var addrList: UnsafeMutablePointer<ifaddrs>?
