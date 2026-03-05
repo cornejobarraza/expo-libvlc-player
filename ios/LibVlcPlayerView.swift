@@ -43,9 +43,9 @@ class LibVlcPlayerView: ExpoView {
 
         clipsToBounds = true
         playerView.backgroundColor = .black
-        addSubview(playerView)
 
         MediaPlayerManager.shared.registerPlayerView(self)
+        addSubview(playerView)
     }
 
     deinit {
