@@ -77,8 +77,7 @@ class AudioFocusManager(
             }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            currentFocusRequest?.let {
-                focusRequest
+            currentFocusRequest?.let { focusRequest ->
                 if (focusRequest.focusGain == audioFocusType) {
                     return
                 }

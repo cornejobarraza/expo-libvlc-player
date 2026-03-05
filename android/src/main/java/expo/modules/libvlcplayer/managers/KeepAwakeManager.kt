@@ -12,17 +12,17 @@ class KeepAwakeManager(
         get() = appContext?.currentActivity ?: throw CurrentActivityNotFoundException()
 
     fun activateKeepAwake() {
-        currentActivity.let {
-            it.runOnUiThread {
-                it.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        currentActivity.let { activity ->
+            activity.runOnUiThread {
+                activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
         }
     }
 
     fun deactivateKeepAwake() {
-        currentActivity.let {
-            it.runOnUiThread {
-                it.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        currentActivity.let { activity ->
+            activity.runOnUiThread {
+                activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
         }
     }

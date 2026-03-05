@@ -47,8 +47,8 @@ class LibVlcPlayerView(
     appContext: AppContext,
 ) : ExpoView(context, appContext) {
     private val playerView: VLCVideoLayout =
-        VLCVideoLayout(context).also {
-            addView(it)
+        VLCVideoLayout(context).also { textureView ->
+            addView(textureView)
         }
 
     var libVLC: LibVLC? = null
@@ -682,9 +682,9 @@ fun LibVlcPlayerView.setMediaPlayerListener() {
 }
 
 fun LibVlcPlayerView.setDialogCallbacks() {
-    libVLC?.let {
+    libVLC?.let { ILibVLC ->
         VLCDialog.setCallbacks(
-            it,
+            ILibVLC,
             object : VLCDialog.Callbacks {
                 override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
                     vlcDialog = dialog
@@ -743,7 +743,7 @@ private fun MutableList<String>.hasStartPausedOption(): Boolean {
             ":start-paused",
         )
 
-    return any { it in options }
+    return any { option -> option in options }
 }
 
 private fun MutableList<String>.toggleStartPausedOption(autoplay: Boolean) {
@@ -754,7 +754,7 @@ private fun MutableList<String>.toggleStartPausedOption(autoplay: Boolean) {
             ":start-paused",
         )
 
-    removeAll { it in options }
+    removeAll { option -> option in options }
 
     if (!autoplay) {
         add("--start-paused")
