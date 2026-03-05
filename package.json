@@ -16,8 +16,8 @@
   },
   "keywords": [
     "react-native",
-    "expo",
     "vlc",
+    "expo",
     "libvlc",
     "player",
     "expo-libvlc-player",
