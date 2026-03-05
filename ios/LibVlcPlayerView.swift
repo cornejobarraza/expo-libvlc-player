@@ -20,7 +20,6 @@ class LibVlcPlayerView: ExpoView {
 
     private var shouldCreate: Bool = true
     var firstPlay: Bool = false
-    var firstTime: Bool = false
 
     let onBuffering = EventDispatcher()
     let onPlaying = EventDispatcher()
@@ -87,12 +86,10 @@ class LibVlcPlayerView: ExpoView {
         }
 
         mediaPlayer!.media = VLCMedia(url: url)
-        addPlayerSlaves()
         mediaPlayer!.play()
 
         shouldCreate = false
         firstPlay = true
-        firstTime = true
     }
 
     func destroyPlayer() {
@@ -177,6 +174,38 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
+    func setupPlayer() {
+        if let player = mediaPlayer {
+            setPlayerTracks()
+
+            addPlayerSlaves()
+
+            setContentFit()
+
+            if scale != MediaPlayerConstants.defaultPlayerScale {
+                player.scaleFactor = scale
+            }
+
+            if rate != MediaPlayerConstants.defaultPlayerRate {
+                player.rate = rate
+            }
+
+            if time != MediaPlayerConstants.defaultPlayerTime {
+                player.time = VLCTime(int: Int32(time))
+            }
+
+            if volume != MediaPlayerConstants.maxPlayerVolume || mute {
+                let newVolume = mute ?
+                    MediaPlayerConstants.minPlayerVolume :
+                    volume
+
+                player.audio?.volume = Int32(newVolume)
+            }
+
+            time = MediaPlayerConstants.defaultPlayerTime
+        }
+    }
+
     func getMediaTracks() -> MediaTracks {
         var mediaTracks = MediaTracks()
 
@@ -247,34 +276,6 @@ class LibVlcPlayerView: ExpoView {
         }
 
         return mediaInfo
-    }
-
-    func setupPlayer() {
-        if let player = mediaPlayer {
-            setPlayerTracks()
-
-            if scale != MediaPlayerConstants.defaultPlayerScale {
-                player.scaleFactor = scale
-            }
-
-            if rate != MediaPlayerConstants.defaultPlayerRate {
-                player.rate = rate
-            }
-
-            if time != MediaPlayerConstants.defaultPlayerTime {
-                player.time = VLCTime(int: Int32(time))
-            }
-
-            if volume != MediaPlayerConstants.maxPlayerVolume || mute {
-                let newVolume = mute ?
-                    MediaPlayerConstants.minPlayerVolume :
-                    volume
-
-                player.audio?.volume = Int32(newVolume)
-            }
-
-            time = MediaPlayerConstants.defaultPlayerTime
-        }
     }
 
     var source: String? {
@@ -462,14 +463,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             case .playing:
                 onPlaying()
 
-                if firstPlay {
-                    setupPlayer()
-
-                    onFirstPlay(getMediaInfo())
-
-                    firstPlay = false
-                }
-
                 MediaPlayerManager.shared.keepAwakeManager.activateKeepAwake()
                 MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
             case .paused:
@@ -484,7 +477,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
 
                 firstPlay = true
-                firstTime = true
             case .ended:
                 onEndReached()
 
@@ -509,16 +501,14 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         if let player = mediaPlayer {
             onTimeChanged(["time": player.time.intValue])
 
-            if firstTime {
-                if mediaLength == nil {
-                    onFirstPlay(getMediaInfo())
-                }
+            if firstPlay {
+                onFirstPlay(getMediaInfo())
 
-                setContentFit()
+                setupPlayer()
 
                 MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
 
-                firstTime = false
+                firstPlay = false
             }
 
             onPositionChanged(["position": player.position])

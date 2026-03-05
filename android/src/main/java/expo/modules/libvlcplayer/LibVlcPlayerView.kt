@@ -57,7 +57,6 @@ class LibVlcPlayerView(
 
     private var shouldCreate: Boolean = true
     var firstPlay: Boolean = false
-    var firstTime: Boolean = false
 
     val onBuffering by EventDispatcher<Unit>()
     val onPlaying by EventDispatcher<Unit>()
@@ -118,9 +117,9 @@ class LibVlcPlayerView(
         initOptions.toggleStartPausedOption(autoplay)
 
         libVLC = LibVLC(context, initOptions)
-        setDialogCallbacks()
+        setDialogCallbacks(libVLC!!)
         mediaPlayer = MediaPlayer(libVLC)
-        setMediaPlayerListener()
+        setPlayerListener(mediaPlayer!!)
 
         try {
             URI(source)
@@ -132,12 +131,10 @@ class LibVlcPlayerView(
         media = Media(libVLC, Uri.parse(source))
         mediaPlayer!!.setMedia(media)
         media!!.release()
-        addPlayerSlaves()
         mediaPlayer!!.play()
 
         shouldCreate = false
         firstPlay = true
-        firstTime = true
     }
 
     fun attachPlayer() {
@@ -264,6 +261,43 @@ class LibVlcPlayerView(
         }
     }
 
+    fun setupPlayer() {
+        mediaPlayer?.let { player ->
+            attachPlayer()
+
+            setPlayerTracks()
+
+            addPlayerSlaves()
+
+            setContentFit()
+
+            if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
+                player.setScale(scale)
+            }
+
+            if (rate != MediaPlayerConstants.DEFAULT_PLAYER_RATE) {
+                player.setRate(rate)
+            }
+
+            if (time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
+                player.setTime(time.toLong())
+            }
+
+            if (volume != MediaPlayerConstants.MAX_PLAYER_VOLUME || mute) {
+                val newVolume =
+                    if (mute) {
+                        MediaPlayerConstants.MIN_PLAYER_VOLUME
+                    } else {
+                        volume
+                    }
+
+                player.setVolume(newVolume)
+            }
+
+            time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
+        }
+    }
+
     fun getMediaTracks(): MediaTracks {
         var mediaTracks = MediaTracks()
 
@@ -336,37 +370,6 @@ class LibVlcPlayerView(
         }
 
         return mediaInfo
-    }
-
-    fun setupPlayer() {
-        mediaPlayer?.let { player ->
-            setPlayerTracks()
-
-            if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
-                player.setScale(scale)
-            }
-
-            if (rate != MediaPlayerConstants.DEFAULT_PLAYER_RATE) {
-                player.setRate(rate)
-            }
-
-            if (time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
-                player.setTime(time.toLong())
-            }
-
-            if (volume != MediaPlayerConstants.MAX_PLAYER_VOLUME || mute) {
-                val newVolume =
-                    if (mute) {
-                        MediaPlayerConstants.MIN_PLAYER_VOLUME
-                    } else {
-                        volume
-                    }
-
-                player.setVolume(newVolume)
-            }
-
-            time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
-        }
     }
 
     var source: String? = null
@@ -579,158 +582,141 @@ class LibVlcPlayerView(
     }
 }
 
-fun LibVlcPlayerView.setMediaPlayerListener() {
-    mediaPlayer?.let { player ->
-        player.setEventListener(
-            EventListener { event ->
-                when (event.type) {
-                    Event.Buffering -> {
-                        onBuffering(Unit)
-                    }
+fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
+    player.setEventListener(
+        EventListener { event ->
+            when (event.type) {
+                Event.Buffering -> {
+                    onBuffering(Unit)
+                }
 
-                    Event.Playing -> {
-                        onPlaying(Unit)
+                Event.Playing -> {
+                    onPlaying(Unit)
 
-                        if (firstPlay) {
-                            attachPlayer()
+                    MediaPlayerManager.keepAwakeManager.activateKeepAwake()
+                    MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                }
 
-                            setupPlayer()
+                Event.Paused -> {
+                    onPaused(Unit)
 
-                            onFirstPlay(getMediaInfo())
+                    MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
+                    MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                }
 
-                            firstPlay = false
-                        }
+                Event.Stopped -> {
+                    onStopped(Unit)
 
-                        MediaPlayerManager.keepAwakeManager.activateKeepAwake()
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-                    }
+                    detachPlayer()
 
-                    Event.Paused -> {
-                        onPaused(Unit)
+                    MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
+                    MediaPlayerManager.audioFocusManager.updateAudioFocus()
 
-                        MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-                    }
+                    firstPlay = true
+                }
 
-                    Event.Stopped -> {
-                        onStopped(Unit)
+                Event.EndReached -> {
+                    onEndReached(Unit)
 
-                        detachPlayer()
+                    player.stop()
 
-                        MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-                        firstPlay = true
-                        firstTime = true
-                    }
-
-                    Event.EndReached -> {
-                        onEndReached(Unit)
-
-                        player.stop()
-
-                        if (repeat) {
-                            player.play()
-                        }
-                    }
-
-                    Event.EncounteredError -> {
-                        onEncounteredError(mapOf("error" to "Player encountered an error"))
-
-                        player.stop()
-                    }
-
-                    Event.TimeChanged -> {
-                        onTimeChanged(mapOf("time" to player.getTime().toInt()))
-
-                        if (firstTime) {
-                            if (mediaLength == null) {
-                                onFirstPlay(getMediaInfo())
-                            }
-
-                            setContentFit()
-
-                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-                            firstTime = false
-                        }
-                    }
-
-                    Event.PositionChanged -> {
-                        onPositionChanged(mapOf("position" to player.getPosition()))
-                    }
-
-                    Event.ESAdded -> {
-                        onESAdded(getMediaTracks())
-                    }
-
-                    Event.RecordChanged -> {
-                        val recording =
-                            Recording(
-                                path = event.getRecordPath(),
-                                isRecording = event.getRecording(),
-                            )
-
-                        onRecordChanged(recording)
+                    if (repeat) {
+                        player.play()
                     }
                 }
-            },
-        )
-    }
+
+                Event.EncounteredError -> {
+                    onEncounteredError(mapOf("error" to "Player encountered an error"))
+
+                    player.stop()
+                }
+
+                Event.TimeChanged -> {
+                    onTimeChanged(mapOf("time" to player.getTime().toInt()))
+
+                    if (firstPlay) {
+                        onFirstPlay(getMediaInfo())
+
+                        setupPlayer()
+
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                        firstPlay = false
+                    }
+                }
+
+                Event.PositionChanged -> {
+                    onPositionChanged(mapOf("position" to player.getPosition()))
+                }
+
+                Event.ESAdded -> {
+                    onESAdded(getMediaTracks())
+                }
+
+                Event.RecordChanged -> {
+                    val recording =
+                        Recording(
+                            path = event.getRecordPath(),
+                            isRecording = event.getRecording(),
+                        )
+
+                    onRecordChanged(recording)
+                }
+            }
+        },
+    )
 }
 
-fun LibVlcPlayerView.setDialogCallbacks() {
-    libVLC?.let { ILibVLC ->
-        VLCDialog.setCallbacks(
-            ILibVLC,
-            object : VLCDialog.Callbacks {
-                override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
-                    vlcDialog = dialog
+fun LibVlcPlayerView.setDialogCallbacks(libVLC: LibVLC) {
+    VLCDialog.setCallbacks(
+        libVLC,
+        object : VLCDialog.Callbacks {
+            override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
+                vlcDialog = dialog
 
-                    val dialog =
-                        Dialog(
-                            title = dialog.getTitle(),
-                            text = dialog.getText(),
-                        )
+                val dialog =
+                    Dialog(
+                        title = dialog.getTitle(),
+                        text = dialog.getText(),
+                    )
 
-                    onDialogDisplay(dialog)
-                }
+                onDialogDisplay(dialog)
+            }
 
-                override fun onDisplay(dialog: VLCDialog.LoginDialog) {
-                    vlcDialog = dialog
+            override fun onDisplay(dialog: VLCDialog.LoginDialog) {
+                vlcDialog = dialog
 
-                    val dialog =
-                        Dialog(
-                            title = dialog.getTitle(),
-                            text = dialog.getText(),
-                        )
+                val dialog =
+                    Dialog(
+                        title = dialog.getTitle(),
+                        text = dialog.getText(),
+                    )
 
-                    onDialogDisplay(dialog)
-                }
+                onDialogDisplay(dialog)
+            }
 
-                override fun onDisplay(dialog: VLCDialog.QuestionDialog) {
-                    vlcDialog = dialog
+            override fun onDisplay(dialog: VLCDialog.QuestionDialog) {
+                vlcDialog = dialog
 
-                    val dialog =
-                        Dialog(
-                            title = dialog.getTitle(),
-                            text = dialog.getText(),
-                            cancelText = dialog.getCancelText(),
-                            action1Text = dialog.getAction1Text(),
-                            action2Text = dialog.getAction2Text(),
-                        )
+                val dialog =
+                    Dialog(
+                        title = dialog.getTitle(),
+                        text = dialog.getText(),
+                        cancelText = dialog.getCancelText(),
+                        action1Text = dialog.getAction1Text(),
+                        action2Text = dialog.getAction2Text(),
+                    )
 
-                    onDialogDisplay(dialog)
-                }
+                onDialogDisplay(dialog)
+            }
 
-                override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
+            override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
 
-                override fun onCanceled(dialog: VLCDialog) {}
+            override fun onCanceled(dialog: VLCDialog) {}
 
-                override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
-            },
-        )
-    }
+            override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
+        },
+    )
 }
 
 private fun MutableList<String>.hasStartPausedOption(): Boolean {
