@@ -113,10 +113,7 @@ class LibVlcPlayerView(
 
         val source = source ?: return
 
-        var initOptions = options
-        initOptions.toggleStartPausedOption(autoplay)
-
-        libVLC = LibVLC(context, initOptions)
+        libVLC = LibVLC(context, options)
         setDialogCallbacks(libVLC!!)
         mediaPlayer = MediaPlayer(libVLC)
         setPlayerListener(mediaPlayer!!)
@@ -131,7 +128,10 @@ class LibVlcPlayerView(
         media = Media(libVLC, Uri.parse(source))
         mediaPlayer!!.setMedia(media)
         media!!.release()
-        mediaPlayer!!.play()
+
+        if (autoplay) {
+            mediaPlayer!!.play()
+        }
 
         shouldCreate = false
         firstPlay = true
@@ -471,10 +471,6 @@ class LibVlcPlayerView(
 
     fun play() {
         mediaPlayer?.let { player ->
-            if (options.hasStartPausedOption()) {
-                player.play()
-            }
-
             player.play()
         }
     }
@@ -715,30 +711,4 @@ fun LibVlcPlayerView.setDialogCallbacks(libVLC: LibVLC) {
             override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
         },
     )
-}
-
-private fun MutableList<String>.hasStartPausedOption(): Boolean {
-    val options =
-        setOf(
-            "--start-paused",
-            "-start-paused",
-            ":start-paused",
-        )
-
-    return any { option -> option in options }
-}
-
-private fun MutableList<String>.toggleStartPausedOption(autoplay: Boolean) {
-    val options =
-        setOf(
-            "--start-paused",
-            "-start-paused",
-            ":start-paused",
-        )
-
-    removeAll { option -> option in options }
-
-    if (!autoplay) {
-        add("--start-paused")
-    }
 }
