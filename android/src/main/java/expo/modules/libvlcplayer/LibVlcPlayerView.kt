@@ -350,7 +350,6 @@ class LibVlcPlayerView(
                     0L
                 }
             val seekable = player.isSeekable()
-            val mediaTracks = getMediaTracks()
 
             mediaInfo =
                 MediaInfo(
@@ -358,7 +357,6 @@ class LibVlcPlayerView(
                     height = video?.height ?: 0,
                     length = length.toDouble(),
                     seekable = seekable,
-                    tracks = mediaTracks,
                 )
 
             mediaLength =

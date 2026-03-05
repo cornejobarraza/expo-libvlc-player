@@ -12,7 +12,4 @@ struct MediaInfo: Record {
 
     @Field
     var seekable: Bool = false
-
-    @Field
-    var tracks: MediaTracks = .init()
 }

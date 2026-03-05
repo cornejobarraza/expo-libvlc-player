@@ -126,7 +126,6 @@ export interface MediaInfo {
   height: number;
   length: number;
   seekable: boolean;
-  tracks: MediaTracks;
 }
 
 /**

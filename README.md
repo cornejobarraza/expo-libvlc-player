@@ -245,7 +245,6 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
   height: number;
   length: number;
   seekable: boolean;
-  tracks: MediaTracks;
 }
 ```
 

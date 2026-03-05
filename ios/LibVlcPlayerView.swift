@@ -260,14 +260,12 @@ class LibVlcPlayerView: ExpoView {
             let video = player.videoSize
             let length = player.media?.length.intValue ?? 0
             let seekable = player.isSeekable
-            let mediaTracks = getMediaTracks()
 
             mediaInfo = MediaInfo(
                 width: Int(video.width),
                 height: Int(video.height),
                 length: Double(length),
                 seekable: seekable,
-                tracks: mediaTracks,
             )
 
             mediaLength = length > 0 ?
