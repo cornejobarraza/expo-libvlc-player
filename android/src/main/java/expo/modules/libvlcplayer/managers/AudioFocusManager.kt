@@ -28,8 +28,8 @@ class AudioFocusManager(
 
     private val anyPlayerRequiresFocus: Boolean
         get() =
-            MediaPlayerManager.playerViews.toList().any { view ->
-                playerRequiresFocus(view.get()?.mediaPlayer)
+            MediaPlayerManager.playerViews.any { view ->
+                playerRequiresFocus(view.mediaPlayer)
             }
 
     var currentMixingMode: AudioMixingMode = AudioMixingMode.AUTO
@@ -46,20 +46,16 @@ class AudioFocusManager(
 
     private fun findAudioMixingMode(): AudioMixingMode {
         val mixingModes =
-            MediaPlayerManager.playerViews.toList().mapNotNull { playerView ->
-                playerView
-                    .get()
-                    ?.takeIf { view ->
-                        view.mediaPlayer?.isPlaying() == true
-                    }?.audioMixingMode
-            }
+            MediaPlayerManager.playerViews
+                .filter { view -> view.mediaPlayer?.isPlaying() == true }
+                .map { view -> view.audioMixingMode }
 
         if (mixingModes.isEmpty()) {
             return AudioMixingMode.AUTO
         }
 
         return mixingModes.reduce { currentAudioMixingMode, next ->
-            next.takeIf { it.priority > currentAudioMixingMode.priority } ?: currentAudioMixingMode
+            next.takeIf { nextAudioMixingMode -> nextAudioMixingMode.priority > currentAudioMixingMode.priority } ?: currentAudioMixingMode
         }
     }
 
@@ -82,7 +78,8 @@ class AudioFocusManager(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             currentFocusRequest?.let {
-                if (it.focusGain == audioFocusType) {
+                focusRequest
+                if (focusRequest.focusGain == audioFocusType) {
                     return
                 }
             }
@@ -110,9 +107,9 @@ class AudioFocusManager(
     }
 
     private fun abandonAudioFocus() {
-        currentFocusRequest?.let {
+        currentFocusRequest?.let { focusRequest ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                audioManager.abandonAudioFocusRequest(it)
+                audioManager.abandonAudioFocusRequest(focusRequest)
             } else {
                 @Suppress("DEPRECATION")
                 audioManager.abandonAudioFocus(this)
@@ -159,7 +156,7 @@ class AudioFocusManager(
             AudioManager.AUDIOFOCUS_LOSS -> {
                 appContext.mainQueue.launch {
                     MediaPlayerManager.playerViews.forEach { view ->
-                        pausePlayerIfUnmuted(view.get()?.mediaPlayer)
+                        pausePlayerIfUnmuted(view.mediaPlayer)
                     }
 
                     currentFocusRequest = null
@@ -175,7 +172,7 @@ class AudioFocusManager(
 
                 appContext.mainQueue.launch {
                     MediaPlayerManager.playerViews.forEach { view ->
-                        pausePlayerIfUnmuted(view.get()?.mediaPlayer)
+                        pausePlayerIfUnmuted(view.mediaPlayer)
                     }
 
                     currentFocusRequest = null
@@ -187,12 +184,10 @@ class AudioFocusManager(
 
                 appContext.mainQueue.launch {
                     MediaPlayerManager.playerViews.forEach { view ->
-                        view.get()?.mediaPlayer?.let { player ->
-                            if (audioMixingMode == AudioMixingMode.DO_NOT_MIX) {
-                                pausePlayerIfUnmuted(player)
-                            } else {
-                                duckPlayer(player)
-                            }
+                        if (audioMixingMode == AudioMixingMode.DO_NOT_MIX) {
+                            pausePlayerIfUnmuted(view.mediaPlayer)
+                        } else {
+                            duckPlayer(view.mediaPlayer)
                         }
                     }
                 }
@@ -201,7 +196,7 @@ class AudioFocusManager(
             AudioManager.AUDIOFOCUS_GAIN -> {
                 appContext.mainQueue.launch {
                     MediaPlayerManager.playerViews.forEach { view ->
-                        unduckPlayer(view.get()?.mediaPlayer)
+                        unduckPlayer(view.mediaPlayer)
                     }
                 }
             }

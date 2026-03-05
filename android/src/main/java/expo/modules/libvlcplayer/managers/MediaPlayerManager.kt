@@ -2,20 +2,21 @@ package expo.modules.libvlcplayer.managers
 
 import expo.modules.kotlin.AppContext
 import expo.modules.libvlcplayer.LibVlcPlayerView
-import java.lang.ref.WeakReference
+import java.util.Collections
+import java.util.WeakHashMap
 
 object MediaPlayerManager {
     lateinit var audioFocusManager: AudioFocusManager
     lateinit var keepAwakeManager: KeepAwakeManager
 
-    val playerViews: MutableList<WeakReference<LibVlcPlayerView>> = mutableListOf()
+    val playerViews: MutableSet<LibVlcPlayerView> = Collections.newSetFromMap(WeakHashMap())
 
     fun registerPlayerView(view: LibVlcPlayerView) {
-        playerViews.find { it.get() == view } ?: run { playerViews.add(WeakReference(view)) }
+        playerViews.add(view)
     }
 
     fun unregisterPlayerView(view: LibVlcPlayerView) {
-        playerViews.removeAll { it.get() == view }
+        playerViews.remove(view)
     }
 
     fun onModuleCreate(appContext: AppContext) {
@@ -29,32 +30,26 @@ object MediaPlayerManager {
     }
 
     fun onModuleDestroy() {
-        playerViews.forEach { playerView ->
-            playerView.get()?.let { view ->
-                view.destroyPlayer()
-            }
+        playerViews.forEach { view ->
+            view.destroyPlayer()
         }
     }
 
     fun onModuleForeground() {
-        playerViews.forEach { playerView ->
-            playerView.get()?.let { view ->
-                view.onForeground(Unit)
-            }
+        playerViews.forEach { view ->
+            view.onForeground(Unit)
         }
     }
 
     fun onModuleBackground() {
-        playerViews.forEach { playerView ->
-            playerView.get()?.let { view ->
-                view.onBackground(Unit)
+        playerViews.forEach { view ->
+            view.onBackground(Unit)
 
-                view.mediaPlayer?.let { player ->
-                    val shouldPause = !view.playInBackground && player.isPlaying()
+            view.mediaPlayer?.let { player ->
+                val shouldPause = !view.playInBackground && player.isPlaying()
 
-                    if (shouldPause) {
-                        player.pause()
-                    }
+                if (shouldPause) {
+                    player.pause()
                 }
             }
         }
