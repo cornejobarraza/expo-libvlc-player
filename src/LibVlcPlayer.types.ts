@@ -250,7 +250,7 @@ export interface LibVlcPlayerViewNativeProps extends ViewProps {
 
 export interface LibVlcPlayerViewProps extends ViewProps {
   /**
-   * Sets the source of the media to be played. Set to `null` to release the player
+   * Sets the source of the media to be played
    *
    * @example
    *
@@ -261,7 +261,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * <LibVlcPlayerView source={BIG_BUCK_BUNNY} />
    * ```
    */
-  source: LibVlcSource;
+  source: NonNullable<LibVlcSource>;
   /**
    * Sets the VLC options to initialize the player with
    *

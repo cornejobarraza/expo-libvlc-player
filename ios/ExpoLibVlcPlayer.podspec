@@ -12,7 +12,6 @@ Pod::Spec.new do |s|
   s.homepage       = package['homepage']
   s.platforms      = {
     :ios => '15.1',
-    :tvos => '15.1',
   }
   s.swift_version  = '5.9'
   s.source         = { git: 'https://github.com/cornejobarraza/expo-libvlc-player' }
@@ -20,7 +19,6 @@ Pod::Spec.new do |s|
 
   s.dependency 'ExpoModulesCore'
   s.ios.dependency 'MobileVLCKit', '3.7.3'
-  s.tvos.dependency 'TVVLCKit', '3.7.3'
 
   # Swift/Objective-C compatibility
   s.pod_target_xcconfig = {
