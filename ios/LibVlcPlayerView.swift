@@ -365,9 +365,7 @@ class LibVlcPlayerView: ExpoView {
     var autoplay: Bool = true
 
     func play() {
-        if let player = mediaPlayer {
-            player.play()
-        }
+        mediaPlayer?.play()
     }
 
     func pause() {

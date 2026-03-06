@@ -470,9 +470,7 @@ class LibVlcPlayerView(
         }
 
     fun play() {
-        mediaPlayer?.let { player ->
-            player.play()
-        }
+        mediaPlayer?.play()
     }
 
     fun pause() {
