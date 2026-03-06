@@ -107,7 +107,8 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         nativeEvent.width / nativeEvent.height || DEFAULT_ASPECT_RATIO;
     };
 
-    const aspectRatio = props.aspectRatio || fallbackRatio.current;
+    const aspectRatio =
+      props.aspectRatio === "auto" ? fallbackRatio.current : props.aspectRatio;
     const nativeRatio = convertAspectRatio(aspectRatio);
 
     return (

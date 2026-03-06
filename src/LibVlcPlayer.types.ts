@@ -77,7 +77,7 @@ export interface Slave {
   selected?: boolean;
 }
 
-export type VideoAspectRatio = string | number;
+export type VideoAspectRatio = "auto" | string | number;
 
 export type VideoContentFit = "contain" | "cover" | "fill";
 
