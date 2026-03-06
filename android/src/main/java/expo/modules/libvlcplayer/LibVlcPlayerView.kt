@@ -263,8 +263,6 @@ class LibVlcPlayerView(
 
     fun setupPlayer() {
         mediaPlayer?.let { player ->
-            attachPlayer()
-
             setPlayerTracks()
 
             addPlayerSlaves()
@@ -584,6 +582,8 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
 
                 Event.Playing -> {
                     onPlaying(Unit)
+
+                    attachPlayer()
 
                     MediaPlayerManager.keepAwakeManager.activateKeepAwake()
                     MediaPlayerManager.audioFocusManager.updateAudioFocus()
