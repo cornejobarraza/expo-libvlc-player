@@ -122,7 +122,7 @@ class LibVlcPlayerModule : Module() {
                 }
 
                 OnViewDidUpdateProps { view: LibVlcPlayerView ->
-                    view.createPlayer()
+                    view.initPlayer()
                 }
 
                 OnViewDestroys { view: LibVlcPlayerView ->

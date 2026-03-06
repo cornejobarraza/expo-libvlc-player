@@ -50,13 +50,12 @@ class LibVlcPlayerView(
 
     var libVLC: LibVLC? = null
     var mediaPlayer: MediaPlayer? = null
-    private var media: Media? = null
+    var media: Media? = null
     var vlcDialog: VLCDialog? = null
 
     var mediaLength: Long? = null
-
-    private var shouldCreate: Boolean = true
-    var firstPlay: Boolean = false
+    var firstPlay: Boolean = true
+    private var shouldInit: Boolean = true
 
     val onBuffering by EventDispatcher<Unit>()
     val onPlaying by EventDispatcher<Unit>()
@@ -104,18 +103,21 @@ class LibVlcPlayerView(
 
     fun getTextureView(): TextureView? = playerView.findViewById(org.videolan.R.id.texture_video)
 
-    fun createPlayer() {
-        if (!shouldCreate) {
-            return
+    fun initPlayer() {
+        if (shouldInit) {
+            destroyPlayer()
+
+            if (source != null) {
+                createPlayer()
+            }
         }
+    }
 
-        destroyPlayer()
-
-        val source = source ?: return
-
+    fun createPlayer() {
         libVLC = LibVLC(context, options)
         setDialogCallbacks(libVLC!!)
-        mediaPlayer = MediaPlayer(libVLC)
+
+        mediaPlayer = MediaPlayer(libVLC!!)
         setPlayerListener(mediaPlayer!!)
 
         try {
@@ -125,16 +127,16 @@ class LibVlcPlayerView(
             return
         }
 
-        media = Media(libVLC, Uri.parse(source))
-        mediaPlayer!!.setMedia(media)
+        media = Media(libVLC!!, Uri.parse(source!!))
+        mediaPlayer!!.setMedia(media!!)
         media!!.release()
 
         if (autoplay) {
             mediaPlayer!!.play()
         }
 
-        shouldCreate = false
         firstPlay = true
+        shouldInit = false
     }
 
     fun attachPlayer() {
@@ -164,7 +166,6 @@ class LibVlcPlayerView(
         mediaPlayer?.release()
         mediaPlayer = null
         media = null
-        vlcDialog = null
         removeAllViews()
     }
 
@@ -371,13 +372,13 @@ class LibVlcPlayerView(
     var source: String? = null
         set(value) {
             field = value
-            shouldCreate = true
+            shouldInit = true
         }
 
     var options: MutableList<String> = mutableListOf()
         set(value) {
             field = value
-            shouldCreate = true
+            shouldInit = true
         }
 
     var tracks: Tracks? = null

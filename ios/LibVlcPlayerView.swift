@@ -16,10 +16,9 @@ class LibVlcPlayerView: ExpoView {
     var vlcDialogRef: NSValue?
 
     var mediaLength: Int32?
-    private var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
-
-    private var shouldCreate: Bool = true
-    var firstPlay: Bool = false
+    var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
+    var firstPlay: Bool = true
+    private var shouldInit: Bool = true
 
     let onBuffering = EventDispatcher()
     let onPlaying = EventDispatcher()
@@ -60,15 +59,17 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    func createPlayer() {
-        if !shouldCreate {
-            return
+    func initPlayer() {
+        if shouldInit {
+            destroyPlayer()
+
+            if source != nil {
+                createPlayer()
+            }
         }
+    }
 
-        destroyPlayer()
-
-        guard let source else { return }
-
+    func createPlayer() {
         mediaPlayer = VLCMediaPlayer(options: options)
         mediaPlayer!.drawable = playerView
         mediaPlayer!.delegate = self
@@ -77,7 +78,7 @@ class LibVlcPlayerView: ExpoView {
         vlcDialog = VLCDialogProvider(library: library, customUI: dialogCustomUI)
         vlcDialog!.customRenderer = self
 
-        guard let url = URL(string: source) else {
+        guard let url = URL(string: source!) else {
             onEncounteredError(["error": "Invalid source, media could not be set"])
             return
         }
@@ -88,8 +89,8 @@ class LibVlcPlayerView: ExpoView {
             mediaPlayer!.play()
         }
 
-        shouldCreate = false
         firstPlay = true
+        shouldInit = false
     }
 
     func destroyPlayer() {
@@ -99,7 +100,6 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer = nil
         vlcDialog?.customRenderer = nil
         vlcDialog = nil
-        vlcDialogRef = nil
     }
 
     func setPlayerTracks() {
@@ -278,13 +278,13 @@ class LibVlcPlayerView: ExpoView {
 
     var source: String? {
         didSet {
-            shouldCreate = true
+            shouldInit = true
         }
     }
 
     var options: [String] = .init() {
         didSet {
-            shouldCreate = true
+            shouldInit = true
         }
     }
 
