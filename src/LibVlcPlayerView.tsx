@@ -18,7 +18,7 @@ import {
   type VideoAspectRatio,
 } from "./LibVlcPlayer.types";
 import { convertAspectRatio } from "./utils/aspect";
-import { parseSource } from "./utils/assets";
+import { parseNativeSource } from "./utils/assets";
 import { convertNativeEvent } from "./utils/events";
 
 const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
@@ -117,10 +117,10 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
           {...props}
           ref={ref}
           style={[props.style, { height: "100%" }]}
-          source={parseSource(props.source)}
+          source={parseNativeSource(props.source)}
           slaves={props.slaves?.map((slave) => ({
             ...slave,
-            source: parseSource(slave.source)!,
+            source: parseNativeSource(slave.source)!,
           }))}
           onEncounteredError={onEncounteredError}
           onDialogDisplay={onDialogDisplay}

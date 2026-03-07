@@ -2,14 +2,14 @@ package expo.modules.libvlcplayer.managers
 
 import android.app.Activity
 import android.view.WindowManager
-import expo.modules.core.errors.CurrentActivityNotFoundException
 import expo.modules.kotlin.AppContext
+import expo.modules.kotlin.exception.Exceptions
 
 class KeepAwakeManager(
     private val appContext: AppContext?,
 ) {
     private val currentActivity: Activity
-        get() = appContext?.currentActivity ?: throw CurrentActivityNotFoundException()
+        get() = appContext?.currentActivity ?: throw Exceptions.MissingActivity()
 
     fun activateKeepAwake() {
         currentActivity.let { activity ->

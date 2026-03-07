@@ -51,6 +51,7 @@ yarn-error.log
 
 # Expo
 .expo/*
+example/.expo/*
 
 # Other
 *.tsbuildinfo

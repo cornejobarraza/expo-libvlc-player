@@ -1,10 +1,10 @@
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import { Image } from "react-native";
 
 import { LibVlcSource } from "../LibVlcPlayer.types";
 
-export function parseSource(source: LibVlcSource): LibVlcSource {
+export function parseNativeSource(source: LibVlcSource): LibVlcSource {
   if (typeof source === "number") {
-    return resolveAssetSource(source).uri;
+    return Image.resolveAssetSource(source).uri;
   }
 
   return source;

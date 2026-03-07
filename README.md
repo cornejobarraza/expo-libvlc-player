@@ -23,7 +23,7 @@
 
 | Platform             | Version |
 | -------------------- | ------- |
-| React Native         | 0.79    |
+| React Native         | 0.83    |
 | Android / Android TV | 7+      |
 | iOS / Apple TV       | 15.1+   |
 

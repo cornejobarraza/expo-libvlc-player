@@ -8,20 +8,19 @@
     "ios": "expo run:ios"
   },
   "dependencies": {
-    "@expo/vector-icons": "^14.1.0",
-    "expo": "~53.0.27",
-    "expo-font": "~13.3.2",
-    "expo-status-bar": "~2.2.3",
-    "expo-symbols": "~0.4.5",
-    "expo-system-ui": "~5.0.11",
-    "react": "19.0.0",
-    "react-native": "0.79.6"
+    "@expo/vector-icons": "^15.0.2",
+    "expo": "^55.0.5",
+    "expo-font": "~55.0.4",
+    "expo-status-bar": "~55.0.4",
+    "expo-symbols": "~55.0.5",
+    "expo-system-ui": "~55.0.9",
+    "react": "19.2.0",
+    "react-native": "0.83.2"
   },
   "devDependencies": {
-    "@types/react": "~19.0.10",
-    "typescript": "~5.8.3"
+    "@types/react": "~19.2.10",
+    "typescript": "~5.9.2"
   },
-  "private": true,
   "expo": {
     "autolinking": {
       "nativeModulesDir": ".."
