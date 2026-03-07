@@ -29,11 +29,11 @@ const RENDERING_CHILDREN_WARNING =
 
 let loggedRenderingChildrenWarning: boolean = false;
 
-const DEFAULT_ASPECT_RATIO = 16 / 9;
+const FALLBACK_RATIO = 16 / 9;
 
 const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
   (props, ref) => {
-    const fallbackRatio = useRef<VideoAspectRatio>(DEFAULT_ASPECT_RATIO);
+    const defaultRatio = useRef<VideoAspectRatio>(FALLBACK_RATIO);
 
     if (props.children && !loggedRenderingChildrenWarning) {
       console.warn(RENDERING_CHILDREN_WARNING);
@@ -98,17 +98,17 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
 
     const onFirstPlay = (event: NativeEvent<MediaInfo>) => {
       const nativeEvent = convertNativeEvent(event);
+      const mediaRatio = nativeEvent.width / nativeEvent.height;
 
       if (props.onFirstPlay) {
         props.onFirstPlay(nativeEvent);
       }
 
-      fallbackRatio.current =
-        nativeEvent.width / nativeEvent.height || DEFAULT_ASPECT_RATIO;
+      defaultRatio.current = mediaRatio || FALLBACK_RATIO;
     };
 
-    const aspectRatio =
-      props.aspectRatio === "auto" ? fallbackRatio.current : props.aspectRatio;
+    const propRatio = props.aspectRatio;
+    const aspectRatio = propRatio === "auto" ? defaultRatio.current : propRatio;
     const nativeRatio = convertAspectRatio(aspectRatio);
 
     return (
