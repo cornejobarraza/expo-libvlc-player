@@ -55,6 +55,7 @@ class LibVlcPlayerView(
 
     var mediaLength: Long? = null
     var firstPlay: Boolean = true
+    var firstTime: Boolean = true
     private var shouldInit: Boolean = true
 
     val onBuffering by EventDispatcher<Unit>()
@@ -136,6 +137,7 @@ class LibVlcPlayerView(
         }
 
         firstPlay = true
+        firstTime = true
         shouldInit = false
     }
 
@@ -591,8 +593,6 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
 
                         setupPlayer()
 
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
                         firstPlay = false
                     }
 
@@ -616,6 +616,7 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
                     MediaPlayerManager.audioFocusManager.updateAudioFocus()
 
                     firstPlay = true
+                    firstTime = true
                 }
 
                 Event.EndReached -> {
@@ -636,6 +637,12 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
 
                 Event.TimeChanged -> {
                     onTimeChanged(mapOf("time" to player.getTime().toInt()))
+
+                    if (firstTime) {
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                        firstTime = false
+                    }
                 }
 
                 Event.PositionChanged -> {

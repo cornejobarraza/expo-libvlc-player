@@ -18,6 +18,7 @@ class LibVlcPlayerView: ExpoView {
     var mediaLength: Int32?
     var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
     var firstPlay: Bool = true
+    var firstTime: Bool = true
     private var shouldInit: Bool = true
 
     let onBuffering = EventDispatcher()
@@ -90,6 +91,7 @@ class LibVlcPlayerView: ExpoView {
         }
 
         firstPlay = true
+        firstTime = true
         shouldInit = false
     }
 
@@ -460,8 +462,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
                     setupPlayer()
 
-                    MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-
                     firstPlay = false
                 }
 
@@ -479,6 +479,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
 
                 firstPlay = true
+                firstTime = true
             case .ended:
                 onEndReached()
 
@@ -502,6 +503,12 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     func mediaPlayerTimeChanged(_: Notification) {
         if let player = mediaPlayer {
             onTimeChanged(["time": player.time.intValue])
+
+            if firstTime {
+                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+
+                firstTime = false
+            }
 
             onPositionChanged(["position": player.position])
         }
