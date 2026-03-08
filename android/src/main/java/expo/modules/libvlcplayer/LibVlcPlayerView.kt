@@ -584,7 +584,17 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
                 Event.Playing -> {
                     onPlaying(Unit)
 
-                    attachPlayer()
+                    if (firstPlay) {
+                        onFirstPlay(getMediaInfo())
+
+                        attachPlayer()
+
+                        setupPlayer()
+
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                        firstPlay = false
+                    }
 
                     MediaPlayerManager.keepAwakeManager.activateKeepAwake()
                     MediaPlayerManager.audioFocusManager.updateAudioFocus()
@@ -626,16 +636,6 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
 
                 Event.TimeChanged -> {
                     onTimeChanged(mapOf("time" to player.getTime().toInt()))
-
-                    if (firstPlay) {
-                        onFirstPlay(getMediaInfo())
-
-                        setupPlayer()
-
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-                        firstPlay = false
-                    }
                 }
 
                 Event.PositionChanged -> {

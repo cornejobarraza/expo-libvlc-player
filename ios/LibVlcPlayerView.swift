@@ -455,6 +455,16 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             case .playing:
                 onPlaying()
 
+                if firstPlay {
+                    onFirstPlay(getMediaInfo())
+
+                    setupPlayer()
+
+                    MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+
+                    firstPlay = false
+                }
+
                 MediaPlayerManager.shared.keepAwakeManager.activateKeepAwake()
                 MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
             case .paused:
@@ -492,16 +502,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     func mediaPlayerTimeChanged(_: Notification) {
         if let player = mediaPlayer {
             onTimeChanged(["time": player.time.intValue])
-
-            if firstPlay {
-                onFirstPlay(getMediaInfo())
-
-                setupPlayer()
-
-                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-
-                firstPlay = false
-            }
 
             onPositionChanged(["position": player.position])
         }
