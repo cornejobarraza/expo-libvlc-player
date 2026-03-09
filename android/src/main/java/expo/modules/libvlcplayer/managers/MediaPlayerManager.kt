@@ -46,9 +46,7 @@ object MediaPlayerManager {
             view.onBackground(Unit)
 
             view.mediaPlayer?.let { player ->
-                val shouldPause = !view.playInBackground && player.isPlaying()
-
-                if (shouldPause) {
+                if (player.isPlaying()) {
                     player.pause()
                 }
             }

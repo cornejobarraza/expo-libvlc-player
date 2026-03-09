@@ -68,8 +68,7 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
       [
         "expo-libvlc-player",
         {
-          "localNetworkPermission": "Allow $(PRODUCT_NAME) to access your local network",
-          "supportsBackgroundPlayback": true
+          "localNetworkPermission": "Allow $(PRODUCT_NAME) to access your local network"
         }
       ]
     ]
@@ -79,10 +78,9 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 
 #### Configurable properties
 
-| Name                         | Description                                                                                                                                                                                                                  | Default                                                |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                               | `"Allow $(PRODUCT_NAME) to access your local network"` |
-| `supportsBackgroundPlayback` | A boolean value to enable background playback on iOS. If `true`, the `audio` key is added to the `UIBackgroundModes` array in the Info.plist file. If `false`, the key is removed. When `undefined`, the key is not modified | `undefined`                                            |
+| Name                     | Description                                                                    | Default                                                |
+| ------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------ |
+| `localNetworkPermission` | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS | `"Allow $(PRODUCT_NAME) to access your local network"` |
 
 ## Usage
 
@@ -93,14 +91,6 @@ const BIG_BUCK_BUNNY =
   "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov";
 
 return <LibVlcPlayerView source={BIG_BUCK_BUNNY} />;
-```
-
-Check whether battery optimization is enabled on Android:
-
-```tsx
-import LibVlcPlayerModule from "expo-libvlc-player";
-
-await LibVlcPlayerModule.checkBatteryOptimization();
 ```
 
 Trigger the local network privacy alert on iOS:
@@ -115,10 +105,9 @@ See the [Example App](example/App.tsx) for additional usage.
 
 ### Module methods
 
-| Method                       | Description                                                          | Returns            |
-| ---------------------------- | -------------------------------------------------------------------- | ------------------ |
-| `checkBatteryOptimization()` | Attempts to check whether battery optimization is enabled on Android | `Promise<boolean>` |
-| `triggerNetworkAlert()`      | Attempts to trigger the local network privacy alert on iOS           | `Promise<void>`    |
+| Method                  | Description                                                | Returns         |
+| ----------------------- | ---------------------------------------------------------- | --------------- |
+| `triggerNetworkAlert()` | Attempts to trigger the local network privacy alert on iOS | `Promise<void>` |
 
 ### View methods
 
@@ -137,23 +126,22 @@ See the [Example App](example/App.tsx) for additional usage.
 
 The `LibVlcPlayerView` extends React Native `ViewProps` and implements the following:
 
-| Prop               | Description                                                                                                                       | Default     |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `source`           | Sets the source of the media to be played. Set to `null` to release the player                                                    |             |
-| `options`          | Sets the VLC options to initialize the player with. See the [VLC Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
-| `tracks`           | Sets the player audio, video and subtitle tracks object. See [`Tracks`](#tracks) for more                                         | `undefined` |
-| `slaves`           | Sets the player audio and subtitle slaves array. See [`Slave`](#slave) for more                                                   | `[]`        |
-| `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
-| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio string, number or `"auto"`                                                 | `undefined` |
-| `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
-| `rate`             | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
-| `time`             | Sets the initial player time. Must be an integer in milliseconds                                                                  | `0`         |
-| `volume`           | Sets the player volume. Must be an integer between `0` and `100`                                                                  | `100`       |
-| `mute`             | Sets the player volume to `0` when `true`. Previous value is set when `false`                                                     | `false`     |
-| `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
-| `playInBackground` | Determines whether the media should continue playing in the background. Battery optimization must be disabled on Android          | `false`     |
-| `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
-| `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
+| Prop              | Description                                                                                                                       | Default     |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `source`          | Sets the source of the media to be played. Set to `null` to release the player                                                    |             |
+| `options`         | Sets the VLC options to initialize the player with. See the [VLC Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
+| `tracks`          | Sets the player audio, video and subtitle tracks object. See [`Tracks`](#tracks) for more                                         | `undefined` |
+| `slaves`          | Sets the player audio and subtitle slaves array. See [`Slave`](#slave) for more                                                   | `[]`        |
+| `scale`           | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
+| `aspectRatio`     | Sets the container aspect ratio. Must be a valid ratio string, number or `"auto"`                                                 | `undefined` |
+| `contentFit`      | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
+| `rate`            | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
+| `time`            | Sets the initial player time. Must be an integer in milliseconds                                                                  | `0`         |
+| `volume`          | Sets the player volume. Must be an integer between `0` and `100`                                                                  | `100`       |
+| `mute`            | Sets the player volume to `0` when `true`. Previous value is set when `false`                                                     | `false`     |
+| `audioMixingMode` | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
+| `repeat`          | Determines whether the media should repeat once ended                                                                             | `false`     |
+| `autoplay`        | Determines whether the media should autoplay once created                                                                         | `true`      |
 
 #### Callbacks
 
@@ -258,14 +246,6 @@ The current workaround attaches the View once a surface is created but this caus
 
 https://code.videolan.org/videolan/vlc-android/-/issues/1495
 
-#### Local network
-
-On iOS, the `VLCKit` player seems to interact with the local network when playing media from external sources.
-
-A clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
-
-https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy
-
 #### Audio delay
 
 On iOS, the `VLCKit` player experiences a small audio delay when resuming or muting media playback.
@@ -273,6 +253,14 @@ On iOS, the `VLCKit` player experiences a small audio delay when resuming or mut
 This might be related to the internal clock used by the library core causing inaccurate time values.
 
 https://code.videolan.org/videolan/VLCKit/-/issues/233
+
+#### Local network
+
+On iOS, the `VLCKit` player seems to interact with the local network when playing media from external sources.
+
+A clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
+
+https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy
 
 ## Disclaimer
 

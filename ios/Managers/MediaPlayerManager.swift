@@ -34,9 +34,7 @@ class MediaPlayerManager {
             view.onBackground()
 
             if let player = view.mediaPlayer {
-                let shouldPause = !view.playInBackground && player.isPlaying
-
-                if shouldPause {
+                if player.isPlaying {
                     player.pause()
                 }
             }

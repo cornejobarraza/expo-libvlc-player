@@ -109,12 +109,6 @@ public class LibVlcPlayerModule: Module {
                 }
             }
 
-            Prop("playInBackground", false) { (view: LibVlcPlayerView, playInBackground: Bool) in
-                if playInBackground != view.playInBackground {
-                    view.playInBackground = playInBackground
-                }
-            }
-
             Prop("repeat", false) { (view: LibVlcPlayerView, shouldRepeat: Bool) in
                 if shouldRepeat != view.shouldRepeat {
                     view.shouldRepeat = shouldRepeat

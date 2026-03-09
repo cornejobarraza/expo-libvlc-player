@@ -1,10 +1,10 @@
 import ExpoModulesCore
+import UIKit
 #if os(tvOS)
     import TVVLCKit
 #else
     import MobileVLCKit
 #endif
-import UIKit
 
 private let dialogCustomUI: Bool = true
 
@@ -40,8 +40,9 @@ class LibVlcPlayerView: ExpoView {
     required init(appContext: AppContext? = nil) {
         super.init(appContext: appContext)
 
-        clipsToBounds = true
+        playerView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         playerView.backgroundColor = .black
+        clipsToBounds = true
 
         MediaPlayerManager.shared.registerPlayerView(self)
         addSubview(playerView)
@@ -359,8 +360,6 @@ class LibVlcPlayerView: ExpoView {
             MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
         }
     }
-
-    var playInBackground: Bool = false
 
     var shouldRepeat: Bool = false
 

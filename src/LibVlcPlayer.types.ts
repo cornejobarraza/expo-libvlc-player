@@ -228,7 +228,6 @@ export interface LibVlcPlayerViewNativeProps extends ViewProps {
   volume?: number;
   mute?: boolean;
   audioMixingMode?: AudioMixingMode;
-  playInBackground?: boolean;
   repeat?: boolean;
   autoplay?: boolean;
   onBuffering?: BufferingListener;
@@ -377,14 +376,6 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * @default "auto"
    */
   audioMixingMode?: AudioMixingMode;
-  /**
-   * Determines whether the media should continue playing in the background
-   *
-   * @note Battery optimization must be disabled on Android
-   *
-   * @default false
-   */
-  playInBackground?: boolean;
   /**
    * Determines whether the media should repeat once ended
    *

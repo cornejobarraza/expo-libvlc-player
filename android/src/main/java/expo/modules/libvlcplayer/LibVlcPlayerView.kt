@@ -455,11 +455,6 @@ class LibVlcPlayerView(
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
-    var playInBackground: Boolean = false
-        set(value) {
-            field = value
-        }
-
     var repeat: Boolean = false
         set(value) {
             field = value

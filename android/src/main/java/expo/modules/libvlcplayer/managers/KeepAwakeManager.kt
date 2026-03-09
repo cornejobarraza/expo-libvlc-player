@@ -6,13 +6,13 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.exception.Exceptions
 
 class KeepAwakeManager(
-    private val appContext: AppContext?,
+    private val appContext: AppContext,
 ) {
-    private val currentActivity: Activity
-        get() = appContext?.currentActivity ?: throw Exceptions.MissingActivity()
+    private val activity: Activity
+        get() = appContext.currentActivity ?: throw Exceptions.MissingActivity()
 
     fun activateKeepAwake() {
-        currentActivity.let { activity ->
+        activity.let { activity ->
             activity.runOnUiThread {
                 activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
@@ -20,7 +20,7 @@ class KeepAwakeManager(
     }
 
     fun deactivateKeepAwake() {
-        currentActivity.let { activity ->
+        activity.let { activity ->
             activity.runOnUiThread {
                 activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }

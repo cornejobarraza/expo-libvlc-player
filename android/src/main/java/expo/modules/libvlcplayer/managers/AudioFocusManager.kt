@@ -6,6 +6,7 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
 import expo.modules.kotlin.AppContext
+import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.enums.AudioMixingMode
@@ -20,7 +21,7 @@ class AudioFocusManager(
 
     private val audioManager by lazy {
         context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: run {
-            throw Exception()
+            throw CodedException("Failed to get AudioFocusManager service")
         }
     }
 
