@@ -20,7 +20,6 @@ class LibVlcPlayerView: ExpoView {
     var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
 
     var firstPlay: Bool = true
-    private var retryCount: Int = 0
     private var shouldInit: Bool = true
 
     let onBuffering = EventDispatcher()
@@ -143,12 +142,10 @@ class LibVlcPlayerView: ExpoView {
 
             if let player = self.mediaPlayer {
                 let video = player.videoSize
-                let width = video.width
-                let height = video.height
 
-                if width > 0, height > 0 {
+                if self.hasVideoSize() {
                     let viewAspect = view.frame.size.width / view.frame.size.height
-                    let videoAspect = width / height
+                    let videoAspect = video.width / video.height
 
                     switch self.contentFit {
                     case .contain:
@@ -207,32 +204,6 @@ class LibVlcPlayerView: ExpoView {
 
             time = MediaPlayerConstants.defaultPlayerTime
         }
-    }
-
-    func setupFirstPlay() {
-        let tracks = getMediaTracks()
-        let media = getMediaInfo()
-        let length = getMediaLength()
-
-        let hasAudio = tracks.audio.contains { track in track.id != -1 }
-        let hasVideo = tracks.video.contains { track in track.id != -1 }
-
-        let hasAudioOnly = hasAudio && !hasVideo && length > 0
-        let hasWidthAndHeight = media.width > 0 && media.height > 0
-        let hasAudioAndVideo = hasAudio && hasVideo && hasWidthAndHeight && length > 0
-
-        let canFirstPlay = hasAudioOnly || hasAudioAndVideo || retryCount == maxRetryCount
-
-        if !canFirstPlay, retryCount < maxRetryCount {
-            retryCount += 1
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in self?.setupFirstPlay() }
-            return
-        }
-
-        retryCount = 0
-        onFirstPlay(media)
-        setContentFit()
-        MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
     }
 
     func getMediaLength() -> Int32 {
@@ -313,6 +284,27 @@ class LibVlcPlayerView: ExpoView {
         }
 
         return mediaInfo
+    }
+
+    func hasAudioVideo() -> Bool {
+        let tracks = getMediaTracks()
+        let length = getMediaLength()
+
+        let hasAudio = tracks.audio.contains { track in track.id != -1 }
+        let hasVideo = tracks.video.contains { track in track.id != -1 }
+
+        let hasAudioOnly = hasAudio && !hasVideo && length > 0
+        let hasAudioAndVideo = hasAudio && hasVideo && hasVideoSize() && length > 0
+
+        return hasAudioOnly || hasAudioAndVideo
+    }
+
+    func hasVideoSize() -> Bool {
+        if let video = mediaPlayer?.videoSize {
+            video.width > 0 && video.height > 0
+        } else {
+            false
+        }
     }
 
     var source: String? {
@@ -451,15 +443,13 @@ class LibVlcPlayerView: ExpoView {
     func snapshot(_ path: String) {
         if let player = mediaPlayer {
             let video = player.videoSize
-            let width = video.width
-            let height = video.height
 
-            if width > 0, height > 0 {
+            if hasVideoSize() {
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
                 let snapshotPath = path + "/vlc-snapshot-\(dateFormatter.string(from: Date())).jpg"
 
-                player.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(width), andHeight: Int32(height))
+                player.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(video.width), andHeight: Int32(video.height))
 
                 onSnapshotTaken(["path": snapshotPath])
             } else {
@@ -482,6 +472,31 @@ class LibVlcPlayerView: ExpoView {
             vlcDialogRef = nil
         }
     }
+
+    func retryUntil(
+        maxRetries: Int = maxRetryCount,
+        retry: Int = 0,
+        delay: Int = 100,
+        block: @escaping () -> Bool
+    ) {
+        if block() {
+            return
+        }
+
+        if retry >= maxRetries {
+            _ = block()
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay)) { [weak self] in
+            self?.retryUntil(
+                maxRetries: maxRetries,
+                retry: retry + 1,
+                delay: delay,
+                block: block
+            )
+        }
+    }
 }
 
 extension LibVlcPlayerView: VLCMediaPlayerDelegate {
@@ -494,7 +509,15 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 onPlaying()
 
                 if firstPlay {
-                    setupFirstPlay()
+                    retryUntil {
+                        self.onFirstPlay(self.getMediaInfo())
+                        return self.hasAudioVideo()
+                    }
+
+                    retryUntil {
+                        self.setContentFit()
+                        return self.hasVideoSize()
+                    }
 
                     setupPlayer()
 
@@ -502,7 +525,11 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 }
 
                 MediaPlayerManager.shared.keepAwakeManager.activateKeepAwake()
-                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+
+                retryUntil {
+                    MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+                    return player.isPlaying
+                }
             case .paused:
                 onPaused()
 

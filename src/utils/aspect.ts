@@ -9,7 +9,9 @@ export function convertAspectRatio(
     if (numbers.length === 2) {
       const [width, height] = numbers.map(Number);
 
-      if (width > 0 && height > 0) {
+      const hasVideoSize = width > 0 && height > 0;
+
+      if (hasVideoSize) {
         return width / height;
       }
     }

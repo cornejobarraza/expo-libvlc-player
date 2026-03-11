@@ -56,7 +56,6 @@ class LibVlcPlayerView(
     var vlcDialog: VLCDialog? = null
 
     var firstPlay: Boolean = true
-    private var retryCount: Int = 0
     private var shouldInit: Boolean = true
 
     val onBuffering by EventDispatcher<Unit>()
@@ -212,16 +211,14 @@ class LibVlcPlayerView(
             val matrix = Matrix()
 
             mediaPlayer?.let { player ->
-                val video = player.getCurrentVideoTrack()
-                val width = video?.width ?: 0
-                val height = video?.height ?: 0
+                val video = player.getCurrentVideoTrack() ?: return@post
 
-                if (width > 0 && height > 0) {
+                if (hasVideoSize()) {
                     val viewWidth = view.width.toFloat()
                     val viewHeight = view.height.toFloat()
 
-                    val videoWidth = width.toFloat()
-                    val videoHeight = height.toFloat()
+                    val videoWidth = video.width.toFloat()
+                    val videoHeight = video.height.toFloat()
 
                     val viewAspect = viewWidth / viewHeight
                     val videoAspect = videoWidth / videoHeight
@@ -298,32 +295,6 @@ class LibVlcPlayerView(
         }
     }
 
-    fun setupFirstPlay() {
-        val tracks = getMediaTracks()
-        val media = getMediaInfo()
-        val length = getMediaLength()
-
-        val hasAudio = tracks.audio.any { track -> track.id != -1 }
-        val hasVideo = tracks.video.any { track -> track.id != -1 }
-
-        val hasAudioOnly = hasAudio && !hasVideo && length > 0L
-        val hasWidthAndHeight = media.width > 0 && media.height > 0
-        val hasAudioAndVideo = hasAudio && hasVideo && hasWidthAndHeight && length > 0L
-
-        val canFirstPlay = hasAudioOnly || hasAudioAndVideo || retryCount == MAX_RETRY_COUNT
-
-        if (!canFirstPlay && retryCount < MAX_RETRY_COUNT) {
-            retryCount++
-            postDelayed(::setupFirstPlay, 100L)
-            return
-        }
-
-        retryCount = 0
-        onFirstPlay(media)
-        setContentFit()
-        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-    }
-
     fun getMediaTracks(): MediaTracks {
         var mediaTracks = MediaTracks()
 
@@ -395,6 +366,29 @@ class LibVlcPlayerView(
         }
 
         return mediaInfo
+    }
+
+    fun hasAudioVideo(): Boolean {
+        val tracks = getMediaTracks()
+        val length = getMediaLength()
+
+        val hasAudio = tracks.audio.any { track -> track.id != -1 }
+        val hasVideo = tracks.video.any { track -> track.id != -1 }
+
+        val hasAudioOnly = hasAudio && !hasVideo && length > 0L
+        val hasAudioAndVideo = hasAudio && hasVideo && hasVideoSize() && length > 0L
+
+        return hasAudioOnly || hasAudioAndVideo
+    }
+
+    fun hasVideoSize(): Boolean {
+        val video = mediaPlayer?.getCurrentVideoTrack()
+
+        return if (video != null) {
+            video.width > 0 && video.height > 0
+        } else {
+            false
+        }
     }
 
     var source: String? = null
@@ -546,11 +540,10 @@ class LibVlcPlayerView(
                 val view = getTextureView() ?: throw Exception()
                 val video = player.getCurrentVideoTrack() ?: throw Exception()
 
-                val width = video.width?.takeIf { it > 0 } ?: throw Exception()
-                val height = video.height?.takeIf { it > 0 } ?: throw Exception()
+                if (!hasVideoSize()) throw Exception()
 
                 val surface = Surface(view.surfaceTexture)
-                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
 
                 PixelCopy.request(
                     surface,
@@ -594,6 +587,22 @@ class LibVlcPlayerView(
             vlcDialog = null
         }
     }
+
+    fun retryUntil(
+        maxRetries: Int = MAX_RETRY_COUNT,
+        retry: Int = 0,
+        delay: Long = 100L,
+        block: () -> Boolean,
+    ) {
+        if (block()) return
+
+        if (retry >= maxRetries) {
+            block()
+            return
+        }
+
+        postDelayed({ retryUntil(maxRetries, retry + 1, delay, block) }, delay)
+    }
 }
 
 fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
@@ -608,7 +617,15 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
                     onPlaying(Unit)
 
                     if (firstPlay) {
-                        setupFirstPlay()
+                        retryUntil {
+                            onFirstPlay(getMediaInfo())
+                            return@retryUntil hasAudioVideo()
+                        }
+
+                        retryUntil {
+                            setContentFit()
+                            return@retryUntil hasVideoSize()
+                        }
 
                         setupPlayer()
 
@@ -618,7 +635,11 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
                     attachPlayer()
 
                     MediaPlayerManager.keepAwakeManager.activateKeepAwake()
-                    MediaPlayerManager.audioFocusManager.updateAudioFocus()
+
+                    retryUntil {
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                        return@retryUntil player.isPlaying()
+                    }
                 }
 
                 Event.Paused -> {
