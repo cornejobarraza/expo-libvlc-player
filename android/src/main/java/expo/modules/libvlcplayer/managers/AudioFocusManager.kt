@@ -93,13 +93,12 @@ class AudioFocusManager(
         }
     }
 
-    private fun playerRequiresFocus(player: MediaPlayer?): Boolean {
+    private fun playerRequiresFocus(player: MediaPlayer?): Boolean =
         if (player != null) {
-            return player.isPlaying() && player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME
+            player.isPlaying() && player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME
         } else {
-            return false
+            false
         }
-    }
 
     private fun findAudioMixingMode(): AudioMixingMode {
         val mixingModes =

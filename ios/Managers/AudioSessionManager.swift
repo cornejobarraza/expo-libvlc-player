@@ -19,9 +19,11 @@ class AudioSessionManager {
         var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession.categoryOptions
 
         let isOutputtingAudio = MediaPlayerManager.shared.playerViews.allObjects.contains { view in
-            guard let player = view.mediaPlayer else { return false }
-            guard let audio = player.audio else { return false }
-            return player.isPlaying && audio.volume > MediaPlayerConstants.minPlayerVolume
+            if let player = view.mediaPlayer, let audio = player.audio {
+                player.isPlaying && audio.volume > MediaPlayerConstants.minPlayerVolume
+            } else {
+                false
+            }
         }
 
         let shouldMixOverride = audioMixingMode == .mixWithOthers

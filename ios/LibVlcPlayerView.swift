@@ -8,7 +8,7 @@ import UIKit
 
 private let dialogCustomUI: Bool = true
 
-private let maxRetryCount: Int = 10
+private let maxRetryCount: Int = 5
 
 class LibVlcPlayerView: ExpoView {
     private let playerView = UIView()
@@ -479,20 +479,15 @@ class LibVlcPlayerView: ExpoView {
         delay: Int = 100,
         block: @escaping () -> Bool
     ) {
-        if block() {
-            return
-        }
+        if block() || retry >= maxRetries { return }
 
-        if retry >= maxRetries {
-            _ = block()
-            return
-        }
+        let expDelay = Double(delay) * 1.5
 
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay)) { [weak self] in
             self?.retryUntil(
                 maxRetries: maxRetries,
                 retry: retry + 1,
-                delay: delay,
+                delay: Int(expDelay),
                 block: block
             )
         }
@@ -527,8 +522,10 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 MediaPlayerManager.shared.keepAwakeManager.activateKeepAwake()
 
                 retryUntil {
+                    let volume = Int(player.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume))
+                    let hasVolume = volume > MediaPlayerConstants.minPlayerVolume
                     MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-                    return player.isPlaying
+                    return hasVolume
                 }
             case .paused:
                 onPaused()

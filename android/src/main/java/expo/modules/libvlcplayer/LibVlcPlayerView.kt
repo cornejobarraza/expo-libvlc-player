@@ -42,7 +42,7 @@ private val DISPLAY_MANAGER: DisplayManager? = null
 private val ENABLE_SUBTITLES: Boolean = true
 private val USE_TEXTURE_VIEW: Boolean = true
 
-private val MAX_RETRY_COUNT: Int = 10
+private val MAX_RETRY_COUNT: Int = 5
 
 class LibVlcPlayerView(
     context: Context,
@@ -594,14 +594,18 @@ class LibVlcPlayerView(
         delay: Long = 100L,
         block: () -> Boolean,
     ) {
-        if (block()) return
+        if (block() || retry >= maxRetries) return
 
-        if (retry >= maxRetries) {
-            block()
-            return
-        }
+        val expDelay = delay.toDouble() * 1.5
 
-        postDelayed({ retryUntil(maxRetries, retry + 1, delay, block) }, delay)
+        postDelayed({
+            retryUntil(
+                maxRetries,
+                retry + 1,
+                expDelay.toLong(),
+                block,
+            )
+        }, delay)
     }
 }
 
@@ -637,8 +641,10 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
                     MediaPlayerManager.keepAwakeManager.activateKeepAwake()
 
                     retryUntil {
+                        val volume = player.getVolume()
+                        val hasVolume = volume > MediaPlayerConstants.MIN_PLAYER_VOLUME
                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
-                        return@retryUntil player.isPlaying()
+                        return@retryUntil hasVolume
                     }
                 }
 
