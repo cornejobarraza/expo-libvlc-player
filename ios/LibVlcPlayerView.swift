@@ -8,6 +8,8 @@ import UIKit
 
 private let dialogCustomUI: Bool = true
 
+private let maxRetryCount: Int = 10
+
 class LibVlcPlayerView: ExpoView {
     private let playerView = UIView()
 
@@ -15,10 +17,10 @@ class LibVlcPlayerView: ExpoView {
     var vlcDialog: VLCDialogProvider?
     var vlcDialogRef: NSValue?
 
-    var mediaLength: Int32?
     var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
+
     var firstPlay: Bool = true
-    var firstTime: Bool = true
+    private var retryCount: Int = 0
     private var shouldInit: Bool = true
 
     let onBuffering = EventDispatcher()
@@ -92,7 +94,6 @@ class LibVlcPlayerView: ExpoView {
         }
 
         firstPlay = true
-        firstTime = true
         shouldInit = false
     }
 
@@ -137,16 +138,17 @@ class LibVlcPlayerView: ExpoView {
 
     func setContentFit() {
         DispatchQueue.main.async {
-            let view = self.playerView.frame.size
-
+            let view = self.playerView
             var transform: CGAffineTransform = .identity
 
             if let player = self.mediaPlayer {
                 let video = player.videoSize
+                let width = video.width
+                let height = video.height
 
-                if video != .zero {
-                    let viewAspect = view.width / view.height
-                    let videoAspect = video.width / video.height
+                if width > 0, height > 0 {
+                    let viewAspect = view.frame.size.width / view.frame.size.height
+                    let videoAspect = width / height
 
                     switch self.contentFit {
                     case .contain:
@@ -173,7 +175,7 @@ class LibVlcPlayerView: ExpoView {
                 }
             }
 
-            self.playerView.transform = transform
+            view.transform = transform
         }
     }
 
@@ -182,8 +184,6 @@ class LibVlcPlayerView: ExpoView {
             setPlayerTracks()
 
             addPlayerSlaves()
-
-            setContentFit()
 
             if scale != MediaPlayerConstants.defaultPlayerScale {
                 player.scaleFactor = scale
@@ -207,6 +207,46 @@ class LibVlcPlayerView: ExpoView {
 
             time = MediaPlayerConstants.defaultPlayerTime
         }
+    }
+
+    func setupFirstPlay() {
+        let tracks = getMediaTracks()
+        let media = getMediaInfo()
+        let length = getMediaLength()
+
+        let hasAudio = tracks.audio.contains { track in track.id != -1 }
+        let hasVideo = tracks.video.contains { track in track.id != -1 }
+
+        let hasAudioOnly = hasAudio && !hasVideo && length > 0
+        let hasWidthAndHeight = media.width > 0 && media.height > 0
+        let hasAudioAndVideo = hasAudio && hasVideo && hasWidthAndHeight && length > 0
+
+        let canFirstPlay = hasAudioOnly || hasAudioAndVideo || retryCount == maxRetryCount
+
+        if !canFirstPlay, retryCount < maxRetryCount {
+            retryCount += 1
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in self?.setupFirstPlay() }
+            return
+        }
+
+        retryCount = 0
+        onFirstPlay(media)
+        setContentFit()
+        MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+    }
+
+    func getMediaLength() -> Int32 {
+        var length: Int32 = 0
+
+        if let player = mediaPlayer, let media = player.media {
+            let duration = media.length.intValue
+
+            if duration > 0 {
+                length = duration
+            }
+        }
+
+        return length
     }
 
     func getMediaTracks() -> MediaTracks {
@@ -261,7 +301,7 @@ class LibVlcPlayerView: ExpoView {
 
         if let player = mediaPlayer {
             let video = player.videoSize
-            let length = player.media?.length.intValue ?? 0
+            let length = getMediaLength()
             let seekable = player.isSeekable
 
             mediaInfo = MediaInfo(
@@ -270,10 +310,6 @@ class LibVlcPlayerView: ExpoView {
                 length: Double(length),
                 seekable: seekable,
             )
-
-            mediaLength = length > 0 ?
-                length :
-                nil
         }
 
         return mediaInfo
@@ -387,8 +423,7 @@ class LibVlcPlayerView: ExpoView {
                 }
             } else {
                 if type == "position" {
-                    let length = mediaLength ?? 0
-                    time = Int(value * Double(length))
+                    time = Int(value * Double(getMediaLength()))
                 } else {
                     time = Int(value)
                 }
@@ -416,13 +451,15 @@ class LibVlcPlayerView: ExpoView {
     func snapshot(_ path: String) {
         if let player = mediaPlayer {
             let video = player.videoSize
+            let width = video.width
+            let height = video.height
 
-            if video != .zero {
+            if width > 0, height > 0 {
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
                 let snapshotPath = path + "/vlc-snapshot-\(dateFormatter.string(from: Date())).jpg"
 
-                player.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(video.width), andHeight: Int32(video.height))
+                player.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(width), andHeight: Int32(height))
 
                 onSnapshotTaken(["path": snapshotPath])
             } else {
@@ -457,7 +494,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 onPlaying()
 
                 if firstPlay {
-                    onFirstPlay(getMediaInfo())
+                    setupFirstPlay()
 
                     setupPlayer()
 
@@ -476,9 +513,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
                 MediaPlayerManager.shared.keepAwakeManager.deactivateKeepAwake()
                 MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-
-                firstPlay = true
-                firstTime = true
             case .ended:
                 onEndReached()
 
@@ -502,12 +536,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     func mediaPlayerTimeChanged(_: Notification) {
         if let player = mediaPlayer {
             onTimeChanged(["time": player.time.intValue])
-
-            if firstTime {
-                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-
-                firstTime = false
-            }
 
             onPositionChanged(["position": player.position])
         }

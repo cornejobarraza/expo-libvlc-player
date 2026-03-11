@@ -42,6 +42,8 @@ private val DISPLAY_MANAGER: DisplayManager? = null
 private val ENABLE_SUBTITLES: Boolean = true
 private val USE_TEXTURE_VIEW: Boolean = true
 
+private val MAX_RETRY_COUNT: Int = 10
+
 class LibVlcPlayerView(
     context: Context,
     appContext: AppContext,
@@ -53,9 +55,8 @@ class LibVlcPlayerView(
     var media: Media? = null
     var vlcDialog: VLCDialog? = null
 
-    var mediaLength: Long? = null
     var firstPlay: Boolean = true
-    var firstTime: Boolean = true
+    private var retryCount: Int = 0
     private var shouldInit: Boolean = true
 
     val onBuffering by EventDispatcher<Unit>()
@@ -137,7 +138,6 @@ class LibVlcPlayerView(
         }
 
         firstPlay = true
-        firstTime = true
         shouldInit = false
     }
 
@@ -208,19 +208,20 @@ class LibVlcPlayerView(
 
     fun setContentFit() {
         post {
-            val textureView = getTextureView() ?: return@post
-
+            val view = getTextureView() ?: return@post
             val matrix = Matrix()
 
             mediaPlayer?.let { player ->
                 val video = player.getCurrentVideoTrack()
+                val width = video?.width ?: 0
+                val height = video?.height ?: 0
 
-                if (video != null) {
-                    val viewWidth = playerView.width.toFloat()
-                    val viewHeight = playerView.height.toFloat()
+                if (width > 0 && height > 0) {
+                    val viewWidth = view.width.toFloat()
+                    val viewHeight = view.height.toFloat()
 
-                    val videoWidth = video.width.toFloat()
-                    val videoHeight = video.height.toFloat()
+                    val videoWidth = width.toFloat()
+                    val videoHeight = height.toFloat()
 
                     val viewAspect = viewWidth / viewHeight
                     val videoAspect = videoWidth / videoHeight
@@ -260,7 +261,7 @@ class LibVlcPlayerView(
                 }
             }
 
-            textureView.setTransform(matrix)
+            view.setTransform(matrix)
         }
     }
 
@@ -269,8 +270,6 @@ class LibVlcPlayerView(
             setPlayerTracks()
 
             addPlayerSlaves()
-
-            setContentFit()
 
             if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
                 player.setScale(scale)
@@ -297,6 +296,32 @@ class LibVlcPlayerView(
 
             time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
         }
+    }
+
+    fun setupFirstPlay() {
+        val tracks = getMediaTracks()
+        val media = getMediaInfo()
+        val length = getMediaLength()
+
+        val hasAudio = tracks.audio.any { track -> track.id != -1 }
+        val hasVideo = tracks.video.any { track -> track.id != -1 }
+
+        val hasAudioOnly = hasAudio && !hasVideo && length > 0L
+        val hasWidthAndHeight = media.width > 0 && media.height > 0
+        val hasAudioAndVideo = hasAudio && hasVideo && hasWidthAndHeight && length > 0L
+
+        val canFirstPlay = hasAudioOnly || hasAudioAndVideo || retryCount == MAX_RETRY_COUNT
+
+        if (!canFirstPlay && retryCount < MAX_RETRY_COUNT) {
+            retryCount++
+            postDelayed(::setupFirstPlay, 100L)
+            return
+        }
+
+        retryCount = 0
+        onFirstPlay(media)
+        setContentFit()
+        MediaPlayerManager.audioFocusManager.updateAudioFocus()
     }
 
     fun getMediaTracks(): MediaTracks {
@@ -338,18 +363,26 @@ class LibVlcPlayerView(
         return mediaTracks
     }
 
+    fun getMediaLength(): Long {
+        var length: Long = 0L
+
+        mediaPlayer?.let { player ->
+            val duration = player.getLength()
+
+            if (duration > 0L) {
+                length = duration
+            }
+        }
+
+        return length
+    }
+
     fun getMediaInfo(): MediaInfo {
         var mediaInfo = MediaInfo()
 
         mediaPlayer?.let { player ->
             val video = player.getCurrentVideoTrack()
-            val duration = player.getLength()
-            val length =
-                if (duration != -1L) {
-                    duration
-                } else {
-                    0L
-                }
+            val length = getMediaLength()
             val seekable = player.isSeekable()
 
             mediaInfo =
@@ -359,13 +392,6 @@ class LibVlcPlayerView(
                     length = length.toDouble(),
                     seekable = seekable,
                 )
-
-            mediaLength =
-                if (length > 0L) {
-                    length
-                } else {
-                    null
-                }
         }
 
         return mediaInfo
@@ -490,8 +516,7 @@ class LibVlcPlayerView(
                 }
             } else {
                 if (type == "position") {
-                    val length = mediaLength ?: 0L
-                    time = (value * length.toDouble()).toInt()
+                    time = (value * getMediaLength().toDouble()).toInt()
                 } else {
                     time = value.toInt()
                 }
@@ -518,19 +543,20 @@ class LibVlcPlayerView(
     fun snapshot(path: String) {
         mediaPlayer?.let { player ->
             try {
-                val textureView = getTextureView() ?: throw Exception()
+                val view = getTextureView() ?: throw Exception()
                 val video = player.getCurrentVideoTrack() ?: throw Exception()
 
-                val surface = Surface(textureView.surfaceTexture)
-                val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
+                val width = video.width?.takeIf { it > 0 } ?: throw Exception()
+                val height = video.height?.takeIf { it > 0 } ?: throw Exception()
+
+                val surface = Surface(view.surfaceTexture)
+                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
 
                 PixelCopy.request(
                     surface,
                     bitmap,
                     { copyResult ->
-                        if (copyResult != PixelCopy.SUCCESS) {
-                            throw Exception()
-                        }
+                        if (copyResult != PixelCopy.SUCCESS) throw Exception()
 
                         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'")
                         val timestamp = Calendar.getInstance().time
@@ -582,14 +608,14 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
                     onPlaying(Unit)
 
                     if (firstPlay) {
-                        onFirstPlay(getMediaInfo())
-
-                        attachPlayer()
+                        setupFirstPlay()
 
                         setupPlayer()
 
                         firstPlay = false
                     }
+
+                    attachPlayer()
 
                     MediaPlayerManager.keepAwakeManager.activateKeepAwake()
                     MediaPlayerManager.audioFocusManager.updateAudioFocus()
@@ -609,9 +635,6 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
 
                     MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
                     MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-                    firstPlay = true
-                    firstTime = true
                 }
 
                 Event.EndReached -> {
@@ -632,12 +655,6 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
 
                 Event.TimeChanged -> {
                     onTimeChanged(mapOf("time" to player.getTime().toInt()))
-
-                    if (firstTime) {
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-
-                        firstTime = false
-                    }
                 }
 
                 Event.PositionChanged -> {
