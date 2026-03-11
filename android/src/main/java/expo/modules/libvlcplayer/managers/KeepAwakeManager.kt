@@ -11,6 +11,12 @@ class KeepAwakeManager(
     private val activity: Activity
         get() = appContext.currentActivity ?: throw Exceptions.MissingActivity()
 
+    private val anyPlayingView: Boolean
+        get() =
+            MediaPlayerManager.playerViews.any { view ->
+                view.mediaPlayer?.isPlaying() == true
+            }
+
     fun activateKeepAwake() {
         activity.let { activity ->
             activity.runOnUiThread {
@@ -24,6 +30,14 @@ class KeepAwakeManager(
             activity.runOnUiThread {
                 activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
+        }
+    }
+
+    fun toggleKeepAwake() {
+        if (anyPlayingView) {
+            activateKeepAwake()
+        } else {
+            deactivateKeepAwake()
         }
     }
 }

@@ -519,7 +519,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     firstPlay = false
                 }
 
-                MediaPlayerManager.shared.keepAwakeManager.activateKeepAwake()
+                MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
 
                 retryUntil {
                     let volume = Int(player.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume))
@@ -530,12 +530,12 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             case .paused:
                 onPaused()
 
-                MediaPlayerManager.shared.keepAwakeManager.deactivateKeepAwake()
+                MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
                 MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
             case .stopped:
                 onStopped()
 
-                MediaPlayerManager.shared.keepAwakeManager.deactivateKeepAwake()
+                MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
                 MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
             case .ended:
                 onEndReached()

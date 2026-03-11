@@ -638,7 +638,7 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
 
                     attachPlayer()
 
-                    MediaPlayerManager.keepAwakeManager.activateKeepAwake()
+                    MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
 
                     retryUntil {
                         val volume = player.getVolume()
@@ -651,7 +651,7 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
                 Event.Paused -> {
                     onPaused(Unit)
 
-                    MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
+                    MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
                     MediaPlayerManager.audioFocusManager.updateAudioFocus()
                 }
 
@@ -660,7 +660,7 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
 
                     detachPlayer()
 
-                    MediaPlayerManager.keepAwakeManager.deactivateKeepAwake()
+                    MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
                     MediaPlayerManager.audioFocusManager.updateAudioFocus()
                 }
 

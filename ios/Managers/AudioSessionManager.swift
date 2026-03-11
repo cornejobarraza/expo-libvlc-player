@@ -72,8 +72,8 @@ class AudioSessionManager {
             return nil
         }
 
-        for playerView in playingViews where (audioMixingMode.priority()) < playerView.audioMixingMode.priority() {
-            audioMixingMode = playerView.audioMixingMode
+        for view in playingViews where (audioMixingMode.priority()) < view.audioMixingMode.priority() {
+            audioMixingMode = view.audioMixingMode
         }
 
         return audioMixingMode
