@@ -8,6 +8,7 @@ import android.os.Build
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.exception.Exceptions
+import expo.modules.libvlcplayer.LibVlcPlayerView
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.enums.AudioMixingMode
 import kotlinx.coroutines.launch
@@ -25,11 +26,14 @@ class AudioFocusManager(
         }
     }
 
+    private val playerViews: MutableSet<LibVlcPlayerView>
+        get() = MediaPlayerManager.playerViews
+
     private var currentFocusRequest: AudioFocusRequest? = null
 
     private val anyPlayerRequiresFocus: Boolean
         get() =
-            MediaPlayerManager.playerViews.any { view ->
+            playerViews.any { view ->
                 playerRequiresFocus(view.mediaPlayer)
             }
 
@@ -41,7 +45,7 @@ class AudioFocusManager(
         appContext.mainQueue.launch {
             when (focusChange) {
                 AudioManager.AUDIOFOCUS_LOSS -> {
-                    MediaPlayerManager.playerViews.forEach { view ->
+                    playerViews.forEach { view ->
                         pausePlayerIfUnmuted(view.mediaPlayer)
                     }
 
@@ -55,7 +59,7 @@ class AudioFocusManager(
                         return@launch
                     }
 
-                    MediaPlayerManager.playerViews.forEach { view ->
+                    playerViews.forEach { view ->
                         pausePlayerIfUnmuted(view.mediaPlayer)
                     }
 
@@ -65,7 +69,7 @@ class AudioFocusManager(
                 AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
                     val audioMixingMode = findAudioMixingMode()
 
-                    MediaPlayerManager.playerViews.forEach { view ->
+                    playerViews.forEach { view ->
                         if (audioMixingMode == AudioMixingMode.DO_NOT_MIX) {
                             pausePlayerIfUnmuted(view.mediaPlayer)
                         } else {
@@ -75,7 +79,7 @@ class AudioFocusManager(
                 }
 
                 AudioManager.AUDIOFOCUS_GAIN -> {
-                    MediaPlayerManager.playerViews.forEach { view ->
+                    playerViews.forEach { view ->
                         unduckPlayer(view.mediaPlayer)
                     }
                 }
@@ -102,7 +106,7 @@ class AudioFocusManager(
 
     private fun findAudioMixingMode(): AudioMixingMode {
         val mixingModes =
-            MediaPlayerManager.playerViews
+            playerViews
                 .filter { view -> view.mediaPlayer?.isPlaying() == true }
                 .map { view -> view.audioMixingMode }
 
