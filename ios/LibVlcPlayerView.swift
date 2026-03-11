@@ -136,18 +136,18 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func setContentFit() {
-        DispatchQueue.main.async {
-            let view = self.playerView
+        DispatchQueue.main.async { [self] in
+            let view = playerView
             var transform: CGAffineTransform = .identity
 
-            if let player = self.mediaPlayer {
+            if let player = mediaPlayer {
                 let video = player.videoSize
 
-                if self.hasVideoSize() {
+                if hasVideoSize() {
                     let viewAspect = view.frame.size.width / view.frame.size.height
                     let videoAspect = video.width / video.height
 
-                    switch self.contentFit {
+                    switch contentFit {
                     case .contain:
                         // No transform required
                         break
@@ -504,14 +504,14 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 onPlaying()
 
                 if firstPlay {
-                    retryUntil {
-                        self.onFirstPlay(self.getMediaInfo())
-                        return self.hasAudioVideo()
+                    retryUntil { [self] in
+                        onFirstPlay(getMediaInfo())
+                        return hasAudioVideo()
                     }
 
-                    retryUntil {
-                        self.setContentFit()
-                        return self.hasVideoSize()
+                    retryUntil { [self] in
+                        setContentFit()
+                        return hasVideoSize()
                     }
 
                     setupPlayer()
@@ -522,7 +522,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
 
                 retryUntil {
-                    let volume = Int(player.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume))
+                    let volume = player.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
                     let hasVolume = volume > MediaPlayerConstants.minPlayerVolume
                     MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
                     return hasVolume
