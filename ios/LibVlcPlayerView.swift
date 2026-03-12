@@ -1,10 +1,6 @@
 import ExpoModulesCore
 import UIKit
-#if os(tvOS)
-    import TVVLCKit
-#else
-    import MobileVLCKit
-#endif
+import VLCKit
 
 private let dialogCustomUI: Bool = true
 
@@ -26,7 +22,6 @@ class LibVlcPlayerView: ExpoView {
     let onPlaying = EventDispatcher()
     let onPaused = EventDispatcher()
     let onStopped = EventDispatcher()
-    let onEndReached = EventDispatcher()
     let onEncounteredError = EventDispatcher()
     let onDialogDisplay = EventDispatcher()
     let onTimeChanged = EventDispatcher()
@@ -56,8 +51,8 @@ class LibVlcPlayerView: ExpoView {
 
     override var bounds: CGRect {
         didSet {
-            playerView.transform = .identity
             playerView.frame = bounds
+            playerView.transform = .identity
             setContentFit()
         }
     }
@@ -105,16 +100,46 @@ class LibVlcPlayerView: ExpoView {
         vlcDialog = nil
     }
 
-    func setPlayerTracks() {
+    func selectTrack(_ track: Int?, _ type: VLCMedia.TrackType) {
         if let player = mediaPlayer {
-            let audioTrackIndex = tracks?.audio ?? Int(player.currentAudioTrackIndex)
-            let videoTrackIndex = tracks?.video ?? Int(player.currentVideoTrackIndex)
-            let videoSubTitleIndex = tracks?.subtitle ?? Int(player.currentVideoSubTitleIndex)
+            let tracks: [VLCMediaPlayer.Track]? = switch type {
+            case .audio:
+                player.audioTracks
+            case .video:
+                player.videoTracks
+            case .text:
+                player.textTracks
+            default:
+                nil
+            }
 
-            player.currentAudioTrackIndex = Int32(audioTrackIndex)
-            player.currentVideoTrackIndex = Int32(videoTrackIndex)
-            player.currentVideoSubTitleIndex = Int32(videoSubTitleIndex)
+            let trackId = tracks?.first?.trackId
+            let firstId = trackId.map { id in (id as NSString).intValue }
+            let trackIndex = track ?? firstId.map { id in Int(id) }
+
+            if let index = trackIndex {
+                switch (type, index) {
+                case (.audio, -1):
+                    player.deselectAllAudioTracks()
+                case (.video, -1):
+                    player.deselectAllVideoTracks()
+                case (.text, -1):
+                    player.deselectAllTextTracks()
+                default:
+                    player.selectTrack(at: index, type: type)
+                }
+            }
         }
+    }
+
+    func setPlayerTracks() {
+        let audioTrack = tracks?.audio
+        let videoTrack = tracks?.video
+        let textTrack = tracks?.subtitle
+
+        selectTrack(audioTrack, .audio)
+        selectTrack(videoTrack, .video)
+        selectTrack(textTrack, .text)
     }
 
     func addPlayerSlaves() {
@@ -226,35 +251,32 @@ class LibVlcPlayerView: ExpoView {
         if let player = mediaPlayer {
             var audioTracks: [Track] = []
 
-            if let audios = player.audioTrackNames as? [String] {
-                if let audioIndexes = player.audioTrackIndexes as? [NSNumber] {
-                    for (index, trackName) in zip(audioIndexes, audios) {
-                        let track = Track(id: index.intValue, name: trackName)
-                        audioTracks.append(track)
-                    }
-                }
+            let audios = player.audioTracks
+
+            audioTracks = audios.map { audio in
+                let id = (audio.trackId as NSString).intValue
+                let name = audio.trackName
+                return Track(id: Int(id), name: name)
             }
 
             var videoTracks: [Track] = []
 
-            if let videos = player.videoTrackNames as? [String] {
-                if let videoIndexes = player.videoTrackIndexes as? [NSNumber] {
-                    for (index, trackName) in zip(videoIndexes, videos) {
-                        let track = Track(id: index.intValue, name: trackName)
-                        videoTracks.append(track)
-                    }
-                }
+            let videos = player.videoTracks
+
+            videoTracks = videos.map { video in
+                let id = (video.trackId as NSString).intValue
+                let name = video.trackName
+                return Track(id: Int(id), name: name)
             }
 
             var subtitleTracks: [Track] = []
 
-            if let subtitles = player.videoSubTitlesNames as? [String] {
-                if let subtitleIndexes = player.videoSubTitlesIndexes as? [NSNumber] {
-                    for (index, trackName) in zip(subtitleIndexes, subtitles) {
-                        let track = Track(id: index.intValue, name: trackName)
-                        subtitleTracks.append(track)
-                    }
-                }
+            let subtitles = player.textTracks
+
+            subtitleTracks = subtitles.map { subtitle in
+                let id = (subtitle.trackId as NSString).intValue
+                let name = subtitle.trackName
+                return Track(id: Int(id), name: name)
             }
 
             mediaTracks = MediaTracks(
@@ -290,8 +312,8 @@ class LibVlcPlayerView: ExpoView {
         let tracks = getMediaTracks()
         let length = getMediaLength()
 
-        let hasAudio = tracks.audio.contains { track in track.id != -1 }
-        let hasVideo = tracks.video.contains { track in track.id != -1 }
+        let hasAudio = tracks.audio.count > 0
+        let hasVideo = tracks.video.count > 0
 
         let hasAudioOnly = hasAudio && !hasVideo && length > 0
         let hasAudioAndVideo = hasAudio && hasVideo && hasVideoSize() && length > 0
@@ -409,7 +431,7 @@ class LibVlcPlayerView: ExpoView {
         if let player = mediaPlayer {
             if player.isSeekable {
                 if type == "position" {
-                    player.position = Float(value)
+                    player.position = value
                 } else {
                     player.time = VLCTime(int: Int32(value))
                 }
@@ -426,17 +448,12 @@ class LibVlcPlayerView: ExpoView {
     func record(_ path: String?) {
         if let player = mediaPlayer {
             if let path {
-                // https://code.videolan.org/videolan/VLCKit/-/issues/394
-                let success = !player.startRecording(atPath: path)
-
-                if !success {
-                    onEncounteredError(["error": "Media could not be recorded"])
-
-                    player.stopRecording()
-                }
+                player.startRecording(atPath: path)
             } else {
                 player.stopRecording()
             }
+        } else {
+            onEncounteredError(["error": "Media could not be recorded"])
         }
     }
 
@@ -495,9 +512,9 @@ class LibVlcPlayerView: ExpoView {
 }
 
 extension LibVlcPlayerView: VLCMediaPlayerDelegate {
-    func mediaPlayerStateChanged(_: Notification) {
+    func mediaPlayerStateChanged(_ newState: VLCMediaPlayerState) {
         if let player = mediaPlayer {
-            switch player.state {
+            switch newState {
             case .buffering:
                 onBuffering()
             case .playing:
@@ -535,22 +552,16 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             case .stopped:
                 onStopped()
 
-                MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
-                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-            case .ended:
-                onEndReached()
-
-                player.stop()
-
                 if shouldRepeat {
                     player.play()
                 }
+
+                MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
+                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
             case .error:
                 onEncounteredError(["error": "Player encountered an error"])
 
                 player.stop()
-            case .esAdded:
-                onESAdded(getMediaTracks())
             default:
                 break
             }
@@ -565,6 +576,10 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         }
     }
 
+    func mediaPlayerTrackAdded(_: String, with _: VLCMedia.TrackType) {
+        onESAdded(getMediaTracks())
+    }
+
     func mediaPlayerStartedRecording(_: VLCMediaPlayer) {
         let recording = Recording(
             path: nil,
@@ -574,7 +589,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         onRecordChanged(recording)
     }
 
-    func mediaPlayer(_: VLCMediaPlayer, recordingStoppedAtPath path: String) {
+    func mediaPlayer(recordingStoppedAt path: String) {
         let recording = Recording(
             path: path,
             isRecording: false,

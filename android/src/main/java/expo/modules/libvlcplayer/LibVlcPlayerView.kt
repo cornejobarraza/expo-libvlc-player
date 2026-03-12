@@ -62,7 +62,6 @@ class LibVlcPlayerView(
     val onPlaying by EventDispatcher<Unit>()
     val onPaused by EventDispatcher<Unit>()
     val onStopped by EventDispatcher<Unit>()
-    val onEndReached by EventDispatcher<Unit>()
     val onEncounteredError by EventDispatcher()
     val onDialogDisplay by EventDispatcher<Dialog>()
     val onTimeChanged by EventDispatcher()
@@ -665,8 +664,6 @@ fun LibVlcPlayerView.setPlayerListener(player: MediaPlayer) {
                 }
 
                 Event.EndReached -> {
-                    onEndReached(Unit)
-
                     player.stop()
 
                     if (repeat) {

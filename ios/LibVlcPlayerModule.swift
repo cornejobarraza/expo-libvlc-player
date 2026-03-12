@@ -5,7 +5,6 @@ private let playerEvents = [
     "onPlaying",
     "onPaused",
     "onStopped",
-    "onEndReached",
     "onEncounteredError",
     "onDialogDisplay",
     "onTimeChanged",

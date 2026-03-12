@@ -15,7 +15,6 @@ private val PLAYER_EVENTS =
         "onPlaying",
         "onPaused",
         "onStopped",
-        "onEndReached",
         "onEncounteredError",
         "onDialogDisplay",
         "onTimeChanged",

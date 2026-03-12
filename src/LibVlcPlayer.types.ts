@@ -148,11 +148,6 @@ type PausedListener = () => void;
  */
 type StoppedListener = () => void;
 
-/**
- * @hidden
- */
-type EndReachedListener = () => void;
-
 export type Error = { error: string };
 
 /**
@@ -234,7 +229,6 @@ export interface LibVlcPlayerViewNativeProps extends ViewProps {
   onPlaying?: PlayingListener;
   onPaused?: PausedListener;
   onStopped?: StoppedListener;
-  onEndReached?: EndReachedListener;
   onEncounteredError?: EncounteredErrorListener;
   onDialogDisplay?: DialogDisplayListener;
   onTimeChanged?: TimeChangedListener;
@@ -404,10 +398,6 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Called after the `Stopped` player event
    */
   onStopped?: () => void;
-  /**
-   * Called after the `EndReached` player event
-   */
-  onEndReached?: () => void;
   /**
    * Called after the `EncounteredError` player event
    */

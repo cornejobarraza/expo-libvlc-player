@@ -151,7 +151,6 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onPlaying`          | Called after the `Playing` player event          |                               |
 | `onPaused`           | Called after the `Paused` player event           |                               |
 | `onStopped`          | Called after the `Stopped` player event          |                               |
-| `onEndReached`       | Called after the `EndReached` player event       |                               |
 | `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`           |
 | `onDialogDisplay`    | Called after a `Dialog` needs to be displayed    | [`Dialog`](#dialog)           |
 | `onTimeChanged`      | Called after the `TimeChanged` player event      | `{ time: number }`            |
