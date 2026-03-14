@@ -110,7 +110,7 @@ class LibVlcPlayerModule : Module() {
                 }
 
                 OnViewDestroys { view: LibVlcPlayerView ->
-                    MediaPlayerManager.unregisterPlayerView(view)
+                    MediaPlayerManager.unregisterExpoView(view)
                     view.destroyPlayer()
                 }
 
@@ -127,7 +127,7 @@ class LibVlcPlayerModule : Module() {
                 }
 
                 AsyncFunction("seek") { view: LibVlcPlayerView, value: Double, type: String? ->
-                    view.seek(value, type ?: "time")
+                    view.seek(value, type)
                 }
 
                 AsyncFunction("record") { view: LibVlcPlayerView, path: String? ->

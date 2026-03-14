@@ -7,7 +7,7 @@ class AudioSessionManager {
 
     private static let managerQueue = DispatchQueue(label: "audioManagerQueue")
 
-    private lazy var playerViews = MediaPlayerManager.shared.playerViews
+    private lazy var expoViews = MediaPlayerManager.shared.expoViews
 
     func setAppropriateAudioSession() {
         Self.managerQueue.async { [weak self] in
@@ -20,7 +20,7 @@ class AudioSessionManager {
         let audioMixingMode = findAudioMixingMode()
         var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession.categoryOptions
 
-        let isOutputtingAudio = playerViews.allObjects.contains { view in
+        let isOutputtingAudio = expoViews.allObjects.contains { view in
             if let player = view.mediaPlayer, let audio = player.audio {
                 player.isPlaying && audio.volume > MediaPlayerConstants.minPlayerVolume
             } else {
@@ -64,7 +64,7 @@ class AudioSessionManager {
     }
 
     private func findAudioMixingMode() -> AudioMixingMode? {
-        let playingViews = playerViews.allObjects.filter { view in
+        let playingViews = expoViews.allObjects.filter { view in
             view.mediaPlayer?.isPlaying == true
         }
 

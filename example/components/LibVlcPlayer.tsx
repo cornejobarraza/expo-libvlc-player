@@ -21,7 +21,7 @@ const MAX_VOLUME = 100;
 
 const DEFAULT_TIME = 0;
 const BUFFERING_DELAY = 1_000;
-const SEEK_STEP = 5_000;
+const SEEK_STEP = 10_000;
 
 interface LibVlcPlayerProps {
   title?: string;

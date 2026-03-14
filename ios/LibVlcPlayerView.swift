@@ -4,8 +4,6 @@ import VLCKit
 
 private let dialogCustomUI: Bool = true
 
-private let maxRetryCount: Int = 5
-
 class LibVlcPlayerView: ExpoView {
     private let playerView = UIView()
 
@@ -40,19 +38,19 @@ class LibVlcPlayerView: ExpoView {
         playerView.backgroundColor = .black
         clipsToBounds = true
 
-        MediaPlayerManager.shared.registerPlayerView(self)
+        MediaPlayerManager.shared.registerExpoView(self)
         addSubview(playerView)
     }
 
     deinit {
-        MediaPlayerManager.shared.unregisterPlayerView(self)
+        MediaPlayerManager.shared.unregisterExpoView(self)
         destroyPlayer()
     }
 
     override var bounds: CGRect {
         didSet {
-            playerView.frame = bounds
             playerView.transform = .identity
+            playerView.frame = bounds
             setContentFit()
         }
     }
@@ -68,7 +66,10 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func createPlayer() {
-        mediaPlayer = VLCMediaPlayer(options: options)
+        var args = options
+        args.toggleStartPausedOption(autoplay)
+
+        mediaPlayer = VLCMediaPlayer(options: args)
         mediaPlayer!.drawable = playerView
         mediaPlayer!.delegate = self
 
@@ -76,25 +77,20 @@ class LibVlcPlayerView: ExpoView {
         vlcDialog = VLCDialogProvider(library: library, customUI: dialogCustomUI)
         vlcDialog!.customRenderer = self
 
-        guard let url = URL(string: source!) else {
+        guard let source, let url = URL(string: source) else {
             onEncounteredError(["error": "Invalid source, media could not be set"])
             return
         }
 
         mediaPlayer!.media = VLCMedia(url: url)
-
-        if autoplay {
-            mediaPlayer!.play()
-        }
+        mediaPlayer!.play()
 
         firstPlay = true
         shouldInit = false
     }
 
     func destroyPlayer() {
-        mediaPlayer?.drawable = nil
-        mediaPlayer?.delegate = nil
-        mediaPlayer?.media = nil
+        mediaPlayer?.stop()
         mediaPlayer = nil
         vlcDialog?.customRenderer = nil
         vlcDialog = nil
@@ -161,43 +157,42 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func setContentFit() {
-        DispatchQueue.main.async { [self] in
-            let view = playerView
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+
             var transform: CGAffineTransform = .identity
 
-            if let player = mediaPlayer {
-                let video = player.videoSize
+            let video = getVideoSize()
 
-                if hasVideoSize() {
-                    let viewAspect = view.frame.size.width / view.frame.size.height
-                    let videoAspect = video.width / video.height
+            if hasVideoSize == true {
+                let viewAspect = playerView.frame.size.width / playerView.frame.size.height
+                let videoAspect = video.width / video.height
 
-                    switch contentFit {
-                    case .contain:
-                        // No transform required
-                        break
-                    case .cover:
-                        let scale = videoAspect > viewAspect ?
-                            videoAspect / viewAspect :
-                            viewAspect / videoAspect
+                switch contentFit {
+                case .contain:
+                    // No transform required
+                    break
+                case .cover:
+                    let scale = videoAspect > viewAspect ?
+                        videoAspect / viewAspect :
+                        viewAspect / videoAspect
 
-                        transform = CGAffineTransform(scaleX: scale, y: scale)
-                    case .fill:
-                        var scaleX = 1.0
-                        var scaleY = 1.0
+                    transform = CGAffineTransform(scaleX: scale, y: scale)
+                case .fill:
+                    var scaleX = 1.0
+                    var scaleY = 1.0
 
-                        if videoAspect > viewAspect {
-                            scaleY = videoAspect / viewAspect
-                        } else {
-                            scaleX = viewAspect / videoAspect
-                        }
-
-                        transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
+                    if videoAspect > viewAspect {
+                        scaleY = videoAspect / viewAspect
+                    } else {
+                        scaleX = viewAspect / videoAspect
                     }
+
+                    transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
                 }
             }
 
-            view.transform = transform
+            playerView.transform = transform
         }
     }
 
@@ -308,25 +303,21 @@ class LibVlcPlayerView: ExpoView {
         return mediaInfo
     }
 
-    func hasAudioVideo() -> Bool {
-        let tracks = getMediaTracks()
-        let length = getMediaLength()
-
-        let hasAudio = tracks.audio.count > 0
-        let hasVideo = tracks.video.count > 0
-
-        let hasAudioOnly = hasAudio && !hasVideo && length > 0
-        let hasAudioAndVideo = hasAudio && hasVideo && hasVideoSize() && length > 0
-
-        return hasAudioOnly || hasAudioAndVideo
+    func getVideoSize() -> CGSize {
+        if let video = mediaPlayer?.videoSize { return video }
+        return CGSize(width: 0, height: 0)
     }
 
-    func hasVideoSize() -> Bool {
-        if let video = mediaPlayer?.videoSize {
-            video.width > 0 && video.height > 0
-        } else {
-            false
-        }
+    var hasVideoOut: Bool {
+        let tracks = getMediaTracks()
+        let length = getMediaLength()
+        let hasVideo = tracks.video.count > 0
+        return hasVideo && hasVideoSize && length > 0
+    }
+
+    var hasVideoSize: Bool {
+        let video = getVideoSize()
+        return video.width > 0 && video.height > 0
     }
 
     var source: String? {
@@ -416,18 +407,31 @@ class LibVlcPlayerView: ExpoView {
     var autoplay: Bool = true
 
     func play() {
-        mediaPlayer?.play()
+        if let player = mediaPlayer {
+            if !autoplay {
+                player.play()
+            }
+
+            player.play()
+        }
     }
 
     func pause() {
         mediaPlayer?.pause()
     }
 
+    func pauseIf(_ condition: Bool? = true) {
+        if let player = mediaPlayer {
+            let shouldPause = condition == true && player.isPlaying
+            if shouldPause { player.pause() }
+        }
+    }
+
     func stop() {
         mediaPlayer?.stop()
     }
 
-    func seek(_ value: Double, _ type: String) {
+    func seek(_ value: Double, _ type: String? = "time") {
         if let player = mediaPlayer {
             if player.isSeekable {
                 if type == "position" {
@@ -458,21 +462,19 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func snapshot(_ path: String) {
-        if let player = mediaPlayer {
-            let video = player.videoSize
+        let video = getVideoSize()
 
-            if hasVideoSize() {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
-                let snapshotPath = path + "/vlc-snapshot-\(dateFormatter.string(from: Date())).jpg"
+        if hasVideoSize {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
+            let snapshotPath = path + "/vlc-snapshot-\(dateFormatter.string(from: Date())).jpg"
 
-                player.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(video.width), andHeight: Int32(video.height))
+            mediaPlayer?.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(video.width), andHeight: Int32(video.height))
 
-                onSnapshotTaken(["path": snapshotPath])
-            } else {
-                onEncounteredError(["error": "Snapshot could not be taken"])
-                return
-            }
+            onSnapshotTaken(["path": snapshotPath])
+        } else {
+            onEncounteredError(["error": "Snapshot could not be taken"])
+            return
         }
     }
 
@@ -491,22 +493,19 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func retryUntil(
-        maxRetries: Int = maxRetryCount,
+        maxRetries: Int = MediaPlayerConstants.maxRetryCount,
         retry: Int = 0,
-        delay: Int = 100,
-        block: @escaping () -> Bool
+        delay: Int = MediaPlayerConstants.retryDelayMs,
+        block: @escaping (_ isLastAttempt: Bool) -> Bool
     ) {
-        if block() || retry >= maxRetries { return }
+        let isLastAttempt = retry >= maxRetries
 
-        let expDelay = Double(delay) * 1.5
+        if block(isLastAttempt) || isLastAttempt { return }
+
+        let expDelay = Int(Double(delay) * 1.5)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay)) { [weak self] in
-            self?.retryUntil(
-                maxRetries: maxRetries,
-                retry: retry + 1,
-                delay: Int(expDelay),
-                block: block
-            )
+            self?.retryUntil(maxRetries: maxRetries, retry: retry + 1, delay: expDelay, block: block)
         }
     }
 }
@@ -517,47 +516,68 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
             switch newState {
             case .buffering:
                 onBuffering()
-            case .playing:
-                onPlaying()
+            case .playing,
+                 .paused,
+                 .stopped:
+                if newState == .playing {
+                    onPlaying()
 
-                if firstPlay {
-                    retryUntil { [self] in
-                        onFirstPlay(getMediaInfo())
-                        return hasAudioVideo()
+                    if firstPlay {
+                        setupPlayer()
+
+                        firstPlay = false
+
+                        retryUntil { [weak self] isLastAttempt in
+                            guard let self else { return true }
+
+                            let shouldSendEvent = hasVideoOut || isLastAttempt
+
+                            if shouldSendEvent {
+                                onFirstPlay(getMediaInfo())
+                            }
+
+                            return hasVideoOut
+                        }
+
+                        retryUntil { [weak self] isLastAttempt in
+                            guard let self else { return true }
+
+                            let shouldFitContent = hasVideoSize || isLastAttempt
+
+                            if shouldFitContent {
+                                setContentFit()
+                            }
+
+                            return hasVideoSize
+                        }
                     }
+                }
 
-                    retryUntil { [self] in
-                        setContentFit()
-                        return hasVideoSize()
+                if newState == .paused {
+                    onPaused()
+                }
+
+                if newState == .stopped {
+                    onStopped()
+
+                    if shouldRepeat {
+                        player.play()
                     }
-
-                    setupPlayer()
-
-                    firstPlay = false
                 }
 
                 MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
 
-                retryUntil {
+                retryUntil { isLastAttempt in
                     let volume = player.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
                     let hasVolume = volume > MediaPlayerConstants.minPlayerVolume
-                    MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+                    let shouldUpdateSession = hasVolume || isLastAttempt
+
+                    if shouldUpdateSession {
+                        MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+                    }
+
                     return hasVolume
                 }
-            case .paused:
-                onPaused()
-
-                MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
-                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-            case .stopped:
-                onStopped()
-
-                if shouldRepeat {
-                    player.play()
-                }
-
-                MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
-                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
             case .error:
                 onEncounteredError(["error": "Player encountered an error"])
 
@@ -667,4 +687,20 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
     ) {}
 
     func cancelDialog(withReference _: NSValue) {}
+}
+
+private extension [String] {
+    mutating func toggleStartPausedOption(_ autoplay: Bool) {
+        let options = [
+            "--start-paused",
+            "-start-paused",
+            ":start-paused",
+        ]
+
+        removeAll { option in options.contains(option) }
+
+        if !autoplay {
+            append("--start-paused")
+        }
+    }
 }

@@ -9,14 +9,14 @@ object MediaPlayerManager {
     lateinit var audioFocusManager: AudioFocusManager
     lateinit var keepAwakeManager: KeepAwakeManager
 
-    val playerViews: MutableSet<LibVlcPlayerView> = Collections.newSetFromMap(WeakHashMap())
+    val expoViews: MutableSet<LibVlcPlayerView> = Collections.newSetFromMap(WeakHashMap())
 
-    fun registerPlayerView(view: LibVlcPlayerView) {
-        playerViews.add(view)
+    fun registerExpoView(view: LibVlcPlayerView) {
+        expoViews.add(view)
     }
 
-    fun unregisterPlayerView(view: LibVlcPlayerView) {
-        playerViews.remove(view)
+    fun unregisterExpoView(view: LibVlcPlayerView) {
+        expoViews.remove(view)
     }
 
     fun onModuleCreate(appContext: AppContext) {
@@ -30,26 +30,21 @@ object MediaPlayerManager {
     }
 
     fun onModuleDestroy() {
-        playerViews.forEach { view ->
+        expoViews.forEach { view ->
             view.destroyPlayer()
         }
     }
 
     fun onModuleForeground() {
-        playerViews.forEach { view ->
+        expoViews.forEach { view ->
             view.onForeground(Unit)
         }
     }
 
     fun onModuleBackground() {
-        playerViews.forEach { view ->
+        expoViews.forEach { view ->
             view.onBackground(Unit)
-
-            view.mediaPlayer?.let { player ->
-                if (player.isPlaying()) {
-                    player.pause()
-                }
-            }
+            view.pauseIf()
         }
     }
 }

@@ -1,7 +1,7 @@
 class KeepAwakeManager {
     static let shared = KeepAwakeManager()
 
-    private lazy var anyPlayingView = MediaPlayerManager.shared.playerViews.allObjects.contains { view in
+    private lazy var anyPlayingView = MediaPlayerManager.shared.expoViews.allObjects.contains { view in
         view.mediaPlayer?.isPlaying == true
     }
 

@@ -6,4 +6,7 @@ object MediaPlayerConstants {
     const val DEFAULT_PLAYER_TIME: Int = 0
     const val MIN_PLAYER_VOLUME: Int = 0
     const val MAX_PLAYER_VOLUME: Int = 100
+
+    const val RETRY_DELAY_MS: Long = 200L
+    const val MAX_RETRY_COUNT: Int = 5
 }

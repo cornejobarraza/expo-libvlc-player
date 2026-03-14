@@ -13,7 +13,7 @@ class KeepAwakeManager(
 
     private val anyPlayingView: Boolean
         get() =
-            MediaPlayerManager.playerViews.any { view ->
+            MediaPlayerManager.expoViews.any { view ->
                 view.mediaPlayer?.isPlaying() == true
             }
 

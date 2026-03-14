@@ -29,5 +29,5 @@ repositories {
 }
 
 dependencies {
-  implementation 'org.videolan.android:libvlc-all:3.6.5'
+  implementation 'org.videolan.android:libvlc-all:3.7.0'
 }

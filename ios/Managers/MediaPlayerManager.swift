@@ -7,37 +7,32 @@ class MediaPlayerManager {
     let audioSessionManager = AudioSessionManager()
     let keepAwakeManager = KeepAwakeManager()
 
-    let playerViews = NSHashTable<LibVlcPlayerView>.weakObjects()
+    let expoViews = NSHashTable<LibVlcPlayerView>.weakObjects()
 
-    func registerPlayerView(_ view: LibVlcPlayerView) {
-        playerViews.add(view)
+    func registerExpoView(_ view: LibVlcPlayerView) {
+        expoViews.add(view)
     }
 
-    func unregisterPlayerView(_ view: LibVlcPlayerView) {
-        playerViews.remove(view)
+    func unregisterExpoView(_ view: LibVlcPlayerView) {
+        expoViews.remove(view)
     }
 
     func onModuleDestroy() {
-        for view in playerViews.allObjects {
+        for view in expoViews.allObjects {
             view.destroyPlayer()
         }
     }
 
     func onModuleForeground() {
-        for view in playerViews.allObjects {
+        for view in expoViews.allObjects {
             view.onForeground()
         }
     }
 
     func onModuleBackground() {
-        for view in playerViews.allObjects {
+        for view in expoViews.allObjects {
             view.onBackground()
-
-            if let player = view.mediaPlayer {
-                if player.isPlaying {
-                    player.pause()
-                }
-            }
+            view.pauseIf()
         }
     }
 }
