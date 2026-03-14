@@ -1,13 +1,17 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { SymbolWeight, SymbolViewProps } from "expo-symbols";
+import { SFSymbol } from "expo-symbols";
 import { ComponentProps } from "react";
 import { OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
 
-type IconMapping = Record<
-  SymbolViewProps["name"],
-  ComponentProps<typeof MaterialIcons>["name"]
->;
-type IconSymbolName = keyof typeof MAPPING;
+interface IconSymbolProps {
+  style?: StyleProp<TextStyle>;
+  name: SFSymbol;
+  size?: number;
+  color: string | OpaqueColorValue;
+}
+
+type MaterialIcon = ComponentProps<typeof MaterialIcons>["name"];
+type IconMapping = Record<SFSymbol, MaterialIcon>;
 
 const MAPPING = {
   "play.fill": "play-arrow",
@@ -19,24 +23,13 @@ const MAPPING = {
   "speaker.3.fill": "volume-up",
 } as IconMapping;
 
-export function IconSymbol({
-  name,
-  size = 24,
-  color,
-  style,
-}: {
-  name: IconSymbolName;
-  size?: number;
-  color: string | OpaqueColorValue;
-  style?: StyleProp<TextStyle>;
-  weight?: SymbolWeight;
-}) {
+export function IconSymbol({ style, name, size = 24, color }: IconSymbolProps) {
   return (
     <MaterialIcons
-      color={color}
-      size={size}
-      name={MAPPING[name]}
       style={style}
+      name={MAPPING[name]}
+      size={size}
+      color={color}
     />
   );
 }
