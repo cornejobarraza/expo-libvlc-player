@@ -5,7 +5,8 @@ import VLCKit
 private let dialogCustomUI: Bool = true
 
 class LibVlcPlayerView: ExpoView {
-    private let playerView = UIView()
+    private let playerDrawable: MediaPlayerDrawable = .init()
+    private var pictureDrawable: PictureInPictureDrawable!
 
     var mediaPlayer: VLCMediaPlayer?
     var vlcDialog: VLCDialogProvider?
@@ -15,6 +16,7 @@ class LibVlcPlayerView: ExpoView {
 
     var firstPlay: Bool = true
     private var shouldInit: Bool = true
+    var isInBackground: Bool = false
 
     let onBuffering = EventDispatcher()
     let onPlaying = EventDispatcher()
@@ -30,16 +32,16 @@ class LibVlcPlayerView: ExpoView {
     let onFirstPlay = EventDispatcher()
     let onForeground = EventDispatcher()
     let onBackground = EventDispatcher()
+    let onPictureInPictureStart = EventDispatcher()
+    let onPictureInPictureStop = EventDispatcher()
 
     required init(appContext: AppContext? = nil) {
         super.init(appContext: appContext)
 
-        playerView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        playerView.backgroundColor = .black
+        pictureDrawable = PictureInPictureDrawable(self)
         clipsToBounds = true
 
         MediaPlayerManager.shared.registerExpoView(self)
-        addSubview(playerView)
     }
 
     deinit {
@@ -49,9 +51,13 @@ class LibVlcPlayerView: ExpoView {
 
     override var bounds: CGRect {
         didSet {
-            playerView.transform = .identity
-            playerView.frame = bounds
-            setContentFit()
+            playerDrawable.transform = .identity
+            playerDrawable.frame = bounds
+            setContentFit(drawable: playerDrawable)
+
+            pictureDrawable.transform = .identity
+            pictureDrawable.frame = bounds
+            setContentFit(drawable: pictureDrawable)
         }
     }
 
@@ -69,8 +75,18 @@ class LibVlcPlayerView: ExpoView {
         var args = options
         args.toggleStartPausedOption(autoplay)
 
+        var drawable: MediaPlayerDrawable
+
+        if pictureInPicture {
+            playerDrawable.removeFromSuperview()
+            drawable = pictureDrawable
+        } else {
+            pictureDrawable?.removeFromSuperview()
+            drawable = playerDrawable
+        }
+
         mediaPlayer = VLCMediaPlayer(options: args)
-        mediaPlayer!.drawable = playerView
+        mediaPlayer!.drawable = drawable
         mediaPlayer!.delegate = self
 
         let library = mediaPlayer!.libraryInstance
@@ -87,6 +103,8 @@ class LibVlcPlayerView: ExpoView {
 
         firstPlay = true
         shouldInit = false
+
+        addSubview(drawable)
     }
 
     func destroyPlayer() {
@@ -156,7 +174,7 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    func setContentFit() {
+    func setContentFit(drawable: MediaPlayerDrawable) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
 
@@ -165,7 +183,7 @@ class LibVlcPlayerView: ExpoView {
             let video = getVideoSize()
 
             if hasVideoSize == true {
-                let viewAspect = playerView.frame.size.width / playerView.frame.size.height
+                let viewAspect = drawable.frame.size.width / drawable.frame.size.height
                 let videoAspect = video.width / video.height
 
                 switch contentFit {
@@ -192,7 +210,7 @@ class LibVlcPlayerView: ExpoView {
                 }
             }
 
-            playerView.transform = transform
+            drawable.transform = transform
         }
     }
 
@@ -244,31 +262,19 @@ class LibVlcPlayerView: ExpoView {
         var mediaTracks = MediaTracks()
 
         if let player = mediaPlayer {
-            var audioTracks: [Track] = []
-
-            let audios = player.audioTracks
-
-            audioTracks = audios.map { audio in
+            let audioTracks: [Track] = player.audioTracks.map { audio in
                 let id = (audio.trackId as NSString).intValue
                 let name = audio.trackName
                 return Track(id: Int(id), name: name)
             }
 
-            var videoTracks: [Track] = []
-
-            let videos = player.videoTracks
-
-            videoTracks = videos.map { video in
+            let videoTracks: [Track] = player.videoTracks.map { video in
                 let id = (video.trackId as NSString).intValue
                 let name = video.trackName
                 return Track(id: Int(id), name: name)
             }
 
-            var subtitleTracks: [Track] = []
-
-            let subtitles = player.textTracks
-
-            subtitleTracks = subtitles.map { subtitle in
+            let subtitleTracks: [Track] = player.textTracks.map { subtitle in
                 let id = (subtitle.trackId as NSString).intValue
                 let name = subtitle.trackName
                 return Track(id: Int(id), name: name)
@@ -361,7 +367,8 @@ class LibVlcPlayerView: ExpoView {
 
     var contentFit: VideoContentFit = .contain {
         didSet {
-            setContentFit()
+            setContentFit(drawable: playerDrawable)
+            setContentFit(drawable: pictureDrawable)
         }
     }
 
@@ -405,6 +412,12 @@ class LibVlcPlayerView: ExpoView {
     var shouldRepeat: Bool = false
 
     var autoplay: Bool = true
+
+    var pictureInPicture: Bool = false {
+        didSet {
+            shouldInit = true
+        }
+    }
 
     func play() {
         if let player = mediaPlayer {
@@ -492,6 +505,33 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
+    func startPictureInPicture() throws {
+        try pictureDrawable.startPictureInPicture()
+    }
+
+    func stopPictureInPicture() {
+        pictureDrawable.stopPictureInPicture()
+    }
+
+    func resetPictureInPicture() {
+        guard let player = mediaPlayer,
+              let videoTrack = player.videoTracks.first { track in track.isSelected },
+            !isInBackground else { return }
+
+        videoTrack.isSelectedExclusively = true
+        player.play()
+        player.pause()
+    }
+
+    func onStartPictureInPicture() {
+        onPictureInPictureStart()
+    }
+
+    func onStopPictureInPicture() {
+        resetPictureInPicture()
+        onPictureInPictureStop()
+    }
+
     func retryUntil(
         maxRetries: Int = MediaPlayerConstants.maxRetryCount,
         retry: Int = 0,
@@ -545,7 +585,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                             let shouldFitContent = hasVideoSize || isLastAttempt
 
                             if shouldFitContent {
-                                setContentFit()
+                                setContentFit(drawable: playerDrawable)
+                                setContentFit(drawable: pictureDrawable)
                             }
 
                             return hasVideoSize
@@ -565,6 +606,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     }
                 }
 
+                pictureDrawable.updatePipState()
                 MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
 
                 retryUntil { isLastAttempt in
@@ -586,6 +628,10 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 break
             }
         }
+    }
+
+    func mediaPlayerLengthChanged(_: Int64) {
+        pictureDrawable.updatePipState()
     }
 
     func mediaPlayerTimeChanged(_: Notification) {

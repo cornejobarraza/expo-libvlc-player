@@ -1,5 +1,8 @@
 package expo.modules.libvlcplayer
 
+import android.app.Activity
+import android.os.Build
+import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
@@ -25,12 +28,24 @@ private val PLAYER_EVENTS =
         "onFirstPlay",
         "onForeground",
         "onBackground",
+        "onPictureInPictureStart",
+        "onPictureInPictureStop",
     )
 
 class LibVlcPlayerModule : Module() {
+    private val activity: Activity
+        get() = appContext.currentActivity ?: throw Exceptions.MissingActivity()
+
     override fun definition() =
         ModuleDefinition {
             Name("ExpoLibVlcPlayer")
+
+            Function("isPictureInPictureSupported") {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                    activity.packageManager.hasSystemFeature(
+                        android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE,
+                    )
+            }
 
             OnCreate {
                 MediaPlayerManager.onModuleCreate(appContext)
@@ -105,6 +120,10 @@ class LibVlcPlayerModule : Module() {
                     view.autoplay = autoplay
                 }
 
+                Prop("pictureInPicture", false) { view: LibVlcPlayerView, pictureInPicture: Boolean ->
+                    view.pictureInPicture = pictureInPicture
+                }
+
                 OnViewDidUpdateProps { view: LibVlcPlayerView ->
                     view.initPlayer()
                 }
@@ -144,6 +163,10 @@ class LibVlcPlayerModule : Module() {
 
                 AsyncFunction("dismiss") { view: LibVlcPlayerView ->
                     view.dismiss()
+                }
+
+                AsyncFunction("startPictureInPicture") { view: LibVlcPlayerView ->
+                    view.startPictureInPicture()
                 }
             }
         }

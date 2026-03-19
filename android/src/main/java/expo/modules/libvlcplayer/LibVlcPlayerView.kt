@@ -25,6 +25,11 @@ import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Track
 import expo.modules.libvlcplayer.records.Tracks
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
@@ -48,7 +53,9 @@ class LibVlcPlayerView(
     context: Context,
     appContext: AppContext,
 ) : ExpoView(context, appContext) {
-    private val playerView: VLCVideoLayout = VLCVideoLayout(context)
+    val playerView: VLCVideoLayout = VLCVideoLayout(context)
+    val pictureView: VLCVideoLayout = VLCVideoLayout(context)
+    private var pauseIfJob: Job? = null
 
     var libVLC: LibVLC? = null
     var mediaPlayer: MediaPlayer? = null
@@ -56,6 +63,7 @@ class LibVlcPlayerView(
 
     var firstPlay: Boolean = true
     private var shouldInit: Boolean = true
+    var isInBackground: Boolean = false
 
     val onBuffering by EventDispatcher<Unit>()
     val onPlaying by EventDispatcher<Unit>()
@@ -71,16 +79,17 @@ class LibVlcPlayerView(
     val onFirstPlay by EventDispatcher<MediaInfo>()
     val onForeground by EventDispatcher<Unit>()
     val onBackground by EventDispatcher<Unit>()
+    val onPictureInPictureStart by EventDispatcher<Unit>()
+    val onPictureInPictureStop by EventDispatcher<Unit>()
 
     init {
         MediaPlayerManager.registerExpoView(this)
-        addPlayerView()
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        attachPlayerView()
+        attachPlayerView(playerView)
     }
 
     override fun onDetachedFromWindow() {
@@ -116,12 +125,14 @@ class LibVlcPlayerView(
         var args = options
         args.toggleStartPausedOption(autoplay)
 
+        MediaPlayerManager.pictureInPictureManager.setupPipManager(this)
+
         libVLC = LibVLC(context, args)
         setDialogCallbacks(libVLC!!)
 
         mediaPlayer = MediaPlayer(libVLC!!)
         setPlayerListener(mediaPlayer!!)
-        attachPlayerView()
+        attachPlayerView(playerView)
 
         try {
             URI(source)
@@ -137,6 +148,8 @@ class LibVlcPlayerView(
 
         firstPlay = true
         shouldInit = false
+
+        addPlayerView(playerView)
     }
 
     fun resetPlayer() {
@@ -145,8 +158,8 @@ class LibVlcPlayerView(
     }
 
     fun attachPlayer() {
-        attachPlayerView()
-        addPlayerView()
+        attachPlayerView(playerView)
+        addPlayerView(playerView)
     }
 
     fun detachPlayer() {
@@ -154,12 +167,12 @@ class LibVlcPlayerView(
         removePlayerView()
     }
 
-    fun attachPlayerView() {
+    fun attachPlayerView(view: VLCVideoLayout) {
         mediaPlayer?.let { player ->
             val attached = player.getVLCVout().areViewsAttached()
 
             if (!attached) {
-                player.attachViews(playerView, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+                player.attachViews(view, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
             }
         }
     }
@@ -174,11 +187,11 @@ class LibVlcPlayerView(
         }
     }
 
-    fun addPlayerView() {
+    fun addPlayerView(view: VLCVideoLayout) {
         val parent = playerView.parent as? ViewGroup
 
         if (parent == null) {
-            addView(playerView)
+            addView(view)
         }
     }
 
@@ -514,6 +527,12 @@ class LibVlcPlayerView(
             field = value
         }
 
+    var pictureInPicture: Boolean = false
+        set(value) {
+            field = value
+            shouldInit = true
+        }
+
     fun play() {
         mediaPlayer?.let { player ->
             if (!autoplay) {
@@ -529,10 +548,21 @@ class LibVlcPlayerView(
     }
 
     fun pauseIf(condition: Boolean? = true) {
-        mediaPlayer?.let { player ->
-            val shouldPause = condition == true && player.isPlaying()
-            if (shouldPause) player.pause()
-        }
+        cancelPauseIf()
+
+        pauseIfJob =
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(MediaPlayerConstants.COROUTINE_DELAY_MS)
+
+                mediaPlayer?.let { player ->
+                    val shouldPause = condition == true && player.isPlaying()
+                    if (shouldPause) player.pause()
+                }
+            }
+    }
+
+    fun cancelPauseIf() {
+        pauseIfJob?.cancel()
     }
 
     fun stop() {
@@ -630,6 +660,20 @@ class LibVlcPlayerView(
         }
     }
 
+    fun startPictureInPicture() {
+        MediaPlayerManager.pictureInPictureManager.startPictureInPicture(this)
+    }
+
+    fun onStartPictureInPicture() {
+        MediaPlayerManager.pictureInPictureManager.layoutForPipEnter()
+        onPictureInPictureStart(Unit)
+    }
+
+    fun onStopPictureInPicture() {
+        MediaPlayerManager.pictureInPictureManager.layoutForPipExit()
+        onPictureInPictureStop(Unit)
+    }
+
     fun retryUntil(
         maxRetries: Int = MediaPlayerConstants.MAX_RETRY_COUNT,
         retry: Int = 0,
@@ -707,6 +751,7 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                             }
                         }
 
+                        MediaPlayerManager.pictureInPictureManager.setPipActions()
                         MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
 
                         retryUntil { isLastAttempt ->

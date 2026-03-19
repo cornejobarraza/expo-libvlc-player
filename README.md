@@ -68,7 +68,8 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
       [
         "expo-libvlc-player",
         {
-          "localNetworkPermission": "Allow $(PRODUCT_NAME) to access your local network"
+          "localNetworkPermission": "Allow $(PRODUCT_NAME) to access your local network",
+          "supportsPictureInPicture": true
         }
       ]
     ]
@@ -78,9 +79,10 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 
 #### Configurable properties
 
-| Name                     | Description                                                                    | Default                                                |
-| ------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------ |
-| `localNetworkPermission` | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS | `"Allow $(PRODUCT_NAME) to access your local network"` |
+| Name                       | Description                                                                                                                                                                                                                                                                                                                                                     | Default                                                |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `localNetworkPermission`   | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                                                                  | `"Allow $(PRODUCT_NAME) to access your local network"` |
+| `supportsPictureInPicture` | A boolean value to enable Picture-in-Picture (PiP) on Android and iOS. If `true`, it adds the `android:supportsPictureInPicture` property on Android and the `audio` key to the `UIBackgroundModes` array in the Info.plist file on iOS. If `false`, it removes the property on Android and the key on iOS. When `undefined`, the configuration is not modified | `undefined`                                            |
 
 ## Usage
 
@@ -101,13 +103,22 @@ import LibVlcPlayerModule from "expo-libvlc-player";
 await LibVlcPlayerModule.triggerNetworkAlert();
 ```
 
+Check for Picture-in-Picture (PiP) support:
+
+```tsx
+import LibVlcPlayerModule from "expo-libvlc-player";
+
+await LibVlcPlayerModule.isPictureInPictureSupported();
+```
+
 See the [Example App](example/App.tsx) for additional usage.
 
 ### Module methods
 
-| Method                  | Description                                                | Returns         |
-| ----------------------- | ---------------------------------------------------------- | --------------- |
-| `triggerNetworkAlert()` | Attempts to trigger the local network privacy alert on iOS | `Promise<void>` |
+| Method                          | Description                                                 | Returns         |
+| ------------------------------- | ----------------------------------------------------------- | --------------- |
+| `triggerNetworkAlert()`         | Attempts to trigger the local network privacy alert on iOS  | `Promise<void>` |
+| `isPictureInPictureSupported()` | Checks whether the device supports Picture-in-Picture (PiP) | `boolean`       |
 
 ### View methods
 
@@ -121,46 +132,51 @@ See the [Example App](example/App.tsx) for additional usage.
 | `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid path string                                                     | `Promise<void>` |
 | `postAction(action: number)`                       | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                             | `Promise<void>` |
 | `dismiss()`                                        | Dismisses a [`Dialog`](#dialog)                                                                                        | `Promise<void>` |
+| `startPictureInPicture()`                          | Enters Picture-in-Picture (PiP) mode. Config plugin has to be configured for Picture-in-Picture (PiP) to work          | `Promise<void>` |
+| `stopPictureInPicture()`                           | Exits Picture-in-Picture (PiP) mode on iOS                                                                             | `Promise<void>` |
 
 ### View props
 
 The `LibVlcPlayerView` extends React Native `ViewProps` and implements the following:
 
-| Prop              | Description                                                                                                                       | Default     |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `source`          | Sets the source of the media to be played. Set to `null` to release the player                                                    |             |
-| `options`         | Sets the VLC options to initialize the player with. See the [VLC Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
-| `tracks`          | Sets the player audio, video and subtitle tracks object. See [`Tracks`](#tracks) for more                                         | `undefined` |
-| `slaves`          | Sets the player audio and subtitle slaves array. See [`Slave`](#slave) for more                                                   | `[]`        |
-| `scale`           | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
-| `aspectRatio`     | Sets the container aspect ratio. Must be a valid ratio string, number or `"auto"`                                                 | `undefined` |
-| `contentFit`      | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
-| `rate`            | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
-| `time`            | Sets the initial player time. Must be an integer in milliseconds                                                                  | `0`         |
-| `volume`          | Sets the player volume. Must be an integer between `0` and `100`                                                                  | `100`       |
-| `mute`            | Sets the player volume to `0` when `true`. Previous value is set when `false`                                                     | `false`     |
-| `audioMixingMode` | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
-| `repeat`          | Determines whether the media should repeat once ended                                                                             | `false`     |
-| `autoplay`        | Determines whether the media should autoplay once created                                                                         | `true`      |
+| Prop               | Description                                                                                                                       | Default     |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `source`           | Sets the source of the media to be played. Set to `null` to release the player                                                    |             |
+| `options`          | Sets the VLC options to initialize the player with. See the [VLC Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
+| `tracks`           | Sets the player audio, video and subtitle tracks object. See [`Tracks`](#tracks) for more                                         | `undefined` |
+| `slaves`           | Sets the player audio and subtitle slaves array. See [`Slave`](#slave) for more                                                   | `[]`        |
+| `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
+| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio string, number or `"auto"`                                                 | `undefined` |
+| `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
+| `rate`             | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
+| `time`             | Sets the initial player time. Must be an integer in milliseconds                                                                  | `0`         |
+| `volume`           | Sets the player volume. Must be an integer between `0` and `100`                                                                  | `100`       |
+| `mute`             | Sets the player volume to `0` when `true`. Previous value is set when `false`                                                     | `false`     |
+| `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
+| `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
+| `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
+| `pictureInPicture` | Determines whether the player should allow Picture-in-Picture (PiP) mode                                                          | `false`     |
 
 #### Callbacks
 
-| Prop                 | Description                                      | Payload                       |
-| -------------------- | ------------------------------------------------ | ----------------------------- |
-| `onBuffering`        | Called after the `Buffering` player event        |                               |
-| `onPlaying`          | Called after the `Playing` player event          |                               |
-| `onPaused`           | Called after the `Paused` player event           |                               |
-| `onStopped`          | Called after the `Stopped` player event          |                               |
-| `onEncounteredError` | Called after the `EncounteredError` player event | `{ error: string }`           |
-| `onDialogDisplay`    | Called after a `Dialog` needs to be displayed    | [`Dialog`](#dialog)           |
-| `onTimeChanged`      | Called after the `TimeChanged` player event      | `{ time: number }`            |
-| `onPositionChanged`  | Called after the `PositionChanged` player event  | `{ position: number }`        |
-| `onESAdded`          | Called after the `ESAdded` player event          | [`MediaTracks`](#mediatracks) |
-| `onRecordChanged`    | Called after the `RecordChanged` player event    | [`Recording`](#recording)     |
-| `onSnapshotTaken`    | Called after a media snapshot is taken           | `{ path: string }`            |
-| `onFirstPlay`        | Called after the player first playing event      | [`MediaInfo`](#mediainfo)     |
-| `onForeground`       | Called after the player enters the foreground    |                               |
-| `onBackground`       | Called after the player enters the background    |                               |
+| Prop                      | Description                                                  | Payload                       |
+| ------------------------- | ------------------------------------------------------------ | ----------------------------- |
+| `onBuffering`             | Called after the `Buffering` player event                    |                               |
+| `onPlaying`               | Called after the `Playing` player event                      |                               |
+| `onPaused`                | Called after the `Paused` player event                       |                               |
+| `onStopped`               | Called after the `Stopped` player event                      |                               |
+| `onEncounteredError`      | Called after the `EncounteredError` player event             | `{ error: string }`           |
+| `onDialogDisplay`         | Called after a `Dialog` needs to be displayed                | [`Dialog`](#dialog)           |
+| `onTimeChanged`           | Called after the `TimeChanged` player event                  | `{ time: number }`            |
+| `onPositionChanged`       | Called after the `PositionChanged` player event              | `{ position: number }`        |
+| `onESAdded`               | Called after the `ESAdded` player event                      | [`MediaTracks`](#mediatracks) |
+| `onRecordChanged`         | Called after the `RecordChanged` player event                | [`Recording`](#recording)     |
+| `onSnapshotTaken`         | Called after a media snapshot is taken                       | `{ path: string }`            |
+| `onFirstPlay`             | Called after the player first playing event                  | [`MediaInfo`](#mediainfo)     |
+| `onForeground`            | Called after the player enters the foreground                |                               |
+| `onBackground`            | Called after the player enters the background                |                               |
+| `onStartPictureInPicture` | Called after the player enters Picture-in-Picture (PiP) mode |                               |
+| `onStopPictureInPicture`  | Called after the player exits Picture-in-Picture (PiP) mode  |                               |
 
 ### Types
 
@@ -244,6 +260,12 @@ On Android, the `libvlcjni` player detaches from the View when its surface is de
 The current workaround attaches the View once a surface is created but this causes a brief black screen.
 
 https://code.videolan.org/videolan/vlc-android/-/issues/1495
+
+On iOS, the `VLCKit` player deallocates from the UIView when closing the Picture-in-Picture (PiP) window.
+
+The current workaround exclusively selects the current video track but this causes a brief black screen.
+
+https://code.videolan.org/videolan/VLCKit/-/issues/743
 
 #### Audio delay
 

@@ -8,6 +8,7 @@ import java.util.WeakHashMap
 object MediaPlayerManager {
     lateinit var audioFocusManager: AudioFocusManager
     lateinit var keepAwakeManager: KeepAwakeManager
+    lateinit var pictureInPictureManager: PictureInPictureManager
 
     val expoViews: MutableSet<LibVlcPlayerView> = Collections.newSetFromMap(WeakHashMap())
 
@@ -27,6 +28,10 @@ object MediaPlayerManager {
         if (!this::keepAwakeManager.isInitialized) {
             keepAwakeManager = KeepAwakeManager(appContext)
         }
+
+        if (!this::pictureInPictureManager.isInitialized) {
+            pictureInPictureManager = PictureInPictureManager(appContext)
+        }
     }
 
     fun onModuleDestroy() {
@@ -38,6 +43,8 @@ object MediaPlayerManager {
     fun onModuleForeground() {
         expoViews.forEach { view ->
             view.onForeground(Unit)
+            view.cancelPauseIf()
+            view.isInBackground = false
         }
     }
 
@@ -45,6 +52,7 @@ object MediaPlayerManager {
         expoViews.forEach { view ->
             view.onBackground(Unit)
             view.pauseIf()
+            view.isInBackground = true
         }
     }
 }

@@ -61,6 +61,22 @@ export interface LibVlcPlayerViewRef {
    * @returns A promise which resolves to `void`
    */
   readonly dismiss: () => Promise<void>;
+  /**
+   * Enters Picture-in-Picture (PiP) mode
+   *
+   * @note Config plugin has to be configured for Picture-in-Picture (PiP) to work
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly startPictureInPicture: () => Promise<void>;
+  /**
+   * Exits Picture-in-Picture (PiP) mode
+   *
+   * @platform ios
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly stopPictureInPicture: () => Promise<void>;
 }
 
 export type LibVlcSource = string | number | null;
@@ -209,6 +225,16 @@ type BackgroundListener = () => void;
 /**
  * @hidden
  */
+type PictureInPictureStartListener = () => void;
+
+/**
+ * @hidden
+ */
+type PictureInPictureStopListener = () => void;
+
+/**
+ * @hidden
+ */
 export interface LibVlcPlayerViewNativeProps extends ViewProps {
   ref?: React.Ref<LibVlcPlayerViewRef>;
   source?: LibVlcSource;
@@ -225,6 +251,7 @@ export interface LibVlcPlayerViewNativeProps extends ViewProps {
   audioMixingMode?: AudioMixingMode;
   repeat?: boolean;
   autoplay?: boolean;
+  pictureInPicture?: boolean;
   onBuffering?: BufferingListener;
   onPlaying?: PlayingListener;
   onPaused?: PausedListener;
@@ -239,6 +266,8 @@ export interface LibVlcPlayerViewNativeProps extends ViewProps {
   onFirstPlay?: FirstPlayListener;
   onForeground?: ForegroundListener;
   onBackground?: BackgroundListener;
+  onPictureInPictureStart?: PictureInPictureStartListener;
+  onPictureInPictureStop?: PictureInPictureStopListener;
 }
 
 export interface LibVlcPlayerViewProps extends ViewProps {
@@ -383,6 +412,12 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   autoplay?: boolean;
   /**
+   * Determines whether the player should allow Picture-in-Picture (PiP) mode
+   *
+   * @default false
+   */
+  pictureInPicture?: boolean;
+  /**
    * Called after the `Buffering` player event
    */
   onBuffering?: () => void;
@@ -438,4 +473,12 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * Called after the player enters the background
    */
   onBackground?: () => void;
+  /**
+   * Called after the player enters Picture-in-Picture (PiP) mode
+   */
+  onPictureInPictureStart?: () => void;
+  /**
+   * Called after the player exits Picture-in-Picture (PiP) mode
+   */
+  onPictureInPictureStop?: () => void;
 }

@@ -1,3 +1,4 @@
+import AVKit
 import ExpoModulesCore
 
 private let playerEvents = [
@@ -15,6 +16,8 @@ private let playerEvents = [
     "onFirstPlay",
     "onForeground",
     "onBackground",
+    "onPictureInPictureStart",
+    "onPictureInPictureStop",
 ]
 
 public class LibVlcPlayerModule: Module {
@@ -23,6 +26,10 @@ public class LibVlcPlayerModule: Module {
 
         AsyncFunction("triggerNetworkAlert") {
             MediaPlayerManager.shared.localNetworkManager.triggerNetworkAlert()
+        }
+
+        Function("isPictureInPictureSupported") {
+            AVPictureInPictureController.isPictureInPictureSupported()
         }
 
         OnDestroy {
@@ -94,6 +101,10 @@ public class LibVlcPlayerModule: Module {
                 view.autoplay = autoplay
             }
 
+            Prop("pictureInPicture", false) { (view: LibVlcPlayerView, pictureInPicture: Bool) in
+                view.pictureInPicture = pictureInPicture
+            }
+
             OnViewDidUpdateProps { (view: LibVlcPlayerView) in
                 view.initPlayer()
             }
@@ -128,6 +139,14 @@ public class LibVlcPlayerModule: Module {
 
             AsyncFunction("dismiss") { (view: LibVlcPlayerView) in
                 view.dismiss()
+            }
+
+            AsyncFunction("startPictureInPicture") { (view: LibVlcPlayerView) in
+                try view.startPictureInPicture()
+            }
+
+            AsyncFunction("stopPictureInPicture") { (view: LibVlcPlayerView) in
+                view.stopPictureInPicture()
             }
         }
     }

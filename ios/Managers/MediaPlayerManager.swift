@@ -26,13 +26,15 @@ class MediaPlayerManager {
     func onModuleForeground() {
         for view in expoViews.allObjects {
             view.onForeground()
+            view.isInBackground = false
         }
     }
 
     func onModuleBackground() {
         for view in expoViews.allObjects {
             view.onBackground()
-            view.pauseIf()
+            view.pauseIf(!view.pictureInPicture)
+            view.isInBackground = true
         }
     }
 }
