@@ -48,7 +48,7 @@ class LibVlcPlayerView(
     context: Context,
     appContext: AppContext,
 ) : ExpoView(context, appContext) {
-    private val playerView = VLCVideoLayout(context)
+    private val playerView: VLCVideoLayout = VLCVideoLayout(context)
 
     var libVLC: LibVLC? = null
     var mediaPlayer: MediaPlayer? = null
@@ -80,13 +80,13 @@ class LibVlcPlayerView(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        attachPlayer()
+        attachPlayerView()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
 
-        detachPlayer()
+        detachPlayerView()
     }
 
     override fun onSizeChanged(
