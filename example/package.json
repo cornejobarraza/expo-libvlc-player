@@ -13,7 +13,7 @@
     "expo-font": "~55.0.4",
     "expo-status-bar": "~55.0.4",
     "expo-symbols": "~55.0.5",
-    "expo-system-ui": "~55.0.9",
+    "expo-system-ui": "~55.0.10",
     "react": "19.2.0",
     "react-native": "0.83.2"
   },
