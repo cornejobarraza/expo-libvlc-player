@@ -302,7 +302,7 @@ class LibVlcPlayerView: ExpoView {
                 width: Int(video.width),
                 height: Int(video.height),
                 length: Double(length),
-                seekable: seekable,
+                seekable: seekable
             )
         }
 
@@ -515,8 +515,8 @@ class LibVlcPlayerView: ExpoView {
 
     func resetPictureInPicture() {
         guard let player = mediaPlayer,
-              let videoTrack = player.videoTracks.first { track in track.isSelected },
-            !isInBackground else { return }
+              let videoTrack = player.videoTracks.first(where: { track in track.isSelected }),
+              isInBackground else { return }
 
         videoTrack.isSelectedExclusively = true
         player.play()
@@ -649,7 +649,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     func mediaPlayerStartedRecording(_: VLCMediaPlayer) {
         let recording = Recording(
             path: nil,
-            isRecording: true,
+            isRecording: true
         )
 
         onRecordChanged(recording)
@@ -658,7 +658,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     func mediaPlayer(recordingStoppedAt path: String) {
         let recording = Recording(
             path: path,
-            isRecording: false,
+            isRecording: false
         )
 
         onRecordChanged(recording)
@@ -672,7 +672,7 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
     ) {
         let dialog = Dialog(
             title: title,
-            text: message,
+            text: message
         )
 
         onDialogDisplay(dialog)
@@ -689,7 +689,7 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
 
         let dialog = Dialog(
             title: title,
-            text: message,
+            text: message
         )
 
         onDialogDisplay(dialog)

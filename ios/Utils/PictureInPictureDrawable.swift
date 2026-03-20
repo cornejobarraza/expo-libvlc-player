@@ -5,8 +5,14 @@ import VLCKit
 
 class PictureInPictureDrawable: MediaPlayerDrawable {
     private var expoView: LibVlcPlayerView!
-    private var mediaPlayer: VLCMediaPlayer? { expoView.mediaPlayer }
-    private var pictureInPicture: Bool { expoView.pictureInPicture }
+
+    private var mediaPlayer: VLCMediaPlayer? {
+        expoView.mediaPlayer
+    }
+
+    private var pictureInPicture: Bool {
+        expoView.pictureInPicture
+    }
 
     private weak var pipController: VLCPictureInPictureWindowControlling?
 

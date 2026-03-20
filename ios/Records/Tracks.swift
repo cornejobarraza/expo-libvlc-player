@@ -10,6 +10,7 @@ struct Tracks: Record, Equatable {
     @Field
     var subtitle: Int = 0
 
+    // swiftformat:disable:next redundantEquatable
     static func == (lhs: Tracks, rhs: Tracks) -> Bool {
         lhs.audio == rhs.audio &&
             lhs.video == rhs.video &&
