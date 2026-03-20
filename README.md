@@ -175,8 +175,8 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onFirstPlay`             | Called after the player first playing event                  | [`MediaInfo`](#mediainfo)     |
 | `onForeground`            | Called after the player enters the foreground                |                               |
 | `onBackground`            | Called after the player enters the background                |                               |
-| `onStartPictureInPicture` | Called after the player enters Picture-in-Picture (PiP) mode |                               |
-| `onStopPictureInPicture`  | Called after the player exits Picture-in-Picture (PiP) mode  |                               |
+| `onPictureInPictureStart` | Called after the player enters Picture-in-Picture (PiP) mode |                               |
+| `onPictureInPictureStop`  | Called after the player exits Picture-in-Picture (PiP) mode  |                               |
 
 ### Types
 
