@@ -419,14 +419,14 @@ class LibVlcPlayerView(
         var mediaInfo = MediaInfo()
 
         mediaPlayer?.let { player ->
-            val video = player.getCurrentVideoTrack()
+            val video = getVideoSize()
             val length = getMediaLength()
             val seekable = player.isSeekable()
 
             mediaInfo =
                 MediaInfo(
-                    width = video?.width ?: 0,
-                    height = video?.height ?: 0,
+                    width = video.width,
+                    height = video.height,
                     length = length.toDouble(),
                     seekable = seekable,
                 )
@@ -445,6 +445,12 @@ class LibVlcPlayerView(
         return Size(0, 0)
     }
 
+    val hasVideoSize: Boolean
+        get() {
+            val video = getVideoSize()
+            return video.width > 0 && video.height > 0
+        }
+
     val hasVideoOut: Boolean
         get() {
             val tracks = getMediaTracks()
@@ -453,10 +459,12 @@ class LibVlcPlayerView(
             return hasVideo && hasVideoSize && length > 0L
         }
 
-    val hasVideoSize: Boolean
+    val hasAudioOut: Boolean
         get() {
-            val video = getVideoSize()
-            return video.width > 0 && video.height > 0
+            val tracks = getMediaTracks()
+            val hasAudio = tracks.audio.any { track -> track.id != -1 }
+            val volume = mediaPlayer?.getVolume() ?: MediaPlayerConstants.MIN_PLAYER_VOLUME
+            return hasAudio && volume > MediaPlayerConstants.MIN_PLAYER_VOLUME
         }
 
     var source: String? = null
@@ -745,9 +753,7 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                                 firstPlay = false
 
                                 retryUntil { isLastAttempt ->
-                                    val shouldSendEvent = hasVideoOut || isLastAttempt
-
-                                    if (shouldSendEvent) {
+                                    if (hasVideoOut || isLastAttempt) {
                                         onFirstPlay(getMediaInfo())
                                     }
 
@@ -755,9 +761,7 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                                 }
 
                                 retryUntil { isLastAttempt ->
-                                    val shouldFitContent = hasVideoSize || isLastAttempt
-
-                                    if (shouldFitContent) {
+                                    if (hasVideoSize) {
                                         setContentFit(layout = playerLayout)
                                         setContentFit(layout = pictureLayout)
                                     }
@@ -785,15 +789,11 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                         MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
 
                         retryUntil { isLastAttempt ->
-                            val volume = player.getVolume()
-                            val hasVolume = volume > MediaPlayerConstants.MIN_PLAYER_VOLUME
-                            val shouldUpdateFocus = hasVolume || isLastAttempt
-
-                            if (shouldUpdateFocus) {
+                            if (hasAudioOut) {
                                 MediaPlayerManager.audioFocusManager.updateAudioFocus()
                             }
 
-                            return@retryUntil hasVolume
+                            return@retryUntil hasAudioOut
                         }
                     }
 

@@ -291,7 +291,7 @@ class LibVlcPlayerView: ExpoView {
         var mediaInfo = MediaInfo()
 
         if let player = mediaPlayer {
-            let video = player.videoSize
+            let video = getVideoSize()
             let length = getMediaLength()
             let seekable = player.isSeekable
 
@@ -307,8 +307,13 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func getVideoSize() -> CGSize {
-        if let video = mediaPlayer?.videoSize { return video }
+        if let size = mediaPlayer?.videoSize { return size }
         return CGSize(width: 0, height: 0)
+    }
+
+    var hasVideoSize: Bool {
+        let video = getVideoSize()
+        return video.width > 0 && video.height > 0
     }
 
     var hasVideoOut: Bool {
@@ -318,9 +323,11 @@ class LibVlcPlayerView: ExpoView {
         return hasVideo && hasVideoSize && length > 0
     }
 
-    var hasVideoSize: Bool {
-        let video = getVideoSize()
-        return video.width > 0 && video.height > 0
+    var hasAudioOut: Bool {
+        let tracks = getMediaTracks()
+        let hasAudio = tracks.audio.count > 0
+        let volume = mediaPlayer?.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
+        return hasAudio && volume > MediaPlayerConstants.minPlayerVolume
     }
 
     var source: String? {
@@ -569,21 +576,17 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                         retryUntil { [weak self] isLastAttempt in
                             guard let self else { return true }
 
-                            let shouldSendEvent = hasVideoOut || isLastAttempt
-
-                            if shouldSendEvent {
+                            if hasVideoOut || isLastAttempt {
                                 onFirstPlay(getMediaInfo())
                             }
 
                             return hasVideoOut
                         }
 
-                        retryUntil { [weak self] isLastAttempt in
+                        retryUntil { [weak self] _ in
                             guard let self else { return true }
 
-                            let shouldFitContent = hasVideoSize || isLastAttempt
-
-                            if shouldFitContent {
+                            if hasVideoSize {
                                 setContentFit(drawable: playerDrawable)
                                 setContentFit(drawable: pictureDrawable)
                             }
@@ -608,16 +611,14 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 pictureDrawable.updatePipState()
                 MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
 
-                retryUntil { isLastAttempt in
-                    let volume = player.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
-                    let hasVolume = volume > MediaPlayerConstants.minPlayerVolume
-                    let shouldUpdateSession = hasVolume || isLastAttempt
+                retryUntil { [weak self] _ in
+                    guard let self else { return true }
 
-                    if shouldUpdateSession {
+                    if hasAudioOut {
                         MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
                     }
 
-                    return hasVolume
+                    return hasAudioOut
                 }
             case .error:
                 onEncounteredError(["error": "Player encountered an error"])
