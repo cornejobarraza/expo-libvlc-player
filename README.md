@@ -108,7 +108,7 @@ Check for Picture-in-Picture (PiP) support:
 ```tsx
 import LibVlcPlayerModule from "expo-libvlc-player";
 
-await LibVlcPlayerModule.isPictureInPictureSupported();
+LibVlcPlayerModule.isPictureInPictureSupported();
 ```
 
 See the [Example App](example/App.tsx) for additional usage.

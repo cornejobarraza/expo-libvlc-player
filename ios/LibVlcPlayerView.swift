@@ -116,33 +116,32 @@ class LibVlcPlayerView: ExpoView {
 
     func selectTrack(_ track: Int?, _ type: VLCMedia.TrackType) {
         if let player = mediaPlayer {
-            let tracks: [VLCMediaPlayer.Track]? = switch type {
-            case .audio:
-                player.audioTracks
-            case .video:
-                player.videoTracks
-            case .text:
-                player.textTracks
-            default:
-                nil
-            }
-
-            let trackId = tracks?.first?.trackId
-            let firstId = trackId.map { id in (id as NSString).intValue }
-            let trackIndex = track ?? firstId.map { id in Int(id) }
-
-            if let index = trackIndex {
-                switch (type, index) {
-                case (.audio, -1):
-                    player.deselectAllAudioTracks()
-                case (.video, -1):
-                    player.deselectAllVideoTracks()
-                case (.text, -1):
-                    player.deselectAllTextTracks()
-                default:
-                    player.selectTrack(at: index, type: type)
+            if track == -1 {
+                switch type {
+                case .audio: player.deselectAllAudioTracks()
+                case .video: player.deselectAllVideoTracks()
+                case .text: player.deselectAllTextTracks()
+                default: break
                 }
+                return
             }
+
+            let tracks: [VLCMediaPlayer.Track]? = switch type {
+            case .audio: player.audioTracks
+            case .video: player.videoTracks
+            case .text: player.textTracks
+            default: nil
+            }
+
+            guard let tracks else { return }
+
+            let trackId = tracks.first?.trackId
+            let firstId = trackId.map { id in (id as NSString).intValue }
+            let index = track ?? firstId.map { id in Int(id) }
+
+            guard let index else { return }
+
+            player.selectTrack(at: index, type: type)
         }
     }
 
@@ -216,8 +215,6 @@ class LibVlcPlayerView: ExpoView {
 
     func setupPlayer() {
         if let player = mediaPlayer {
-            setPlayerTracks()
-
             addPlayerSlaves()
 
             if scale != MediaPlayerConstants.defaultPlayerScale {
@@ -561,6 +558,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                  .stopped:
                 if newState == .playing {
                     onPlaying()
+
+                    setPlayerTracks()
 
                     if firstPlay {
                         setupPlayer()

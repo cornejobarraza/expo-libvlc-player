@@ -53,8 +53,8 @@ class LibVlcPlayerView(
     context: Context,
     appContext: AppContext,
 ) : ExpoView(context, appContext) {
-    val playerView: VLCVideoLayout = VLCVideoLayout(context)
-    val pictureView: VLCVideoLayout = VLCVideoLayout(context)
+    val playerLayout: VLCVideoLayout = VLCVideoLayout(context)
+    val pictureLayout: VLCVideoLayout = VLCVideoLayout(context)
     private var pauseIfJob: Job? = null
 
     var libVLC: LibVLC? = null
@@ -89,13 +89,13 @@ class LibVlcPlayerView(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        attachPlayerView(playerView)
+        attachPlayerLayout(playerLayout)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
 
-        detachPlayerView()
+        detachPlayerLayout()
     }
 
     override fun onSizeChanged(
@@ -106,10 +106,11 @@ class LibVlcPlayerView(
     ) {
         super.onSizeChanged(w, h, oldw, oldh)
 
-        setContentFit()
+        setContentFit(layout = playerLayout)
+        setContentFit(layout = pictureLayout)
     }
 
-    fun getTextureView(): TextureView? = playerView.findViewById(org.videolan.R.id.texture_video)
+    fun getTextureView(layout: VLCVideoLayout): TextureView? = layout.findViewById(org.videolan.R.id.texture_video)
 
     fun initPlayer() {
         if (shouldInit) {
@@ -125,14 +126,16 @@ class LibVlcPlayerView(
         var args = options
         args.toggleStartPausedOption(autoplay)
 
-        MediaPlayerManager.pictureInPictureManager.setupPipManager(this)
+        if (pictureInPicture) {
+            MediaPlayerManager.pictureInPictureManager.setupPipManager(this)
+        }
 
         libVLC = LibVLC(context, args)
         setDialogCallbacks(libVLC!!)
 
         mediaPlayer = MediaPlayer(libVLC!!)
         setPlayerListener(mediaPlayer!!)
-        attachPlayerView(playerView)
+        attachPlayerLayout(playerLayout)
 
         try {
             URI(source)
@@ -149,7 +152,7 @@ class LibVlcPlayerView(
         firstPlay = true
         shouldInit = false
 
-        addPlayerView(playerView)
+        addPlayerLayout(playerLayout)
     }
 
     fun resetPlayer() {
@@ -158,16 +161,16 @@ class LibVlcPlayerView(
     }
 
     fun attachPlayer() {
-        attachPlayerView(playerView)
-        addPlayerView(playerView)
+        attachPlayerLayout(playerLayout)
+        addPlayerLayout(playerLayout)
     }
 
     fun detachPlayer() {
-        detachPlayerView()
-        removePlayerView()
+        detachPlayerLayout()
+        removePlayerLayout()
     }
 
-    fun attachPlayerView(view: VLCVideoLayout) {
+    fun attachPlayerLayout(view: VLCVideoLayout) {
         mediaPlayer?.let { player ->
             val attached = player.getVLCVout().areViewsAttached()
 
@@ -177,7 +180,7 @@ class LibVlcPlayerView(
         }
     }
 
-    fun detachPlayerView() {
+    fun detachPlayerLayout() {
         mediaPlayer?.let { player ->
             val attached = player.getVLCVout().areViewsAttached()
 
@@ -187,19 +190,19 @@ class LibVlcPlayerView(
         }
     }
 
-    fun addPlayerView(view: VLCVideoLayout) {
-        val parent = playerView.parent as? ViewGroup
+    fun addPlayerLayout(view: VLCVideoLayout) {
+        val parent = playerLayout.parent as? ViewGroup
 
         if (parent == null) {
             addView(view)
         }
     }
 
-    fun removePlayerView() {
-        val parent = playerView.parent as? ViewGroup
+    fun removePlayerLayout() {
+        val parent = playerLayout.parent as? ViewGroup
 
         if (parent != null) {
-            removeView(playerView)
+            removeView(playerLayout)
         }
     }
 
@@ -211,16 +214,41 @@ class LibVlcPlayerView(
         removeAllViews()
     }
 
-    fun setPlayerTracks() {
+    fun selectTrack(
+        track: Int?,
+        type: Int,
+    ) {
         mediaPlayer?.let { player ->
-            val audioTrack = tracks?.audio ?: player.getAudioTrack()
-            val videoTrack = tracks?.video ?: player.getVideoTrack()
-            val spuTrack = tracks?.subtitle ?: player.getSpuTrack()
+            when (type) {
+                IMedia.Track.Type.Audio -> {
+                    val firstTrack = player.getAudioTracks()?.firstOrNull { track -> track.id != -1 }?.id
+                    val index = track ?: firstTrack ?: player.getAudioTrack()
+                    player.setAudioTrack(index)
+                }
 
-            player.setAudioTrack(audioTrack)
-            player.setVideoTrack(videoTrack)
-            player.setSpuTrack(spuTrack)
+                IMedia.Track.Type.Video -> {
+                    val firstTrack = player.getVideoTracks()?.firstOrNull { track -> track.id != -1 }?.id
+                    val index = track ?: firstTrack ?: player.getVideoTrack()
+                    player.setVideoTrack(index)
+                }
+
+                IMedia.Track.Type.Text -> {
+                    val firstTrack = player.getSpuTracks()?.firstOrNull { track -> track.id != -1 }?.id
+                    val index = track ?: firstTrack ?: player.getSpuTrack()
+                    player.setSpuTrack(index)
+                }
+            }
         }
+    }
+
+    fun setPlayerTracks() {
+        val audioTrack = tracks?.audio
+        val videoTrack = tracks?.video
+        val spuTrack = tracks?.subtitle
+
+        selectTrack(audioTrack, IMedia.Track.Type.Audio)
+        selectTrack(videoTrack, IMedia.Track.Type.Video)
+        selectTrack(spuTrack, IMedia.Track.Type.Text)
     }
 
     fun addPlayerSlaves() {
@@ -246,9 +274,9 @@ class LibVlcPlayerView(
         }
     }
 
-    fun setContentFit() {
+    fun setContentFit(layout: VLCVideoLayout) {
         post {
-            val view = getTextureView() ?: return@post
+            val view = getTextureView(layout) ?: return@post
             val matrix = Matrix()
 
             mediaPlayer?.let { player ->
@@ -305,8 +333,6 @@ class LibVlcPlayerView(
 
     fun setupPlayer() {
         mediaPlayer?.let { player ->
-            setPlayerTracks()
-
             addPlayerSlaves()
 
             if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
@@ -471,7 +497,8 @@ class LibVlcPlayerView(
     var contentFit: VideoContentFit = VideoContentFit.CONTAIN
         set(value) {
             field = value
-            setContentFit()
+            setContentFit(layout = playerLayout)
+            setContentFit(layout = pictureLayout)
         }
 
     var rate: Float = MediaPlayerConstants.DEFAULT_PLAYER_RATE
@@ -609,7 +636,7 @@ class LibVlcPlayerView(
     fun snapshot(path: String) {
         mediaPlayer?.let { player ->
             try {
-                val view = getTextureView() ?: throw Exception()
+                val view = getTextureView(playerLayout) ?: throw Exception()
                 val video = getVideoSize()
 
                 if (!hasVideoSize) throw Exception()
@@ -710,6 +737,8 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                         if (type == Event.Playing) {
                             onPlaying(Unit)
 
+                            setPlayerTracks()
+
                             if (firstPlay) {
                                 setupPlayer()
 
@@ -729,7 +758,8 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                                     val shouldFitContent = hasVideoSize || isLastAttempt
 
                                     if (shouldFitContent) {
-                                        setContentFit()
+                                        setContentFit(layout = playerLayout)
+                                        setContentFit(layout = pictureLayout)
                                     }
 
                                     return@retryUntil hasVideoSize

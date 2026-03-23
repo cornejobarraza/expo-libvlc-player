@@ -114,8 +114,15 @@ class PictureInPictureManager(
                                         player.setTime(time - MediaPlayerConstants.SEEK_STEP_MS)
                                     }
                                 }
-                                MediaPlayerConstants.EXTRA_CONTROL_PLAY -> player.play()
-                                MediaPlayerConstants.EXTRA_CONTROL_PAUSE -> player.pause()
+
+                                MediaPlayerConstants.EXTRA_CONTROL_PLAY -> {
+                                    player.play()
+                                }
+
+                                MediaPlayerConstants.EXTRA_CONTROL_PAUSE -> {
+                                    player.pause()
+                                }
+
                                 MediaPlayerConstants.EXTRA_CONTROL_FORWARD -> {
                                     val time = player.getTime()
 
@@ -147,19 +154,20 @@ class PictureInPictureManager(
     }
 
     fun setPipParams() {
-        val view = pipView?.getTextureView()
-        val canSetParams = isPictureInPictureSupported() && view != null
+        val view = pipView ?: return
+        val texture = view.getTextureView(view.playerLayout)
+        val canSetParams = isPictureInPictureSupported() && texture != null
 
         if (!canSetParams) return
 
-        val ratio = Rational(view.width, view.height)
+        val ratio = Rational(texture.width, texture.height)
         val safeRatio = ratio.takeIf { it.toFloat() in 0.41841..2.39 }
 
         val hint = Rect()
-        view.getGlobalVisibleRect(hint)
+        texture.getGlobalVisibleRect(hint)
 
         val location = IntArray(2)
-        view.getLocationOnScreen(location)
+        texture.getLocationOnScreen(location)
 
         val height = hint.bottom - hint.top
         hint.top = location[1]
@@ -256,7 +264,7 @@ class PictureInPictureManager(
     }
 
     fun layoutForPipEnter() {
-        val pictureView = pipView?.pictureView ?: return
+        val pictureLayout = pipView?.pictureLayout ?: return
         val rootView = activity.findViewById<ViewGroup>(android.R.id.content)
 
         for (i in 0 until rootView.childCount) {
@@ -265,29 +273,29 @@ class PictureInPictureManager(
             rootView.getChildAt(i).visibility = View.GONE
         }
 
-        rootView.addView(pictureView)
+        rootView.addView(pictureLayout)
 
         pipView?.let { view ->
             // Picture-in-Picture (PiP) black window workaround
-            view.detachPlayerView()
-            view.attachPlayerView(pictureView)
+            view.detachPlayerLayout()
+            view.attachPlayerLayout(pictureLayout)
 
-            view.detachPlayerView()
-            view.post { view.attachPlayerView(pictureView) }
+            view.detachPlayerLayout()
+            view.post { view.attachPlayerLayout(pictureLayout) }
         }
     }
 
     fun layoutForPipExit() {
-        val playerView = pipView?.playerView ?: return
-        val pictureView = pipView?.pictureView ?: return
+        val playerLayout = pipView?.playerLayout ?: return
+        val pictureLayout = pipView?.pictureLayout ?: return
         val rootView = activity.findViewById<ViewGroup>(android.R.id.content)
 
         pipView?.let { view ->
-            view.detachPlayerView()
-            view.post { view.attachPlayerView(playerView) }
+            view.detachPlayerLayout()
+            view.post { view.attachPlayerLayout(playerLayout) }
         }
 
-        rootView.removeView(pictureView)
+        rootView.removeView(pictureLayout)
 
         for (i in 0 until rootView.childCount) {
             val child = rootView.getChildAt(i)
