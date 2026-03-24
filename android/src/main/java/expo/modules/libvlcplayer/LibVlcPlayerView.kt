@@ -134,8 +134,9 @@ class LibVlcPlayerView(
         setDialogCallbacks(libVLC!!)
 
         mediaPlayer = MediaPlayer(libVLC!!)
-        setPlayerListener(mediaPlayer!!)
         attachPlayerLayout(playerLayout)
+        setPlayerListener(mediaPlayer!!)
+        setupPlayer()
 
         try {
             URI(source)
@@ -332,33 +333,35 @@ class LibVlcPlayerView(
     }
 
     fun setupPlayer() {
-        mediaPlayer?.let { player ->
-            addPlayerSlaves()
+        post {
+            mediaPlayer?.let { player ->
+                addPlayerSlaves()
 
-            if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
-                player.setScale(scale)
+                if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
+                    player.setScale(scale)
+                }
+
+                if (rate != MediaPlayerConstants.DEFAULT_PLAYER_RATE) {
+                    player.setRate(rate)
+                }
+
+                if (time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
+                    player.setTime(time.toLong())
+                }
+
+                if (volume != MediaPlayerConstants.MAX_PLAYER_VOLUME || mute) {
+                    val newVolume =
+                        if (mute) {
+                            MediaPlayerConstants.MIN_PLAYER_VOLUME
+                        } else {
+                            volume
+                        }
+
+                    player.setVolume(newVolume)
+                }
+
+                time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
             }
-
-            if (rate != MediaPlayerConstants.DEFAULT_PLAYER_RATE) {
-                player.setRate(rate)
-            }
-
-            if (time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
-                player.setTime(time.toLong())
-            }
-
-            if (volume != MediaPlayerConstants.MAX_PLAYER_VOLUME || mute) {
-                val newVolume =
-                    if (mute) {
-                        MediaPlayerConstants.MIN_PLAYER_VOLUME
-                    } else {
-                        volume
-                    }
-
-                player.setVolume(newVolume)
-            }
-
-            time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
         }
     }
 
@@ -745,12 +748,8 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                         if (type == Event.Playing) {
                             onPlaying(Unit)
 
-                            setPlayerTracks()
-
                             if (firstPlay) {
-                                setupPlayer()
-
-                                firstPlay = false
+                                setPlayerTracks()
 
                                 retryUntil { isLastAttempt ->
                                     if (hasVideoOut || isLastAttempt) {
@@ -768,6 +767,8 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
 
                                     return@retryUntil hasVideoSize
                                 }
+
+                                firstPlay = false
                             }
                         }
 
@@ -779,6 +780,8 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                             onStopped(Unit)
 
                             resetPlayer()
+
+                            firstPlay = true
 
                             if (repeat) {
                                 player.play()
