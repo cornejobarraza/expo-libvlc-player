@@ -3,7 +3,7 @@
     android:height="24dp"
     android:viewportWidth="960"
     android:viewportHeight="960"
-    android:tint="?attr/colorControlNormal">
+    android:tint="@android:color/white">
   <path
       android:fillColor="@android:color/white"
       android:pathData="M860,720L500,480L860,240L860,720ZM460,720L100,480L460,240L460,720Z"/>
