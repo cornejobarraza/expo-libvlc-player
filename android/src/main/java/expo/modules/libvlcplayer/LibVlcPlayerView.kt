@@ -127,7 +127,7 @@ class LibVlcPlayerView(
         args.toggleStartPausedOption(autoplay)
 
         if (pictureInPicture) {
-            MediaPlayerManager.pictureInPictureManager.setupPipManager(this)
+            MediaPlayerManager.pictureInPictureManager.setupPipView(this)
         }
 
         libVLC = LibVLC(context, args)
@@ -216,26 +216,36 @@ class LibVlcPlayerView(
     }
 
     fun selectTrack(
-        track: Int?,
+        trackId: Int?,
         type: Int,
     ) {
         mediaPlayer?.let { player ->
+            val tracks =
+                when (type) {
+                    IMedia.Track.Type.Audio -> player.getAudioTracks()
+                    IMedia.Track.Type.Video -> player.getVideoTracks()
+                    IMedia.Track.Type.Text -> player.getSpuTracks()
+                    else -> null
+                }
+
+            if (tracks == null) return
+
+            val firstTrack = tracks.firstOrNull { track -> track.id != -1 }
+            val firstTrackId = firstTrack?.id
+            val index = trackId ?: firstTrackId
+
+            if (index == null) return
+
             when (type) {
                 IMedia.Track.Type.Audio -> {
-                    val firstTrack = player.getAudioTracks()?.firstOrNull { track -> track.id != -1 }?.id
-                    val index = track ?: firstTrack ?: player.getAudioTrack()
                     player.setAudioTrack(index)
                 }
 
                 IMedia.Track.Type.Video -> {
-                    val firstTrack = player.getVideoTracks()?.firstOrNull { track -> track.id != -1 }?.id
-                    val index = track ?: firstTrack ?: player.getVideoTrack()
                     player.setVideoTrack(index)
                 }
 
                 IMedia.Track.Type.Text -> {
-                    val firstTrack = player.getSpuTracks()?.firstOrNull { track -> track.id != -1 }?.id
-                    val index = track ?: firstTrack ?: player.getSpuTrack()
                     player.setSpuTrack(index)
                 }
             }

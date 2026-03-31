@@ -115,9 +115,9 @@ class LibVlcPlayerView: ExpoView {
         vlcDialog = nil
     }
 
-    func selectTrack(_ track: Int?, _ type: VLCMedia.TrackType) {
+    func selectTrack(_ trackId: Int?, _ type: VLCMedia.TrackType) {
         if let player = mediaPlayer {
-            if track == -1 {
+            if trackId == -1 {
                 switch type {
                 case .audio: player.deselectAllAudioTracks()
                 case .video: player.deselectAllVideoTracks()
@@ -136,9 +136,10 @@ class LibVlcPlayerView: ExpoView {
 
             guard let tracks else { return }
 
-            let trackId = tracks.first?.trackId
-            let firstId = trackId.map { id in (id as NSString).intValue }
-            let index = track ?? firstId.map { id in Int(id) }
+            let firstTrack = tracks.first?.trackId
+            let firstTrackInt = firstTrack.map { id in (id as NSString).intValue }
+            let firstTrackId = firstTrackInt.map { id in Int(id) }
+            let index = trackId ?? firstTrackId
 
             guard let index else { return }
 

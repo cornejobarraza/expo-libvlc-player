@@ -33,6 +33,18 @@ class PictureInPictureManager(
     private var pipFragment: PictureInPictureFragment? = null
     private var pipReceiver: BroadcastReceiver? = null
     private var pipView: LibVlcPlayerView? = null
+        set(value) {
+            field = value
+
+            val canSetupPip = value != null && isPictureInPictureSupported()
+
+            if (canSetupPip) {
+                setupPipFragment()
+                setupPipReceiver()
+                setPipParams()
+                setPipActions()
+            }
+        }
 
     private val rootChildrenVisibility: MutableMap<Int, Int> = mutableMapOf()
 
@@ -47,13 +59,8 @@ class PictureInPictureManager(
     private val pictureInPicture: Boolean
         get() = pipView?.pictureInPicture == true
 
-    fun setupPipManager(view: LibVlcPlayerView) {
-        if (!isPictureInPictureSupported()) return
+    fun setupPipView(view: LibVlcPlayerView) {
         pipView = view
-        setupPipFragment()
-        setupPipReceiver()
-        setPipParams()
-        setPipActions()
     }
 
     private fun setupPipFragment() {
@@ -310,7 +317,7 @@ class PictureInPictureManager(
 
     fun startPictureInPicture(view: LibVlcPlayerView) {
         maybeThrowPipException()
-        setupPipManager(view)
+        setupPipView(view)
         enterPictureInPicture()
     }
 

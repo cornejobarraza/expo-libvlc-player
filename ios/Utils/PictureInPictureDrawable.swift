@@ -41,7 +41,7 @@ class PictureInPictureDrawable: MediaPlayerDrawable {
         }
     }
 
-    func maybeThrowPipException() throws {
+    private func maybeThrowPipException() throws {
         if !AVPictureInPictureController.isPictureInPictureSupported() {
             throw PictureInPictureUnsupportedException()
         } else if !pictureInPicture {
