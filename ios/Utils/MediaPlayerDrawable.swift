@@ -1,6 +1,7 @@
 class MediaPlayerDrawable: UIView {
     init() {
         super.init(frame: .zero)
+        isUserInteractionEnabled = false
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         backgroundColor = .black
     }
