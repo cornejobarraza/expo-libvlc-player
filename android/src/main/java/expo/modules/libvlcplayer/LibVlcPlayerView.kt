@@ -658,11 +658,11 @@ class LibVlcPlayerView(
         mediaPlayer?.let { player ->
             try {
                 val view = getTextureView(playerLayout) ?: throw Exception()
-                val video = getVideoSize()
 
                 if (!hasVideoSize) throw Exception()
 
                 val surface = Surface(view.surfaceTexture)
+                val video = getVideoSize()
                 val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
 
                 PixelCopy.request(
@@ -672,8 +672,9 @@ class LibVlcPlayerView(
                         if (copyResult != PixelCopy.SUCCESS) throw Exception()
 
                         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'")
-                        val timestamp = Calendar.getInstance().time
-                        val snapshotPath = path + "/vlc-snapshot-${simpleDateFormat.format(timestamp)}.jpg"
+                        val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
+
+                        val snapshotPath = path + "/vlc-snapshot-$timestamp.jpg"
                         val file = File(snapshotPath)
 
                         FileOutputStream(file).use { stream ->

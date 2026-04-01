@@ -485,12 +485,13 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func snapshot(_ path: String) {
-        let video = getVideoSize()
-
         if hasVideoSize {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
-            let snapshotPath = path + "/vlc-snapshot-\(dateFormatter.string(from: Date())).jpg"
+            let timestamp = dateFormatter.string(from: Date())
+
+            let snapshotPath = path + "/vlc-snapshot-\(timestamp).jpg"
+            let video = getVideoSize()
 
             mediaPlayer?.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(video.width), andHeight: Int32(video.height))
 
