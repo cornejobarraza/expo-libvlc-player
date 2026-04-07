@@ -128,8 +128,8 @@ See the [Example App](example/App.tsx) for additional usage.
 | `pause()`                                          | Pauses playback of the current player                                                                                  | `Promise<void>` |
 | `stop()`                                           | Stops playback of the current player                                                                                   | `Promise<void>` |
 | `seek(value: number, type?: "time" \| "position")` | Sets the time or position of the current player. Must be a number equal or greater than `0`, type defaults to `"time"` | `Promise<void>` |
-| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid path string or `undefined` to stop recording              | `Promise<void>` |
-| `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid path string                                                     | `Promise<void>` |
+| `record(path?: string)`                            | Starts or stops recording the current media. Must be a valid directory path string or `undefined` to stop recording    | `Promise<void>` |
+| `snapshot(path: string)`                           | Takes a snapshot of the current media. Must be a valid directory path string                                           | `Promise<void>` |
 | `postAction(action: number)`                       | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                             | `Promise<void>` |
 | `dismiss()`                                        | Dismisses a [`Dialog`](#dialog)                                                                                        | `Promise<void>` |
 | `startPictureInPicture()`                          | Enters Picture-in-Picture (PiP) mode. Config plugin has to be configured for Picture-in-Picture (PiP) to work          | `Promise<void>` |

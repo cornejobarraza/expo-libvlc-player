@@ -34,7 +34,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Starts or stops recording the current media
    *
-   * @param path - Must be a valid path string or `undefined` to stop recording
+   * @param path - Must be a valid directory path string or `undefined` to stop recording
    *
    * @returns A promise which resolves to `void`
    */
@@ -42,7 +42,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Takes a snapshot of the current media
    *
-   * @param path - Must be a valid path string
+   * @param path - Must be a valid directory path string
    *
    * @returns A promise which resolves to `void`
    */
