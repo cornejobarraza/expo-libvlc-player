@@ -484,6 +484,10 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
+    private func snapshotExists(_ path: String) -> Bool {
+        FileManager.default.fileExists(atPath: path)
+    }
+
     func snapshot(_ path: String) {
         if hasVideoSize {
             let dateFormatter = DateFormatter()
@@ -495,10 +499,23 @@ class LibVlcPlayerView: ExpoView {
 
             mediaPlayer?.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(video.width), andHeight: Int32(video.height))
 
-            onSnapshotTaken(["path": snapshotPath])
+            retryUntil { [weak self] isLastAttempt in
+                guard let self else { return true }
+
+                let hasSnapshot = snapshotExists(snapshotPath)
+
+                if hasSnapshot {
+                    onSnapshotTaken(["path": snapshotPath])
+                } else if !isLastAttempt {
+                    mediaPlayer?.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(0), andHeight: Int32(0))
+                } else {
+                    onEncounteredError(["error": "Snapshot could not be taken"])
+                }
+
+                return hasSnapshot
+            }
         } else {
             onEncounteredError(["error": "Snapshot could not be taken"])
-            return
         }
     }
 

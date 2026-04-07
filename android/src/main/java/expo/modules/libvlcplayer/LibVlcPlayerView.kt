@@ -669,7 +669,9 @@ class LibVlcPlayerView(
                     surface,
                     bitmap,
                     { copyResult ->
-                        if (copyResult != PixelCopy.SUCCESS) throw Exception()
+                        if (copyResult != PixelCopy.SUCCESS) {
+                            onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
+                        }
 
                         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'")
                         val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
