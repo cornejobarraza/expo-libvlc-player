@@ -35,7 +35,7 @@ export function LibVlcPlayer({ title, source }: LibVlcPlayerProps) {
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
-  const bufferingRef = useRef<NodeJS.Timeout>(undefined);
+  const bufferingRef = useRef<number>(undefined);
 
   return (
     <View style={styles.libvlc}>
