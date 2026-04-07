@@ -671,19 +671,24 @@ class LibVlcPlayerView(
                     { copyResult ->
                         if (copyResult != PixelCopy.SUCCESS) {
                             onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
+                            return@request
                         }
 
-                        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'")
-                        val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
+                        try {
+                            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'")
+                            val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
 
-                        val snapshotPath = path + "/vlc-snapshot-$timestamp.jpg"
-                        val file = File(snapshotPath)
+                            val snapshotPath = path + "/vlc-snapshot-$timestamp.jpg"
+                            val file = File(snapshotPath)
 
-                        FileOutputStream(file).use { stream ->
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                            FileOutputStream(file).use { stream ->
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                            }
+
+                            onSnapshotTaken(mapOf("path" to snapshotPath))
+                        } catch (_: Exception) {
+                            onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
                         }
-
-                        onSnapshotTaken(mapOf("path" to snapshotPath))
                     },
                     Handler(Looper.getMainLooper()),
                 )
