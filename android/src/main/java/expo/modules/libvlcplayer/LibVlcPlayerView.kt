@@ -290,50 +290,48 @@ class LibVlcPlayerView(
             val view = getTextureView(layout) ?: return@post
             val matrix = Matrix()
 
-            mediaPlayer?.let { player ->
-                val video = getVideoSize()
+            val video = getVideoSize()
 
-                if (hasVideoSize) {
-                    val viewWidth = view.width.toFloat()
-                    val viewHeight = view.height.toFloat()
+            if (hasVideoSize) {
+                val viewWidth = view.width.toFloat()
+                val viewHeight = view.height.toFloat()
 
-                    val videoWidth = video.width.toFloat()
-                    val videoHeight = video.height.toFloat()
+                val videoWidth = video.width.toFloat()
+                val videoHeight = video.height.toFloat()
 
-                    val viewAspect = viewWidth / viewHeight
-                    val videoAspect = videoWidth / videoHeight
+                val viewAspect = viewWidth / viewHeight
+                val videoAspect = videoWidth / videoHeight
 
-                    val pivotX = viewWidth / 2f
-                    val pivotY = viewHeight / 2f
+                val pivotX = viewWidth / 2f
+                val pivotY = viewHeight / 2f
 
-                    when (contentFit) {
-                        VideoContentFit.CONTAIN -> {
-                            // No scale required
-                        }
+                when (contentFit) {
+                    VideoContentFit.CONTAIN -> {
+                        // No scale required
+                    }
 
-                        VideoContentFit.COVER -> {
-                            val scale =
-                                if (videoAspect > viewAspect) {
-                                    videoAspect / viewAspect
-                                } else {
-                                    viewAspect / videoAspect
-                                }
-
-                            matrix.setScale(scale, scale, pivotX, pivotY)
-                        }
-
-                        VideoContentFit.FILL -> {
-                            var scaleX = 1f
-                            var scaleY = 1f
-
+                    VideoContentFit.COVER -> {
+                        val scale =
                             if (videoAspect > viewAspect) {
-                                scaleY = videoAspect / viewAspect
+                                videoAspect / viewAspect
                             } else {
-                                scaleX = viewAspect / videoAspect
+                                viewAspect / videoAspect
                             }
 
-                            matrix.setScale(scaleX, scaleY, pivotX, pivotY)
+                        matrix.setScale(scale, scale, pivotX, pivotY)
+                    }
+
+                    VideoContentFit.FILL -> {
+                        var scaleX = 1f
+                        var scaleY = 1f
+
+                        if (videoAspect > viewAspect) {
+                            scaleY = videoAspect / viewAspect
+                        } else {
+                            scaleX = viewAspect / videoAspect
                         }
+
+                        matrix.setScale(scaleX, scaleY, pivotX, pivotY)
                     }
                 }
             }
@@ -417,12 +415,10 @@ class LibVlcPlayerView(
     fun getMediaLength(): Long {
         var length: Long = 0L
 
-        mediaPlayer?.let { player ->
-            val duration = player.getLength()
+        val duration = mediaPlayer?.getLength() ?: 0L
 
-            if (duration > 0L) {
-                length = duration
-            }
+        if (duration > 0L) {
+            length = duration
         }
 
         return length
@@ -431,19 +427,17 @@ class LibVlcPlayerView(
     fun getMediaInfo(): MediaInfo {
         var mediaInfo = MediaInfo()
 
-        mediaPlayer?.let { player ->
-            val video = getVideoSize()
-            val length = getMediaLength()
-            val seekable = player.isSeekable()
+        val video = getVideoSize()
+        val length = getMediaLength()
+        val seekable = mediaPlayer?.isSeekable() ?: false
 
-            mediaInfo =
-                MediaInfo(
-                    width = video.width,
-                    height = video.height,
-                    length = length.toDouble(),
-                    seekable = seekable,
-                )
-        }
+        mediaInfo =
+            MediaInfo(
+                width = video.width,
+                height = video.height,
+                length = length.toDouble(),
+                seekable = seekable,
+            )
 
         return mediaInfo
     }
@@ -655,46 +649,44 @@ class LibVlcPlayerView(
     }
 
     fun snapshot(path: String) {
-        mediaPlayer?.let { player ->
-            try {
-                val view = getTextureView(playerLayout) ?: throw Exception()
+        try {
+            val view = getTextureView(playerLayout) ?: throw Exception()
 
-                if (!hasVideoSize) throw Exception()
+            if (!hasVideoSize) throw Exception()
 
-                val surface = Surface(view.surfaceTexture)
-                val video = getVideoSize()
-                val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
+            val surface = Surface(view.surfaceTexture)
+            val video = getVideoSize()
+            val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
 
-                PixelCopy.request(
-                    surface,
-                    bitmap,
-                    { copyResult ->
-                        if (copyResult != PixelCopy.SUCCESS) {
-                            onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
-                            return@request
+            PixelCopy.request(
+                surface,
+                bitmap,
+                { copyResult ->
+                    if (copyResult != PixelCopy.SUCCESS) {
+                        onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
+                        return@request
+                    }
+
+                    try {
+                        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'")
+                        val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
+
+                        val snapshotPath = path + "/vlc-snapshot-$timestamp.jpg"
+                        val file = File(snapshotPath)
+
+                        FileOutputStream(file).use { stream ->
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
                         }
 
-                        try {
-                            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'")
-                            val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
-
-                            val snapshotPath = path + "/vlc-snapshot-$timestamp.jpg"
-                            val file = File(snapshotPath)
-
-                            FileOutputStream(file).use { stream ->
-                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-                            }
-
-                            onSnapshotTaken(mapOf("path" to snapshotPath))
-                        } catch (_: Exception) {
-                            onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
-                        }
-                    },
-                    Handler(Looper.getMainLooper()),
-                )
-            } catch (_: Exception) {
-                onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
-            }
+                        onSnapshotTaken(mapOf("path" to snapshotPath))
+                    } catch (_: Exception) {
+                        onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
+                    }
+                },
+                Handler(Looper.getMainLooper()),
+            )
+        } catch (_: Exception) {
+            onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
         }
     }
 

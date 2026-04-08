@@ -250,12 +250,10 @@ class LibVlcPlayerView: ExpoView {
     func getMediaLength() -> Int32 {
         var length: Int32 = 0
 
-        if let player = mediaPlayer, let media = player.media {
-            let duration = media.length.intValue
+        let duration = mediaPlayer?.media?.length.intValue ?? 0
 
-            if duration > 0 {
-                length = duration
-            }
+        if duration > 0 {
+            length = duration
         }
 
         return length
@@ -296,18 +294,16 @@ class LibVlcPlayerView: ExpoView {
     func getMediaInfo() -> MediaInfo {
         var mediaInfo = MediaInfo()
 
-        if let player = mediaPlayer {
-            let video = getVideoSize()
-            let length = getMediaLength()
-            let seekable = player.isSeekable
+        let video = getVideoSize()
+        let length = getMediaLength()
+        let seekable = mediaPlayer?.isSeekable ?? false
 
-            mediaInfo = MediaInfo(
-                width: Int(video.width),
-                height: Int(video.height),
-                length: Double(length),
-                seekable: seekable
-            )
-        }
+        mediaInfo = MediaInfo(
+            width: Int(video.width),
+            height: Int(video.height),
+            length: Double(length),
+            seekable: seekable
+        )
 
         return mediaInfo
     }
