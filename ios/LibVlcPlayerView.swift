@@ -167,7 +167,7 @@ class LibVlcPlayerView: ExpoView {
             let selected = slave.selected ?? false
 
             guard let url = URL(string: source) else {
-                onEncounteredError(["error": "Invalid slave, \(type) could not be added"])
+                onEncounteredError(["error": "Invalid source, \(type) could not be added"])
                 continue
             }
 
@@ -247,18 +247,6 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    func getMediaLength() -> Int32 {
-        var length: Int32 = 0
-
-        let duration = mediaPlayer?.media?.length.intValue ?? 0
-
-        if duration > 0 {
-            length = duration
-        }
-
-        return length
-    }
-
     func getMediaTracks() -> MediaTracks {
         var mediaTracks = MediaTracks()
 
@@ -289,6 +277,18 @@ class LibVlcPlayerView: ExpoView {
         }
 
         return mediaTracks
+    }
+
+    func getMediaLength() -> Int32 {
+        var length: Int32 = 0
+
+        let duration = mediaPlayer?.media?.length.intValue ?? 0
+
+        if duration > 0 {
+            length = duration
+        }
+
+        return length
     }
 
     func getMediaInfo() -> MediaInfo {
@@ -613,6 +613,16 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                             return hasVideoSize
                         }
 
+                        retryUntil { [weak self] _ in
+                            guard let self else { return true }
+
+                            if hasAudioOut {
+                                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+                            }
+
+                            return hasAudioOut
+                        }
+
                         firstPlay = false
                     }
                 }
@@ -631,18 +641,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     }
                 }
 
-                pictureDrawable.updatePipState()
                 MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
-
-                retryUntil { [weak self] _ in
-                    guard let self else { return true }
-
-                    if hasAudioOut {
-                        MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-                    }
-
-                    return hasAudioOut
-                }
+                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+                pictureDrawable.updatePipState()
             case .error:
                 onEncounteredError(["error": "Player encountered an error"])
 

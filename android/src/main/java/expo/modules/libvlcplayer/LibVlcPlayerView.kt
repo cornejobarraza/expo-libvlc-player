@@ -112,6 +112,57 @@ class LibVlcPlayerView(
 
     fun getTextureView(layout: VLCVideoLayout): TextureView? = layout.findViewById(org.videolan.R.id.texture_video)
 
+    fun addPlayerLayout(view: VLCVideoLayout) {
+        val parent = playerLayout.parent as? ViewGroup
+
+        if (parent == null) {
+            addView(view)
+        }
+    }
+
+    fun removePlayerLayout() {
+        val parent = playerLayout.parent as? ViewGroup
+
+        if (parent != null) {
+            removeView(playerLayout)
+        }
+    }
+
+    fun resetPlayer() {
+        detachPlayer()
+        attachPlayer()
+    }
+
+    fun attachPlayer() {
+        attachPlayerLayout(playerLayout)
+        addPlayerLayout(playerLayout)
+    }
+
+    fun detachPlayer() {
+        detachPlayerLayout()
+        removePlayerLayout()
+    }
+
+    fun attachPlayerLayout(view: VLCVideoLayout) {
+        mediaPlayer?.let { player ->
+            val attached = player.getVLCVout().areViewsAttached()
+
+            if (!attached) {
+                player.attachViews(view, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+            }
+        }
+    }
+
+    fun detachPlayerLayout() {
+        mediaPlayer?.let { player ->
+            val attached = player.getVLCVout().areViewsAttached()
+
+            if (attached) {
+                player.detachViews()
+            }
+        }
+    }
+
     fun initPlayer() {
         if (shouldInit) {
             destroyPlayer()
@@ -154,57 +205,6 @@ class LibVlcPlayerView(
         shouldInit = false
 
         addPlayerLayout(playerLayout)
-    }
-
-    fun resetPlayer() {
-        detachPlayer()
-        attachPlayer()
-    }
-
-    fun attachPlayer() {
-        attachPlayerLayout(playerLayout)
-        addPlayerLayout(playerLayout)
-    }
-
-    fun detachPlayer() {
-        detachPlayerLayout()
-        removePlayerLayout()
-    }
-
-    fun attachPlayerLayout(view: VLCVideoLayout) {
-        mediaPlayer?.let { player ->
-            val attached = player.getVLCVout().areViewsAttached()
-
-            if (!attached) {
-                player.attachViews(view, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
-            }
-        }
-    }
-
-    fun detachPlayerLayout() {
-        mediaPlayer?.let { player ->
-            val attached = player.getVLCVout().areViewsAttached()
-
-            if (attached) {
-                player.detachViews()
-            }
-        }
-    }
-
-    fun addPlayerLayout(view: VLCVideoLayout) {
-        val parent = playerLayout.parent as? ViewGroup
-
-        if (parent == null) {
-            addView(view)
-        }
-    }
-
-    fun removePlayerLayout() {
-        val parent = playerLayout.parent as? ViewGroup
-
-        if (parent != null) {
-            removeView(playerLayout)
-        }
     }
 
     fun destroyPlayer() {
@@ -277,7 +277,7 @@ class LibVlcPlayerView(
             try {
                 URI(source)
             } catch (_: Exception) {
-                onEncounteredError(mapOf("error" to "Invalid slave, $type could not be added"))
+                onEncounteredError(mapOf("error" to "Invalid source, $type could not be added"))
                 return@forEach
             }
 
@@ -444,11 +444,7 @@ class LibVlcPlayerView(
 
     fun getVideoSize(): Size {
         val video = mediaPlayer?.getCurrentVideoTrack()
-
-        if (video != null) {
-            return Size(video.width, video.height)
-        }
-
+        if (video != null) return Size(video.width, video.height)
         return Size(0, 0)
     }
 
@@ -642,8 +638,6 @@ class LibVlcPlayerView(
 
                 if (!success) {
                     onEncounteredError(mapOf("error" to "Media could not be recorded"))
-
-                    player.record(null)
                 }
             } else {
                 player.record(null)
@@ -665,12 +659,9 @@ class LibVlcPlayerView(
                 surface,
                 bitmap,
                 { copyResult ->
-                    if (copyResult != PixelCopy.SUCCESS) {
-                        onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
-                        return@request
-                    }
-
                     try {
+                        if (copyResult != PixelCopy.SUCCESS) throw Exception()
+
                         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'")
                         val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
 
@@ -781,6 +772,14 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                                     return@retryUntil hasVideoSize
                                 }
 
+                                retryUntil { isLastAttempt ->
+                                    if (hasAudioOut) {
+                                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                                    }
+
+                                    return@retryUntil hasAudioOut
+                                }
+
                                 firstPlay = false
                             }
                         }
@@ -801,16 +800,9 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                             }
                         }
 
-                        MediaPlayerManager.pictureInPictureManager.setPipActions()
                         MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
-
-                        retryUntil { isLastAttempt ->
-                            if (hasAudioOut) {
-                                MediaPlayerManager.audioFocusManager.updateAudioFocus()
-                            }
-
-                            return@retryUntil hasAudioOut
-                        }
+                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                        MediaPlayerManager.pictureInPictureManager.setPipActions()
                     }
 
                     Event.EndReached -> {

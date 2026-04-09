@@ -1,6 +1,5 @@
 import AVKit
 import ExpoModulesCore
-import UIKit
 import VLCKit
 
 class PictureInPictureDrawable: MediaPlayerDrawable {
