@@ -19,7 +19,7 @@
   <i>Screenshots taken from the <a href="example/App.tsx">Example App</a> on Android and iOS</i>
 </p>
 
-### Supported versions
+#### Supported versions
 
 | Platform             | Version |
 | -------------------- | ------- |
@@ -27,9 +27,7 @@
 | Android / Android TV | 7+      |
 | iOS / Apple TV       | 15.1+   |
 
-### Installation
-
-Add the package to your npm dependencies.
+## Installation
 
 ```
 npm install expo-libvlc-player
@@ -143,8 +141,8 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | `source`           | Sets the source of the media to be played. Set to `null` to release the player                                                    |             |
 | `options`          | Sets the VLC options to initialize the player with. See the [VLC Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
-| `tracks`           | Sets the player audio, video and subtitle tracks object. See [`Tracks`](#tracks) for more                                         | `undefined` |
-| `slaves`           | Sets the player audio and subtitle slaves array. See [`Slave`](#slave) for more                                                   | `[]`        |
+| `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more                                         | `undefined` |
+| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                   | `[]`        |
 | `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
 | `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio string, number or `"auto"`                                                 | `undefined` |
 | `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
@@ -157,7 +155,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
 | `pictureInPicture` | Determines whether the player should allow Picture-in-Picture (PiP) mode                                                          | `false`     |
 
-#### Callbacks
+#### Callback props
 
 | Prop                      | Description                                                  | Payload                       |
 | ------------------------- | ------------------------------------------------------------ | ----------------------------- |
@@ -178,7 +176,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onPictureInPictureStart` | Called after the player enters Picture-in-Picture (PiP) mode |                               |
 | `onPictureInPictureStop`  | Called after the player exits Picture-in-Picture (PiP) mode  |                               |
 
-### Types
+### Module types
 
 #### `Tracks`
 
