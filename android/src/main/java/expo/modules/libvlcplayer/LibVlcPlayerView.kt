@@ -262,7 +262,7 @@ class LibVlcPlayerView(
         selectTrack(spuTrack, IMedia.Track.Type.Text)
     }
 
-    fun addPlayerSlaves() {
+    fun addPlayerSlaves(slaves: List<Slave>) {
         slaves.forEach { slave ->
             val source = slave.source
             val type = slave.type
@@ -343,7 +343,7 @@ class LibVlcPlayerView(
     fun setupPlayer() {
         post {
             mediaPlayer?.let { player ->
-                addPlayerSlaves()
+                addPlayerSlaves(slaves)
 
                 if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
                     player.setScale(scale)
@@ -499,7 +499,7 @@ class LibVlcPlayerView(
             field = field.apply { addAll(newSlaves) }
 
             if (!newSlaves.isEmpty()) {
-                addPlayerSlaves()
+                addPlayerSlaves(newSlaves)
             }
         }
 
@@ -598,7 +598,10 @@ class LibVlcPlayerView(
 
                 mediaPlayer?.let { player ->
                     val shouldPause = condition == true && player.isPlaying()
-                    if (shouldPause) player.pause()
+
+                    if (shouldPause) {
+                        player.pause()
+                    }
                 }
             }
     }

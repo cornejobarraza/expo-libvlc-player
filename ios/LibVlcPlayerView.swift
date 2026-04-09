@@ -157,7 +157,7 @@ class LibVlcPlayerView: ExpoView {
         selectTrack(textTrack, .text)
     }
 
-    func addPlayerSlaves() {
+    func addPlayerSlaves(_ slaves: [Slave]) {
         for slave in slaves {
             let source = slave.source
             let type = slave.type
@@ -220,7 +220,7 @@ class LibVlcPlayerView: ExpoView {
             guard let self else { return }
 
             if let player = mediaPlayer {
-                addPlayerSlaves()
+                addPlayerSlaves(slaves)
 
                 if scale != MediaPlayerConstants.defaultPlayerScale {
                     player.scaleFactor = scale
@@ -360,7 +360,7 @@ class LibVlcPlayerView: ExpoView {
             _slaves += newSlaves
 
             if !newSlaves.isEmpty {
-                addPlayerSlaves()
+                addPlayerSlaves(newSlaves)
             }
         }
     }
@@ -442,7 +442,10 @@ class LibVlcPlayerView: ExpoView {
     func pauseIf(_ condition: Bool? = true) {
         if let player = mediaPlayer {
             let shouldPause = condition == true && player.isPlaying
-            if shouldPause { player.pause() }
+
+            if shouldPause {
+                player.pause()
+            }
         }
     }
 
