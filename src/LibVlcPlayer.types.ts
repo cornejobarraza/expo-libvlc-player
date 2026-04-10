@@ -56,6 +56,20 @@ export interface LibVlcPlayerViewRef {
    */
   readonly postAction: (action: 1 | 2) => Promise<void>;
   /**
+   * Posts a username and password to a login `Dialog`
+   *
+   * @param username - Must be a valid username, can't be empty
+   * @param password - Must be a valid password, can be empty
+   * @param store - If `true`, store the credentials
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly postLogin: (
+    username: string,
+    password: string,
+    store?: boolean,
+  ) => Promise<void>;
+  /**
    * Dismisses a `Dialog`
    *
    * @returns A promise which resolves to `void`

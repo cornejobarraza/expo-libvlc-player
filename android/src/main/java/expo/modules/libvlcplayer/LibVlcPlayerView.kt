@@ -695,6 +695,21 @@ class LibVlcPlayerView(
         }
     }
 
+    fun postLogin(
+        username: String,
+        password: String,
+        store: Boolean? = false,
+    ) {
+        vlcDialog?.let { dialog ->
+            when (dialog) {
+                is VLCDialog.LoginDialog -> {
+                    dialog.postLogin(username, password, store ?: false)
+                    vlcDialog = null
+                }
+            }
+        }
+    }
+
     fun dismiss() {
         vlcDialog?.let { dialog ->
             dialog.dismiss()

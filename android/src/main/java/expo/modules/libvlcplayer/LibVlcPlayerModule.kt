@@ -161,6 +161,10 @@ class LibVlcPlayerModule : Module() {
                     view.postAction(action)
                 }
 
+                AsyncFunction("postLogin") { view: LibVlcPlayerView, username: String, password: String, store: Boolean? ->
+                    view.postLogin(username, password, store)
+                }
+
                 AsyncFunction("dismiss") { view: LibVlcPlayerView ->
                     view.dismiss()
                 }

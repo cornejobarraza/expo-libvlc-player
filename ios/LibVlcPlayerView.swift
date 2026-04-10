@@ -525,6 +525,13 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
+    func postLogin(_ username: String, _ password: String, _ store: Bool? = false) {
+        if let dialog = vlcDialog, let reference = vlcDialogRef {
+            dialog.postUsername(username, andPassword: password, forDialogReference: reference, store: store ?? false)
+            vlcDialogRef = nil
+        }
+    }
+
     func dismiss() {
         if let dialog = vlcDialog, let reference = vlcDialogRef {
             dialog.dismissDialog(withReference: reference)
