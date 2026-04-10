@@ -19,7 +19,7 @@
   <i>Screenshots taken from the <a href="example/App.tsx">Example App</a> on Android and iOS</i>
 </p>
 
-#### Supported versions
+### Supported versions
 
 | Platform             | Version |
 | -------------------- | ------- |
