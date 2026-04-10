@@ -8,7 +8,6 @@
     "build": "expo-module build",
     "clean": "expo-module clean",
     "lint": "expo-module lint",
-    "test": "expo-module test",
     "prepare": "husky && expo-module prepare",
     "prepublishOnly": "expo-module prepublishOnly",
     "open:ios": "xed example/ios",
@@ -33,6 +32,7 @@
   "author": "David Cornejo <davidcornejo1@live.com> (https://github.com/cornejobarraza)",
   "license": "MIT",
   "homepage": "https://github.com/cornejobarraza/expo-libvlc-player#readme",
+  "dependencies": {},
   "devDependencies": {
     "@eslint/compat": "^1.4.1",
     "@eslint/eslintrc": "^3.3.5",
@@ -44,7 +44,9 @@
     "globals": "^16.5.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.3.2",
-    "react-native": "0.83.4"
+    "prettier": "^3.8.1",
+    "react-native": "0.83.4",
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "expo": "*",
