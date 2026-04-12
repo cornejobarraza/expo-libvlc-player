@@ -64,11 +64,7 @@ export interface LibVlcPlayerViewRef {
    *
    * @returns A promise which resolves to `void`
    */
-  readonly postLogin: (
-    username: string,
-    password: string,
-    store?: boolean,
-  ) => Promise<void>;
+  readonly postLogin: (username: string, password: string, store?: boolean) => Promise<void>;
   /**
    * Dismisses a `Dialog`
    *
@@ -111,11 +107,7 @@ export type VideoAspectRatio = "auto" | string | number;
 
 export type VideoContentFit = "contain" | "cover" | "fill";
 
-export type AudioMixingMode =
-  | "mixWithOthers"
-  | "duckOthers"
-  | "auto"
-  | "doNotMix";
+export type AudioMixingMode = "mixWithOthers" | "duckOthers" | "auto" | "doNotMix";
 
 export interface NativeEventProps {
   target: number;
@@ -130,6 +122,7 @@ export type LibVlcEvent<T> = Omit<T & NativeEventProps, "target">;
 export interface Dialog {
   title: string;
   text: string;
+  type: "error" | "login" | "question";
   cancelText?: string;
   action1Text?: string;
   action2Text?: string;

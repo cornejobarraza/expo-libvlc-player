@@ -7,6 +7,7 @@ import java.io.Serializable
 class Dialog(
     @Field var title: String = "",
     @Field var text: String = "",
+    @Field var type: String = "",
     @Field var cancelText: String? = "",
     @Field var action1Text: String? = "",
     @Field var action2Text: String? = "",

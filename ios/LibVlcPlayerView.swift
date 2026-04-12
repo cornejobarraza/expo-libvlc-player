@@ -703,7 +703,8 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
     ) {
         let dialog = Dialog(
             title: title,
-            text: message
+            text: message,
+            type: "error"
         )
 
         onDialogDisplay(dialog)
@@ -720,7 +721,8 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
 
         let dialog = Dialog(
             title: title,
-            text: message
+            text: message,
+            type: "login"
         )
 
         onDialogDisplay(dialog)
@@ -740,6 +742,7 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
         let dialog = Dialog(
             title: title,
             text: message,
+            type: "question",
             cancelText: cancel,
             action1Text: action1String,
             action2Text: action2String

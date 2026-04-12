@@ -869,6 +869,7 @@ fun LibVlcPlayerView.setDialogCallbacks(ILibVLC: LibVLC?) {
                         Dialog(
                             title = dialog.getTitle(),
                             text = dialog.getText(),
+                            type = "error",
                         )
 
                     onDialogDisplay(dialog)
@@ -881,6 +882,7 @@ fun LibVlcPlayerView.setDialogCallbacks(ILibVLC: LibVLC?) {
                         Dialog(
                             title = dialog.getTitle(),
                             text = dialog.getText(),
+                            type = "login",
                         )
 
                     onDialogDisplay(dialog)
@@ -893,6 +895,7 @@ fun LibVlcPlayerView.setDialogCallbacks(ILibVLC: LibVLC?) {
                         Dialog(
                             title = dialog.getTitle(),
                             text = dialog.getText(),
+                            type = "question",
                             cancelText = dialog.getCancelText(),
                             action1Text = dialog.getAction1Text(),
                             action2Text = dialog.getAction2Text(),

@@ -8,6 +8,9 @@ struct Dialog: Record {
     var text: String = ""
 
     @Field
+    var type: String = ""
+
+    @Field
     var cancelText: String? = ""
 
     @Field

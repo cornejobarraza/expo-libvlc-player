@@ -205,6 +205,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 {
   title: string;
   text: string;
+  type: "error" | "login" | "question";
   cancelText?: string;
   action1Text?: string;
   action2Text?: string;
