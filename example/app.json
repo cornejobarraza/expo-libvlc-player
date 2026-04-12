@@ -23,9 +23,6 @@
       },
       "predictiveBackGestureEnabled": false
     },
-    "plugins": [
-      "../app.plugin.js",
-      "expo-font"
-    ]
+    "plugins": ["../app.plugin.js", "expo-font"]
   }
 }

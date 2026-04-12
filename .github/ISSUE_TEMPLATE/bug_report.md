@@ -1,10 +1,9 @@
 ---
 name: Bug report
 about: Report an issue to improve the library
-title: ''
+title: ""
 labels: bug
-assignees: ''
-
+assignees: ""
 ---
 
 **Describe the bug**
@@ -20,6 +19,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Platform**
- - Device / Simulator
- - Expo SDK version
- - Library version
+
+- Device / Simulator
+- Expo SDK version
+- Library version

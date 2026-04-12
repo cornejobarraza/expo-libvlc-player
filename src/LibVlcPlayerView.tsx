@@ -31,109 +31,107 @@ let loggedRenderingChildrenWarning: boolean = false;
 
 const FALLBACK_RATIO = 16 / 9;
 
-const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
-  (props, ref) => {
-    const defaultRatio = useRef<VideoAspectRatio>(FALLBACK_RATIO);
+const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>((props, ref) => {
+  const defaultRatio = useRef<VideoAspectRatio>(FALLBACK_RATIO);
 
-    if (props.children && !loggedRenderingChildrenWarning) {
-      console.warn(RENDERING_CHILDREN_WARNING);
-      loggedRenderingChildrenWarning = true;
+  if (props.children && !loggedRenderingChildrenWarning) {
+    console.warn(RENDERING_CHILDREN_WARNING);
+    loggedRenderingChildrenWarning = true;
+  }
+
+  const onEncounteredError = (event: NativeEvent<Error>) => {
+    const nativeEvent = convertNativeEvent(event);
+
+    if (props.onEncounteredError) {
+      props.onEncounteredError(nativeEvent);
+    }
+  };
+
+  const onDialogDisplay = (event: NativeEvent<Dialog>) => {
+    const nativeEvent = convertNativeEvent(event);
+
+    if (props.onDialogDisplay) {
+      props.onDialogDisplay(nativeEvent);
+    }
+  };
+
+  const onTimeChanged = (event: NativeEvent<Time>) => {
+    const nativeEvent = convertNativeEvent(event);
+
+    if (props.onTimeChanged) {
+      props.onTimeChanged(nativeEvent);
+    }
+  };
+
+  const onPositionChanged = (event: NativeEvent<Position>) => {
+    const nativeEvent = convertNativeEvent(event);
+
+    if (props.onPositionChanged) {
+      props.onPositionChanged(nativeEvent);
+    }
+  };
+
+  const onESAdded = (event: NativeEvent<MediaTracks>) => {
+    const nativeEvent = convertNativeEvent(event);
+
+    if (props.onESAdded) {
+      props.onESAdded(nativeEvent);
+    }
+  };
+
+  const onRecordChanged = (event: NativeEvent<Recording>) => {
+    const nativeEvent = convertNativeEvent(event);
+
+    if (props.onRecordChanged) {
+      props.onRecordChanged(nativeEvent);
+    }
+  };
+
+  const onSnapshotTaken = (event: NativeEvent<Snapshot>) => {
+    const nativeEvent = convertNativeEvent(event);
+
+    if (props.onSnapshotTaken) {
+      props.onSnapshotTaken(nativeEvent);
+    }
+  };
+
+  const onFirstPlay = (event: NativeEvent<MediaInfo>) => {
+    const nativeEvent = convertNativeEvent(event);
+    const mediaRatio = nativeEvent.width / nativeEvent.height;
+
+    if (props.onFirstPlay) {
+      props.onFirstPlay(nativeEvent);
     }
 
-    const onEncounteredError = (event: NativeEvent<Error>) => {
-      const nativeEvent = convertNativeEvent(event);
+    defaultRatio.current = mediaRatio || FALLBACK_RATIO;
+  };
 
-      if (props.onEncounteredError) {
-        props.onEncounteredError(nativeEvent);
-      }
-    };
+  const propRatio = props.aspectRatio;
+  const aspectRatio = propRatio === "auto" ? defaultRatio.current : propRatio;
+  const nativeRatio = convertAspectRatio(aspectRatio);
 
-    const onDialogDisplay = (event: NativeEvent<Dialog>) => {
-      const nativeEvent = convertNativeEvent(event);
-
-      if (props.onDialogDisplay) {
-        props.onDialogDisplay(nativeEvent);
-      }
-    };
-
-    const onTimeChanged = (event: NativeEvent<Time>) => {
-      const nativeEvent = convertNativeEvent(event);
-
-      if (props.onTimeChanged) {
-        props.onTimeChanged(nativeEvent);
-      }
-    };
-
-    const onPositionChanged = (event: NativeEvent<Position>) => {
-      const nativeEvent = convertNativeEvent(event);
-
-      if (props.onPositionChanged) {
-        props.onPositionChanged(nativeEvent);
-      }
-    };
-
-    const onESAdded = (event: NativeEvent<MediaTracks>) => {
-      const nativeEvent = convertNativeEvent(event);
-
-      if (props.onESAdded) {
-        props.onESAdded(nativeEvent);
-      }
-    };
-
-    const onRecordChanged = (event: NativeEvent<Recording>) => {
-      const nativeEvent = convertNativeEvent(event);
-
-      if (props.onRecordChanged) {
-        props.onRecordChanged(nativeEvent);
-      }
-    };
-
-    const onSnapshotTaken = (event: NativeEvent<Snapshot>) => {
-      const nativeEvent = convertNativeEvent(event);
-
-      if (props.onSnapshotTaken) {
-        props.onSnapshotTaken(nativeEvent);
-      }
-    };
-
-    const onFirstPlay = (event: NativeEvent<MediaInfo>) => {
-      const nativeEvent = convertNativeEvent(event);
-      const mediaRatio = nativeEvent.width / nativeEvent.height;
-
-      if (props.onFirstPlay) {
-        props.onFirstPlay(nativeEvent);
-      }
-
-      defaultRatio.current = mediaRatio || FALLBACK_RATIO;
-    };
-
-    const propRatio = props.aspectRatio;
-    const aspectRatio = propRatio === "auto" ? defaultRatio.current : propRatio;
-    const nativeRatio = convertAspectRatio(aspectRatio);
-
-    return (
-      <View style={{ aspectRatio: nativeRatio }}>
-        <NativeView
-          {...props}
-          ref={ref}
-          style={[props.style, { height: "100%" }]}
-          source={parseNativeSource(props.source)}
-          slaves={props.slaves?.map((slave) => ({
-            ...slave,
-            source: parseNativeSource(slave.source)!,
-          }))}
-          onEncounteredError={onEncounteredError}
-          onDialogDisplay={onDialogDisplay}
-          onTimeChanged={onTimeChanged}
-          onPositionChanged={onPositionChanged}
-          onESAdded={onESAdded}
-          onRecordChanged={onRecordChanged}
-          onSnapshotTaken={onSnapshotTaken}
-          onFirstPlay={onFirstPlay}
-        />
-      </View>
-    );
-  },
-);
+  return (
+    <View style={{ aspectRatio: nativeRatio }}>
+      <NativeView
+        {...props}
+        ref={ref}
+        style={[props.style, { height: "100%" }]}
+        source={parseNativeSource(props.source)}
+        slaves={props.slaves?.map((slave) => ({
+          ...slave,
+          source: parseNativeSource(slave.source)!,
+        }))}
+        onEncounteredError={onEncounteredError}
+        onDialogDisplay={onDialogDisplay}
+        onTimeChanged={onTimeChanged}
+        onPositionChanged={onPositionChanged}
+        onESAdded={onESAdded}
+        onRecordChanged={onRecordChanged}
+        onSnapshotTaken={onSnapshotTaken}
+        onFirstPlay={onFirstPlay}
+      />
+    </View>
+  );
+});
 
 export default LibVlcPlayerView;

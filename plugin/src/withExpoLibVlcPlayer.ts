@@ -6,8 +6,7 @@ import {
   type ConfigPlugin,
 } from "expo/config-plugins";
 
-const LOCAL_NETWORK_USAGE =
-  "Allow $(PRODUCT_NAME) to access your local network";
+const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network";
 
 type WithExpoLibVlcPlayerOptions = {
   localNetworkPermission?: string;
@@ -16,7 +15,7 @@ type WithExpoLibVlcPlayerOptions = {
 
 const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerOptions> = (
   config,
-  { localNetworkPermission, supportsPictureInPicture } = {},
+  { localNetworkPermission, supportsPictureInPicture } = {}
 ) => {
   IOSConfig.Permissions.createPermissionsPlugin({
     NSLocalNetworkUsageDescription: LOCAL_NETWORK_USAGE,
@@ -45,9 +44,7 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerOptions> = (
     const needsConfigMod = typeof supportsPictureInPicture === "boolean";
 
     if (needsConfigMod) {
-      const activity = AndroidConfig.Manifest.getMainActivityOrThrow(
-        config.modResults,
-      );
+      const activity = AndroidConfig.Manifest.getMainActivityOrThrow(config.modResults);
 
       if (supportsPictureInPicture) {
         activity.$["android:supportsPictureInPicture"] = "true";

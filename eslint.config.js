@@ -1,7 +1,7 @@
 const { fixupConfigRules } = require("@eslint/compat");
 const { FlatCompat } = require("@eslint/eslintrc");
 const js = require("@eslint/js");
-const { defineConfig } = require("eslint/config");
+const { defineConfig, globalIgnores } = require("eslint/config");
 const globals = require("globals");
 
 const compat = new FlatCompat({
@@ -13,9 +13,9 @@ const compat = new FlatCompat({
 module.exports = defineConfig([
   {
     extends: [...fixupConfigRules(compat.extends("universe/native"))],
-    ignores: ["build"],
     languageOptions: {
       globals: globals.node,
     },
   },
+  globalIgnores(["build"]),
 ]);

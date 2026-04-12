@@ -1,17 +1,6 @@
-import {
-  LibVlcPlayerView,
-  LibVlcPlayerViewRef,
-  type LibVlcSource,
-} from "expo-libvlc-player";
+import { LibVlcPlayerView, LibVlcPlayerViewRef, type LibVlcSource } from "expo-libvlc-player";
 import { useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { IconSymbol } from "./IconSymbol";
 
@@ -41,13 +30,7 @@ export function LibVlcPlayer({ title, source }: LibVlcPlayerProps) {
     <View style={styles.libvlc}>
       {title && <Text style={styles.title}>{title}</Text>}
       <View style={styles.container}>
-        {buffering && (
-          <ActivityIndicator
-            style={styles.buffering}
-            color="#f1f1f1"
-            size="large"
-          />
-        )}
+        {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
           key={source}
           ref={playerRef}
@@ -58,10 +41,7 @@ export function LibVlcPlayer({ title, source }: LibVlcPlayerProps) {
           onBuffering={() => {
             setBuffering(true);
             clearTimeout(bufferingRef.current);
-            bufferingRef.current = setTimeout(
-              () => setBuffering(false),
-              BUFFERING_DELAY,
-            );
+            bufferingRef.current = setTimeout(() => setBuffering(false), BUFFERING_DELAY);
           }}
           onPlaying={() => setPlaying(true)}
           onPaused={() => setPlaying(false)}
@@ -73,45 +53,30 @@ export function LibVlcPlayer({ title, source }: LibVlcPlayerProps) {
       <View style={styles.controls}>
         <TouchableOpacity
           style={styles.control}
-          onPress={() => playerRef.current?.seek(time - SEEK_STEP)}
-        >
+          onPress={() => playerRef.current?.seek(time - SEEK_STEP)}>
           <IconSymbol color="#f1f1f1" name="backward.fill" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.control}
-          onPress={() =>
-            setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME))
-          }
-        >
+          onPress={() => setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME))}>
           <IconSymbol color="#f1f1f1" name="speaker.1.fill" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.control}
-          onPress={() => playerRef.current?.[!playing ? "play" : "pause"]()}
-        >
-          <IconSymbol
-            color="#f1f1f1"
-            name={!playing ? "play.fill" : "pause.fill"}
-          />
+          onPress={() => playerRef.current?.[!playing ? "play" : "pause"]()}>
+          <IconSymbol color="#f1f1f1" name={!playing ? "play.fill" : "pause.fill"} />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.control}
-          onPress={() => playerRef.current?.stop()}
-        >
+        <TouchableOpacity style={styles.control} onPress={() => playerRef.current?.stop()}>
           <IconSymbol color="#f1f1f1" name="stop.fill" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.control}
-          onPress={() =>
-            setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME))
-          }
-        >
+          onPress={() => setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME))}>
           <IconSymbol color="#f1f1f1" name="speaker.3.fill" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.control}
-          onPress={() => playerRef.current?.seek(time + SEEK_STEP)}
-        >
+          onPress={() => playerRef.current?.seek(time + SEEK_STEP)}>
           <IconSymbol color="#f1f1f1" name="forward.fill" />
         </TouchableOpacity>
       </View>

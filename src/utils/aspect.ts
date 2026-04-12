@@ -1,8 +1,6 @@
 import { VideoAspectRatio } from "../LibVlcPlayer.types";
 
-export function convertAspectRatio(
-  ratio?: VideoAspectRatio,
-): VideoAspectRatio | undefined {
+export function convertAspectRatio(ratio?: VideoAspectRatio): VideoAspectRatio | undefined {
   if (typeof ratio === "string") {
     const numbers = ratio.split(":");
 

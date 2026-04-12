@@ -24,12 +24,5 @@ const MAPPING = {
 } as IconMapping;
 
 export function IconSymbol({ style, name, size = 24, color }: IconSymbolProps) {
-  return (
-    <MaterialIcons
-      style={style}
-      name={MAPPING[name]}
-      size={size}
-      color={color}
-    />
-  );
+  return <MaterialIcons style={style} name={MAPPING[name]} size={size} color={color} />;
 }
