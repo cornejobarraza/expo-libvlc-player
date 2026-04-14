@@ -46,8 +46,8 @@ export function LibVlcPlayer({ title, source }: LibVlcPlayerProps) {
           onPlaying={() => setPlaying(true)}
           onPaused={() => setPlaying(false)}
           onStopped={() => setPlaying(false)}
-          onEncounteredError={({ error }) => Alert.alert("Error", error)}
-          onTimeChanged={({ time }) => setTime(time)}
+          onEncounteredError={({ message }) => Alert.alert("Error", message)}
+          onTimeChanged={({ value }) => setTime(value)}
         />
       </View>
       <View style={styles.controls}>

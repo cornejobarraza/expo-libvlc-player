@@ -95,7 +95,7 @@ class LibVlcPlayerView: ExpoView {
         vlcDialog!.customRenderer = self
 
         guard let source, let url = URL(string: source) else {
-            onEncounteredError(["error": "Invalid source, media could not be set"])
+            onEncounteredError(["message": "Invalid source, media could not be set"])
             return
         }
 
@@ -167,7 +167,7 @@ class LibVlcPlayerView: ExpoView {
             let selected = slave.selected ?? false
 
             guard let url = URL(string: source) else {
-                onEncounteredError(["error": "Invalid source, \(type) could not be added"])
+                onEncounteredError(["message": "Invalid source, \(type) could not be added"])
                 continue
             }
 
@@ -479,7 +479,7 @@ class LibVlcPlayerView: ExpoView {
                 player.stopRecording()
             }
         } else {
-            onEncounteredError(["error": "Media could not be recorded"])
+            onEncounteredError(["message": "Media could not be recorded"])
         }
     }
 
@@ -508,13 +508,13 @@ class LibVlcPlayerView: ExpoView {
                 } else if !isLastAttempt {
                     mediaPlayer?.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(0), andHeight: Int32(0))
                 } else {
-                    onEncounteredError(["error": "Snapshot could not be taken"])
+                    onEncounteredError(["message": "Snapshot could not be taken"])
                 }
 
                 return hasSnapshot
             }
         } else {
-            onEncounteredError(["error": "Snapshot could not be taken"])
+            onEncounteredError(["message": "Snapshot could not be taken"])
         }
     }
 
@@ -652,7 +652,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
                 pictureDrawable.updatePipState()
             case .error:
-                onEncounteredError(["error": "Player encountered an error"])
+                onEncounteredError(["message": "Player encountered an error"])
 
                 player.stop()
             default:
@@ -667,9 +667,9 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
     func mediaPlayerTimeChanged(_: Notification) {
         if let player = mediaPlayer {
-            onTimeChanged(["time": player.time.intValue])
+            onTimeChanged(["value": player.time.intValue])
 
-            onPositionChanged(["position": player.position])
+            onPositionChanged(["value": player.position])
         }
     }
 

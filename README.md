@@ -164,13 +164,13 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onPlaying`               | Called after the `Playing` player event                      |                               |
 | `onPaused`                | Called after the `Paused` player event                       |                               |
 | `onStopped`               | Called after the `Stopped` player event                      |                               |
-| `onEncounteredError`      | Called after the `EncounteredError` player event             | `{ error: string }`           |
+| `onEncounteredError`      | Called after the `EncounteredError` player event             | [`Error`](#error)             |
 | `onDialogDisplay`         | Called after a `Dialog` needs to be displayed                | [`Dialog`](#dialog)           |
-| `onTimeChanged`           | Called after the `TimeChanged` player event                  | `{ time: number }`            |
-| `onPositionChanged`       | Called after the `PositionChanged` player event              | `{ position: number }`        |
+| `onTimeChanged`           | Called after the `TimeChanged` player event                  | [`Time`](#time)               |
+| `onPositionChanged`       | Called after the `PositionChanged` player event              | [`Position`](#position)       |
 | `onESAdded`               | Called after the `ESAdded` player event                      | [`MediaTracks`](#mediatracks) |
 | `onRecordChanged`         | Called after the `RecordChanged` player event                | [`Recording`](#recording)     |
-| `onSnapshotTaken`         | Called after a media snapshot is taken                       | `{ path: string }`            |
+| `onSnapshotTaken`         | Called after a media snapshot is taken                       | [`Snapshot`](#snapshot)       |
 | `onFirstPlay`             | Called after the player first playing event                  | [`MediaInfo`](#mediainfo)     |
 | `onForeground`            | Called after the player enters the foreground                |                               |
 | `onBackground`            | Called after the player enters the background                |                               |
@@ -179,10 +179,34 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 ### Module types
 
+#### `Error`
+
+```ts
+type Error = { message: string };
+```
+
+#### `Time`
+
+```ts
+type Time = { value: number };
+```
+
+#### `Position`
+
+```ts
+type Position = { value: number };
+```
+
+#### `Snapshot`
+
+```ts
+type Snapshot = { path: string };
+```
+
 #### `Tracks`
 
 ```ts
-{
+interface Tracks {
   audio?: number;
   video?: number;
   subtitle?: number;
@@ -192,7 +216,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 #### `Slave`
 
 ```ts
-{
+interface Slave {
   source: string | number;
   type: "audio" | "subtitle";
   selected?: boolean;
@@ -202,7 +226,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 #### `Dialog`
 
 ```ts
-{
+interface Dialog {
   title: string;
   text: string;
   type: "error" | "login" | "question";
@@ -215,7 +239,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 #### `Recording`
 
 ```ts
-{
+interface Recording {
   path: string | null;
   isRecording: boolean;
 }
@@ -224,7 +248,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 #### `Track`
 
 ```ts
-{
+interface Track {
   id: number;
   name: string;
 }
@@ -233,7 +257,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 #### `MediaTracks`
 
 ```ts
-{
+interface MediaTracks {
   audio: Track[];
   video: Track[];
   subtitle: Track[];
@@ -243,7 +267,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 #### `MediaInfo`
 
 ```ts
-{
+interface MediaInfo {
   width: number;
   height: number;
   length: number;

@@ -192,7 +192,7 @@ class LibVlcPlayerView(
         try {
             URI(source)
         } catch (_: Exception) {
-            onEncounteredError(mapOf("error" to "Invalid source, media could not be set"))
+            onEncounteredError(mapOf("message" to "Invalid source, media could not be set"))
             return
         }
 
@@ -277,7 +277,7 @@ class LibVlcPlayerView(
             try {
                 URI(source)
             } catch (_: Exception) {
-                onEncounteredError(mapOf("error" to "Invalid source, $type could not be added"))
+                onEncounteredError(mapOf("message" to "Invalid source, $type could not be added"))
                 return@forEach
             }
 
@@ -637,7 +637,7 @@ class LibVlcPlayerView(
                 val success = player.record(path)
 
                 if (!success) {
-                    onEncounteredError(mapOf("error" to "Media could not be recorded"))
+                    onEncounteredError(mapOf("message" to "Media could not be recorded"))
                 }
             } else {
                 player.record(null)
@@ -674,13 +674,13 @@ class LibVlcPlayerView(
 
                         onSnapshotTaken(mapOf("path" to snapshotPath))
                     } catch (_: Exception) {
-                        onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
+                        onEncounteredError(mapOf("message" to "Snapshot could not be taken"))
                     }
                 },
                 Handler(Looper.getMainLooper()),
             )
         } catch (_: Exception) {
-            onEncounteredError(mapOf("error" to "Snapshot could not be taken"))
+            onEncounteredError(mapOf("message" to "Snapshot could not be taken"))
         }
     }
 
@@ -825,17 +825,17 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                     }
 
                     Event.EncounteredError -> {
-                        onEncounteredError(mapOf("error" to "Player encountered an error"))
+                        onEncounteredError(mapOf("message" to "Player encountered an error"))
 
                         player.stop()
                     }
 
                     Event.TimeChanged -> {
-                        onTimeChanged(mapOf("time" to player.getTime().toInt()))
+                        onTimeChanged(mapOf("value" to player.getTime().toInt()))
                     }
 
                     Event.PositionChanged -> {
-                        onPositionChanged(mapOf("position" to player.getPosition()))
+                        onPositionChanged(mapOf("value" to player.getPosition()))
                     }
 
                     Event.ESAdded -> {

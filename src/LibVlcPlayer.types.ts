@@ -119,6 +119,14 @@ export interface NativeEvent<T> {
 
 export type LibVlcEvent<T> = Omit<T & NativeEventProps, "target">;
 
+export type Error = { message: string };
+
+export type Time = { value: number };
+
+export type Position = { value: number };
+
+export type Snapshot = { path: string };
+
 export interface Dialog {
   title: string;
   text: string;
@@ -171,21 +179,15 @@ type PausedListener = () => void;
  */
 type StoppedListener = () => void;
 
-export type Error = { error: string };
-
 /**
  * @hidden
  */
 type EncounteredErrorListener = (event: NativeEvent<Error>) => void;
 
-export type Time = { time: number };
-
 /**
  * @hidden
  */
 type TimeChangedListener = (event: NativeEvent<Time>) => void;
-
-export type Position = { position: number };
 
 /**
  * @hidden
@@ -201,8 +203,6 @@ type ESAddedListener = (event: NativeEvent<MediaTracks>) => void;
  * @hidden
  */
 type RecordChangedListener = (event: NativeEvent<Recording>) => void;
-
-export type Snapshot = { path: string };
 
 /**
  * @hidden
