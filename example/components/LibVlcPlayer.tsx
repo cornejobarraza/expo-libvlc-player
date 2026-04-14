@@ -36,7 +36,7 @@ export function LibVlcPlayer({ title, source }: LibVlcPlayerProps) {
           ref={playerRef}
           style={styles.player}
           source={source}
-          aspectRatio="auto"
+          aspectRatio="16:9"
           volume={volume}
           onBuffering={() => {
             setBuffering(true);
