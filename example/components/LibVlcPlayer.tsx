@@ -13,11 +13,12 @@ const BUFFERING_DELAY = 1_000;
 const SEEK_STEP = 10_000;
 
 interface LibVlcPlayerProps {
-  title?: string;
   source: LibVlcSource;
+  title?: string;
+  fullScreen?: boolean;
 }
 
-export function LibVlcPlayer({ title, source }: LibVlcPlayerProps) {
+export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(true);
   const [time, setTime] = useState<number>(DEFAULT_TIME);
@@ -27,14 +28,17 @@ export function LibVlcPlayer({ title, source }: LibVlcPlayerProps) {
   const bufferingRef = useRef<number>(undefined);
 
   return (
-    <View style={styles.libvlc}>
-      {title && <Text style={styles.title}>{title}</Text>}
+    <View style={{ ...styles.libvlc, alignItems: fullScreen ? "center" : undefined }}>
+      {!fullScreen && title && <Text style={styles.title}>{title}</Text>}
       <View style={styles.container}>
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
           key={source}
           ref={playerRef}
-          style={styles.player}
+          style={{
+            ...styles.player,
+            borderRadius: !fullScreen ? styles.player.borderRadius : undefined,
+          }}
           source={source}
           aspectRatio="16:9"
           volume={volume}
@@ -50,36 +54,38 @@ export function LibVlcPlayer({ title, source }: LibVlcPlayerProps) {
           onTimeChanged={({ value }) => setTime(value)}
         />
       </View>
-      <View style={styles.controls}>
-        <TouchableOpacity
-          style={styles.control}
-          onPress={() => playerRef.current?.seek(time - SEEK_STEP)}>
-          <IconSymbol color="#f1f1f1" name="backward.fill" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.control}
-          onPress={() => setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME))}>
-          <IconSymbol color="#f1f1f1" name="speaker.1.fill" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.control}
-          onPress={() => playerRef.current?.[!playing ? "play" : "pause"]()}>
-          <IconSymbol color="#f1f1f1" name={!playing ? "play.fill" : "pause.fill"} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.control} onPress={() => playerRef.current?.stop()}>
-          <IconSymbol color="#f1f1f1" name="stop.fill" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.control}
-          onPress={() => setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME))}>
-          <IconSymbol color="#f1f1f1" name="speaker.3.fill" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.control}
-          onPress={() => playerRef.current?.seek(time + SEEK_STEP)}>
-          <IconSymbol color="#f1f1f1" name="forward.fill" />
-        </TouchableOpacity>
-      </View>
+      {!fullScreen && (
+        <View style={styles.controls}>
+          <TouchableOpacity
+            style={styles.control}
+            onPress={() => playerRef.current?.seek(time - SEEK_STEP)}>
+            <IconSymbol color="#f1f1f1" name="backward.fill" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.control}
+            onPress={() => setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME))}>
+            <IconSymbol color="#f1f1f1" name="speaker.1.fill" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.control}
+            onPress={() => playerRef.current?.[!playing ? "play" : "pause"]()}>
+            <IconSymbol color="#f1f1f1" name={!playing ? "play.fill" : "pause.fill"} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.control} onPress={() => playerRef.current?.stop()}>
+            <IconSymbol color="#f1f1f1" name="stop.fill" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.control}
+            onPress={() => setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME))}>
+            <IconSymbol color="#f1f1f1" name="speaker.3.fill" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.control}
+            onPress={() => playerRef.current?.seek(time + SEEK_STEP)}>
+            <IconSymbol color="#f1f1f1" name="forward.fill" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -97,7 +103,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   buffering: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: 9999,
   },
   player: {
