@@ -23,6 +23,12 @@ export interface LibVlcPlayerViewRef {
    */
   readonly stop: () => Promise<void>;
   /**
+   * Destroys the player and releases all resources
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly destroy: () => Promise<void>;
+  /**
    * Sets the time or position of the current player
    *
    * @param value - Must be a number equal or greater than `0`

@@ -109,6 +109,7 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func destroyPlayer() {
+        mediaPlayer?.delegate = nil
         mediaPlayer?.stop()
         mediaPlayer = nil
         vlcDialog?.customRenderer = nil
