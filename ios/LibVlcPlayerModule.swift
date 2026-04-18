@@ -152,6 +152,10 @@ public class LibVlcPlayerModule: Module {
             AsyncFunction("stopPictureInPicture") { (view: LibVlcPlayerView) in
                 view.stopPictureInPicture()
             }
+
+            AsyncFunction("destroy") { (view: LibVlcPlayerView) in
+                view.destroyPlayer()
+            }
         }
     }
 }
