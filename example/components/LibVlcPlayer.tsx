@@ -30,7 +30,11 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
   return (
     <View style={{ ...styles.libvlc, alignItems: fullScreen ? "center" : undefined }}>
       {!fullScreen && title && <Text style={styles.title}>{title}</Text>}
-      <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.container}
+        onPress={() => playerRef.current?.[!playing ? "play" : "pause"]()}
+        activeOpacity={0.8}
+        disabled={!fullScreen}>
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
           key={source}
@@ -53,7 +57,7 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
           onEncounteredError={({ message }) => Alert.alert("Error", message)}
           onTimeChanged={({ value }) => setTime(value)}
         />
-      </View>
+      </TouchableOpacity>
       {!fullScreen && (
         <View style={styles.controls}>
           <TouchableOpacity
@@ -104,11 +108,13 @@ const styles = StyleSheet.create({
   },
   buffering: {
     ...StyleSheet.absoluteFill,
+    pointerEvents: "none",
     zIndex: 9999,
   },
   player: {
     backgroundColor: "black",
     borderRadius: 12,
+    pointerEvents: "none",
   },
   controls: {
     flexDirection: "row",
