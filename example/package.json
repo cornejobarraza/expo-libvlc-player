@@ -1,11 +1,12 @@
 {
   "name": "expo-libvlc-player-example",
   "version": "1.0.0",
-  "main": "index.ts",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "prebuild:tv": "EXPO_TV=1 expo prebuild --clean",
+    "prebuild": "expo prebuild --clean"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -16,13 +17,19 @@
     "expo-symbols": "~55.0.7",
     "expo-system-ui": "~55.0.15",
     "react": "19.2.0",
-    "react-native": "0.83.4"
+    "react-native": "npm:react-native-tvos@0.83-stable"
   },
   "devDependencies": {
+    "@react-native-tvos/config-tv": "^0.1.6",
     "@types/react": "~19.2.10",
     "typescript": "~5.9.2"
   },
   "expo": {
+    "install": {
+      "exclude": [
+        "react-native"
+      ]
+    },
     "autolinking": {
       "nativeModulesDir": ".."
     }

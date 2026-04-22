@@ -1,8 +1,9 @@
 import { LibVlcPlayerView, LibVlcPlayerViewRef, type LibVlcSource } from "expo-libvlc-player";
+import { SFSymbol } from "expo-symbols";
 import { useRef, useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 
-import { IconSymbol } from "./IconSymbol";
+import { Focusable } from "./Focusable";
 
 const MIN_VOLUME = 0;
 const VOLUME_STEP = 10;
@@ -18,31 +19,27 @@ interface LibVlcPlayerProps {
   fullScreen?: boolean;
 }
 
+const EMPTY_FOCUSABLE = "" as SFSymbol;
+
 export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(true);
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
+  const [focusable, setFocusable] = useState<SFSymbol>(EMPTY_FOCUSABLE);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
   const bufferingRef = useRef<number>(undefined);
 
   return (
-    <View style={{ ...styles.libvlc, alignItems: fullScreen ? "center" : undefined }}>
+    <View style={fullScreen ? styles.libVlcFull : styles.libVlc}>
       {!fullScreen && title && <Text style={styles.title}>{title}</Text>}
-      <TouchableOpacity
-        style={styles.container}
-        onPress={() => playerRef.current?.[!playing ? "play" : "pause"]()}
-        activeOpacity={0.8}
-        disabled={!fullScreen}>
+      <View style={styles.container}>
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
           key={source}
           ref={playerRef}
-          style={{
-            ...styles.player,
-            borderRadius: !fullScreen ? styles.player.borderRadius : undefined,
-          }}
+          style={fullScreen ? styles.playerFull : styles.player}
           source={source}
           aspectRatio="16:9"
           volume={volume}
@@ -57,46 +54,62 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
           onEncounteredError={({ message }) => Alert.alert("Error", message)}
           onTimeChanged={({ value }) => setTime(value)}
         />
-      </TouchableOpacity>
-      {!fullScreen && (
-        <View style={styles.controls}>
-          <TouchableOpacity
-            style={styles.control}
-            onPress={() => playerRef.current?.seek(time - SEEK_STEP)}>
-            <IconSymbol color="#f1f1f1" name="backward.fill" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.control}
-            onPress={() => setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME))}>
-            <IconSymbol color="#f1f1f1" name="speaker.1.fill" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.control}
-            onPress={() => playerRef.current?.[!playing ? "play" : "pause"]()}>
-            <IconSymbol color="#f1f1f1" name={!playing ? "play.fill" : "pause.fill"} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.control} onPress={() => playerRef.current?.stop()}>
-            <IconSymbol color="#f1f1f1" name="stop.fill" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.control}
-            onPress={() => setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME))}>
-            <IconSymbol color="#f1f1f1" name="speaker.3.fill" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.control}
-            onPress={() => playerRef.current?.seek(time + SEEK_STEP)}>
-            <IconSymbol color="#f1f1f1" name="forward.fill" />
-          </TouchableOpacity>
-        </View>
-      )}
+      </View>
+      <View style={fullScreen ? styles.controlsFull : styles.controls}>
+        <Focusable
+          name="backward.fill"
+          focused={focusable === "backward.fill"}
+          onFocus={() => setFocusable("backward.fill")}
+          onPressIn={() => playerRef.current?.seek(time - SEEK_STEP)}
+          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+        />
+        <Focusable
+          name="speaker.1.fill"
+          focused={focusable === "speaker.1.fill"}
+          onFocus={() => setFocusable("speaker.1.fill")}
+          onPressIn={() => setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME))}
+          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+        />
+        <Focusable
+          name={playing ? "pause.fill" : "play.fill"}
+          focused={focusable === "play.fill" || focusable === "pause.fill"}
+          onFocus={() => setFocusable(playing ? "pause.fill" : "play.fill")}
+          onPressIn={() => playerRef.current?.[playing ? "pause" : "play"]()}
+          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+        />
+        <Focusable
+          name="stop.fill"
+          focused={focusable === "stop.fill"}
+          onFocus={() => setFocusable("stop.fill")}
+          onPressIn={() => playerRef.current?.stop()}
+          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+        />
+        <Focusable
+          name="speaker.3.fill"
+          focused={focusable === "speaker.3.fill"}
+          onFocus={() => setFocusable("speaker.3.fill")}
+          onPressIn={() => setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME))}
+          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+        />
+        <Focusable
+          name="forward.fill"
+          focused={focusable === "forward.fill"}
+          onFocus={() => setFocusable("forward.fill")}
+          onPressIn={() => playerRef.current?.seek(time + SEEK_STEP)}
+          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  libvlc: {
+  libVlc: {
     gap: 20,
+  },
+  libVlcFull: {
+    alignItems: "center",
+    position: "relative",
   },
   title: {
     color: "#f1f1f1",
@@ -108,24 +121,26 @@ const styles = StyleSheet.create({
   },
   buffering: {
     ...StyleSheet.absoluteFill,
-    pointerEvents: "none",
     zIndex: 9999,
   },
   player: {
     backgroundColor: "black",
     borderRadius: 12,
-    pointerEvents: "none",
+  },
+  playerFull: {
+    backgroundColor: "black",
   },
   controls: {
     flexDirection: "row",
     justifyContent: "center",
     gap: 16,
   },
-  control: {
-    backgroundColor: "#272727",
+  controlsFull: {
+    ...StyleSheet.absoluteFill,
+    bottom: 24,
+    flexDirection: "row",
     justifyContent: "center",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4,
+    alignItems: "flex-end",
+    gap: 16,
   },
 });

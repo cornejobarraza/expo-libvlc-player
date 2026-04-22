@@ -6,13 +6,14 @@ import {
   type OrientationChangeEvent,
 } from "expo-screen-orientation";
 import { useEffect, useState } from "react";
+import { Platform } from "react-native";
 
 function getFullScreen(orientation: Orientation): boolean {
   return orientation === Orientation.LANDSCAPE_LEFT || orientation === Orientation.LANDSCAPE_RIGHT;
 }
 
 export function useFullScreen() {
-  const [fullScreen, setFullScreen] = useState<boolean>(false);
+  const [fullScreen, setFullScreen] = useState<boolean>(Platform.isTV);
 
   useEffect(() => {
     unlockAsync();

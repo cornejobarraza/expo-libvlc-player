@@ -1,22 +1,39 @@
 {
   "expo": {
-    "name": "LibVLC Player for Expo",
+    "name": "LibVLC Player",
     "slug": "expo-libvlc-player-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#e6f4fe",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
+      }
     },
-    "plugins": ["../app.plugin.js", "expo-font"]
+    "plugins": [
+      [
+        "@react-native-tvos/config-tv",
+        {
+          "androidTVBanner": "./assets/icon-400x240.png",
+          "appleTVImages": {
+            "icon": "./assets/icon-1280x768.png",
+            "iconSmall": "./assets/icon-400x240.png",
+            "iconSmall2x": "./assets/icon-800x480.png",
+            "topShelf": "./assets/icon-1920x720.png",
+            "topShelf2x": "./assets/icon-3840x1440.png",
+            "topShelfWide": "./assets/icon-2320x720.png",
+            "topShelfWide2x": "./assets/icon-4640x1440.png"
+          }
+        }
+      ],
+      "../app.plugin.js",
+      "expo-font"
+    ]
   }
 }
