@@ -1,16 +1,11 @@
 {
   "expo": {
-    "name": "expo-libvlc-player-example",
+    "name": "LibVLC Player for Expo",
     "slug": "expo-libvlc-player-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true
     },
@@ -21,7 +16,6 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
     },
     "plugins": ["../app.plugin.js", "expo-font"]
   }
