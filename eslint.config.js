@@ -17,5 +17,5 @@ module.exports = defineConfig([
       globals: globals.node,
     },
   },
-  globalIgnores(["build"]),
+  globalIgnores(["**/build"]),
 ]);
