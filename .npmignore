@@ -18,3 +18,4 @@ eslint.config.js
 .prettierrc
 lint-staged.config.js
 *.tsbuildinfo
+.swift-version
