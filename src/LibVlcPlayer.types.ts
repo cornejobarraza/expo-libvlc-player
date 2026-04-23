@@ -285,14 +285,16 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    *
    * ```tsx
    * const BIG_BUCK_BUNNY =
-   *    "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov";
+   *   "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov";
    *
    * <LibVlcPlayerView source={BIG_BUCK_BUNNY} />
    * ```
    */
   source: LibVlcSource;
   /**
-   * Sets the VLC options to initialize the player with
+   * Sets the options to initialize the media with.
+   *
+   * See the VideoLAN Wiki for more:
    *
    * https://wiki.videolan.org/VLC_command-line_help/
    *
@@ -302,8 +304,8 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * const options = ["--network-caching=1000"];
    *
    * <LibVlcPlayerView
-   *    source={BIG_BUCK_BUNNY}
-   *    options={options}
+   *   source={BIG_BUCK_BUNNY}
+   *   options={options}
    * />
    * ```
    *
@@ -317,14 +319,14 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    *
    * ```tsx
    * const tracks = {
-   *    audio: 3,
-   *    video: 2,
-   *    subtitle: 1,
+   *   audio: -1,
+   *   video: 1,
+   *   subtitle: 1,
    * };
    *
    * <LibVlcPlayerView
-   *    source={BIG_BUCK_BUNNY}
-   *    tracks={tracks}
+   *   source={BIG_BUCK_BUNNY}
+   *   tracks={tracks}
    * />
    * ```
    *
@@ -337,15 +339,17 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    * @example
    *
    * ```tsx
-   * const subtitles = [{
-   *    source: "file://path/to/subtitle.srt",
-   *    type: "subtitle",
-   *    selected: true,
-   * }];
+   * const slaves = [
+   *   {
+   *     source: "file://path/to/subtitle.srt",
+   *     type: "subtitle",
+   *     selected: true,
+   *   },
+   * ];
    *
    * <LibVlcPlayerView
-   *    source={BIG_BUCK_BUNNY}
-   *    slaves={subtitles}
+   *   source={BIG_BUCK_BUNNY}
+   *   slaves={slaves}
    * />
    * ```
    *

@@ -6,14 +6,16 @@ import {
   type ConfigPlugin,
 } from "expo/config-plugins";
 
-const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network";
-
-type WithExpoLibVlcPlayerOptions = {
+interface WithExpoLibVlcPlayerProps {
   localNetworkPermission?: string;
   supportsPictureInPicture?: boolean;
-};
+}
 
-const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerOptions> = (
+const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network";
+const AUDIO_BACKGROUND_MODE = "audio";
+const PICTURE_CONFIG_MANIFEST = "android:supportsPictureInPicture";
+
+const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
   config,
   { localNetworkPermission, supportsPictureInPicture } = {}
 ) => {
@@ -28,10 +30,10 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerOptions> = (
 
     if (needsConfigMod) {
       const backgroundModes = config.modResults.UIBackgroundModes ?? [];
-      const filteredModes = backgroundModes.filter((mode) => mode !== "audio");
+      const filteredModes = backgroundModes.filter((mode) => mode !== AUDIO_BACKGROUND_MODE);
 
       if (supportsPictureInPicture) {
-        config.modResults.UIBackgroundModes = [...filteredModes, "audio"];
+        config.modResults.UIBackgroundModes = [...filteredModes, AUDIO_BACKGROUND_MODE];
       } else {
         config.modResults.UIBackgroundModes = filteredModes;
       }
@@ -47,9 +49,9 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerOptions> = (
       const activity = AndroidConfig.Manifest.getMainActivityOrThrow(config.modResults);
 
       if (supportsPictureInPicture) {
-        activity.$["android:supportsPictureInPicture"] = "true";
+        activity.$[PICTURE_CONFIG_MANIFEST] = "true";
       } else {
-        delete activity.$["android:supportsPictureInPicture"];
+        delete activity.$[PICTURE_CONFIG_MANIFEST];
       }
     }
 

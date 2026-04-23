@@ -141,7 +141,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | Prop               | Description                                                                                                                       | Default     |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | `source`           | Sets the source of the media to be played. Set to `null` to release the player                                                    |             |
-| `options`          | Sets the VLC options to initialize the player with. See the [VLC Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
+| `options`          | Sets the options to initialize the media with. See the [VideoLAN Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
 | `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more                                                | `undefined` |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
 | `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
