@@ -323,3 +323,7 @@ This library is inspired by existing projects such as [expo-video](https://githu
 ## Contributing
 
 Contributions are always welcome. Please raise any issues and/or fix them by creating a pull request.
+
+## License
+
+Made available under the MIT license, as found in the [LICENSE](LICENSE) file.
