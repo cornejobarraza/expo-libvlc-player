@@ -174,14 +174,11 @@ class LibVlcPlayerView(
     }
 
     fun createPlayer() {
-        var args = options
-        args.toggleStartPausedOption(autoplay)
-
         if (pictureInPicture) {
             MediaPlayerManager.pictureInPictureManager.setupPipView(this)
         }
 
-        libVLC = LibVLC(context, args)
+        libVLC = LibVLC(context)
         setDialogCallbacks(libVLC!!)
 
         mediaPlayer = MediaPlayer(libVLC!!)
@@ -196,7 +193,12 @@ class LibVlcPlayerView(
             return
         }
 
+        var args = options
+        args.normalizeOptions()
+        args.toggleStartPausedOption(autoplay)
+
         val media = Media(libVLC!!, Uri.parse(source!!))
+        args.forEach { arg -> media!!.addOption(arg) }
         mediaPlayer!!.setMedia(media)
         media.release()
         mediaPlayer!!.play()
@@ -216,26 +218,10 @@ class LibVlcPlayerView(
     }
 
     fun selectTrack(
-        trackId: Int?,
+        index: Int,
         type: Int,
     ) {
         mediaPlayer?.let { player ->
-            val tracks =
-                when (type) {
-                    IMedia.Track.Type.Audio -> player.getAudioTracks()
-                    IMedia.Track.Type.Video -> player.getVideoTracks()
-                    IMedia.Track.Type.Text -> player.getSpuTracks()
-                    else -> null
-                }
-
-            if (tracks == null) return
-
-            val firstTrack = tracks.firstOrNull { track -> track.id != -1 }
-            val firstTrackId = firstTrack?.id
-            val index = trackId ?: firstTrackId
-
-            if (index == null) return
-
             when (type) {
                 IMedia.Track.Type.Audio -> {
                     player.setAudioTrack(index)
@@ -257,9 +243,9 @@ class LibVlcPlayerView(
         val videoTrack = tracks?.video
         val spuTrack = tracks?.subtitle
 
-        selectTrack(audioTrack, IMedia.Track.Type.Audio)
-        selectTrack(videoTrack, IMedia.Track.Type.Video)
-        selectTrack(spuTrack, IMedia.Track.Type.Text)
+        audioTrack?.let { audioTrack -> selectTrack(audioTrack, IMedia.Track.Type.Audio) }
+        videoTrack?.let { videoTrack -> selectTrack(videoTrack, IMedia.Track.Type.Video) }
+        spuTrack?.let { spuTrack -> selectTrack(spuTrack, IMedia.Track.Type.Text) }
     }
 
     fun addPlayerSlaves(slaves: List<Slave>) {
@@ -914,16 +900,25 @@ fun LibVlcPlayerView.setDialogCallbacks(ILibVLC: LibVLC?) {
     }
 }
 
+private fun MutableList<String>.normalizeOptions() {
+    val normalized =
+        map { option ->
+            if (!option.startsWith(":")) {
+                ":" + option.dropWhile { character -> character == '-' }
+            } else {
+                option
+            }
+        }
+
+    for (i in indices) {
+        this[i] = normalized[i]
+    }
+}
+
 private fun MutableList<String>.toggleStartPausedOption(autoplay: Boolean) {
-    val options =
-        setOf(
-            "--start-paused",
-            ":start-paused",
-        )
+    val hasOption = contains(":start-paused")
 
-    removeAll { option -> option in options }
-
-    if (!autoplay) {
-        add("--start-paused")
+    if (!autoplay && !hasOption) {
+        add(":start-paused")
     }
 }

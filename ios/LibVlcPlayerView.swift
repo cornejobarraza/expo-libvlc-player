@@ -8,6 +8,7 @@ class LibVlcPlayerView: ExpoView {
     private let playerDrawable: MediaPlayerDrawable = .init()
     private var pictureDrawable: PictureInPictureDrawable!
 
+    var library: VLCLibrary?
     var mediaPlayer: VLCMediaPlayer?
     var vlcDialog: VLCDialogProvider?
     var vlcDialogRef: NSValue?
@@ -72,10 +73,6 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func createPlayer() {
-        var args = options
-        args.toggleStartPausedOption(autoplay)
-
-        let library = VLCLibrary(options: args)
         var drawable: MediaPlayerDrawable
 
         if pictureInPicture {
@@ -86,12 +83,13 @@ class LibVlcPlayerView: ExpoView {
             drawable = playerDrawable
         }
 
-        mediaPlayer = VLCMediaPlayer(library: library)
+        library = VLCLibrary()
+        mediaPlayer = VLCMediaPlayer(library: library!)
         mediaPlayer!.drawable = drawable
         mediaPlayer!.delegate = self
         setupPlayer()
 
-        vlcDialog = VLCDialogProvider(library: library, customUI: dialogCustomUI)
+        vlcDialog = VLCDialogProvider(library: library!, customUI: dialogCustomUI)
         vlcDialog!.customRenderer = self
 
         guard let source, let url = URL(string: source) else {
@@ -99,7 +97,13 @@ class LibVlcPlayerView: ExpoView {
             return
         }
 
-        mediaPlayer!.media = VLCMedia(url: url)
+        var args = options
+        args.normalizeOptions()
+        args.toggleStartPausedOption(autoplay)
+
+        let media = VLCMedia(url: url)
+        args.forEach { arg in media!.addOption(arg) }
+        mediaPlayer!.media = media
         mediaPlayer!.play()
 
         firstPlay = true
@@ -109,41 +113,25 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func destroyPlayer() {
+        library = nil
         mediaPlayer?.stop()
         mediaPlayer = nil
         vlcDialog?.customRenderer = nil
         vlcDialog = nil
     }
 
-    func selectTrack(_ trackId: Int?, _ type: VLCMedia.TrackType) {
+    func selectTrack(_ index: Int, _ type: VLCMedia.TrackType) {
         if let player = mediaPlayer {
-            if trackId == -1 {
+            if index == -1 {
                 switch type {
                 case .audio: player.deselectAllAudioTracks()
                 case .video: player.deselectAllVideoTracks()
                 case .text: player.deselectAllTextTracks()
                 default: break
                 }
-                return
+            } else {
+                player.selectTrack(at: index, type: type)
             }
-
-            let tracks: [VLCMediaPlayer.Track]? = switch type {
-            case .audio: player.audioTracks
-            case .video: player.videoTracks
-            case .text: player.textTracks
-            default: nil
-            }
-
-            guard let tracks else { return }
-
-            let firstTrack = tracks.first?.trackId
-            let firstTrackInt = firstTrack.map { id in (id as NSString).intValue }
-            let firstTrackId = firstTrackInt.map { id in Int(id) }
-            let index = trackId ?? firstTrackId
-
-            guard let index else { return }
-
-            player.selectTrack(at: index, type: type)
         }
     }
 
@@ -152,9 +140,9 @@ class LibVlcPlayerView: ExpoView {
         let videoTrack = tracks?.video
         let textTrack = tracks?.subtitle
 
-        selectTrack(audioTrack, .audio)
-        selectTrack(videoTrack, .video)
-        selectTrack(textTrack, .text)
+        if let audioTrack { selectTrack(audioTrack, .audio) }
+        if let videoTrack { selectTrack(videoTrack, .video) }
+        if let textTrack { selectTrack(textTrack, .text) }
     }
 
     func addPlayerSlaves(_ slaves: [Slave]) {
@@ -770,16 +758,23 @@ extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
 }
 
 private extension [String] {
+    mutating func normalizeOptions() {
+        self = map { option in
+            if !option.hasPrefix(":") {
+                ":" + option.drop { character in character == "-" }
+            } else {
+                option
+            }
+        }
+    }
+}
+
+private extension [String] {
     mutating func toggleStartPausedOption(_ autoplay: Bool) {
-        let options = [
-            "--start-paused",
-            ":start-paused",
-        ]
+        let hasOption = self.contains(":start-paused")
 
-        removeAll { option in options.contains(option) }
-
-        if !autoplay {
-            append("--start-paused")
+        if !autoplay, !hasOption {
+            append(":start-paused")
         }
     }
 }
