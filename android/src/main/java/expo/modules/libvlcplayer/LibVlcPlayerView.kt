@@ -918,7 +918,6 @@ private fun MutableList<String>.toggleStartPausedOption(autoplay: Boolean) {
     val options =
         setOf(
             "--start-paused",
-            "-start-paused",
             ":start-paused",
         )
 

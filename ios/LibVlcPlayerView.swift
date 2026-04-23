@@ -75,6 +75,7 @@ class LibVlcPlayerView: ExpoView {
         var args = options
         args.toggleStartPausedOption(autoplay)
 
+        let library = VLCLibrary(options: args)
         var drawable: MediaPlayerDrawable
 
         if pictureInPicture {
@@ -85,12 +86,11 @@ class LibVlcPlayerView: ExpoView {
             drawable = playerDrawable
         }
 
-        mediaPlayer = VLCMediaPlayer(options: args)
+        mediaPlayer = VLCMediaPlayer(library: library)
         mediaPlayer!.drawable = drawable
         mediaPlayer!.delegate = self
         setupPlayer()
 
-        let library = mediaPlayer!.libraryInstance
         vlcDialog = VLCDialogProvider(library: library, customUI: dialogCustomUI)
         vlcDialog!.customRenderer = self
 
@@ -773,7 +773,6 @@ private extension [String] {
     mutating func toggleStartPausedOption(_ autoplay: Bool) {
         let options = [
             "--start-paused",
-            "-start-paused",
             ":start-paused",
         ]
 
