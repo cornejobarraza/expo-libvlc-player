@@ -223,11 +223,18 @@ class LibVlcPlayerView: ExpoView {
                 }
 
                 if volume != MediaPlayerConstants.maxPlayerVolume || mute {
-                    let newVolume = mute ?
-                        MediaPlayerConstants.minPlayerVolume :
-                        volume
+                    // Audio instance not available, try again
+                    retryUntil { [weak self] isLastAttempt in
+                        guard let self else { return true }
 
-                    player.audio?.volume = Int32(newVolume)
+                        let newVolume = mute ?
+                            MediaPlayerConstants.minPlayerVolume :
+                            volume
+
+                        player.audio?.volume = Int32(newVolume)
+
+                        return isLastAttempt
+                    }
                 }
 
                 time = MediaPlayerConstants.defaultPlayerTime
