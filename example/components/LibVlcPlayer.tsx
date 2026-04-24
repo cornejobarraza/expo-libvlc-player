@@ -37,7 +37,6 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
       <View style={styles.container}>
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
-          key={source}
           ref={playerRef}
           style={fullScreen ? styles.playerFull : styles.player}
           source={source}
