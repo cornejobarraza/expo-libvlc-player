@@ -289,6 +289,14 @@ export interface LibVlcPlayerViewNativeProps extends ViewProps {
 
 export interface LibVlcPlayerViewProps extends ViewProps {
   /**
+   * Allows getting a ref to the component instance.
+   *
+   * Once the component unmounts, React will set `ref.current` to `null`
+   *
+   * @see {@link https://react.dev/learn/referencing-values-with-refs#refs-and-the-dom React Docs}
+   */
+  ref: React.RefObject<LibVlcPlayerViewRef | null>;
+  /**
    * Sets the source of the media to be played. Set to `null` to release the player
    *
    * @example

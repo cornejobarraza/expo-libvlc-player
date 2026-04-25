@@ -1,11 +1,10 @@
 import { requireNativeView } from "expo";
-import { forwardRef, useRef, type ComponentType } from "react";
+import { useRef, type ComponentType } from "react";
 import { View } from "react-native";
 
 import {
   type LibVlcPlayerViewNativeProps,
   type LibVlcPlayerViewProps,
-  type LibVlcPlayerViewRef,
   type Dialog,
   type Error,
   type MediaInfo,
@@ -31,7 +30,7 @@ let loggedRenderingChildrenWarning = false;
 
 const FALLBACK_RATIO = 16 / 9;
 
-const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>((props, ref) => {
+const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
   const defaultRatio = useRef<VideoAspectRatio>(FALLBACK_RATIO);
 
   if (props.children && !loggedRenderingChildrenWarning) {
@@ -132,6 +131,6 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
       />
     </View>
   );
-});
+};
 
 export default LibVlcPlayerView;
