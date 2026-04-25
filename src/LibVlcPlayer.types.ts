@@ -25,7 +25,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Sets the time or position of the current player
    *
-   * @param value - Must be a number equal or greater than `0`
+   * @param value - Must be an integer equal or greater than `0`
    * @param type - Defaults to `"time"`
    *
    * @returns A promise which resolves to `void`
@@ -34,7 +34,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Starts or stops recording the current media
    *
-   * @param path - Must be a valid directory path string or `undefined` to stop recording
+   * @param path - Must be a valid directory path or `undefined` to stop recording
    *
    * @returns A promise which resolves to `void`
    */
@@ -42,7 +42,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Takes a snapshot of the current media
    *
-   * @param path - Must be a valid directory path string
+   * @param path - Must be a valid directory path
    *
    * @returns A promise which resolves to `void`
    */
@@ -50,7 +50,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Posts an answer to a `Dialog`
    *
-   * @param action - Must be an integer of `1` or `2`
+   * @param action - Must be either `1` or `2`
    *
    * @returns A promise which resolves to `void`
    */
@@ -379,7 +379,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   scale?: number;
   /**
-   * Sets the container aspect ratio. Must be a valid ratio string or number
+   * Sets the container aspect ratio. Must be a valid ratio, float or `"auto"`
    *
    * @example "16:9"
    *

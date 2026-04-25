@@ -125,10 +125,10 @@ See the [Example App](example/App.tsx) for additional usage.
 | `play()`                                                         | Starts playback of the current player                                                                                                             | `Promise<void>` |
 | `pause()`                                                        | Pauses playback of the current player                                                                                                             | `Promise<void>` |
 | `stop()`                                                         | Stops playback of the current player                                                                                                              | `Promise<void>` |
-| `seek(value: number, type?: "time" \| "position")`               | Sets the time or position of the current player. Must be a number equal or greater than `0`, type defaults to `"time"`                            | `Promise<void>` |
-| `record(path?: string)`                                          | Starts or stops recording the current media. Must be a valid directory path string or `undefined` to stop recording                               | `Promise<void>` |
-| `snapshot(path: string)`                                         | Takes a snapshot of the current media. Must be a valid directory path string                                                                      | `Promise<void>` |
-| `postAction(action: number)`                                     | Posts an answer to a [`Dialog`](#dialog). Must be an integer of `1` or `2`                                                                        | `Promise<void>` |
+| `seek(value: number, type?: "time" \| "position")`               | Sets the time or position of the current player. Must be an integer equal or greater than `0`, type defaults to `"time"`                          | `Promise<void>` |
+| `record(path?: string)`                                          | Starts or stops recording the current media. Must be a valid directory path or `undefined` to stop recording                                      | `Promise<void>` |
+| `snapshot(path: string)`                                         | Takes a snapshot of the current media. Must be a valid directory path                                                                             | `Promise<void>` |
+| `postAction(action: 1 \| 2)`                                     | Posts an answer to a [`Dialog`](#dialog). Must be either `1` or `2`                                                                               | `Promise<void>` |
 | `postLogin(username: string, password: string, store?: boolean)` | Posts a username and password to a login [`Dialog`](#dialog). Username can't be empty, password can be empty and if `true`, store the credentials | `Promise<void>` |
 | `dismiss()`                                                      | Dismisses a [`Dialog`](#dialog)                                                                                                                   | `Promise<void>` |
 | `startPictureInPicture()`                                        | Enters Picture-in-Picture (PiP) mode. Config plugin has to be configured for Picture-in-Picture (PiP) to work                                     | `Promise<void>` |
@@ -145,7 +145,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more                                                | `undefined` |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
 | `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
-| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio string, number or `"auto"`                                                 | `undefined` |
+| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio, float or `"auto"`                                                         | `undefined` |
 | `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
 | `rate`             | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
 | `time`             | Sets the initial player time. Must be an integer in milliseconds                                                                  | `0`         |
@@ -182,25 +182,33 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 #### `Error`
 
 ```ts
-type Error = { message: string };
+interface Error {
+  message: string;
+}
 ```
 
 #### `Time`
 
 ```ts
-type Time = { value: number };
+interface Time {
+  value: number;
+}
 ```
 
 #### `Position`
 
 ```ts
-type Position = { value: number };
+interface Position {
+  value: number;
+}
 ```
 
 #### `Snapshot`
 
 ```ts
-type Snapshot = { path: string };
+interface Snapshot {
+  path: string;
+}
 ```
 
 #### `Tracks`
