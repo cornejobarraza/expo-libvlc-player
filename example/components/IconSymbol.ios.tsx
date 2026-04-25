@@ -1,5 +1,5 @@
-import { SFSymbol, SymbolView } from "expo-symbols";
-import { StyleProp, ViewStyle } from "react-native";
+import { type SFSymbol, SymbolView } from "expo-symbols";
+import { type StyleProp, type ViewStyle } from "react-native";
 
 interface IconSymbolProps {
   style?: StyleProp<ViewStyle>;

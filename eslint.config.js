@@ -1,21 +1,28 @@
-const { fixupConfigRules } = require("@eslint/compat");
-const { FlatCompat } = require("@eslint/eslintrc");
-const js = require("@eslint/js");
 const { defineConfig, globalIgnores } = require("eslint/config");
-const globals = require("globals");
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
+const tseslint = require("typescript-eslint");
+const eslintPluginPrettierRecommended = require("eslint-plugin-prettier/recommended");
 
 module.exports = defineConfig([
   {
-    extends: [...fixupConfigRules(compat.extends("universe/native"))],
+    extends: [
+      tseslint.configs.strictTypeChecked,
+      tseslint.configs.stylisticTypeChecked,
+      eslintPluginPrettierRecommended,
+      globalIgnores(["**/build"]),
+    ],
     languageOptions: {
-      globals: globals.node,
+      parserOptions: {
+        project: ["./tsconfig.eslint.json", "./example/tsconfig.json"],
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unused-vars": ["error", { ignoreRestSiblings: true }],
+      "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
     },
   },
-  globalIgnores(["**/build"]),
+  {
+    files: ["**/*.js"],
+    extends: [tseslint.configs.disableTypeChecked],
+  },
 ]);

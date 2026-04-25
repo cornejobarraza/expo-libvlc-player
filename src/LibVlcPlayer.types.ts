@@ -1,6 +1,6 @@
 import type { ViewProps } from "react-native";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/consistent-type-definitions
 export type LibVlcPlayerModuleEvents = {};
 
 export interface LibVlcPlayerViewRef {
@@ -91,6 +91,8 @@ export interface LibVlcPlayerViewRef {
 
 export type LibVlcSource = string | number | null;
 
+export type LibVlcSlaveSource = string | number;
+
 export interface Tracks {
   audio?: number;
   video?: number;
@@ -98,12 +100,12 @@ export interface Tracks {
 }
 
 export interface Slave {
-  source: NonNullable<LibVlcSource>;
+  source: LibVlcSlaveSource;
   type: "audio" | "subtitle";
   selected?: boolean;
 }
 
-export type VideoAspectRatio = "auto" | string | number;
+export type VideoAspectRatio = "auto" | (string & {}) | number;
 
 export type VideoContentFit = "contain" | "cover" | "fill";
 
@@ -119,13 +121,21 @@ export interface NativeEvent<T> {
 
 export type LibVlcEvent<T> = Omit<T & NativeEventProps, "target">;
 
-export type Error = { message: string };
+export interface Error {
+  message: string;
+}
 
-export type Time = { value: number };
+export interface Time {
+  value: number;
+}
 
-export type Position = { value: number };
+export interface Position {
+  value: number;
+}
 
-export type Snapshot = { path: string };
+export interface Snapshot {
+  path: string;
+}
 
 export interface Dialog {
   title: string;
@@ -292,11 +302,9 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   source: LibVlcSource;
   /**
-   * Sets the options to initialize the media with.
+   * Sets the options to initialize the media with
    *
-   * See the VideoLAN Wiki for more:
-   *
-   * https://wiki.videolan.org/VLC_command-line_help/
+   * @see {@link https://wiki.videolan.org/VLC_command-line_help/ VideoLAN Wiki}
    *
    * @example
    *

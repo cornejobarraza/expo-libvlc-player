@@ -17,6 +17,7 @@ const PICTURE_CONFIG_MANIFEST = "android:supportsPictureInPicture";
 
 const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
   config,
+  // eslint-disable-next-line @typescript-eslint/no-useless-default-assignment
   { localNetworkPermission, supportsPictureInPicture } = {}
 ) => {
   IOSConfig.Permissions.createPermissionsPlugin({
@@ -51,7 +52,7 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
       if (supportsPictureInPicture) {
         activity.$[PICTURE_CONFIG_MANIFEST] = "true";
       } else {
-        delete activity.$[PICTURE_CONFIG_MANIFEST];
+        Reflect.deleteProperty(activity.$, PICTURE_CONFIG_MANIFEST);
       }
     }
 

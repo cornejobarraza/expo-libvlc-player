@@ -4,7 +4,7 @@ const path = require("path");
 const config = getDefaultConfig(__dirname);
 
 config.resolver.blockList = [
-  ...Array.from(config.resolver.blockList ?? []),
+  ...Array.from(config.resolver.blockList),
   new RegExp(path.resolve("..", "node_modules", "react")),
   new RegExp(path.resolve("..", "node_modules", "react-native")),
 ];
@@ -27,7 +27,7 @@ if (process.env.EXPO_TV) {
 
 config.watchFolders = [path.resolve(__dirname, "..")];
 
-config.transformer.getTransformOptions = async () => ({
+config.transformer.getTransformOptions = () => ({
   transform: {
     experimentalImportSupport: false,
     inlineRequires: true,

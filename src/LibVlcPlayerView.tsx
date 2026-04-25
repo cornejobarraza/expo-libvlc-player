@@ -3,9 +3,9 @@ import { forwardRef, useRef, type ComponentType } from "react";
 import { View } from "react-native";
 
 import {
-  LibVlcPlayerViewNativeProps,
-  LibVlcPlayerViewProps,
-  LibVlcPlayerViewRef,
+  type LibVlcPlayerViewNativeProps,
+  type LibVlcPlayerViewProps,
+  type LibVlcPlayerViewRef,
   type Dialog,
   type Error,
   type MediaInfo,
@@ -27,7 +27,7 @@ const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
 const RENDERING_CHILDREN_WARNING =
   "The <LibVlcPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the LibVlcPlayer, consider using absolute positioning.";
 
-let loggedRenderingChildrenWarning: boolean = false;
+let loggedRenderingChildrenWarning = false;
 
 const FALLBACK_RATIO = 16 / 9;
 
@@ -119,7 +119,7 @@ const LibVlcPlayerView = forwardRef<LibVlcPlayerViewRef, LibVlcPlayerViewProps>(
         source={parseNativeSource(props.source)}
         slaves={props.slaves?.map((slave) => ({
           ...slave,
-          source: parseNativeSource(slave.source)!,
+          source: parseNativeSource(slave.source),
         }))}
         onEncounteredError={onEncounteredError}
         onDialogDisplay={onDialogDisplay}

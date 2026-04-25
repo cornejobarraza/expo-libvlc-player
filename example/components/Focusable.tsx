@@ -1,4 +1,4 @@
-import { SFSymbol } from "expo-symbols";
+import { type SFSymbol } from "expo-symbols";
 import { Pressable, StyleSheet } from "react-native";
 
 import { IconSymbol } from "./IconSymbol";

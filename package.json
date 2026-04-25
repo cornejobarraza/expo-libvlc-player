@@ -32,21 +32,19 @@
   "author": "David Cornejo <davidcornejo1@live.com> (https://github.com/cornejobarraza)",
   "license": "MIT",
   "homepage": "https://github.com/cornejobarraza/expo-libvlc-player#readme",
-  "dependencies": {},
   "devDependencies": {
-    "@eslint/compat": "^1.4.1",
-    "@eslint/eslintrc": "^3.3.5",
-    "@eslint/js": "^9.39.4",
     "@types/react": "~19.2.10",
     "eslint": "^9.39.4",
-    "expo": "~55.0.15",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
     "expo-module-scripts": "^55.0.2",
-    "globals": "^16.5.0",
+    "expo": "~55.0.15",
     "husky": "^9.1.7",
-    "lint-staged": "^16.3.2",
-    "prettier": "^3.8.1",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.3",
     "react-native": "0.83.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.59.0"
   },
   "peerDependencies": {
     "expo": "*",

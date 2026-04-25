@@ -1,7 +1,7 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { SFSymbol } from "expo-symbols";
-import { ComponentProps } from "react";
-import { OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
+import { type SFSymbol } from "expo-symbols";
+import { type ComponentProps } from "react";
+import { type OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
 
 interface IconSymbolProps {
   style?: StyleProp<TextStyle>;

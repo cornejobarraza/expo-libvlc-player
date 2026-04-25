@@ -1,5 +1,5 @@
-import { LibVlcPlayerView, LibVlcPlayerViewRef, type LibVlcSource } from "expo-libvlc-player";
-import { SFSymbol } from "expo-symbols";
+import { LibVlcPlayerView, type LibVlcPlayerViewRef, type LibVlcSource } from "expo-libvlc-player";
+import { type SFSymbol } from "expo-symbols";
 import { useRef, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 
@@ -45,57 +45,97 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
           onBuffering={() => {
             setBuffering(true);
             clearTimeout(bufferingRef.current);
-            bufferingRef.current = setTimeout(() => setBuffering(false), BUFFERING_DELAY);
+            bufferingRef.current = setTimeout(() => {
+              setBuffering(false);
+            }, BUFFERING_DELAY);
           }}
-          onPlaying={() => setPlaying(true)}
-          onPaused={() => setPlaying(false)}
-          onStopped={() => setPlaying(false)}
-          onEncounteredError={({ message }) => Alert.alert("Error", message)}
-          onTimeChanged={({ value }) => setTime(value)}
+          onPlaying={() => {
+            setPlaying(true);
+          }}
+          onPaused={() => {
+            setPlaying(false);
+          }}
+          onStopped={() => {
+            setPlaying(false);
+          }}
+          onEncounteredError={({ message }) => {
+            Alert.alert("Error", message);
+          }}
+          onTimeChanged={({ value }) => {
+            setTime(value);
+          }}
         />
       </View>
       <View style={fullScreen ? styles.controlsFull : styles.controls}>
         <Focusable
           name="backward.fill"
           focused={focusable === "backward.fill"}
-          onFocus={() => setFocusable("backward.fill")}
-          onPressIn={() => playerRef.current?.seek(time - SEEK_STEP)}
-          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+          onFocus={() => {
+            setFocusable("backward.fill");
+          }}
+          onPressIn={() => void playerRef.current?.seek(time - SEEK_STEP)}
+          onPressOut={() => {
+            setFocusable(EMPTY_FOCUSABLE);
+          }}
         />
         <Focusable
           name="speaker.1.fill"
           focused={focusable === "speaker.1.fill"}
-          onFocus={() => setFocusable("speaker.1.fill")}
-          onPressIn={() => setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME))}
-          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+          onFocus={() => {
+            setFocusable("speaker.1.fill");
+          }}
+          onPressIn={() => {
+            setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME));
+          }}
+          onPressOut={() => {
+            setFocusable(EMPTY_FOCUSABLE);
+          }}
         />
         <Focusable
           name={playing ? "pause.fill" : "play.fill"}
           focused={focusable === "play.fill" || focusable === "pause.fill"}
-          onFocus={() => setFocusable(playing ? "pause.fill" : "play.fill")}
-          onPressIn={() => playerRef.current?.[playing ? "pause" : "play"]()}
-          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+          onFocus={() => {
+            setFocusable(playing ? "pause.fill" : "play.fill");
+          }}
+          onPressIn={() => void playerRef.current?.[playing ? "pause" : "play"]()}
+          onPressOut={() => {
+            setFocusable(EMPTY_FOCUSABLE);
+          }}
         />
         <Focusable
           name="stop.fill"
           focused={focusable === "stop.fill"}
-          onFocus={() => setFocusable("stop.fill")}
-          onPressIn={() => playerRef.current?.stop()}
-          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+          onFocus={() => {
+            setFocusable("stop.fill");
+          }}
+          onPressIn={() => void playerRef.current?.stop()}
+          onPressOut={() => {
+            setFocusable(EMPTY_FOCUSABLE);
+          }}
         />
         <Focusable
           name="speaker.3.fill"
           focused={focusable === "speaker.3.fill"}
-          onFocus={() => setFocusable("speaker.3.fill")}
-          onPressIn={() => setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME))}
-          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+          onFocus={() => {
+            setFocusable("speaker.3.fill");
+          }}
+          onPressIn={() => {
+            setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME));
+          }}
+          onPressOut={() => {
+            setFocusable(EMPTY_FOCUSABLE);
+          }}
         />
         <Focusable
           name="forward.fill"
           focused={focusable === "forward.fill"}
-          onFocus={() => setFocusable("forward.fill")}
-          onPressIn={() => playerRef.current?.seek(time + SEEK_STEP)}
-          onPressOut={() => setFocusable(EMPTY_FOCUSABLE)}
+          onFocus={() => {
+            setFocusable("forward.fill");
+          }}
+          onPressIn={() => void playerRef.current?.seek(time + SEEK_STEP)}
+          onPressOut={() => {
+            setFocusable(EMPTY_FOCUSABLE);
+          }}
         />
       </View>
     </View>
