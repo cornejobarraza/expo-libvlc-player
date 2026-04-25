@@ -5,31 +5,75 @@ import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 
 import { Focusable } from "./Focusable";
 
-const MIN_VOLUME = 0;
-const VOLUME_STEP = 10;
-const MAX_VOLUME = 100;
-
-const DEFAULT_TIME = 0;
-const BUFFERING_DELAY = 1_000;
-const SEEK_STEP = 10_000;
-
 interface LibVlcPlayerProps {
   source: LibVlcSource;
   title?: string;
   fullScreen?: boolean;
 }
 
-const EMPTY_FOCUSABLE = "" as SFSymbol;
+interface PlayerControl {
+  name: SFSymbol;
+  onPress: () => void;
+}
+
+const MIN_VOLUME = 0;
+const VOLUME_STEP = 10;
+const MAX_VOLUME = 100;
+
+const DEFAULT_TIME = 0;
+const BUFFER_DELAY = 1_000;
+const SEEK_STEP = 10_000;
+
+const DEFAULT_FOCUSABLE = "" as SFSymbol;
 
 export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(true);
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
-  const [focusable, setFocusable] = useState<SFSymbol>(EMPTY_FOCUSABLE);
+  const [focus, setFocus] = useState<SFSymbol>(DEFAULT_FOCUSABLE);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
-  const bufferingRef = useRef<number>(undefined);
+  const bufferRef = useRef<number>(undefined);
+
+  const PLAYER_CONTROLS: PlayerControl[] = [
+    {
+      name: "backward.fill",
+      onPress: () => {
+        void playerRef.current?.seek(time - SEEK_STEP);
+      },
+    },
+    {
+      name: "speaker.1.fill",
+      onPress: () => {
+        setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME));
+      },
+    },
+    {
+      name: playing ? "pause.fill" : "play.fill",
+      onPress: () => {
+        void playerRef.current?.[playing ? "pause" : "play"]();
+      },
+    },
+    {
+      name: "stop.fill",
+      onPress: () => {
+        void playerRef.current?.stop();
+      },
+    },
+    {
+      name: "speaker.3.fill",
+      onPress: () => {
+        setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME));
+      },
+    },
+    {
+      name: "forward.fill",
+      onPress: () => {
+        void playerRef.current?.seek(time + SEEK_STEP);
+      },
+    },
+  ];
 
   return (
     <View style={fullScreen ? styles.libVlcFull : styles.libVlc}>
@@ -44,15 +88,17 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
           volume={volume}
           onBuffering={() => {
             setBuffering(true);
-            clearTimeout(bufferingRef.current);
-            bufferingRef.current = setTimeout(() => {
+            clearTimeout(bufferRef.current);
+            bufferRef.current = setTimeout(() => {
               setBuffering(false);
-            }, BUFFERING_DELAY);
+            }, BUFFER_DELAY);
           }}
           onPlaying={() => {
+            setFocus((prev) => (prev !== DEFAULT_FOCUSABLE ? "pause.fill" : prev));
             setPlaying(true);
           }}
           onPaused={() => {
+            setFocus((prev) => (prev !== DEFAULT_FOCUSABLE ? "play.fill" : prev));
             setPlaying(false);
           }}
           onStopped={() => {
@@ -67,76 +113,20 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
         />
       </View>
       <View style={fullScreen ? styles.controlsFull : styles.controls}>
-        <Focusable
-          name="backward.fill"
-          focused={focusable === "backward.fill"}
-          onFocus={() => {
-            setFocusable("backward.fill");
-          }}
-          onPressIn={() => void playerRef.current?.seek(time - SEEK_STEP)}
-          onPressOut={() => {
-            setFocusable(EMPTY_FOCUSABLE);
-          }}
-        />
-        <Focusable
-          name="speaker.1.fill"
-          focused={focusable === "speaker.1.fill"}
-          onFocus={() => {
-            setFocusable("speaker.1.fill");
-          }}
-          onPressIn={() => {
-            setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME));
-          }}
-          onPressOut={() => {
-            setFocusable(EMPTY_FOCUSABLE);
-          }}
-        />
-        <Focusable
-          name={playing ? "pause.fill" : "play.fill"}
-          focused={focusable === "play.fill" || focusable === "pause.fill"}
-          onFocus={() => {
-            setFocusable(playing ? "pause.fill" : "play.fill");
-          }}
-          onPressIn={() => void playerRef.current?.[playing ? "pause" : "play"]()}
-          onPressOut={() => {
-            setFocusable(EMPTY_FOCUSABLE);
-          }}
-        />
-        <Focusable
-          name="stop.fill"
-          focused={focusable === "stop.fill"}
-          onFocus={() => {
-            setFocusable("stop.fill");
-          }}
-          onPressIn={() => void playerRef.current?.stop()}
-          onPressOut={() => {
-            setFocusable(EMPTY_FOCUSABLE);
-          }}
-        />
-        <Focusable
-          name="speaker.3.fill"
-          focused={focusable === "speaker.3.fill"}
-          onFocus={() => {
-            setFocusable("speaker.3.fill");
-          }}
-          onPressIn={() => {
-            setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME));
-          }}
-          onPressOut={() => {
-            setFocusable(EMPTY_FOCUSABLE);
-          }}
-        />
-        <Focusable
-          name="forward.fill"
-          focused={focusable === "forward.fill"}
-          onFocus={() => {
-            setFocusable("forward.fill");
-          }}
-          onPressIn={() => void playerRef.current?.seek(time + SEEK_STEP)}
-          onPressOut={() => {
-            setFocusable(EMPTY_FOCUSABLE);
-          }}
-        />
+        {PLAYER_CONTROLS.map((control, index) => (
+          <Focusable
+            key={index}
+            name={control.name}
+            focused={focus === control.name}
+            onFocus={() => {
+              setFocus(control.name);
+            }}
+            onPressIn={control.onPress}
+            onPressOut={() => {
+              setFocus(DEFAULT_FOCUSABLE);
+            }}
+          />
+        ))}
       </View>
     </View>
   );

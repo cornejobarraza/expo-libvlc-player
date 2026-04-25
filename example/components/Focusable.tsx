@@ -1,7 +1,8 @@
 import { type SFSymbol } from "expo-symbols";
-import { Pressable, StyleSheet } from "react-native";
+import { Platform, Pressable, StyleSheet } from "react-native";
 
 import { IconSymbol } from "./IconSymbol";
+import { useRef } from "react";
 
 interface FocusableProps {
   name: SFSymbol;
@@ -11,16 +12,26 @@ interface FocusableProps {
   onPressOut?: () => void;
 }
 
+const PRESS_DELAY = 125;
+
 export function Focusable({ name, focused, onFocus, onPressIn, onPressOut }: FocusableProps) {
+  const pressRef = useRef<number>(undefined);
+
   return (
     <Pressable
       style={focused ? styles.focused : styles.unfocused}
       onFocus={() => onFocus?.()}
       onPressIn={() => {
-        onFocus?.();
+        if (!Platform.isTV) onFocus?.();
         onPressIn?.();
       }}
-      onPressOut={() => onPressOut?.()}>
+      onPressOut={() => {
+        onPressOut?.();
+        clearTimeout(pressRef.current);
+        pressRef.current = setTimeout(() => {
+          if (Platform.isTV) onFocus?.();
+        }, PRESS_DELAY);
+      }}>
       <IconSymbol color={focused ? "#272727" : "#f1f1f1"} name={name} />
     </Pressable>
   );
