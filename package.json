@@ -14,12 +14,11 @@
   },
   "keywords": [
     "react-native",
-    "vlc",
     "expo",
     "libvlc",
     "player",
     "expo-libvlc-player",
-    "ExpoLibvlcPlayer"
+    "ExpoLibVlcPlayer"
   ],
   "repository": {
     "type": "git",
