@@ -17,9 +17,10 @@ switch (process.platform) {
 
     if (process.env.ANDROID_STUDIO) {
       studioSh = path.join(process.env.ANDROID_STUDIO, "bin", "studio.sh");
+
       if (!fs.existsSync(studioSh)) {
         console.error(
-          `Error: Android Studio not found at ${studioSh}.\n` +
+          `⛔️ Android Studio not found at ${studioSh}.\n` +
             `Check that the ANDROID_STUDIO environment variable points to your Android Studio installation directory, ` +
             `or open the project manually in Android Studio: ${projectPath}`
         );
@@ -59,19 +60,21 @@ switch (process.platform) {
               break;
             }
           }
+
           if (studioSh) break;
         }
       }
 
       if (!studioSh) {
         console.error(
-          `Error: Android Studio not found.\n` +
+          `⛔️ Android Studio not found.\n` +
             `Set the ANDROID_STUDIO environment variable to your Android Studio installation directory, ` +
             `or open the project manually in Android Studio: ${projectPath}`
         );
         process.exit(1);
       }
     }
+
     spawn(studioSh, [projectPath], { stdio: "inherit" });
     break;
   }
@@ -79,19 +82,21 @@ switch (process.platform) {
     const studioExe = process.env.ANDROID_STUDIO
       ? path.join(process.env.ANDROID_STUDIO, "bin", "studio64.exe")
       : path.join("C:", "Program Files", "Android", "Android Studio", "bin", "studio64.exe");
+
     if (!require("fs").existsSync(studioExe)) {
       console.error(
-        `Error: Android Studio not found at ${studioExe}.\n` +
+        `⛔️ Android Studio not found at ${studioExe}.\n` +
           `Set the ANDROID_STUDIO environment variable to your Android Studio installation directory, ` +
           `or open the project manually in Android Studio: ${projectPath}`
       );
       process.exit(1);
     }
+
     spawn(studioExe, [projectPath], { stdio: "inherit" });
     break;
   }
   default:
-    console.error(`Error: Unsupported platform: ${process.platform}`);
+    console.error(`⛔️ Unsupported platform: ${process.platform}`);
     process.exit(1);
 }
 

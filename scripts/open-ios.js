@@ -4,7 +4,7 @@ const path = require("path");
 
 if (process.platform !== "darwin") {
   console.error(
-    `Error: Xcode is only available on macOS. Cannot open the iOS project on ${process.platform}.`
+    `⛔️ Xcode is only available on macOS. Cannot open the iOS project on ${process.platform}.`
   );
   process.exit(1);
 }
