@@ -54,8 +54,7 @@ yarn-error.log
 /*.tgz
 
 # Expo
-.expo/*
-example/.expo/*
+.expo/
 
 # Other
-*.tsbuildinfo
+tsconfig.tsbuildinfo

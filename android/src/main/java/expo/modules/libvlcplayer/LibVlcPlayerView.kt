@@ -293,7 +293,7 @@ class LibVlcPlayerView(
 
                 when (contentFit) {
                     VideoContentFit.CONTAIN -> {
-                        // No scale required
+                        // No scaling required
                     }
 
                     VideoContentFit.COVER -> {

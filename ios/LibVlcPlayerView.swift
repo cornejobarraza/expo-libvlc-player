@@ -177,7 +177,7 @@ class LibVlcPlayerView: ExpoView {
 
                 switch contentFit {
                 case .contain:
-                    // No transform required
+                    // No transformation required
                     break
                 case .cover:
                     let scale = videoAspect > viewAspect ?
@@ -223,7 +223,7 @@ class LibVlcPlayerView: ExpoView {
                 }
 
                 if volume != MediaPlayerConstants.maxPlayerVolume || mute {
-                    // Audio instance not available, try again
+                    // Audio instance not ready, try again
                     retryUntil { [weak self] isLastAttempt in
                         guard let self else { return true }
 

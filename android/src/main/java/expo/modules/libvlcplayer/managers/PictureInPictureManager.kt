@@ -283,7 +283,7 @@ class PictureInPictureManager(
         rootView.addView(pictureLayout)
 
         pipView?.let { view ->
-            // Picture-in-Picture (PiP) black window workaround
+            // Black screen workaround
             view.detachPlayerLayout()
             view.attachPlayerLayout(pictureLayout)
 

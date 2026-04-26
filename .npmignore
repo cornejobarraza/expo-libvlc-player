@@ -5,16 +5,14 @@
 /*.tgz
 
 /scripts/
-/android/src/androidTest/
-/android/src/test/
 /android/build/
 /example/
 
 # Other
-.eslintrc.js
-eslint.config.js
-.prettierrc
-lint-staged.config.js
-*.tsbuildinfo
-.swift-version
-tsconfig.eslint.json
+/.eslintrc.js
+/eslint.config.js
+/.prettierrc
+/lint-staged.config.js
+tsconfig.tsbuildinfo
+/.swift-version
+/tsconfig.eslint.json
