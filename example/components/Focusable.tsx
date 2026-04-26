@@ -19,7 +19,7 @@ export function Focusable({ name, focused, onFocus, onPressIn, onPressOut }: Foc
 
   return (
     <Pressable
-      style={focused ? styles.focused : styles.unfocused}
+      style={[styles.pressable, focused ? styles.focused : styles.unfocused]}
       onFocus={() => onFocus?.()}
       onPressIn={() => {
         if (!Platform.isTV) onFocus?.();
@@ -38,21 +38,16 @@ export function Focusable({ name, focused, onFocus, onPressIn, onPressOut }: Foc
 }
 
 const styles = StyleSheet.create({
-  unfocused: {
-    backgroundColor: "#272727",
-    maxHeight: 32,
+  pressable: {
     justifyContent: "center",
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
   },
+  unfocused: {
+    backgroundColor: "#272727",
+  },
   focused: {
     backgroundColor: "#f1f1f1",
-    borderColor: "#272727",
-    maxHeight: 32,
-    justifyContent: "center",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4,
   },
 });
