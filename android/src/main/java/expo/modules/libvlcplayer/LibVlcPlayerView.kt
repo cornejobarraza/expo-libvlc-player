@@ -505,18 +505,25 @@ class LibVlcPlayerView(
         set(value) {
             field = value
 
-            val newVolume = value.coerceIn(MediaPlayerConstants.MIN_PLAYER_VOLUME, MediaPlayerConstants.MAX_PLAYER_VOLUME)
-            MediaPlayerManager.audioFocusManager.oldVolume = newVolume
+            if (mute) return
 
-            if (!mute) {
-                mediaPlayer?.setVolume(newVolume)
-                MediaPlayerManager.audioFocusManager.updateAudioFocus()
-            }
+            val newVolume =
+                value.coerceIn(
+                    MediaPlayerConstants.MIN_PLAYER_VOLUME,
+                    MediaPlayerConstants.MAX_PLAYER_VOLUME,
+                )
+            mediaPlayer?.setVolume(newVolume)
+
+            MediaPlayerManager.audioFocusManager.updateAudioFocus()
         }
 
     var mute: Boolean = false
         set(value) {
             field = value
+
+            if (mute) {
+                MediaPlayerManager.audioFocusManager.oldVolume = volume
+            }
 
             val newVolume =
                 if (value) {
