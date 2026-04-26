@@ -65,7 +65,7 @@ public class LibVlcPlayerModule: Module {
                 view.slaves = slaves
             }
 
-            Prop("scale", MediaPlayerConstants.defaultPlayerScale) { (view: LibVlcPlayerView, scale: Float) in
+            Prop("scale", MediaPlayerConstants.defaultPlayerScale) { (view: LibVlcPlayerView, scale: Double) in
                 view.scale = scale
             }
 
@@ -73,7 +73,7 @@ public class LibVlcPlayerModule: Module {
                 view.contentFit = contentFit
             }
 
-            Prop("rate", MediaPlayerConstants.defaultPlayerRate) { (view: LibVlcPlayerView, rate: Float) in
+            Prop("rate", MediaPlayerConstants.defaultPlayerRate) { (view: LibVlcPlayerView, rate: Double) in
                 view.rate = rate
             }
 

@@ -25,7 +25,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Sets the time or position of the current player
    *
-   * @param value - Must be an integer equal or greater than `0`
+   * @param value - Must be a double equal or greater than `0`
    * @param type - Defaults to `"time"`
    *
    * @returns A promise which resolves to `void`

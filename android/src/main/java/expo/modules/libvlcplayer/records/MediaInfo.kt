@@ -7,7 +7,7 @@ import java.io.Serializable
 class MediaInfo(
     @Field var width: Int = 0,
     @Field var height: Int = 0,
-    @Field var length: Double = 0.0,
+    @Field var length: Int = 0,
     @Field var seekable: Boolean = false,
 ) : Record,
     Serializable

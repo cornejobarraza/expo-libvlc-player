@@ -332,11 +332,11 @@ class LibVlcPlayerView(
                 addPlayerSlaves(slaves)
 
                 if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
-                    player.setScale(scale)
+                    player.setScale(scale.toFloat())
                 }
 
                 if (rate != MediaPlayerConstants.DEFAULT_PLAYER_RATE) {
-                    player.setRate(rate)
+                    player.setRate(rate.toFloat())
                 }
 
                 if (time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
@@ -398,12 +398,12 @@ class LibVlcPlayerView(
         return mediaTracks
     }
 
-    fun getMediaLength(): Long {
-        var length: Long = 0L
+    fun getMediaLength(): Int {
+        var length = 0
 
-        val duration = mediaPlayer?.getLength() ?: 0L
+        val duration = mediaPlayer?.getLength()?.toInt() ?: 0
 
-        if (duration > 0L) {
+        if (duration > 0) {
             length = duration
         }
 
@@ -411,21 +411,16 @@ class LibVlcPlayerView(
     }
 
     fun getMediaInfo(): MediaInfo {
-        var mediaInfo = MediaInfo()
-
         val video = getVideoSize()
         val length = getMediaLength()
         val seekable = mediaPlayer?.isSeekable() ?: false
 
-        mediaInfo =
-            MediaInfo(
-                width = video.width,
-                height = video.height,
-                length = length.toDouble(),
-                seekable = seekable,
-            )
-
-        return mediaInfo
+        return MediaInfo(
+            width = video.width,
+            height = video.height,
+            length = length,
+            seekable = seekable,
+        )
     }
 
     fun getVideoSize(): Size {
@@ -445,7 +440,7 @@ class LibVlcPlayerView(
             val tracks = getMediaTracks()
             val length = getMediaLength()
             val hasVideo = tracks.video.any { track -> track.id != -1 }
-            return hasVideo && hasVideoSize && length > 0L
+            return hasVideo && hasVideoSize && length > 0
         }
 
     val hasAudioOut: Boolean
@@ -485,10 +480,10 @@ class LibVlcPlayerView(
             }
         }
 
-    var scale: Float = MediaPlayerConstants.DEFAULT_PLAYER_SCALE
+    var scale: Double = MediaPlayerConstants.DEFAULT_PLAYER_SCALE
         set(value) {
             field = value
-            mediaPlayer?.setScale(value)
+            mediaPlayer?.setScale(value.toFloat())
         }
 
     var contentFit: VideoContentFit = VideoContentFit.CONTAIN
@@ -498,10 +493,10 @@ class LibVlcPlayerView(
             setContentFit(layout = pictureLayout)
         }
 
-    var rate: Float = MediaPlayerConstants.DEFAULT_PLAYER_RATE
+    var rate: Double = MediaPlayerConstants.DEFAULT_PLAYER_RATE
         set(value) {
             field = value
-            mediaPlayer?.setRate(value)
+            mediaPlayer?.setRate(value.toFloat())
         }
 
     var time: Int = MediaPlayerConstants.DEFAULT_PLAYER_TIME

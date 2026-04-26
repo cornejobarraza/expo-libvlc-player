@@ -211,11 +211,11 @@ class LibVlcPlayerView: ExpoView {
                 addPlayerSlaves(slaves)
 
                 if scale != MediaPlayerConstants.defaultPlayerScale {
-                    player.scaleFactor = scale
+                    player.scaleFactor = Float(scale)
                 }
 
                 if rate != MediaPlayerConstants.defaultPlayerRate {
-                    player.rate = rate
+                    player.rate = Float(rate)
                 }
 
                 if time != MediaPlayerConstants.defaultPlayerTime {
@@ -274,10 +274,10 @@ class LibVlcPlayerView: ExpoView {
         return mediaTracks
     }
 
-    func getMediaLength() -> Int32 {
-        var length: Int32 = 0
+    func getMediaLength() -> Int {
+        var length = 0
 
-        let duration = mediaPlayer?.media?.length.intValue ?? 0
+        let duration = Int(mediaPlayer?.media?.length.intValue ?? 0)
 
         if duration > 0 {
             length = duration
@@ -287,20 +287,16 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func getMediaInfo() -> MediaInfo {
-        var mediaInfo = MediaInfo()
-
         let video = getVideoSize()
         let length = getMediaLength()
         let seekable = mediaPlayer?.isSeekable ?? false
 
-        mediaInfo = MediaInfo(
+        return MediaInfo(
             width: Int(video.width),
             height: Int(video.height),
-            length: Double(length),
+            length: length,
             seekable: seekable
         )
-
-        return mediaInfo
     }
 
     func getVideoSize() -> CGSize {
@@ -360,9 +356,9 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    var scale: Float = MediaPlayerConstants.defaultPlayerScale {
+    var scale: Double = MediaPlayerConstants.defaultPlayerScale {
         didSet {
-            mediaPlayer?.scaleFactor = scale
+            mediaPlayer?.scaleFactor = Float(scale)
         }
     }
 
@@ -373,9 +369,9 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    var rate: Float = MediaPlayerConstants.defaultPlayerRate {
+    var rate: Double = MediaPlayerConstants.defaultPlayerRate {
         didSet {
-            mediaPlayer?.rate = rate
+            mediaPlayer?.rate = Float(rate)
         }
     }
 
