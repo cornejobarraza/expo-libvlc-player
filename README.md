@@ -125,7 +125,7 @@ See the [Example App](example/App.tsx) for additional usage.
 | `play()`                                                         | Starts playback of the current player                                                                                                             | `Promise<void>` |
 | `pause()`                                                        | Pauses playback of the current player                                                                                                             | `Promise<void>` |
 | `stop()`                                                         | Stops playback of the current player                                                                                                              | `Promise<void>` |
-| `seek(value: number, type?: "time" \| "position")`               | Sets the time or position of the current player. Value must be a double equal or greater than `0` and type defaults to `"time"`                   | `Promise<void>` |
+| `seek(value: number, type?: "time" \| "position")`               | Sets the time or position of the current player. Value must be a number equal or greater than `0` and type defaults to `"time"`                   | `Promise<void>` |
 | `record(path?: string)`                                          | Starts or stops recording the current media. Path must be a valid directory or `undefined` to stop recording                                      | `Promise<void>` |
 | `snapshot(path: string)`                                         | Takes a snapshot of the current media. Path must be a valid directory                                                                             | `Promise<void>` |
 | `postAction(action: 1 \| 2)`                                     | Posts an answer to a [`Dialog`](#dialog). Action must be either `1` or `2`                                                                        | `Promise<void>` |
@@ -144,12 +144,12 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `options`          | Sets the options to initialize the media with. See the [VideoLAN Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
 | `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more                                                | `undefined` |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
-| `scale`            | Sets the player scaling factor. Must be a float equal or greater than `0`                                                         | `0`         |
-| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio, float, or `"auto"`                                                        | `undefined` |
+| `scale`            | Sets the player scaling factor. Must be a number equal or greater than `0`                                                        | `0`         |
+| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio, number, or `"auto"`                                                       | `undefined` |
 | `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
-| `rate`             | Sets the player rate. Must be a float equal or greater than `1`                                                                   | `1`         |
-| `time`             | Sets the initial player time. Must be an integer (ms) greater than `0`                                                            | `0`         |
-| `volume`           | Sets the player volume. Must be an integer between `0` and `100`                                                                  | `100`       |
+| `rate`             | Sets the player rate. Must be a number equal or greater than `1`                                                                  | `1`         |
+| `time`             | Sets the initial player time. Must be a number equal or greater than `0`                                                          | `0`         |
+| `volume`           | Sets the player volume. Must be a number between `0` and `100`                                                                    | `100`       |
 | `mute`             | Sets the player volume to `0` when `true` and previous value is restored when `false`                                             | `false`     |
 | `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
 | `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |

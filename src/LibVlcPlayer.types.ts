@@ -25,7 +25,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Sets the time or position of the current player
    *
-   * @param value - Must be a double equal or greater than `0`
+   * @param value - Must be a number equal or greater than `0`
    * @param type - Defaults to `"time"`
    *
    * @returns A promise which resolves to `void`
@@ -373,13 +373,13 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   slaves?: Slave[];
   /**
-   * Sets the player scaling factor. Must be a float equal or greater than `0`
+   * Sets the player scaling factor. Must be a number equal or greater than `0`
    *
    * @default 0
    */
   scale?: number;
   /**
-   * Sets the container aspect ratio. Must be a valid ratio, float, or `"auto"`
+   * Sets the container aspect ratio. Must be a valid ratio, number, or `"auto"`
    *
    * @example "16:9"
    *
@@ -395,19 +395,19 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    */
   contentFit?: VideoContentFit;
   /**
-   * Sets the player rate. Must be a float equal or greater than `1`
+   * Sets the player rate. Must be a number equal or greater than `1`
    *
    * @default 1
    */
   rate?: number;
   /**
-   * Sets the initial player time. Must be an integer (ms) greater than `0`
+   * Sets the initial player time. Must be a number equal or greater than `0`
    *
    * @default 0
    */
   time?: number;
   /**
-   * Sets the player volume. Must be an integer between `0` and `100`
+   * Sets the player volume. Must be a number between `0` and `100`
    *
    * @default 100
    */
