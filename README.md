@@ -120,19 +120,19 @@ See the [Example App](example/App.tsx) for additional usage.
 
 ### View methods
 
-| Method                                                           | Description                                                                                                                                       | Returns         |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
-| `play()`                                                         | Starts playback of the current player                                                                                                             | `Promise<void>` |
-| `pause()`                                                        | Pauses playback of the current player                                                                                                             | `Promise<void>` |
-| `stop()`                                                         | Stops playback of the current player                                                                                                              | `Promise<void>` |
-| `seek(value: number, type?: "time" \| "position")`               | Sets the time or position of the current player. Value must be a number equal or greater than `0` and type defaults to `"time"`                   | `Promise<void>` |
-| `record(path?: string)`                                          | Starts or stops recording the current media. Path must be a valid directory or `undefined` to stop recording                                      | `Promise<void>` |
-| `snapshot(path: string)`                                         | Takes a snapshot of the current media. Path must be a valid directory                                                                             | `Promise<void>` |
-| `postAction(action: 1 \| 2)`                                     | Posts an answer to a [`Dialog`](#dialog). Action must be either `1` or `2`                                                                        | `Promise<void>` |
-| `postLogin(username: string, password: string, store?: boolean)` | Posts a username and password to a login [`Dialog`](#dialog). Username can't be empty, password can be empty and if `true`, store the credentials | `Promise<void>` |
-| `dismiss()`                                                      | Dismisses a [`Dialog`](#dialog)                                                                                                                   | `Promise<void>` |
-| `startPictureInPicture()`                                        | Enters Picture-in-Picture (PiP) mode. Config plugin has to be configured for Picture-in-Picture (PiP) to work                                     | `Promise<void>` |
-| `stopPictureInPicture()`                                         | Exits Picture-in-Picture (PiP) mode on iOS                                                                                                        | `Promise<void>` |
+| Method                                                           | Description                                                                                                                          | Returns         |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
+| `play()`                                                         | Starts playback of the current player                                                                                                | `Promise<void>` |
+| `pause()`                                                        | Pauses playback of the current player                                                                                                | `Promise<void>` |
+| `stop()`                                                         | Stops playback of the current player                                                                                                 | `Promise<void>` |
+| `seek(value: number, type?: "time" \| "position")`               | Sets the time or position of the current player. Value must be a number equal or greater than `0` and type defaults to `"time"`      | `Promise<void>` |
+| `record(path?: string)`                                          | Starts or stops recording the current media. Path must be a valid directory or `undefined` to stop recording                         | `Promise<void>` |
+| `snapshot(path: string)`                                         | Takes a snapshot of the current media. Path must be a valid directory                                                                | `Promise<void>` |
+| `postAction(action: 1 \| 2)`                                     | Posts an answer to a dialog. Action must be either `1` or `2`                                                                        | `Promise<void>` |
+| `postLogin(username: string, password: string, store?: boolean)` | Posts a username and password to a login dialog. Username can't be empty, password can be empty and if `true`, store the credentials | `Promise<void>` |
+| `dismiss()`                                                      | Dismisses a dialog                                                                                                                   | `Promise<void>` |
+| `startPictureInPicture()`                                        | Enters Picture-in-Picture (PiP) mode. Config plugin has to be configured for Picture-in-Picture (PiP) to work                        | `Promise<void>` |
+| `stopPictureInPicture()`                                         | Exits Picture-in-Picture (PiP) mode on iOS                                                                                           | `Promise<void>` |
 
 ### View props
 
@@ -165,7 +165,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onPaused`                | Called after the `Paused` player event                       |                               |
 | `onStopped`               | Called after the `Stopped` player event                      |                               |
 | `onEncounteredError`      | Called after the `EncounteredError` player event             | [`Error`](#error)             |
-| `onDialogDisplay`         | Called after a `Dialog` needs to be displayed                | [`Dialog`](#dialog)           |
+| `onDialogDisplay`         | Called after a dialog needs to be displayed                  | [`Dialog`](#dialog)           |
 | `onTimeChanged`           | Called after the `TimeChanged` player event                  | [`Time`](#time)               |
 | `onPositionChanged`       | Called after the `PositionChanged` player event              | [`Position`](#position)       |
 | `onESAdded`               | Called after the `ESAdded` player event                      | [`MediaTracks`](#mediatracks) |
@@ -178,38 +178,6 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onPictureInPictureStop`  | Called after the player exits Picture-in-Picture (PiP) mode  |                               |
 
 ### Module types
-
-#### `Error`
-
-```ts
-interface Error {
-  message: string;
-}
-```
-
-#### `Time`
-
-```ts
-interface Time {
-  value: number;
-}
-```
-
-#### `Position`
-
-```ts
-interface Position {
-  value: number;
-}
-```
-
-#### `Snapshot`
-
-```ts
-interface Snapshot {
-  path: string;
-}
-```
 
 #### `Tracks`
 
@@ -231,6 +199,14 @@ interface Slave {
 }
 ```
 
+#### `Error`
+
+```ts
+interface Error {
+  message: string;
+}
+```
+
 #### `Dialog`
 
 ```ts
@@ -244,12 +220,19 @@ interface Dialog {
 }
 ```
 
-#### `Recording`
+#### `Time`
 
 ```ts
-interface Recording {
-  path: string | null;
-  isRecording: boolean;
+interface Time {
+  value: number;
+}
+```
+
+#### `Position`
+
+```ts
+interface Position {
+  value: number;
 }
 ```
 
@@ -269,6 +252,23 @@ interface MediaTracks {
   audio: Track[];
   video: Track[];
   subtitle: Track[];
+}
+```
+
+#### `Recording`
+
+```ts
+interface Recording {
+  path: string | null;
+  isRecording: boolean;
+}
+```
+
+#### `Snapshot`
+
+```ts
+interface Snapshot {
+  path: string;
 }
 ```
 
@@ -317,7 +317,7 @@ https://developer.apple.com/documentation/technotes/tn3179-understanding-local-n
 
 ## Disclaimer
 
-This project is not affiliated with, endorsed by, or officially supported by VideoLAN. The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with the following **LibVLC** bindings:
+This project is not affiliated with, endorsed by, or officially supported by VideoLAN. The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with the following LibVLC bindings:
 
 - `libvlcjni` for Android / Android TV
 - `VLCKit` for iOS / Apple TV
@@ -326,11 +326,11 @@ For official VLC products and support, please visit [videolan.org](https://www.v
 
 ## Credits
 
-This library is inspired by existing projects such as [expo-video](https://github.com/expo/expo/tree/main/packages/expo-video) and [react-native-vlc-media-player](https://github.com/razorRun/react-native-vlc-media-player).
+This library is inspired by existing projects such as [react-native-vlc-media-player](https://github.com/razorRun/react-native-vlc-media-player) and [expo-video](https://github.com/expo/expo/tree/main/packages/expo-video).
 
 ## Contributing
 
-Contributions are always welcome. Please raise any issues and/or fix them by creating a pull request.
+Contributions are always welcome. Please raise any issues or fix them by creating a pull request.
 
 ## License
 
