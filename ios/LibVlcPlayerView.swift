@@ -224,7 +224,7 @@ class LibVlcPlayerView: ExpoView {
 
                 if volume != MediaPlayerConstants.maxPlayerVolume || mute {
                     // Audio instance not ready, try again
-                    retryUntil { [weak self] isLastAttempt in
+                    retryUntil { [weak self] _ in
                         guard let self else { return true }
 
                         let newVolume = mute ?
@@ -233,7 +233,7 @@ class LibVlcPlayerView: ExpoView {
 
                         player.audio?.volume = Int32(newVolume)
 
-                        return isLastAttempt
+                        return false
                     }
                 }
 
@@ -480,10 +480,6 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    private func snapshotExists(_ path: String) -> Bool {
-        FileManager.default.fileExists(atPath: path)
-    }
-
     func snapshot(_ path: String) {
         if hasVideoSize {
             let dateFormatter = DateFormatter()
@@ -491,24 +487,16 @@ class LibVlcPlayerView: ExpoView {
             let timestamp = dateFormatter.string(from: Date())
 
             let snapshotPath = path + "/vlc-snapshot-\(timestamp).jpg"
-            let video = getVideoSize()
+            let video = CGSize(width: 0, height: 0) // Use original window size
 
             mediaPlayer?.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(video.width), andHeight: Int32(video.height))
 
-            retryUntil { [weak self] isLastAttempt in
-                guard let self else { return true }
+            let fileExists = FileManager.default.fileExists(atPath: snapshotPath)
 
-                let hasSnapshot = snapshotExists(snapshotPath)
-
-                if hasSnapshot {
-                    onSnapshotTaken(["path": snapshotPath])
-                } else if !isLastAttempt {
-                    mediaPlayer?.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(0), andHeight: Int32(0))
-                } else {
-                    onEncounteredError(["message": "Snapshot could not be taken"])
-                }
-
-                return hasSnapshot
+            if fileExists {
+                onSnapshotTaken(["path": snapshotPath])
+            } else {
+                onEncounteredError(["message": "Snapshot could not be taken"])
             }
         } else {
             onEncounteredError(["message": "Snapshot could not be taken"])
@@ -566,16 +554,17 @@ class LibVlcPlayerView: ExpoView {
     func retryUntil(
         maxRetries: Int = MediaPlayerConstants.maxRetryCount,
         retry: Int = 0,
-        delay: Int = MediaPlayerConstants.retryDelayMs,
+        delay: Double = MediaPlayerConstants.retryDelayMs,
         block: @escaping (_ isLastAttempt: Bool) -> Bool
     ) {
         let isLastAttempt = retry >= maxRetries
 
         if block(isLastAttempt) || isLastAttempt { return }
 
-        let expDelay = Int(Double(delay) * 1.5)
+        let deadline = DispatchTime.now() + .milliseconds(Int(delay))
+        let expDelay = delay * MediaPlayerConstants.expDelayMultiplier
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay)) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
             self?.retryUntil(maxRetries: maxRetries, retry: retry + 1, delay: expDelay, block: block)
         }
     }

@@ -722,18 +722,19 @@ class LibVlcPlayerView(
     fun retryUntil(
         maxRetries: Int = MediaPlayerConstants.MAX_RETRY_COUNT,
         retry: Int = 0,
-        delay: Long = MediaPlayerConstants.RETRY_DELAY_MS,
+        delay: Double = MediaPlayerConstants.RETRY_DELAY_MS,
         block: (isLastAttempt: Boolean) -> Boolean,
     ) {
         val isLastAttempt = retry >= maxRetries
 
         if (block(isLastAttempt) || isLastAttempt) return
 
-        val expDelay = (delay.toDouble() * 1.5).toLong()
+        val expDelay = delay * MediaPlayerConstants.EXP_DELAY_MULTIPLIER
+        val postDelay = delay.toLong()
 
         postDelayed({
             retryUntil(maxRetries, retry + 1, expDelay, block)
-        }, delay)
+        }, postDelay)
     }
 }
 
@@ -766,7 +767,7 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                                     return@retryUntil hasVideoOut
                                 }
 
-                                retryUntil { isLastAttempt ->
+                                retryUntil {
                                     if (hasVideoSize) {
                                         setContentFit(layout = playerLayout)
                                         setContentFit(layout = pictureLayout)
@@ -775,7 +776,7 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                                     return@retryUntil hasVideoSize
                                 }
 
-                                retryUntil { isLastAttempt ->
+                                retryUntil {
                                     if (hasAudioOut) {
                                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
                                     }
