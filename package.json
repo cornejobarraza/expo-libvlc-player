@@ -31,17 +31,17 @@
   "license": "MIT",
   "homepage": "https://github.com/cornejobarraza/expo-libvlc-player#readme",
   "devDependencies": {
-    "@types/react": "~19.2.10",
+    "@eslint/compat": "^2.0.5",
+    "@eslint/eslintrc": "^3.3.5",
+    "@types/react": "^19.2.14",
     "eslint": "^9.39.4",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-config-universe": "^15.0.3",
     "expo": "~55.0.15",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
     "react-native": "0.83.6",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.59.0"
+    "typescript": "~5.9.2"
   },
   "peerDependencies": {
     "expo": "*",

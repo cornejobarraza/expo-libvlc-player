@@ -1,9 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { LibVlcPlayer } from "./components/LibVlcPlayer";
 import { useFullScreen } from "./hooks/useFullScreen";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function App() {
   const fullScreen = useFullScreen();

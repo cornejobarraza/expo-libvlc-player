@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 const { spawn, spawnSync } = require("child_process");
-const path = require("path");
 const fs = require("fs");
 const os = require("os");
+const path = require("path");
 
 const projectPath = path.join(process.cwd(), "example", "android");
 

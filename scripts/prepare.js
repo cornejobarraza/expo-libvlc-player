@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-const { run } = require("./utils");
 const fs = require("fs");
 const path = require("path");
+
+const { run } = require("./utils");
 
 const SUBTARGETS = ["plugin"];
 

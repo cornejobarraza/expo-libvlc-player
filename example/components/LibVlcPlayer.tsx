@@ -2,9 +2,9 @@ import { LibVlcPlayerView, type LibVlcPlayerViewRef, type LibVlcSource } from "e
 import { type SFSymbol } from "expo-symbols";
 import { useRef, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Focusable } from "./Focusable";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface LibVlcPlayerProps {
   source: LibVlcSource;
@@ -41,7 +41,7 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
     {
       name: "backward.fill",
       onPress: () => {
-        void playerRef.current?.seek(time - SEEK_STEP);
+        playerRef.current?.seek(time - SEEK_STEP);
       },
     },
     {
@@ -53,13 +53,13 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
     {
       name: playing ? "pause.fill" : "play.fill",
       onPress: () => {
-        void playerRef.current?.[playing ? "pause" : "play"]();
+        playerRef.current?.[playing ? "pause" : "play"]();
       },
     },
     {
       name: "stop.fill",
       onPress: () => {
-        void playerRef.current?.stop();
+        playerRef.current?.stop();
       },
     },
     {
@@ -71,7 +71,7 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
     {
       name: "forward.fill",
       onPress: () => {
-        void playerRef.current?.seek(time + SEEK_STEP);
+        playerRef.current?.seek(time + SEEK_STEP);
       },
     },
   ];
