@@ -3,24 +3,27 @@ import { StyleSheet, View } from "react-native";
 
 import { LibVlcPlayer } from "./components/LibVlcPlayer";
 import { useFullScreen } from "./hooks/useFullScreen";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function App() {
   const fullScreen = useFullScreen();
 
   return (
-    <View
-      style={{
-        ...styles.app,
-        backgroundColor: !fullScreen ? styles.app.backgroundColor : "black",
-        padding: !fullScreen ? styles.app.padding : undefined,
-      }}>
-      <StatusBar style="light" hidden={fullScreen} />
-      <LibVlcPlayer
-        title="Big Buck Bunny"
-        source="https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov"
-        fullScreen={fullScreen}
-      />
-    </View>
+    <SafeAreaProvider>
+      <View
+        style={{
+          ...styles.app,
+          backgroundColor: !fullScreen ? styles.app.backgroundColor : "black",
+          padding: !fullScreen ? styles.app.padding : undefined,
+        }}>
+        <StatusBar style="light" hidden={fullScreen} />
+        <LibVlcPlayer
+          title="Big Buck Bunny"
+          source="https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov"
+          fullScreen={fullScreen}
+        />
+      </View>
+    </SafeAreaProvider>
   );
 }
 

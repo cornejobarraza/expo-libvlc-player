@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 
 import { Focusable } from "./Focusable";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface LibVlcPlayerProps {
   source: LibVlcSource;
@@ -75,14 +76,16 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
     },
   ];
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={fullScreen ? styles.libVlcFull : styles.libVlc}>
+    <View style={[styles.libVlc, fullScreen && styles.libVlcFull]}>
       {!fullScreen && title && <Text style={styles.title}>{title}</Text>}
       <View style={styles.container}>
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
           ref={playerRef}
-          style={fullScreen ? styles.playerFull : styles.player}
+          style={[styles.player, fullScreen && { borderRadius: 0 }]}
           source={source}
           aspectRatio="16:9"
           volume={volume}
@@ -112,7 +115,11 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
           }}
         />
       </View>
-      <View style={fullScreen ? styles.controlsFull : styles.controls}>
+      <View
+        style={[
+          styles.controls,
+          fullScreen && [styles.controlsFull, { paddingBottom: insets.bottom }],
+        ]}>
         {PLAYER_CONTROLS.map((control, index) => (
           <Focusable
             key={index}
@@ -156,20 +163,15 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     borderRadius: 12,
   },
-  playerFull: {
-    backgroundColor: "black",
-  },
   controls: {
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
     gap: 16,
   },
   controlsFull: {
     ...StyleSheet.absoluteFill,
-    bottom: 24,
-    flexDirection: "row",
-    justifyContent: "center",
+    bottom: 20,
     alignItems: "flex-end",
-    gap: 16,
   },
 });
