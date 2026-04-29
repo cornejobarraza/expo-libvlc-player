@@ -55,7 +55,7 @@ class LibVlcPlayerView(
 ) : ExpoView(context, appContext) {
     val playerLayout: VLCVideoLayout = VLCVideoLayout(context)
     val pictureLayout: VLCVideoLayout = VLCVideoLayout(context)
-    private var pauseIfJob: Job? = null
+    private var pauseCoroutine: Job? = null
 
     var libVLC: LibVLC? = null
     var mediaPlayer: MediaPlayer? = null
@@ -573,25 +573,23 @@ class LibVlcPlayerView(
         mediaPlayer?.pause()
     }
 
-    fun pauseIf(condition: Boolean? = true) {
-        cancelPauseIf()
+    fun pauseJob() {
+        cancelPauseJob()
 
-        pauseIfJob =
+        pauseCoroutine =
             CoroutineScope(Dispatchers.Main).launch {
-                delay(MediaPlayerConstants.COROUTINE_DELAY_MS)
+                if (pictureInPicture) {
+                    delay(MediaPlayerConstants.COROUTINE_DELAY_MS)
+                }
 
-                mediaPlayer?.let { player ->
-                    val shouldPause = condition == true && player.isPlaying()
-
-                    if (shouldPause) {
-                        player.pause()
-                    }
+                if (isInBackground) {
+                    mediaPlayer?.pause()
                 }
             }
     }
 
-    fun cancelPauseIf() {
-        pauseIfJob?.cancel()
+    fun cancelPauseJob() {
+        pauseCoroutine?.cancel()
     }
 
     fun stop() {

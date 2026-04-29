@@ -42,17 +42,17 @@ object MediaPlayerManager {
 
     fun onModuleForeground() {
         expoViews.forEach { view ->
-            view.onForeground(Unit)
-            view.cancelPauseIf()
             view.isInBackground = false
+            view.onForeground(Unit)
+            view.cancelPauseJob()
         }
     }
 
     fun onModuleBackground() {
         expoViews.forEach { view ->
-            view.onBackground(Unit)
-            view.pauseIf(!view.pictureInPicture)
             view.isInBackground = true
+            view.onBackground(Unit)
+            view.pauseJob()
         }
     }
 }

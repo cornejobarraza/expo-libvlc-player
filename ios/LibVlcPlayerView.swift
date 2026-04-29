@@ -436,13 +436,9 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer?.pause()
     }
 
-    func pauseIf(_ condition: Bool? = true) {
-        if let player = mediaPlayer {
-            let shouldPause = condition == true && player.isPlaying
-
-            if shouldPause {
-                player.pause()
-            }
+    func pausePip() {
+        if !pictureInPicture {
+            mediaPlayer?.pause()
         }
     }
 

@@ -17,10 +17,10 @@ class PictureInPictureFragment(
         expoView.get()?.let { view ->
             if (isInPictureInPictureMode) {
                 view.onStartPictureInPicture()
-                view.cancelPauseIf()
+                view.cancelPauseJob()
             } else {
                 view.onStopPictureInPicture()
-                view.pauseIf(view.isInBackground)
+                view.pauseJob()
             }
         }
     }
