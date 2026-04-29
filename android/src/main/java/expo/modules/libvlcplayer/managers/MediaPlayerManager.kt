@@ -51,7 +51,7 @@ object MediaPlayerManager {
     fun onModuleBackground() {
         expoViews.forEach { view ->
             view.onBackground(Unit)
-            view.pauseIf()
+            view.pauseIf(!view.pictureInPicture)
             view.isInBackground = true
         }
     }

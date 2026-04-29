@@ -15,7 +15,7 @@ object MediaPlayerConstants {
     const val EXTRA_CONTROL_FORWARD: Int = 4
     const val SEEK_STEP_MS: Long = 10_000L
 
-    const val COROUTINE_DELAY_MS: Long = 1_000L
+    const val COROUTINE_DELAY_MS: Long = 750L
     const val EXP_DELAY_MULTIPLIER: Double = 1.5
     const val RETRY_DELAY_MS: Double = 300.0
     const val MAX_RETRY_COUNT: Int = 3
