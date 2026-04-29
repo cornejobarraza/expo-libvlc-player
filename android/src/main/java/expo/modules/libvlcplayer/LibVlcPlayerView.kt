@@ -725,7 +725,7 @@ class LibVlcPlayerView(
         delay: Double = MediaPlayerConstants.RETRY_DELAY_MS,
         block: (isLastAttempt: Boolean) -> Boolean,
     ) {
-        val isLastAttempt = retry >= maxRetries
+        val isLastAttempt = retry > maxRetries
 
         if (block(isLastAttempt) || isLastAttempt) return
 

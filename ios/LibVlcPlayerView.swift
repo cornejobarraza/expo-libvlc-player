@@ -557,7 +557,7 @@ class LibVlcPlayerView: ExpoView {
         delay: Double = MediaPlayerConstants.retryDelayMs,
         block: @escaping (_ isLastAttempt: Bool) -> Bool
     ) {
-        let isLastAttempt = retry >= maxRetries
+        let isLastAttempt = retry > maxRetries
 
         if block(isLastAttempt) || isLastAttempt { return }
 
