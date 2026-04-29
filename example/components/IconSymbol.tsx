@@ -1,6 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-import { IconMapping, IconSymbolProps } from "./types";
+import { type IconMapping, type IconSymbolProps } from "./types";
 
 const MAPPING = {
   "play.fill": "play-arrow",

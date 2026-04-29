@@ -1,8 +1,13 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import { LibVlcSource } from "expo-libvlc-player";
-import { SFSymbol } from "expo-symbols";
-import { ComponentProps } from "react";
-import { OpaqueColorValue, StyleProp, TextStyle, ViewStyle } from "react-native";
+import { type MaterialIcons } from "@expo/vector-icons";
+import { type LibVlcSource } from "expo-libvlc-player";
+import { type SFSymbol } from "expo-symbols";
+import { type ComponentProps } from "react";
+import {
+  type OpaqueColorValue,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from "react-native";
 
 export interface FocusableProps {
   name: SFSymbol;

@@ -1,6 +1,6 @@
 import { SymbolView } from "expo-symbols";
 
-import { IconSymbolIosProps } from "./types";
+import { type IconSymbolIosProps } from "./types";
 
 export function IconSymbol({ style, name, size = 24, color }: IconSymbolIosProps) {
   return (

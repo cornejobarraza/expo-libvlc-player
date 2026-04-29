@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Platform, Pressable, StyleSheet } from "react-native";
 
 import { IconSymbol } from "./IconSymbol";
-import { FocusableProps, TimeoutRef } from "./types";
+import { type FocusableProps, type TimeoutRef } from "./types";
 
 const PRESS_DELAY = 125;
 

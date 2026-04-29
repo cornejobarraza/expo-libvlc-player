@@ -5,7 +5,7 @@ import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Focusable } from "./Focusable";
-import { LibVlcPlayerProps, PlayerControl, TimeoutRef } from "./types";
+import { type LibVlcPlayerProps, type PlayerControl, type TimeoutRef } from "./types";
 
 const MIN_VOLUME = 0;
 const VOLUME_STEP = 10;
