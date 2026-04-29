@@ -1,17 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { type SFSymbol } from "expo-symbols";
-import { type ComponentProps } from "react";
-import { type OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
 
-interface IconSymbolProps {
-  style?: StyleProp<TextStyle>;
-  name: SFSymbol;
-  size?: number;
-  color: string | OpaqueColorValue;
-}
-
-type MaterialIcon = ComponentProps<typeof MaterialIcons>["name"];
-type IconMapping = Record<SFSymbol, MaterialIcon>;
+import { IconMapping, IconSymbolProps } from "./types";
 
 const MAPPING = {
   "play.fill": "play-arrow",

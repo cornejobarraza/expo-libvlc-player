@@ -1,21 +1,13 @@
-import { type SFSymbol } from "expo-symbols";
 import { useRef } from "react";
 import { Platform, Pressable, StyleSheet } from "react-native";
 
 import { IconSymbol } from "./IconSymbol";
-
-interface FocusableProps {
-  name: SFSymbol;
-  focused?: boolean;
-  onFocus?: () => void;
-  onPressIn?: () => void;
-  onPressOut?: () => void;
-}
+import { FocusableProps, TimeoutRef } from "./types";
 
 const PRESS_DELAY = 125;
 
 export function Focusable({ name, focused, onFocus, onPressIn, onPressOut }: FocusableProps) {
-  const pressRef = useRef<number>(undefined);
+  const pressRef = useRef<TimeoutRef>(undefined);
 
   return (
     <Pressable

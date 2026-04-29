@@ -1,14 +1,8 @@
-import { type SFSymbol, SymbolView } from "expo-symbols";
-import { type StyleProp, type ViewStyle } from "react-native";
+import { SymbolView } from "expo-symbols";
 
-interface IconSymbolProps {
-  style?: StyleProp<ViewStyle>;
-  name: SFSymbol;
-  size?: number;
-  color: string;
-}
+import { IconSymbolIosProps } from "./types";
 
-export function IconSymbol({ style, name, size = 24, color }: IconSymbolProps) {
+export function IconSymbol({ style, name, size = 24, color }: IconSymbolIosProps) {
   return (
     <SymbolView
       style={[{ width: size, height: size }, style]}

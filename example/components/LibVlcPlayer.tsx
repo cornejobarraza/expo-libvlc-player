@@ -1,21 +1,11 @@
-import { LibVlcPlayerView, type LibVlcPlayerViewRef, type LibVlcSource } from "expo-libvlc-player";
+import { LibVlcPlayerView, type LibVlcPlayerViewRef } from "expo-libvlc-player";
 import { type SFSymbol } from "expo-symbols";
 import { useRef, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Focusable } from "./Focusable";
-
-interface LibVlcPlayerProps {
-  source: LibVlcSource;
-  title?: string;
-  fullScreen?: boolean;
-}
-
-interface PlayerControl {
-  name: SFSymbol;
-  onPress: () => void;
-}
+import { LibVlcPlayerProps, PlayerControl, TimeoutRef } from "./types";
 
 const MIN_VOLUME = 0;
 const VOLUME_STEP = 10;
@@ -35,7 +25,7 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
   const [focus, setFocus] = useState<SFSymbol>(DEFAULT_FOCUSABLE);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
-  const bufferRef = useRef<number>(undefined);
+  const bufferRef = useRef<TimeoutRef>(undefined);
 
   const PLAYER_CONTROLS: PlayerControl[] = [
     {
