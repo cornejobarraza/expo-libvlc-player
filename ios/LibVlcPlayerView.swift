@@ -530,12 +530,19 @@ class LibVlcPlayerView: ExpoView {
 
     func resetPictureInPicture() {
         guard let player = mediaPlayer,
-              let videoTrack = player.videoTracks.first(where: { track in track.isSelected }),
-              isInBackground else { return }
+              let videoTrack = player.videoTracks.first(where: { track in track.isSelected })
+        else { return }
 
+        videoTrack.isSelected = false
         videoTrack.isSelectedExclusively = true
+
         player.play()
-        player.pause()
+
+        let deadline = DispatchTime.now() + .milliseconds(Int(MediaPlayerConstants.pipDelayMs))
+
+        DispatchQueue.main.asyncAfter(deadline: deadline) {
+            player.pause()
+        }
     }
 
     func onStartPictureInPicture() {

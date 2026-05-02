@@ -15,4 +15,5 @@
 /lint-staged.config.js
 tsconfig.tsbuildinfo
 /.swift-version
+/.swiftformat
 /tsconfig.eslint.json
