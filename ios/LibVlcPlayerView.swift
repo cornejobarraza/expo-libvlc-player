@@ -530,6 +530,7 @@ class LibVlcPlayerView: ExpoView {
 
     func resetPictureInPicture() {
         guard let player = mediaPlayer,
+              !player.isPlaying,
               let videoTrack = player.videoTracks.first(where: { track in track.isSelected })
         else { return }
 
