@@ -471,10 +471,12 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func seekZero() {
-        if let player = mediaPlayer {
-            // Black screen workaround
-            player.time = VLCTime(int: Int32(player.time.intValue))
-        }
+        guard let player = mediaPlayer,
+              !player.isPlaying
+        else { return }
+
+        // Black screen workaround
+        player.time = VLCTime(int: Int32(player.time.intValue))
     }
 
     func record(_ path: String?) {
