@@ -295,7 +295,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
    *
    * @see {@link https://react.dev/learn/referencing-values-with-refs#refs-and-the-dom React Docs}
    */
-  ref: React.RefObject<LibVlcPlayerViewRef | null>;
+  ref?: React.RefObject<LibVlcPlayerViewRef | null>;
   /**
    * Sets the source of the media to be played. Set to `null` to release the player
    *
