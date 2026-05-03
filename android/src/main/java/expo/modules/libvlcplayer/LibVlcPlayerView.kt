@@ -63,7 +63,6 @@ class LibVlcPlayerView(
 
     var firstPlay: Boolean = true
     private var shouldInit: Boolean = true
-    var isInBackground: Boolean = false
 
     val onBuffering by EventDispatcher<Unit>()
     val onPlaying by EventDispatcher<Unit>()

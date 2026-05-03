@@ -42,7 +42,6 @@ object MediaPlayerManager {
 
     fun onModuleForeground() {
         expoViews.forEach { view ->
-            view.isInBackground = false
             view.onForeground(Unit)
             view.cancelPauseJob()
         }
@@ -50,7 +49,6 @@ object MediaPlayerManager {
 
     fun onModuleBackground() {
         expoViews.forEach { view ->
-            view.isInBackground = true
             view.onBackground(Unit)
             view.pauseJob()
         }
