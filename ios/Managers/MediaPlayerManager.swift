@@ -27,6 +27,7 @@ class MediaPlayerManager {
         for view in expoViews.allObjects {
             view.isInBackground = false
             view.onForeground()
+            view.seekZero()
         }
     }
 

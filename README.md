@@ -287,15 +287,15 @@ interface MediaInfo {
 
 #### Black screen
 
-On Android, the `libvlcjni` player detaches from the View when its surface is destroyed after switching screens.
+On Android, the `libvlcjni` player detaches from the View after switching screens.
 
-The current workaround attaches the View once a surface is created but this causes a brief black screen.
+The current workaround attaches the View back but it causes a brief black screen.
 
 https://code.videolan.org/videolan/vlc-android/-/issues/1495
 
-On iOS, the `VLCKit` player deallocates from the UIView when closing the Picture-in-Picture (PiP) window.
+On iOS, the `VLCKit` player deselects the video track after switching screens.
 
-The current workaround exclusively selects the current video track but this causes a brief black screen.
+The current workaround selects the video track back but it causes a brief black screen.
 
 https://code.videolan.org/videolan/VLCKit/-/issues/743
 

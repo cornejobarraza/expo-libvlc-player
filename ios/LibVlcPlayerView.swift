@@ -307,15 +307,6 @@ class LibVlcPlayerView: ExpoView {
 
         videoTrack.isSelected = false
         videoTrack.isSelectedExclusively = true
-
-        // Black screen workaround
-        let delay = DispatchTimeInterval.milliseconds(Int(MediaPlayerConstants.resetDelayMs))
-        let deadline = DispatchTime.now() + delay
-        let time = VLCTime(int: Int32(player.time.intValue))
-
-        DispatchQueue.main.asyncAfter(deadline: deadline) {
-            player.time = time
-        }
     }
 
     var hasVideoSize: Bool {
@@ -476,6 +467,13 @@ class LibVlcPlayerView: ExpoView {
                     time = Int(value)
                 }
             }
+        }
+    }
+
+    func seekZero() {
+        if let player = mediaPlayer {
+            // Black screen workaround
+            player.time = VLCTime(int: Int32(player.time.intValue))
         }
     }
 
