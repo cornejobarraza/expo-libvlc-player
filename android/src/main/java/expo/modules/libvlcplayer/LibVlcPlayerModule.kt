@@ -56,7 +56,6 @@ class LibVlcPlayerModule : Module() {
             }
 
             OnActivityEntersForeground {
-                MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
                 MediaPlayerManager.onModuleForeground()
             }
 
