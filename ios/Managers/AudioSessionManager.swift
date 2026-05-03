@@ -20,7 +20,7 @@ class AudioSessionManager {
         let audioMixingMode = findAudioMixingMode()
         var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession.categoryOptions
 
-        let isOutputtingAudio = expoViews.allObjects.contains { view in
+        let anyPlayingView = expoViews.allObjects.contains { view in
             if let player = view.mediaPlayer, let audio = player.audio {
                 player.isPlaying && audio.volume > MediaPlayerConstants.minPlayerVolume
             } else {
@@ -30,9 +30,9 @@ class AudioSessionManager {
 
         let shouldMixOverride = audioMixingMode == .mixWithOthers
         let doNotMixOverride = audioMixingMode == .doNotMix
-        let shouldDuckOthers = audioMixingMode == .duckOthers && isOutputtingAudio
+        let shouldDuckOthers = audioMixingMode == .duckOthers && anyPlayingView
 
-        let shouldMixWithOthers = shouldMixOverride || !isOutputtingAudio
+        let shouldMixWithOthers = shouldMixOverride || !anyPlayingView
 
         if shouldMixWithOthers && !shouldDuckOthers && !doNotMixOverride {
             audioSessionCategoryOptions.insert(.mixWithOthers)
@@ -54,7 +54,7 @@ class AudioSessionManager {
             }
         }
 
-        if isOutputtingAudio || doNotMixOverride {
+        if anyPlayingView || doNotMixOverride {
             do {
                 try audioSession.setActive(true)
             } catch {

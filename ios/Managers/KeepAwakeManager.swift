@@ -1,9 +1,7 @@
 class KeepAwakeManager {
     static let shared = KeepAwakeManager()
 
-    private lazy var anyPlayingView = MediaPlayerManager.shared.expoViews.allObjects.contains { view in
-        view.mediaPlayer?.isPlaying == true
-    }
+    private lazy var expoViews = MediaPlayerManager.shared.expoViews
 
     func activateKeepAwake() {
         DispatchQueue.main.async {
@@ -18,6 +16,10 @@ class KeepAwakeManager {
     }
 
     func toggleKeepAwake() {
+        let anyPlayingView = expoViews.allObjects.contains { view in
+            view.mediaPlayer?.isPlaying == true
+        }
+
         if anyPlayingView {
             activateKeepAwake()
         } else {
