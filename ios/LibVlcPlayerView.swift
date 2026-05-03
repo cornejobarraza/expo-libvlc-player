@@ -73,17 +73,11 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func createPlayer() {
-        var drawable: MediaPlayerDrawable
-
-        if pictureInPicture {
-            playerDrawable.removeFromSuperview()
-            drawable = pictureDrawable
-        } else {
-            pictureDrawable?.removeFromSuperview()
-            drawable = playerDrawable
-        }
-
         library = VLCLibrary()
+        let drawable = pictureInPicture
+            ? pictureDrawable!
+            : playerDrawable
+
         mediaPlayer = VLCMediaPlayer(library: library!)
         mediaPlayer!.drawable = drawable
         mediaPlayer!.delegate = self
@@ -109,6 +103,7 @@ class LibVlcPlayerView: ExpoView {
         firstPlay = true
         shouldInit = false
 
+        subviews.forEach { view in view.removeFromSuperview() }
         addSubview(drawable)
     }
 
@@ -304,6 +299,25 @@ class LibVlcPlayerView: ExpoView {
         return CGSize(width: 0, height: 0)
     }
 
+    func resetVideoTrack() {
+        guard let player = mediaPlayer,
+              let videoTrack = player.videoTracks.first(where: { track in track.isSelected }),
+              isInBackground
+        else { return }
+
+        videoTrack.isSelected = false
+        videoTrack.isSelectedExclusively = true
+
+        // Black screen workaround
+        let delay = DispatchTimeInterval.milliseconds(Int(MediaPlayerConstants.resetDelayMs))
+        let deadline = DispatchTime.now() + delay
+        let time = VLCTime(int: Int32(player.time.intValue))
+
+        DispatchQueue.main.asyncAfter(deadline: deadline) {
+            player.time = time
+        }
+    }
+
     var hasVideoSize: Bool {
         let video = getVideoSize()
         return video.width > 0 && video.height > 0
@@ -436,9 +450,10 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer?.pause()
     }
 
-    func pausePip() {
+    func pauseReset() {
         if !pictureInPicture {
             mediaPlayer?.pause()
+            resetVideoTrack()
         }
     }
 
@@ -528,30 +543,12 @@ class LibVlcPlayerView: ExpoView {
         pictureDrawable.stopPictureInPicture()
     }
 
-    func resetPictureInPicture() {
-        guard let player = mediaPlayer,
-              !player.isPlaying,
-              let videoTrack = player.videoTracks.first(where: { track in track.isSelected })
-        else { return }
-
-        videoTrack.isSelected = false
-        videoTrack.isSelectedExclusively = true
-
-        player.play()
-
-        let deadline = DispatchTime.now() + .milliseconds(Int(MediaPlayerConstants.pipDelayMs))
-
-        DispatchQueue.main.asyncAfter(deadline: deadline) {
-            player.pause()
-        }
-    }
-
     func onStartPictureInPicture() {
         onPictureInPictureStart()
     }
 
     func onStopPictureInPicture() {
-        resetPictureInPicture()
+        resetVideoTrack()
         onPictureInPictureStop()
     }
 
@@ -565,7 +562,8 @@ class LibVlcPlayerView: ExpoView {
 
         if block(isLastAttempt) || isLastAttempt { return }
 
-        let deadline = DispatchTime.now() + .milliseconds(Int(delay))
+        let deadDelay = DispatchTimeInterval.milliseconds(Int(delay))
+        let deadline = DispatchTime.now() + deadDelay
         let expDelay = delay * MediaPlayerConstants.expDelayMultiplier
 
         DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in

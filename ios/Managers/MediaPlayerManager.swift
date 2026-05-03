@@ -34,7 +34,7 @@ class MediaPlayerManager {
         for view in expoViews.allObjects {
             view.isInBackground = true
             view.onBackground()
-            view.pausePip()
+            view.pauseReset()
         }
     }
 }

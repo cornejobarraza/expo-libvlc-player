@@ -112,11 +112,11 @@ class LibVlcPlayerView(
 
     fun getTextureView(layout: VLCVideoLayout): TextureView? = layout.findViewById(org.videolan.R.id.texture_video)
 
-    fun addPlayerLayout(view: VLCVideoLayout) {
+    fun addPlayerLayout(layout: VLCVideoLayout) {
         val parent = playerLayout.parent as? ViewGroup
 
         if (parent == null) {
-            addView(view)
+            addView(layout)
         }
     }
 
@@ -143,12 +143,12 @@ class LibVlcPlayerView(
         removePlayerLayout()
     }
 
-    fun attachPlayerLayout(view: VLCVideoLayout) {
+    fun attachPlayerLayout(layout: VLCVideoLayout) {
         mediaPlayer?.let { player ->
             val attached = player.getVLCVout().areViewsAttached()
 
             if (!attached) {
-                player.attachViews(view, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+                player.attachViews(layout, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
             }
         }
     }
@@ -579,12 +579,10 @@ class LibVlcPlayerView(
         pauseCoroutine =
             CoroutineScope(Dispatchers.Main).launch {
                 if (pictureInPicture) {
-                    delay(MediaPlayerConstants.COROUTINE_DELAY_MS)
+                    delay(MediaPlayerConstants.PAUSE_DELAY_MS)
                 }
 
-                if (isInBackground) {
-                    mediaPlayer?.pause()
-                }
+                mediaPlayer?.pause()
             }
     }
 
