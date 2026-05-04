@@ -5,16 +5,16 @@ import { View } from "react-native";
 import {
   type LibVlcPlayerViewNativeProps,
   type LibVlcPlayerViewProps,
-  type Dialog,
-  type Error,
-  type MediaInfo,
-  type MediaTracks,
+  type VideoAspectRatio,
   type NativeEvent,
+  type Error,
+  type Dialog,
+  type Time,
   type Position,
+  type MediaTracks,
   type Recording,
   type Snapshot,
-  type Time,
-  type VideoAspectRatio,
+  type MediaInfo,
 } from "./LibVlcPlayer.types";
 import { convertAspectRatio } from "./utils/aspect";
 import { parseNativeSource } from "./utils/assets";

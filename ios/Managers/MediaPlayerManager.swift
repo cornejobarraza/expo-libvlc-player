@@ -27,7 +27,6 @@ class MediaPlayerManager {
         for view in expoViews.allObjects {
             view.isInBackground = false
             view.onForeground()
-            view.seekZero()
         }
     }
 
@@ -35,7 +34,10 @@ class MediaPlayerManager {
         for view in expoViews.allObjects {
             view.isInBackground = true
             view.onBackground()
-            view.pauseReset()
+
+            if !view.pictureInPicture {
+                view.pauseReset()
+            }
         }
     }
 }

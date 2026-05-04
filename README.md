@@ -289,13 +289,13 @@ interface MediaInfo {
 
 On Android, the `libvlcjni` player detaches from the View after switching screens.
 
-The current workaround attaches the View back but it causes a brief black screen.
+The current workaround attaches the View back but this causes a brief black screen.
 
 https://code.videolan.org/videolan/vlc-android/-/issues/1495
 
-On iOS, the `VLCKit` player deselects the video track after switching screens.
+On iOS, the `VLCKit` player deselects the current video track after switching screens.
 
-The current workaround selects the video track back but it causes a brief black screen.
+The current workaround selects the previous video track but this causes a brief black screen.
 
 https://code.videolan.org/videolan/VLCKit/-/issues/743
 

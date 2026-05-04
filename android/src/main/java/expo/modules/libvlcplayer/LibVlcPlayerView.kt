@@ -577,10 +577,7 @@ class LibVlcPlayerView(
 
         pauseCoroutine =
             CoroutineScope(Dispatchers.Main).launch {
-                if (pictureInPicture) {
-                    delay(MediaPlayerConstants.PAUSE_DELAY_MS)
-                }
-
+                delay(MediaPlayerConstants.PAUSE_DELAY_MS)
                 mediaPlayer?.pause()
             }
     }

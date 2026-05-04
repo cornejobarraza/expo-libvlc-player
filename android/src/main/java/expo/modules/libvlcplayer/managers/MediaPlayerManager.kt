@@ -43,14 +43,22 @@ object MediaPlayerManager {
     fun onModuleForeground() {
         expoViews.forEach { view ->
             view.onForeground(Unit)
-            view.cancelPauseJob()
+
+            if (view.pictureInPicture) {
+                view.cancelPauseJob()
+            }
         }
     }
 
     fun onModuleBackground() {
         expoViews.forEach { view ->
             view.onBackground(Unit)
-            view.pauseJob()
+
+            if (view.pictureInPicture) {
+                view.pauseJob()
+            } else {
+                view.pause()
+            }
         }
     }
 }

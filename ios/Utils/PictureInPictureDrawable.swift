@@ -83,13 +83,7 @@ extension PictureInPictureDrawable: VLCPictureInPictureMediaControlling {
     }
 
     func seek(by offset: Int64, completion: (() -> Void)!) {
-        if let player = mediaPlayer {
-            player.time = VLCTime(int: Int32(player.time.intValue + Int32(offset)))
-
-            DispatchQueue.main.async {
-                completion()
-            }
-        }
+        mediaPlayer?.jump(withOffset: Int32(offset), completion: completion)
     }
 
     func mediaLength() -> Int64 {

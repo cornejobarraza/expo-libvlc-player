@@ -14,10 +14,10 @@ class LibVlcPlayerView: ExpoView {
     var vlcDialogRef: NSValue?
 
     var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
+    var isInBackground: Bool = false
 
     var firstPlay: Bool = true
     private var shouldInit: Bool = true
-    var isInBackground: Bool = false
 
     let onBuffering = EventDispatcher()
     let onPlaying = EventDispatcher()
@@ -73,11 +73,11 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func createPlayer() {
-        library = VLCLibrary()
         let drawable = pictureInPicture
             ? pictureDrawable!
             : playerDrawable
 
+        library = VLCLibrary()
         mediaPlayer = VLCMediaPlayer(library: library!)
         mediaPlayer!.drawable = drawable
         mediaPlayer!.delegate = self
@@ -299,16 +299,6 @@ class LibVlcPlayerView: ExpoView {
         return CGSize(width: 0, height: 0)
     }
 
-    func resetVideoTrack() {
-        guard let player = mediaPlayer,
-              let videoTrack = player.videoTracks.first(where: { track in track.isSelected }),
-              isInBackground
-        else { return }
-
-        videoTrack.isSelected = false
-        videoTrack.isSelectedExclusively = true
-    }
-
     var hasVideoSize: Bool {
         let video = getVideoSize()
         return video.width > 0 && video.height > 0
@@ -442,10 +432,15 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func pauseReset() {
-        if !pictureInPicture {
-            mediaPlayer?.pause()
-            resetVideoTrack()
-        }
+        guard let player = mediaPlayer,
+              let videoTrack = player.videoTracks.first(where: { track in track.isSelected }),
+              isInBackground
+        else { return }
+
+        player.pause()
+        videoTrack.isSelected = false
+        videoTrack.isSelectedExclusively = true
+        DispatchQueue.main.async { player.time = VLCTime(int: player.time.intValue) }
     }
 
     func stop() {
@@ -468,15 +463,6 @@ class LibVlcPlayerView: ExpoView {
                 }
             }
         }
-    }
-
-    func seekZero() {
-        guard let player = mediaPlayer,
-              !player.isPlaying
-        else { return }
-
-        // Black screen workaround
-        player.time = VLCTime(int: Int32(player.time.intValue))
     }
 
     func record(_ path: String?) {
@@ -548,7 +534,7 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func onStopPictureInPicture() {
-        resetVideoTrack()
+        pauseReset()
         onPictureInPictureStop()
     }
 
