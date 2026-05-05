@@ -1,7 +1,7 @@
 import { LibVlcPlayerView, type LibVlcPlayerViewRef } from "expo-libvlc-player";
 import { type SFSymbol } from "expo-symbols";
 import { useRef, useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Image, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Focusable } from "./Focusable";
@@ -23,6 +23,7 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
   const [focus, setFocus] = useState<SFSymbol>(DEFAULT_FOCUSABLE);
+  const [background, setBackground] = useState<boolean>(false);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
   const bufferRef = useRef<TimeoutRef>(undefined);
@@ -66,12 +67,16 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
     },
   ];
 
+  const showPoster = background || (!playing && time === 0);
   const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.libVlc, fullScreen && styles.libVlcFull]}>
       {!fullScreen && title && <Text style={styles.title}>{title}</Text>}
       <View style={styles.container}>
+        {showPoster && (
+          <Image style={styles.poster} source={require("../assets/bbb.png")} resizeMode="contain" />
+        )}
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
           ref={playerRef}
@@ -89,6 +94,7 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
           onPlaying={() => {
             setFocus((prev) => (prev !== DEFAULT_FOCUSABLE ? "pause.fill" : prev));
             setPlaying(true);
+            setBackground(false);
           }}
           onPaused={() => {
             setFocus((prev) => (prev !== DEFAULT_FOCUSABLE ? "play.fill" : prev));
@@ -96,12 +102,16 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
           }}
           onStopped={() => {
             setPlaying(false);
+            setTime(0);
           }}
           onEncounteredError={({ message }) => {
             Alert.alert("Error", message);
           }}
           onTimeChanged={({ value }) => {
             setTime(value);
+          }}
+          onBackground={() => {
+            setBackground(true);
           }}
         />
       </View>
@@ -147,6 +157,13 @@ const styles = StyleSheet.create({
   },
   buffering: {
     ...StyleSheet.absoluteFill,
+    zIndex: 9998,
+  },
+  poster: {
+    ...StyleSheet.absoluteFill,
+    width: "100%",
+    height: "100%",
+    borderRadius: 12,
     zIndex: 9999,
   },
   player: {
