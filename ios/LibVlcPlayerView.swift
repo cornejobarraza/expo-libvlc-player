@@ -438,9 +438,15 @@ class LibVlcPlayerView: ExpoView {
         else { return }
 
         player.pause()
+ 
         videoTrack.isSelected = false
         videoTrack.isSelectedExclusively = true
-        DispatchQueue.main.async { player.time = VLCTime(int: player.time.intValue) }
+
+        DispatchQueue.main.async {
+            if player.isSeekable {
+                player.time = VLCTime(int: player.time.intValue)
+            }
+        }
     }
 
     func stop() {
