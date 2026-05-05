@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="VLC icon" src="https://images.videolan.org/images/VLC-IconSmall.png">
+  <img alt="VLC icon" src="example/assets/vlc.png">
 </p>
 
 <h1 align="center">LibVLC Player for Expo</h1>
@@ -293,9 +293,9 @@ The current workaround attaches the View back but this causes a brief black scre
 
 https://code.videolan.org/videolan/vlc-android/-/issues/1495
 
-On iOS, the `VLCKit` player deselects the current video track after switching screens.
+On iOS, the `VLCKit` player loses the current video track after pausing in the background.
 
-The current workaround selects the previous video track but this causes a brief black screen.
+The current workaround restores the selected video track but this causes a brief black screen.
 
 https://code.videolan.org/videolan/VLCKit/-/issues/743
 
