@@ -31,7 +31,7 @@ class AudioFocusManager(
 
     private var currentFocusRequest: AudioFocusRequest? = null
 
-    private val anyPlayerRequiresFocus: Boolean
+    private val anyPlayingView: Boolean
         get() =
             expoViews.any { view ->
                 playerRequiresFocus(view.mediaPlayer)
@@ -89,7 +89,7 @@ class AudioFocusManager(
 
     fun updateAudioFocus() {
         appContext.mainQueue.launch {
-            if (anyPlayerRequiresFocus || findAudioMixingMode() != currentMixingMode) {
+            if (anyPlayingView || findAudioMixingMode() != currentMixingMode) {
                 requestAudioFocus()
             } else {
                 abandonAudioFocus()
@@ -97,12 +97,10 @@ class AudioFocusManager(
         }
     }
 
-    private fun playerRequiresFocus(player: MediaPlayer?): Boolean =
-        if (player != null) {
-            player.isPlaying() && player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME
-        } else {
-            false
-        }
+    private fun playerRequiresFocus(mediaPlayer: MediaPlayer?): Boolean {
+        val player = mediaPlayer ?: return false
+        return player.isPlaying() && player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME
+    }
 
     private fun findAudioMixingMode(): AudioMixingMode {
         val mixingModes =
@@ -122,7 +120,7 @@ class AudioFocusManager(
     private fun requestAudioFocus() {
         val audioMixingMode = findAudioMixingMode()
 
-        if (audioMixingMode == AudioMixingMode.MIX_WITH_OTHERS || !anyPlayerRequiresFocus) {
+        if (audioMixingMode == AudioMixingMode.MIX_WITH_OTHERS || !anyPlayingView) {
             abandonAudioFocus()
             currentMixingMode = audioMixingMode
             return

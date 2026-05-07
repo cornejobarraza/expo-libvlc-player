@@ -1,6 +1,7 @@
 import AVFoundation
 import ExpoModulesCore
 import Foundation
+import VLCKit
 
 class AudioSessionManager {
     static let shared = AudioSessionManager()
@@ -21,11 +22,7 @@ class AudioSessionManager {
         var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession.categoryOptions
 
         let anyPlayingView = expoViews.allObjects.contains { view in
-            if let player = view.mediaPlayer, let audio = player.audio {
-                player.isPlaying && audio.volume > MediaPlayerConstants.minPlayerVolume
-            } else {
-                false
-            }
+            playerRequiresCategory(view.mediaPlayer)
         }
 
         let shouldMixOverride = audioMixingMode == .mixWithOthers
@@ -54,13 +51,16 @@ class AudioSessionManager {
             }
         }
 
-        if anyPlayingView || doNotMixOverride {
-            do {
-                try audioSession.setActive(true)
-            } catch {
-                log.warn("Failed to activate the audio session")
-            }
+        do {
+            try audioSession.setActive(anyPlayingView || doNotMixOverride)
+        } catch {
+            log.warn("Failed to set the audio session")
         }
+    }
+
+    private func playerRequiresCategory(_ mediaPlayer: VLCMediaPlayer?) -> Bool {
+        guard let player = mediaPlayer, let audio = player.audio else { return false }
+        return player.isPlaying && audio.volume > MediaPlayerConstants.minPlayerVolume
     }
 
     private func findAudioMixingMode() -> AudioMixingMode? {
