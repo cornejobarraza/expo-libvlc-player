@@ -14,7 +14,6 @@ class LibVlcPlayerView: ExpoView {
     var vlcDialogRef: NSValue?
 
     var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
-    var isInBackground: Bool = false
 
     var firstPlay: Bool = true
     private var shouldInit: Bool = true
@@ -299,6 +298,22 @@ class LibVlcPlayerView: ExpoView {
         return CGSize(width: 0, height: 0)
     }
 
+    func resetVideoTrack() {
+        guard let player = mediaPlayer,
+              let videoTrack = player.videoTracks.first(where: { track in track.isSelected }),
+              !player.isPlaying
+        else { return }
+
+        videoTrack.isSelected = false
+        videoTrack.isSelectedExclusively = true
+
+        DispatchQueue.main.async {
+            if player.isSeekable {
+                player.time = VLCTime(int: player.time.intValue)
+            }
+        }
+    }
+
     var hasVideoSize: Bool {
         let video = getVideoSize()
         return video.width > 0 && video.height > 0
@@ -432,21 +447,11 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func pauseReset() {
-        guard let player = mediaPlayer,
-              let videoTrack = player.videoTracks.first(where: { track in track.isSelected }),
-              isInBackground
-        else { return }
-
-        player.pause()
-
-        videoTrack.isSelected = false
-        videoTrack.isSelectedExclusively = true
-
-        DispatchQueue.main.async {
-            if player.isSeekable {
-                player.time = VLCTime(int: player.time.intValue)
-            }
+        if !pictureInPicture {
+            mediaPlayer?.pause()
         }
+
+        resetVideoTrack()
     }
 
     func stop() {
@@ -540,7 +545,7 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func onStopPictureInPicture() {
-        pauseReset()
+        resetVideoTrack()
         onPictureInPictureStop()
     }
 
