@@ -438,7 +438,7 @@ class LibVlcPlayerView: ExpoView {
         else { return }
 
         player.pause()
- 
+
         videoTrack.isSelected = false
         videoTrack.isSelectedExclusively = true
 
