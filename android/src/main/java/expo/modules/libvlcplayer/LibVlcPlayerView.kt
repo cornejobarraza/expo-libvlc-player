@@ -602,18 +602,10 @@ class LibVlcPlayerView(
         type: String? = "time",
     ) {
         mediaPlayer?.let { player ->
-            if (player.isSeekable()) {
-                if (type == "position") {
-                    player.setPosition(value.toFloat())
-                } else {
-                    player.setTime(value.toLong())
-                }
+            if (type == "position") {
+                player.setPosition(value.toFloat())
             } else {
-                if (type == "position") {
-                    time = (value * getMediaLength().toDouble()).toInt()
-                } else {
-                    time = value.toInt()
-                }
+                player.setTime(value.toLong())
             }
         }
     }

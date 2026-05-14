@@ -307,10 +307,9 @@ class LibVlcPlayerView: ExpoView {
         videoTrack.isSelected = false
         videoTrack.isSelectedExclusively = true
 
+        // Black screen workaround
         DispatchQueue.main.async {
-            if player.isSeekable {
-                player.time = VLCTime(int: player.time.intValue)
-            }
+            player.time = VLCTime(int: player.time.intValue)
         }
     }
 
@@ -466,18 +465,10 @@ class LibVlcPlayerView: ExpoView {
 
     func seek(_ value: Double, _ type: String? = "time") {
         if let player = mediaPlayer {
-            if player.isSeekable {
-                if type == "position" {
-                    player.position = value
-                } else {
-                    player.time = VLCTime(int: Int32(value))
-                }
+            if type == "position" {
+                player.position = value
             } else {
-                if type == "position" {
-                    time = Int(value * Double(getMediaLength()))
-                } else {
-                    time = Int(value)
-                }
+                player.time = VLCTime(int: Int32(value))
             }
         }
     }
