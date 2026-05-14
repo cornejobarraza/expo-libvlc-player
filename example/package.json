@@ -10,12 +10,12 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
-    "expo": "~55.0.23",
+    "expo": "~55.0.24",
     "expo-font": "~55.0.7",
-    "expo-screen-orientation": "~55.0.14",
+    "expo-screen-orientation": "~55.0.15",
     "expo-status-bar": "~55.0.6",
     "expo-symbols": "~55.0.8",
-    "expo-system-ui": "~55.0.17",
+    "expo-system-ui": "~55.0.18",
     "react": "19.2.0",
     "react-native": "npm:react-native-tvos@0.83-stable",
     "react-native-safe-area-context": "~5.6.2"
