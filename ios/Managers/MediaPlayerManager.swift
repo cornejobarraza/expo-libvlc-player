@@ -32,7 +32,10 @@ class MediaPlayerManager {
     func onModuleBackground() {
         for view in expoViews.allObjects {
             view.onBackground()
-            view.pauseReset()
+
+            if !view.pictureInPicture {
+                view.pauseReset()
+            }
         }
     }
 }
