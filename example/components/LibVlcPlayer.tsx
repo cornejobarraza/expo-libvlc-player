@@ -75,7 +75,13 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
       {!fullScreen && title && <Text style={styles.title}>{title}</Text>}
       <View style={styles.container}>
         {showPoster && (
-          <Image style={styles.poster} source={require("../assets/bbb.png")} resizeMode="contain" />
+          <View style={styles.poster}>
+            <Image
+              style={[styles.image, fullScreen && { borderRadius: 0 }]}
+              source={require("../assets/bbb.png")}
+              resizeMode="contain"
+            />
+          </View>
         )}
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
@@ -157,14 +163,16 @@ const styles = StyleSheet.create({
   },
   buffering: {
     ...StyleSheet.absoluteFill,
-    zIndex: 9998,
+    zIndex: 9997,
   },
   poster: {
     ...StyleSheet.absoluteFill,
+    zIndex: 9998,
+  },
+  image: {
     width: "100%",
     height: "100%",
     borderRadius: 12,
-    zIndex: 9999,
   },
   player: {
     backgroundColor: "black",
@@ -180,5 +188,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     bottom: 20,
     alignItems: "flex-end",
+    zIndex: 9999,
   },
 });
