@@ -216,19 +216,17 @@ class LibVlcPlayerView: ExpoView {
                     player.time = VLCTime(int: Int32(time))
                 }
 
-                if volume != MediaPlayerConstants.maxPlayerVolume || mute {
-                    // Audio instance not ready, try again
-                    retryUntil { [weak self] _ in
-                        guard let self else { return true }
+                // Negative volume workaround
+                retryUntil { [weak self] _ in
+                    guard let self else { return true }
 
-                        let newVolume = mute ?
-                            MediaPlayerConstants.minPlayerVolume :
-                            volume
+                    let newVolume = mute ?
+                        MediaPlayerConstants.minPlayerVolume :
+                        volume
 
-                        player.audio?.volume = Int32(newVolume)
+                    player.audio?.volume = Int32(newVolume)
 
-                        return false
-                    }
+                    return false
                 }
 
                 time = MediaPlayerConstants.defaultPlayerTime
