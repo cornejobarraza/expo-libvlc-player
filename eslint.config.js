@@ -1,13 +1,8 @@
-const { fixupConfigRules } = require("@eslint/compat");
-const { FlatCompat } = require("@eslint/eslintrc");
 const { defineConfig, globalIgnores } = require("eslint/config");
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+const universe = require("eslint-config-universe/flat/native");
 
 module.exports = defineConfig([
-  ...fixupConfigRules(compat.extends("universe/native")),
+  ...universe,
   globalIgnores(["**/build"]),
   {
     files: ["**/*.js"],

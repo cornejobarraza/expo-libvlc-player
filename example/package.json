@@ -22,8 +22,8 @@
   },
   "devDependencies": {
     "@react-native-tvos/config-tv": "^0.1.6",
-    "@types/react": "~19.2.10",
-    "typescript": "~5.9.2"
+    "@types/react": "~19.2.15",
+    "typescript": "~5.9.3"
   },
   "expo": {
     "install": {
