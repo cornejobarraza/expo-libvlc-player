@@ -35,7 +35,6 @@ switch (process.platform) {
         "/usr/local/android-studio/bin/studio.sh",
         // snap
         "/snap/android-studio/current/bin/studio.sh",
-        // TODO @behenate Install toolbox on Linux and check which is the correct path
         // JetBrains Toolbox 2.x (flat layout)
         `${home}/.local/share/JetBrains/Toolbox/apps/android-studio/bin/studio.sh`,
         // JetBrains Toolbox 2.x (with channel subdirectory still present)
