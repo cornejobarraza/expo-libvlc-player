@@ -3,13 +3,13 @@ class KeepAwakeManager {
 
     private lazy var expoViews = MediaPlayerManager.shared.expoViews
 
-    func activateKeepAwake() {
+    private func activateKeepAwake() {
         DispatchQueue.main.async {
             UIApplication.shared.isIdleTimerDisabled = true
         }
     }
 
-    func deactivateKeepAwake() {
+    private func deactivateKeepAwake() {
         DispatchQueue.main.async {
             UIApplication.shared.isIdleTimerDisabled = false
         }
