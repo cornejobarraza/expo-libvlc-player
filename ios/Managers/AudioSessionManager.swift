@@ -51,10 +51,12 @@ class AudioSessionManager {
             }
         }
 
-        do {
-            try audioSession.setActive(anyPlayingView || doNotMixOverride)
-        } catch {
-            log.warn("Failed to set the audio session")
+        if anyPlayingView || doNotMixOverride {
+            do {
+                try audioSession.setActive(true)
+            } catch {
+                log.warn("Failed to set the audio session")
+            }
         }
     }
 
