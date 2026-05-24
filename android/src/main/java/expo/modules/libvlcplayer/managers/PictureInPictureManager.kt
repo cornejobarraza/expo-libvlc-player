@@ -115,11 +115,7 @@ class PictureInPictureManager(
 
                             when (controlType) {
                                 MediaPlayerConstants.EXTRA_CONTROL_REWIND -> {
-                                    val time = player.getTime()
-
-                                    if (time != -1L) {
-                                        player.setTime(time - MediaPlayerConstants.SEEK_STEP_MS)
-                                    }
+                                    player.setTime(player.getTime() - MediaPlayerConstants.SEEK_STEP_MS)
                                 }
 
                                 MediaPlayerConstants.EXTRA_CONTROL_PLAY -> {
@@ -131,11 +127,7 @@ class PictureInPictureManager(
                                 }
 
                                 MediaPlayerConstants.EXTRA_CONTROL_FORWARD -> {
-                                    val time = player.getTime()
-
-                                    if (time != -1L) {
-                                        player.setTime(time + MediaPlayerConstants.SEEK_STEP_MS)
-                                    }
+                                    player.setTime(player.getTime() + MediaPlayerConstants.SEEK_STEP_MS)
                                 }
                             }
                         }
@@ -284,9 +276,6 @@ class PictureInPictureManager(
 
         pipView?.let { view ->
             // Black screen workaround
-            view.detachPlayerLayout()
-            view.attachPlayerLayout(pictureLayout)
-
             view.detachPlayerLayout()
             view.post { view.attachPlayerLayout(pictureLayout) }
         }
