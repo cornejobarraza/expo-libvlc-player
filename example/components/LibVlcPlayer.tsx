@@ -67,7 +67,7 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
     },
   ];
 
-  const showPoster = background || (!playing && time === 0);
+  const showPoster = (!playing && background) || (!playing && time === 0);
   const insets = useSafeAreaInsets();
 
   return (
@@ -126,6 +126,7 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
           styles.controls,
           fullScreen && [styles.controlsFull, { paddingBottom: insets.bottom }],
         ]}>
+        {/* eslint-disable-next-line react-hooks/refs */}
         {PLAYER_CONTROLS.map((control, index) => (
           <Focusable
             key={index}
