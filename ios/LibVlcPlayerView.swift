@@ -253,15 +253,7 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func getMediaLength() -> Int {
-        var length = 0
-
-        let duration = Int(mediaPlayer?.media?.length.intValue ?? 0)
-
-        if duration > 0 {
-            length = duration
-        }
-
-        return length
+        Int(mediaPlayer?.media?.length.intValue ?? 0)
     }
 
     func getMediaInfo() -> MediaInfo {

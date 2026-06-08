@@ -397,17 +397,7 @@ class LibVlcPlayerView(
         return mediaTracks
     }
 
-    fun getMediaLength(): Int {
-        var length = 0
-
-        val duration = mediaPlayer?.getLength()?.toInt() ?: 0
-
-        if (duration > 0) {
-            length = duration
-        }
-
-        return length
-    }
+    fun getMediaLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
 
     fun getMediaInfo(): MediaInfo {
         val video = getVideoSize()
