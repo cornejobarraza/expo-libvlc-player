@@ -17,25 +17,20 @@ export function useFullScreen() {
   useEffect(() => {
     unlockAsync();
 
-    getOrientation();
+    getOrientationAsync().then((orientation) => {
+      setFullScreen(getFullScreen(orientation));
+    });
 
-    const listener = ({ orientationInfo: { orientation } }: OrientationChangeEvent) => {
-      const fullScreen = getFullScreen(orientation);
-      setFullScreen(fullScreen);
-    };
-
-    const subscription = addOrientationChangeListener(listener);
+    const subscription = addOrientationChangeListener(
+      ({ orientationInfo: { orientation } }: OrientationChangeEvent) => {
+        setFullScreen(getFullScreen(orientation));
+      }
+    );
 
     return () => {
       subscription.remove();
     };
   }, []);
-
-  const getOrientation = async () => {
-    const orientation = await getOrientationAsync();
-    const fullScreen = getFullScreen(orientation);
-    setFullScreen(fullScreen);
-  };
 
   return fullScreen;
 }

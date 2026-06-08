@@ -1,5 +1,5 @@
 import { requireNativeView } from "expo";
-import { useRef, type ComponentType } from "react";
+import { useState, type ComponentType } from "react";
 import { View } from "react-native";
 
 import {
@@ -26,16 +26,15 @@ const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
 const RENDERING_CHILDREN_WARNING =
   "The <LibVlcPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the LibVlcPlayer, consider using absolute positioning.";
 
-let loggedRenderingChildrenWarning = false;
-
 const FALLBACK_RATIO = 16 / 9;
 
 const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
-  const defaultRatio = useRef<VideoAspectRatio>(FALLBACK_RATIO);
+  const [defaultRatio, setDefaultRatio] = useState<VideoAspectRatio>(FALLBACK_RATIO);
+  const [loggedWarning, setLoggedWarning] = useState<boolean>(false);
 
-  if (props.children && !loggedRenderingChildrenWarning) {
+  if (props.children && !loggedWarning) {
     console.warn(RENDERING_CHILDREN_WARNING);
-    loggedRenderingChildrenWarning = true;
+    setLoggedWarning(true);
   }
 
   const onEncounteredError = (event: NativeEvent<Error>) => {
@@ -102,11 +101,11 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
       props.onFirstPlay(nativeEvent);
     }
 
-    defaultRatio.current = mediaRatio || FALLBACK_RATIO;
+    setDefaultRatio(mediaRatio || FALLBACK_RATIO);
   };
 
   const propRatio = props.aspectRatio;
-  const aspectRatio = propRatio === "auto" ? defaultRatio.current : propRatio;
+  const aspectRatio = propRatio === "auto" ? defaultRatio : propRatio;
   const nativeRatio = convertAspectRatio(aspectRatio);
 
   return (
