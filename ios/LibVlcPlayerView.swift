@@ -235,35 +235,21 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func getMediaTracks() -> MediaTracks {
-        var mediaTracks = MediaTracks()
+        guard let player = mediaPlayer else { return MediaTracks() }
 
-        if let player = mediaPlayer {
-            let audioTracks: [Track] = player.audioTracks.map { audio in
-                let id = (audio.trackId as NSString).intValue
-                let name = audio.trackName
-                return Track(id: Int(id), name: name)
-            }
+        let audioTracks = player.audioTracks.enumerated()
+        let videoTracks = player.videoTracks.enumerated()
+        let subtitleTracks = player.textTracks.enumerated()
 
-            let videoTracks: [Track] = player.videoTracks.map { video in
-                let id = (video.trackId as NSString).intValue
-                let name = video.trackName
-                return Track(id: Int(id), name: name)
-            }
+        let audio = audioTracks.map { index, audio in Track(id: index, name: audio.trackName) }
+        let video = videoTracks.map { index, video in Track(id: index, name: video.trackName) }
+        let subtitle = subtitleTracks.map { index, subtitle in Track(id: index, name: subtitle.trackName) }
 
-            let subtitleTracks: [Track] = player.textTracks.map { subtitle in
-                let id = (subtitle.trackId as NSString).intValue
-                let name = subtitle.trackName
-                return Track(id: Int(id), name: name)
-            }
-
-            mediaTracks = MediaTracks(
-                audio: audioTracks,
-                video: videoTracks,
-                subtitle: subtitleTracks
-            )
-        }
-
-        return mediaTracks
+        return MediaTracks(
+            audio: audio,
+            video: video,
+            subtitle: subtitle
+        )
     }
 
     func getMediaLength() -> Int {
