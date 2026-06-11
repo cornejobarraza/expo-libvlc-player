@@ -6,8 +6,8 @@ import expo.modules.libvlcplayer.records.Track
 import java.io.Serializable
 
 class MediaTracks(
-    @Field var audio: MutableList<Track> = mutableListOf(),
-    @Field var video: MutableList<Track> = mutableListOf(),
-    @Field var subtitle: MutableList<Track> = mutableListOf(),
+    @Field var audio: List<Track> = emptyList(),
+    @Field var video: List<Track> = emptyList(),
+    @Field var subtitle: List<Track> = emptyList(),
 ) : Record,
     Serializable

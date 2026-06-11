@@ -237,13 +237,15 @@ class LibVlcPlayerView: ExpoView {
     func getMediaTracks() -> MediaTracks {
         guard let player = mediaPlayer else { return MediaTracks() }
 
-        let audioTracks = player.audioTracks.enumerated()
-        let videoTracks = player.videoTracks.enumerated()
-        let subtitleTracks = player.textTracks.enumerated()
+        let disableTrack = Track(id: -1, name: "Disable")
 
-        let audio = audioTracks.map { index, audio in Track(id: index, name: audio.trackName) }
-        let video = videoTracks.map { index, video in Track(id: index, name: video.trackName) }
-        let subtitle = subtitleTracks.map { index, subtitle in Track(id: index, name: subtitle.trackName) }
+        let audios = player.audioTracks.enumerated()
+        let videos = player.videoTracks.enumerated()
+        let subtitles = player.textTracks.enumerated()
+
+        let audio = [disableTrack] + audios.map { index, audio in Track(id: index, name: audio.trackName) }
+        let video = [disableTrack] + videos.map { index, video in Track(id: index, name: video.trackName) }
+        let subtitle = [disableTrack] + subtitles.map { index, subtitle in Track(id: index, name: subtitle.trackName) }
 
         return MediaTracks(
             audio: audio,
@@ -270,8 +272,8 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func getVideoSize() -> CGSize {
-        if let size = mediaPlayer?.videoSize { return size }
-        return CGSize(width: 0, height: 0)
+        guard let size = mediaPlayer?.videoSize else { return CGSize(width: 0, height: 0) }
+        return size
     }
 
     func resetVideoTrack() {
@@ -291,18 +293,14 @@ class LibVlcPlayerView: ExpoView {
         return video.width > 0 && video.height > 0
     }
 
-    var hasVideoOut: Bool {
-        let tracks = getMediaTracks()
+    var hasMediaLength: Bool {
         let length = getMediaLength()
-        let hasVideo = tracks.video.count > 0
-        return hasVideo && hasVideoSize && length > 0
+        return length > 0
     }
 
-    var hasAudioOut: Bool {
-        let tracks = getMediaTracks()
-        let hasAudio = tracks.audio.count > 0
+    var hasMediaVolume: Bool {
         let volume = mediaPlayer?.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
-        return hasAudio && volume > MediaPlayerConstants.minPlayerVolume
+        return volume > MediaPlayerConstants.minPlayerVolume
     }
 
     var source: String? {
@@ -556,11 +554,11 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                         retryUntil { [weak self] isLastAttempt in
                             guard let self else { return true }
 
-                            if hasVideoOut || isLastAttempt {
+                            if hasMediaLength || isLastAttempt {
                                 onFirstPlay(getMediaInfo())
                             }
 
-                            return hasVideoOut
+                            return hasMediaLength
                         }
 
                         retryUntil { [weak self] _ in
@@ -577,11 +575,11 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                         retryUntil { [weak self] _ in
                             guard let self else { return true }
 
-                            if hasAudioOut {
+                            if hasMediaVolume {
                                 MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
                             }
 
-                            return hasAudioOut
+                            return hasMediaVolume
                         }
 
                         firstPlay = false

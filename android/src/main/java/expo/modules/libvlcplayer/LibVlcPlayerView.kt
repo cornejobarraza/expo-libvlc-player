@@ -359,42 +359,21 @@ class LibVlcPlayerView(
     }
 
     fun getMediaTracks(): MediaTracks {
-        var mediaTracks = MediaTracks()
+        val player = mediaPlayer ?: return MediaTracks()
 
-        mediaPlayer?.let { player ->
-            val audioTracks = mutableListOf<Track>()
-            val audios = player.getAudioTracks()
+        val audios = player.getAudioTracks()?.map { track -> Track(id = track.id, name = track.name) }
+        val videos = player.getVideoTracks()?.map { track -> Track(id = track.id, name = track.name) }
+        val subtitles = player.getSpuTracks()?.map { track -> Track(id = track.id, name = track.name) }
 
-            audios?.forEach { track ->
-                val trackObj = Track(id = track.id, name = track.name)
-                audioTracks.add(trackObj)
-            }
+        val audio = audios ?: emptyList()
+        val video = videos ?: emptyList()
+        val subtitle = subtitles ?: emptyList()
 
-            val videoTracks = mutableListOf<Track>()
-            val videos = player.getVideoTracks()
-
-            videos?.forEach { track ->
-                val trackObj = Track(id = track.id, name = track.name)
-                videoTracks.add(trackObj)
-            }
-
-            val subtitleTracks = mutableListOf<Track>()
-            val subtitles = player.getSpuTracks()
-
-            subtitles?.forEach { track ->
-                val trackObj = Track(id = track.id, name = track.name)
-                subtitleTracks.add(trackObj)
-            }
-
-            mediaTracks =
-                MediaTracks(
-                    audio = audioTracks,
-                    video = videoTracks,
-                    subtitle = subtitleTracks,
-                )
-        }
-
-        return mediaTracks
+        return MediaTracks(
+            audio = audio,
+            video = video,
+            subtitle = subtitle,
+        )
     }
 
     fun getMediaLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
@@ -413,9 +392,8 @@ class LibVlcPlayerView(
     }
 
     fun getVideoSize(): Size {
-        val video = mediaPlayer?.getCurrentVideoTrack()
-        if (video != null) return Size(video.width, video.height)
-        return Size(0, 0)
+        val video = mediaPlayer?.getCurrentVideoTrack() ?: return Size(0, 0)
+        return Size(video.width, video.height)
     }
 
     val hasVideoSize: Boolean
@@ -424,20 +402,16 @@ class LibVlcPlayerView(
             return video.width > 0 && video.height > 0
         }
 
-    val hasVideoOut: Boolean
+    val hasMediaLength: Boolean
         get() {
-            val tracks = getMediaTracks()
             val length = getMediaLength()
-            val hasVideo = tracks.video.any { track -> track.id != -1 }
-            return hasVideo && hasVideoSize && length > 0
+            return length > 0
         }
 
-    val hasAudioOut: Boolean
+    val hasMediaVolume: Boolean
         get() {
-            val tracks = getMediaTracks()
-            val hasAudio = tracks.audio.any { track -> track.id != -1 }
             val volume = mediaPlayer?.getVolume() ?: MediaPlayerConstants.MIN_PLAYER_VOLUME
-            return hasAudio && volume > MediaPlayerConstants.MIN_PLAYER_VOLUME
+            return volume > MediaPlayerConstants.MIN_PLAYER_VOLUME
         }
 
     var source: String? = null
@@ -741,11 +715,11 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                                 setPlayerTracks()
 
                                 retryUntil { isLastAttempt ->
-                                    if (hasVideoOut || isLastAttempt) {
+                                    if (hasMediaLength || isLastAttempt) {
                                         onFirstPlay(getMediaInfo())
                                     }
 
-                                    return@retryUntil hasVideoOut
+                                    return@retryUntil hasMediaLength
                                 }
 
                                 retryUntil {
@@ -758,11 +732,11 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                                 }
 
                                 retryUntil {
-                                    if (hasAudioOut) {
+                                    if (hasMediaVolume) {
                                         MediaPlayerManager.audioFocusManager.updateAudioFocus()
                                     }
 
-                                    return@retryUntil hasAudioOut
+                                    return@retryUntil hasMediaVolume
                                 }
 
                                 firstPlay = false
