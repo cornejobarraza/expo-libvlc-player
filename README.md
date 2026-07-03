@@ -299,21 +299,13 @@ The current workaround selects the video track back but causes a brief black scr
 
 https://code.videolan.org/videolan/VLCKit/-/issues/743
 
-#### Audio delay
-
-On iOS, the `VLCKit` player experiences a small audio delay when resuming or muting media playback.
-
-This might be related to the internal clock used by the library core causing inaccurate time values.
-
-https://code.videolan.org/videolan/VLCKit/-/issues/233
-
 #### Local network
 
-On iOS, the `VLCKit` player seems to interact with the local network when playing media from external sources.
+On iOS, the `VLCKit` player interacts with the local network to discover media servers by default.
 
-A clear message must be provided to the `NSLocalNetworkUsageDescription` key in the Info.plist file.
+A custom message can be provided for the `NSLocalNetworkUsageDescription` key in the Info.plist file.
 
-https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy
+https://code.videolan.org/videolan/vlc-ios/-/issues/893
 
 ## Disclaimer
 
