@@ -5,8 +5,8 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "prebuild:tv": "EXPO_TV=1 expo prebuild --clean",
-    "prebuild": "expo prebuild --clean"
+    "prebuild": "expo prebuild --clean",
+    "prebuild:tv": "EXPO_TV=1 expo prebuild --clean"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -34,8 +34,5 @@
     "autolinking": {
       "nativeModulesDir": ".."
     }
-  },
-  "allowScripts": {
-    "fsevents@2.3.3": true
   }
 }

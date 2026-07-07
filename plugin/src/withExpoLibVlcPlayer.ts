@@ -19,6 +19,22 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
   config,
   { localNetworkPermission, supportsPictureInPicture } = {}
 ) => {
+  withAndroidManifest(config, (config) => {
+    const needsConfigMod = typeof supportsPictureInPicture === "boolean";
+
+    if (needsConfigMod) {
+      const activity = AndroidConfig.Manifest.getMainActivityOrThrow(config.modResults);
+
+      if (supportsPictureInPicture) {
+        activity.$[PICTURE_CONFIG_MANIFEST] = "true";
+      } else {
+        Reflect.deleteProperty(activity.$, PICTURE_CONFIG_MANIFEST);
+      }
+    }
+
+    return config;
+  });
+
   IOSConfig.Permissions.createPermissionsPlugin({
     NSLocalNetworkUsageDescription: LOCAL_NETWORK_USAGE,
   })(config, {
@@ -36,22 +52,6 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
         config.modResults.UIBackgroundModes = [...filteredModes, AUDIO_BACKGROUND_MODE];
       } else {
         config.modResults.UIBackgroundModes = filteredModes;
-      }
-    }
-
-    return config;
-  });
-
-  withAndroidManifest(config, (config) => {
-    const needsConfigMod = typeof supportsPictureInPicture === "boolean";
-
-    if (needsConfigMod) {
-      const activity = AndroidConfig.Manifest.getMainActivityOrThrow(config.modResults);
-
-      if (supportsPictureInPicture) {
-        activity.$[PICTURE_CONFIG_MANIFEST] = "true";
-      } else {
-        Reflect.deleteProperty(activity.$, PICTURE_CONFIG_MANIFEST);
       }
     }
 

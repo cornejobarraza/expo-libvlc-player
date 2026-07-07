@@ -2,12 +2,7 @@ import { type MaterialIcons } from "@expo/vector-icons";
 import { type LibVlcSource } from "expo-libvlc-player";
 import { type SFSymbol } from "expo-symbols";
 import { type ComponentProps } from "react";
-import {
-  type OpaqueColorValue,
-  type StyleProp,
-  type TextStyle,
-  type ViewStyle,
-} from "react-native";
+import { type OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
 
 export interface FocusableProps {
   name: SFSymbol;
@@ -15,13 +10,6 @@ export interface FocusableProps {
   onFocus?: () => void;
   onPressIn?: () => void;
   onPressOut?: () => void;
-}
-
-export interface IconSymbolIosProps {
-  style?: StyleProp<ViewStyle>;
-  name: SFSymbol;
-  size?: number;
-  color: string;
 }
 
 export interface IconSymbolProps {

@@ -8,12 +8,13 @@
     "build": "node scripts/build.js",
     "clean": "node scripts/clean.js",
     "lint": "eslint src/",
-    "prepare": "node scripts/prepare.js",
+    "open:android": "node scripts/open-android.js",
     "open:ios": "node scripts/open-ios.js",
-    "open:android": "node scripts/open-android.js"
+    "prepare": "node scripts/prepare.js"
   },
   "keywords": [
     "react-native",
+    "vlc",
     "expo",
     "libvlc",
     "player",
@@ -45,8 +46,5 @@
     "expo": "*",
     "react": "*",
     "react-native": "*"
-  },
-  "allowScripts": {
-    "fsevents@2.3.3": true
   }
 }
