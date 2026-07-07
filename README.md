@@ -160,7 +160,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 | Prop                      | Description                                                  | Payload                       |
 | ------------------------- | ------------------------------------------------------------ | ----------------------------- |
-| `onBuffering`             | Called after the `Buffering` player event                    |                               |
+| `onBuffering`             | Called after the `Buffering` player event                    | [`Buffering`](#buffering)     |
 | `onPlaying`               | Called after the `Playing` player event                      |                               |
 | `onPaused`                | Called after the `Paused` player event                       |                               |
 | `onStopped`               | Called after the `Stopped` player event                      |                               |
@@ -196,6 +196,14 @@ interface Slave {
   source: string | number;
   type: "audio" | "subtitle";
   selected?: boolean;
+}
+```
+
+#### `Buffering`
+
+```ts
+interface Buffering {
+  progress: number;
 }
 ```
 

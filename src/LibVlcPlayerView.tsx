@@ -7,6 +7,7 @@ import {
   type LibVlcPlayerViewProps,
   type VideoAspectRatio,
   type NativeEvent,
+  type Buffering,
   type Error,
   type Dialog,
   type Time,
@@ -36,6 +37,14 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
     console.warn(RENDERING_CHILDREN_WARNING);
     setLoggedWarning(true);
   }
+
+  const onBuffering = (event: NativeEvent<Buffering>) => {
+    const nativeEvent = convertNativeEvent(event);
+
+    if (props.onBuffering) {
+      props.onBuffering(nativeEvent);
+    }
+  };
 
   const onEncounteredError = (event: NativeEvent<Error>) => {
     const nativeEvent = convertNativeEvent(event);
@@ -119,6 +128,7 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
           ...slave,
           source: parseNativeSource(slave.source),
         }))}
+        onBuffering={onBuffering}
         onEncounteredError={onEncounteredError}
         onDialogDisplay={onDialogDisplay}
         onTimeChanged={onTimeChanged}

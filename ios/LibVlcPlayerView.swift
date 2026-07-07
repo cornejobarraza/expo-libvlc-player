@@ -540,8 +540,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
     func mediaPlayerStateChanged(_ newState: VLCMediaPlayerState) {
         if let player = mediaPlayer {
             switch newState {
-            case .buffering:
-                onBuffering()
             case .playing,
                  .paused,
                  .stopped:
@@ -611,6 +609,10 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 break
             }
         }
+    }
+
+    func mediaPlayerBufferingChanged(_ progress: Float) {
+        onBuffering(["progress": progress])
     }
 
     func mediaPlayerLengthChanged(_: Int64) {

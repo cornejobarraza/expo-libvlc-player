@@ -64,7 +64,7 @@ class LibVlcPlayerView(
     var firstPlay: Boolean = true
     private var shouldInit: Boolean = true
 
-    val onBuffering by EventDispatcher<Unit>()
+    val onBuffering by EventDispatcher()
     val onPlaying by EventDispatcher<Unit>()
     val onPaused by EventDispatcher<Unit>()
     val onStopped by EventDispatcher<Unit>()
@@ -702,7 +702,7 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                 @Suppress("ktlint")
                 when (type) {
                     Event.Buffering -> {
-                        onBuffering(Unit)
+                        onBuffering(mapOf("progress" to event.getBuffering()))
                     }
 
                     Event.Playing,

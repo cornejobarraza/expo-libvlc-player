@@ -121,6 +121,10 @@ export interface NativeEvent<T> {
 
 export type LibVlcEvent<T> = Omit<T & NativeEventProps, "target">;
 
+export interface Buffering {
+  progress: number;
+}
+
 export interface Error {
   message: string;
 }
@@ -172,7 +176,7 @@ export interface MediaInfo {
 /**
  * @hidden
  */
-type BufferingListener = () => void;
+type BufferingListener = (event: NativeEvent<Buffering>) => void;
 
 /**
  * @hidden
@@ -447,7 +451,7 @@ export interface LibVlcPlayerViewProps extends ViewProps {
   /**
    * Called after the `Buffering` player event
    */
-  onBuffering?: () => void;
+  onBuffering?: (event: Buffering) => void;
   /**
    * Called after the `Playing` player event
    */

@@ -12,7 +12,6 @@ const VOLUME_STEP = 10;
 const MAX_VOLUME = 100;
 
 const DEFAULT_TIME = 0;
-const BUFFER_DELAY = 1_000;
 const SEEK_STEP = 10_000;
 
 const DEFAULT_FOCUSABLE = "" as SFSymbol;
@@ -26,7 +25,6 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
   const [background, setBackground] = useState<boolean>(false);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
-  const bufferRef = useRef<TimeoutRef>(undefined);
 
   const PLAYER_CONTROLS: PlayerControl[] = [
     {
@@ -90,12 +88,8 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
           source={source}
           aspectRatio="16:9"
           volume={volume}
-          onBuffering={() => {
-            setBuffering(true);
-            clearTimeout(bufferRef.current);
-            bufferRef.current = setTimeout(() => {
-              setBuffering(false);
-            }, BUFFER_DELAY);
+          onBuffering={({ progress }) => {
+            setBuffering(progress < 1);
           }}
           onPlaying={() => {
             setFocus((prev) => (prev !== DEFAULT_FOCUSABLE ? "pause.fill" : prev));
