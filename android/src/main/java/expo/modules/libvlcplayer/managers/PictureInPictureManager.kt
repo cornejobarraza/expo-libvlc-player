@@ -277,7 +277,7 @@ class PictureInPictureManager(
         pipView?.let { view ->
             // Black screen workaround
             view.detachPlayerLayout()
-            view.post { view.attachPlayerLayout(pictureLayout) }
+            view.postDelayed({ view.attachPlayerLayout(pictureLayout) }, MediaPlayerConstants.ATTACH_DELAY_MS)
         }
     }
 
