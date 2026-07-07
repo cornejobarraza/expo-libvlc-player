@@ -21,6 +21,8 @@ module.exports = defineConfig([
     },
     rules: {
       "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
+      "@typescript-eslint/no-unused-vars": ["error", { enableAutofixRemoval: { imports: true } }],
+      "no-unused-vars": "off",
     },
   },
 ]);
