@@ -4,8 +4,11 @@ on:
   release:
     types: [created]
 
+permissions:
+  id-token: write # Required for OIDC
+
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -13,9 +16,8 @@ jobs:
         with:
           node-version: lts/iron
           registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Publish package
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
