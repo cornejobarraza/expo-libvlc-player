@@ -183,6 +183,7 @@ class LibVlcPlayerView(
         mediaPlayer = MediaPlayer(libVLC!!)
         attachPlayerLayout(playerLayout)
         setPlayerListener(mediaPlayer!!)
+        addPlayerSlaves(slaves)
         setupPlayer()
 
         try {
@@ -328,8 +329,6 @@ class LibVlcPlayerView(
     fun setupPlayer() {
         post {
             mediaPlayer?.let { player ->
-                addPlayerSlaves(slaves)
-
                 if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
                     player.setScale(scale.toFloat())
                 }
@@ -467,15 +466,15 @@ class LibVlcPlayerView(
     var volume: Int = MediaPlayerConstants.MAX_PLAYER_VOLUME
         set(value) {
             val oldValue = field
-            field = value
-
-            if (mute) return
-
             val newVolume =
                 value.coerceIn(
                     MediaPlayerConstants.MIN_PLAYER_VOLUME,
                     MediaPlayerConstants.MAX_PLAYER_VOLUME,
                 )
+
+            field = newVolume
+
+            if (mute) return
 
             mediaPlayer?.setVolume(newVolume)
 
@@ -712,6 +711,8 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                             onPlaying(Unit)
 
                             if (firstPlay) {
+                                setupPlayer()
+
                                 setPlayerTracks()
 
                                 retryUntil { isLastAttempt ->

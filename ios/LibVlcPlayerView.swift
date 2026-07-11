@@ -80,6 +80,7 @@ class LibVlcPlayerView: ExpoView {
         mediaPlayer = VLCMediaPlayer(library: library!)
         mediaPlayer!.drawable = drawable
         mediaPlayer!.delegate = self
+        addPlayerSlaves(slaves)
         setupPlayer()
 
         vlcDialog = VLCDialogProvider(library: library!, customUI: dialogCustomUI)
@@ -202,8 +203,6 @@ class LibVlcPlayerView: ExpoView {
             guard let self else { return }
 
             if let player = mediaPlayer {
-                addPlayerSlaves(slaves)
-
                 if scale != MediaPlayerConstants.defaultPlayerScale {
                     player.scaleFactor = Float(scale)
                 }
@@ -357,14 +356,20 @@ class LibVlcPlayerView: ExpoView {
 
     var time: Int = MediaPlayerConstants.defaultPlayerTime
 
-    var volume: Int = MediaPlayerConstants.maxPlayerVolume {
-        didSet {
-            if mute { return }
+    var _volume: Int = MediaPlayerConstants.maxPlayerVolume
 
+    var volume: Int {
+        get { _volume }
+        set {
+            let oldValue = _volume
             let newVolume = max(
                 MediaPlayerConstants.minPlayerVolume,
-                min(MediaPlayerConstants.maxPlayerVolume, volume)
+                min(MediaPlayerConstants.maxPlayerVolume, newValue)
             )
+
+            _volume = newVolume
+
+            if mute { return }
 
             mediaPlayer?.audio?.volume = Int32(newVolume)
 
@@ -547,6 +552,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                     onPlaying()
 
                     if firstPlay {
+                        setupPlayer()
+
                         setPlayerTracks()
 
                         retryUntil { [weak self] isLastAttempt in
