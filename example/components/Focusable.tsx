@@ -4,6 +4,8 @@ import { Platform, Pressable, StyleSheet } from "react-native";
 import { IconSymbol } from "./IconSymbol";
 import { type FocusableProps, type TimeoutRef } from "./types";
 
+const COLOR_FOCUSED = "#f1f1f1";
+const COLOR_UNFOCUSED = "#272727";
 const PRESS_DELAY = 125;
 
 export function Focusable({ name, focused, onFocus, onPressIn, onPressOut }: FocusableProps) {
@@ -11,8 +13,10 @@ export function Focusable({ name, focused, onFocus, onPressIn, onPressOut }: Foc
 
   return (
     <Pressable
-      style={[styles.pressable, focused ? styles.focused : styles.unfocused]}
-      onFocus={() => onFocus?.()}
+      style={[styles.pressable, { backgroundColor: focused ? COLOR_FOCUSED : COLOR_UNFOCUSED }]}
+      onFocus={() => {
+        onFocus?.();
+      }}
       onPressIn={() => {
         if (!Platform.isTV) onFocus?.();
         onPressIn?.();
@@ -24,7 +28,7 @@ export function Focusable({ name, focused, onFocus, onPressIn, onPressOut }: Foc
           if (Platform.isTV) onFocus?.();
         }, PRESS_DELAY);
       }}>
-      <IconSymbol color={focused ? "#272727" : "#f1f1f1"} name={name} />
+      <IconSymbol color={!focused ? COLOR_FOCUSED : COLOR_UNFOCUSED} name={name} />
     </Pressable>
   );
 }
@@ -35,11 +39,5 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
-  },
-  unfocused: {
-    backgroundColor: "#272727",
-  },
-  focused: {
-    backgroundColor: "#f1f1f1",
   },
 });
