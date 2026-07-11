@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <i>Screenshots taken from the <a href="example/App.tsx">Example App</a> on Android and iOS</i>
+  <i>Screenshots taken from the <a href="example">Example App</a> on Android and iOS</i>
 </p>
 
 ### Supported versions
@@ -109,7 +109,7 @@ import LibVlcPlayerModule from "expo-libvlc-player";
 LibVlcPlayerModule.isPictureInPictureSupported();
 ```
 
-See the [Example App](example/App.tsx) for additional usage.
+_See the [Example App](example) for additional usage._
 
 ### Module methods
 
