@@ -867,7 +867,7 @@ private fun MutableList<String>.normalizeOptions() {
     val normalized =
         map { option ->
             if (!option.startsWith(":")) {
-                ":" + option.dropWhile { character -> character == '-' }
+                ":" + option.dropWhile { character -> character == "-" }
             } else {
                 option
             }
