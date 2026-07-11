@@ -17,6 +17,7 @@ class LibVlcPlayerView: ExpoView {
 
     var firstPlay: Bool = true
     private var shouldInit: Bool = true
+    private var shouldRepeat: Bool = true
 
     let onBuffering = EventDispatcher()
     let onPlaying = EventDispatcher()
@@ -403,7 +404,7 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
-    var shouldRepeat: Bool = false
+    var Repeat: Bool = false
 
     var autoplay: Bool = true
 
@@ -433,6 +434,7 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func stop() {
+        shouldRepeat = false
         mediaPlayer?.stop()
     }
 
@@ -600,9 +602,11 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
                     firstPlay = true
 
-                    if shouldRepeat {
+                    if Repeat, shouldRepeat {
                         player.play()
                     }
+
+                    shouldRepeat = true
                 }
 
                 MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()

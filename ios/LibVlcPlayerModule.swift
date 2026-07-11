@@ -91,8 +91,8 @@ public class LibVlcPlayerModule: Module {
                 view.audioMixingMode = audioMixingMode
             }
 
-            Prop("repeat", false) { (view: LibVlcPlayerView, shouldRepeat: Bool) in
-                view.shouldRepeat = shouldRepeat
+            Prop("repeat", false) { (view: LibVlcPlayerView, Repeat: Bool) in
+                view.Repeat = Repeat
             }
 
             Prop("autoplay", true) { (view: LibVlcPlayerView, autoplay: Bool) in

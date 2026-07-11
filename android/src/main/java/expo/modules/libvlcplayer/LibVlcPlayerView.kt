@@ -63,6 +63,7 @@ class LibVlcPlayerView(
 
     var firstPlay: Boolean = true
     private var shouldInit: Boolean = true
+    var shouldRepeat: Boolean = true
 
     val onBuffering by EventDispatcher()
     val onPlaying by EventDispatcher<Unit>()
@@ -557,6 +558,7 @@ class LibVlcPlayerView(
     }
 
     fun stop() {
+        shouldRepeat = false
         mediaPlayer?.stop()
     }
 
@@ -755,9 +757,11 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
 
                             firstPlay = true
 
-                            if (repeat) {
+                            if (repeat && shouldRepeat) {
                                 player.play()
                             }
+
+                            shouldRepeat = true
                         }
 
                         MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
