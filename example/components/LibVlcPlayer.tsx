@@ -8,8 +8,8 @@ import { Focusable } from "./Focusable";
 import { type LibVlcPlayerProps, type PlayerControl } from "./types";
 
 const MIN_VOLUME = 0;
-const VOLUME_STEP = 10;
 const MAX_VOLUME = 100;
+const VOLUME_STEP = 10;
 
 const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;

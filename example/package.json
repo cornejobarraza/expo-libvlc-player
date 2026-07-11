@@ -2,7 +2,6 @@
   "name": "expo-libvlc-player-example",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "prebuild": "expo prebuild --clean",
@@ -26,13 +25,13 @@
     "typescript": "~5.9.3"
   },
   "expo": {
+    "autolinking": {
+      "nativeModulesDir": ".."
+    },
     "install": {
       "exclude": [
         "react-native"
       ]
-    },
-    "autolinking": {
-      "nativeModulesDir": ".."
     }
   }
 }
