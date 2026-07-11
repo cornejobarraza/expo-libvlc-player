@@ -11,9 +11,10 @@
 # Other
 /.eslintrc.js
 /eslint.config.js
-/.prettierrc
 /lint-staged.config.js
-tsconfig.tsbuildinfo
+/package-lock.json
+/.prettierrc
 /.swift-version
 /.swiftformat
 /tsconfig.eslint.json
+tsconfig.tsbuildinfo
