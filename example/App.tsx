@@ -19,7 +19,7 @@ export default function App() {
         <StatusBar style="light" hidden={fullScreen} />
         <LibVlcPlayer
           title="Big Buck Bunny"
-          source="https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov"
+          source="https://mirror.umd.edu/xbmc/demo-files/BBB/bbb_sunflower_1080p_30fps_normal.mp4"
           fullScreen={fullScreen}
         />
       </View>

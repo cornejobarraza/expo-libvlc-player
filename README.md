@@ -88,7 +88,7 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 import { LibVlcPlayerView } from "expo-libvlc-player";
 
 const BIG_BUCK_BUNNY =
-  "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_h264.mov";
+  "https://mirror.umd.edu/xbmc/demo-files/BBB/bbb_sunflower_1080p_30fps_normal.mp4";
 
 return <LibVlcPlayerView source={BIG_BUCK_BUNNY} />;
 ```
