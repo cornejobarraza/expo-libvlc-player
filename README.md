@@ -125,7 +125,7 @@ _See the [Example App](example) for additional usage._
 | `play()`                                                         | Starts playback of the current player                                                                                                | `Promise<void>` |
 | `pause()`                                                        | Pauses playback of the current player                                                                                                | `Promise<void>` |
 | `stop()`                                                         | Stops playback of the current player                                                                                                 | `Promise<void>` |
-| `seek(value: number, type?: "time" \| "position")`               | Sets the time or position of the current player. Value must be a number equal or greater than `0` and type defaults to `"time"`      | `Promise<void>` |
+| `seek(value: number, type?: "time" \| "position")`               | Sets the time or position of the current player. Value must be a number equal or greater than `0` and type defaults to time          | `Promise<void>` |
 | `record(path?: string)`                                          | Starts or stops recording the current media. Path must be a valid directory or `undefined` to stop recording                         | `Promise<void>` |
 | `snapshot(path: string)`                                         | Takes a snapshot of the current media. Path must be a valid directory                                                                | `Promise<void>` |
 | `postAction(action: 1 \| 2)`                                     | Posts an answer to a dialog. Action must be either `1` or `2`                                                                        | `Promise<void>` |
@@ -145,7 +145,8 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `tracks`           | Sets the player audio, video and subtitle tracks. See [`Tracks`](#tracks) for more                                                | `undefined` |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
 | `scale`            | Sets the player scaling factor. Must be a number equal or greater than `0`                                                        | `0`         |
-| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio, number, or `"auto"`                                                       | `undefined` |
+| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio, number, or auto. If auto, a fallback ratio value must be provided         | `undefined` |
+| `fallbackRatio`    | Sets the fallback aspect ratio. Must be a valid ratio or number                                                                   | `undefined` |
 | `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
 | `rate`             | Sets the player rate. Must be a number equal or greater than `1`                                                                  | `1`         |
 | `time`             | Sets the initial player time. Must be a number equal or greater than `0`                                                          | `0`         |
