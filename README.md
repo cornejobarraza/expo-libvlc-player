@@ -23,9 +23,10 @@
 
 | Platform             | Version |
 | -------------------- | ------- |
-| React Native         | 0.83    |
+| Expo SDK             | 57+     |
+| React Native         | 0.86+   |
 | Android / Android TV | 7+      |
-| iOS / Apple TV       | 15.1+   |
+| iOS / Apple TV       | 16.4+   |
 
 ## Installation
 

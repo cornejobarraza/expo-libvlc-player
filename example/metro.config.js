@@ -18,13 +18,6 @@ config.resolver.extraNodeModules = {
   "expo-libvlc-player": "..",
 };
 
-if (process.env.EXPO_TV) {
-  config.resolver.sourceExts = [].concat(
-    config.resolver.sourceExts.map((e) => `tv.${e}`),
-    config.resolver.sourceExts
-  );
-}
-
 config.watchFolders = [path.resolve(__dirname, "..")];
 
 config.transformer.getTransformOptions = () => ({

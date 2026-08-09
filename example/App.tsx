@@ -1,8 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { LibVlcPlayer } from "./components/LibVlcPlayer";
+import { VlcPlayer } from "./components/VlcPlayer";
 import { useFullScreen } from "./hooks/useFullScreen";
 
 export default function App() {
@@ -17,8 +17,8 @@ export default function App() {
           padding: !fullScreen ? styles.app.padding : undefined,
         }}>
         <StatusBar style="light" hidden={fullScreen} />
-        <LibVlcPlayer
-          title="Big Buck Bunny"
+        {!fullScreen && <Text style={styles.title}>Big Buck Bunny</Text>}
+        <VlcPlayer
           source="https://mirror.umd.edu/xbmc/demo-files/BBB/bbb_sunflower_1080p_30fps_normal.mp4"
           fullScreen={fullScreen}
         />
@@ -32,7 +32,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#0f0f0f",
     justifyContent: "center",
-    gap: 24,
+    gap: 20,
     padding: 24,
+  },
+  title: {
+    color: "#f1f1f1",
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });

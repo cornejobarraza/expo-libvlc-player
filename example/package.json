@@ -4,34 +4,27 @@
   "scripts": {
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "prebuild": "expo prebuild --clean",
-    "prebuild:tv": "EXPO_TV=1 expo prebuild --clean"
+    "prebuild": "expo prebuild --clean"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
-    "expo": "~55.0.28",
-    "expo-font": "~55.0.8",
-    "expo-screen-orientation": "~55.0.18",
-    "expo-status-bar": "~55.0.6",
-    "expo-symbols": "~55.0.9",
-    "expo-system-ui": "~55.0.20",
-    "react": "19.2.0",
-    "react-native": "npm:react-native-tvos@0.83-stable",
-    "react-native-safe-area-context": "~5.6.2"
+    "expo": "^57.0.11",
+    "expo-font": "~57.0.1",
+    "expo-screen-orientation": "~57.0.1",
+    "expo-status-bar": "~57.0.1",
+    "expo-symbols": "~57.0.2",
+    "expo-system-ui": "~57.0.2",
+    "react": "19.2.3",
+    "react-native": "0.86.2",
+    "react-native-safe-area-context": "~5.7.0"
   },
   "devDependencies": {
-    "@react-native-tvos/config-tv": "^0.1.6",
     "@types/react": "~19.2.18",
-    "typescript": "~5.9.3"
+    "typescript": "~6.0.3"
   },
   "expo": {
     "autolinking": {
       "nativeModulesDir": ".."
-    },
-    "install": {
-      "exclude": [
-        "react-native"
-      ]
     }
   }
 }

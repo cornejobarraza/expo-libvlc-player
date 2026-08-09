@@ -4,13 +4,9 @@ import { type SFSymbol } from "expo-symbols";
 import { type ComponentProps } from "react";
 import { type OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
 
-export interface FocusableProps {
-  name: SFSymbol;
-  focused?: boolean;
-  onFocus?: () => void;
-  onPressIn?: () => void;
-  onPressOut?: () => void;
-}
+export type MaterialIcon = ComponentProps<typeof MaterialIcons>["name"];
+
+export type IconMapping = Record<SFSymbol, MaterialIcon>;
 
 export interface IconSymbolProps {
   style?: StyleProp<TextStyle>;
@@ -19,13 +15,13 @@ export interface IconSymbolProps {
   color: string | OpaqueColorValue;
 }
 
-export type MaterialIcon = ComponentProps<typeof MaterialIcons>["name"];
+export interface VlcControlProps {
+  name: SFSymbol;
+  onPress?: () => void;
+}
 
-export type IconMapping = Record<SFSymbol, MaterialIcon>;
-
-export interface LibVlcPlayerProps {
+export interface VlcPlayerProps {
   source: LibVlcSource;
-  title?: string;
   fullScreen?: boolean;
 }
 
@@ -33,5 +29,3 @@ export interface PlayerControl {
   name: SFSymbol;
   onPress: () => void;
 }
-
-export type TimeoutRef = ReturnType<typeof setTimeout>;

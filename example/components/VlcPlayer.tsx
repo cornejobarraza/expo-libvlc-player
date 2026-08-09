@@ -1,11 +1,10 @@
 import { LibVlcPlayerView, type LibVlcPlayerViewRef } from "expo-libvlc-player";
-import { type SFSymbol } from "expo-symbols";
 import { useRef, useState } from "react";
-import { ActivityIndicator, Alert, Image, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Image, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Focusable } from "./Focusable";
-import { type LibVlcPlayerProps, type PlayerControl } from "./types";
+import { VlcControl } from "./VlcControl";
+import { type VlcPlayerProps, type PlayerControl } from "./types";
 
 const MIN_VOLUME = 0;
 const MAX_VOLUME = 100;
@@ -14,14 +13,11 @@ const VOLUME_STEP = 10;
 const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
-const DEFAULT_FOCUSABLE = "" as SFSymbol;
-
-export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
+export function VlcPlayer({ source, fullScreen }: VlcPlayerProps) {
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(true);
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
-  const [focus, setFocus] = useState<SFSymbol>(DEFAULT_FOCUSABLE);
   const [background, setBackground] = useState<boolean>(false);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
@@ -70,7 +66,6 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
 
   return (
     <View style={[styles.libVlc, fullScreen && styles.libVlcFull]}>
-      {!fullScreen && title && <Text style={styles.title}>{title}</Text>}
       <View style={styles.container}>
         {showPoster && (
           <View style={styles.poster}>
@@ -92,12 +87,10 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
             setBuffering(progress < 1);
           }}
           onPlaying={() => {
-            setFocus((prev) => (prev !== DEFAULT_FOCUSABLE ? "pause.fill" : prev));
             setPlaying(true);
             setBackground(false);
           }}
           onPaused={() => {
-            setFocus((prev) => (prev !== DEFAULT_FOCUSABLE ? "play.fill" : prev));
             setPlaying(false);
           }}
           onStopped={() => {
@@ -122,18 +115,7 @@ export function LibVlcPlayer({ source, title, fullScreen }: LibVlcPlayerProps) {
         ]}>
         {/* eslint-disable-next-line react-hooks/refs */}
         {PLAYER_CONTROLS.map((control, index) => (
-          <Focusable
-            key={index}
-            name={control.name}
-            focused={focus === control.name}
-            onFocus={() => {
-              setFocus(control.name);
-            }}
-            onPressIn={control.onPress}
-            onPressOut={() => {
-              setFocus(DEFAULT_FOCUSABLE);
-            }}
-          />
+          <VlcControl key={index} name={control.name} onPress={control.onPress} />
         ))}
       </View>
     </View>
@@ -147,11 +129,6 @@ const styles = StyleSheet.create({
   libVlcFull: {
     alignItems: "center",
     position: "relative",
-  },
-  title: {
-    color: "#f1f1f1",
-    fontSize: 20,
-    fontWeight: "bold",
   },
   container: {
     position: "relative",
