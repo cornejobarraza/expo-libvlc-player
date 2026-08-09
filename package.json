@@ -10,7 +10,7 @@
     "lint": "eslint src/",
     "open:android": "node scripts/open-android.js",
     "open:ios": "node scripts/open-ios.js",
-    "prepare": "node scripts/prepare.js"
+    "prepare": "husky && node scripts/prepare.js"
   },
   "keywords": [
     "react-native",
