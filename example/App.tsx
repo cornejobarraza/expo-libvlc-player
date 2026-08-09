@@ -1,3 +1,4 @@
+import { NavigationBar } from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -22,6 +23,7 @@ export default function App() {
           source="https://mirror.umd.edu/xbmc/demo-files/BBB/bbb_sunflower_1080p_30fps_normal.mp4"
           fullScreen={fullScreen}
         />
+        <NavigationBar style="light" hidden={fullScreen} />
       </View>
     </SafeAreaProvider>
   );
