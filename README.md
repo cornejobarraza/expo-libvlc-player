@@ -85,6 +85,8 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 
 ## Usage
 
+Create a basic player:
+
 ```tsx
 import { LibVlcPlayerView } from "expo-libvlc-player";
 
@@ -112,16 +114,20 @@ LibVlcPlayerModule.isPictureInPictureSupported();
 
 _See the [Example App](example) for additional usage._
 
-### Module methods
+### Module functions
 
-| Method                          | Description                                                 | Returns         |
+The `LibVlcPlayerModule` implements the following functions:
+
+| Function                        | Description                                                 | Returns         |
 | ------------------------------- | ----------------------------------------------------------- | --------------- |
 | `triggerNetworkAlert()`         | Attempts to trigger the local network privacy alert on iOS  | `Promise<void>` |
 | `isPictureInPictureSupported()` | Checks whether the device supports Picture-in-Picture (PiP) | `boolean`       |
 
-### View methods
+### View functions
 
-| Method                                                           | Description                                                                                                                          | Returns         |
+The `LibVlcPlayerViewRef` implements the following functions:
+
+| Function                                                         | Description                                                                                                                          | Returns         |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
 | `play()`                                                         | Starts playback of the current player                                                                                                | `Promise<void>` |
 | `pause()`                                                        | Pauses playback of the current player                                                                                                | `Promise<void>` |
@@ -137,7 +143,7 @@ _See the [Example App](example) for additional usage._
 
 ### View props
 
-The `LibVlcPlayerView` extends React Native `ViewProps` and implements the following:
+The `LibVlcPlayerView` extends React Native `ViewProps` and implements the following props:
 
 | Prop               | Description                                                                                                                       | Default     |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
