@@ -168,13 +168,14 @@ export type AudioMixingMode = "mixWithOthers" | "duckOthers" | "auto" | "doNotMi
 
 export interface NativeEventProps {
   target: number;
+  timeStamp: number;
 }
 
 export interface NativeEvent<T> {
   nativeEvent: T & NativeEventProps;
 }
 
-export type LibVlcEvent<T> = Omit<T & NativeEventProps, "target">;
+export type LibVlcEvent<T> = Omit<T, "target" | "timeStamp">;
 
 export interface Buffering {
   progress: number;
