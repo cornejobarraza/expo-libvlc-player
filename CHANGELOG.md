@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 57.0.3 - 2026-08-17
+
+### 🐛 Bug fixes
+
+- Removed unused event property
+
+### 💡 Others
+
+- Bumped Expo dependency to 57.0.14
+
 ## 57.0.2 - 2026-08-13
 
 ### 💡 Others
