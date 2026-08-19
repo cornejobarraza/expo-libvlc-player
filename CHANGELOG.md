@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.4 - 2026-08-19
+
+### 🛠 Breaking changes
+
+- Renamed Buffering event progress to value
+
 ## 57.0.3 - 2026-08-17
 
 ### 🐛 Bug fixes
