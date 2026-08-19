@@ -211,7 +211,7 @@ interface Slave {
 
 ```ts
 interface Buffering {
-  progress: number;
+  value: number;
 }
 ```
 

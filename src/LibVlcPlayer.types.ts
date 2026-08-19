@@ -178,7 +178,7 @@ export interface NativeEvent<T> {
 export type LibVlcEvent<T> = Omit<T, "target" | "timeStamp">;
 
 export interface Buffering {
-  progress: number;
+  value: number;
 }
 
 export interface Error {

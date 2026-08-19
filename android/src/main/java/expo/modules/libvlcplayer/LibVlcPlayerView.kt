@@ -703,7 +703,7 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                 @Suppress("ktlint")
                 when (type) {
                     Event.Buffering -> {
-                        onBuffering(mapOf("progress" to event.getBuffering()))
+                        onBuffering(mapOf("value" to event.getBuffering()))
                     }
 
                     Event.Playing,

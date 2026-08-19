@@ -15,7 +15,7 @@ const SEEK_STEP = 10_000;
 
 export function VlcPlayer({ source, fullScreen }: VlcPlayerProps) {
   const [buffering, setBuffering] = useState<boolean>(false);
-  const [playing, setPlaying] = useState<boolean>(true);
+  const [playing, setPlaying] = useState<boolean>(false);
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
   const [background, setBackground] = useState<boolean>(false);
@@ -61,7 +61,7 @@ export function VlcPlayer({ source, fullScreen }: VlcPlayerProps) {
     },
   ];
 
-  const showPoster = (!playing && background) || (!playing && time === 0);
+  const showPoster = (!playing && background) || time === 0;
   const insets = useSafeAreaInsets();
 
   return (
@@ -83,8 +83,8 @@ export function VlcPlayer({ source, fullScreen }: VlcPlayerProps) {
           source={source}
           aspectRatio="16:9"
           volume={volume}
-          onBuffering={({ progress }) => {
-            setBuffering(progress < 1);
+          onBuffering={({ value }) => {
+            setBuffering(value < 1);
           }}
           onPlaying={() => {
             setPlaying(true);
@@ -135,11 +135,11 @@ const styles = StyleSheet.create({
   },
   buffering: {
     ...StyleSheet.absoluteFill,
-    zIndex: 9997,
+    zIndex: 9998,
   },
   poster: {
     ...StyleSheet.absoluteFill,
-    zIndex: 9998,
+    zIndex: 9997,
   },
   image: {
     width: "100%",

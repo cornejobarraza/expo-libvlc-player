@@ -622,8 +622,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         }
     }
 
-    func mediaPlayerBufferingChanged(_ progress: Float) {
-        onBuffering(["progress": progress])
+    func mediaPlayerBufferingChanged(_ buffering: Float) {
+        onBuffering(["value": buffering])
     }
 
     func mediaPlayerLengthChanged(_: Int64) {
