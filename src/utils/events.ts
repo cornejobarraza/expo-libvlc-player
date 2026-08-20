@@ -1,6 +1,6 @@
-import { type LibVlcEvent, type NativeEvent } from "../LibVlcPlayer.types";
+import { type NativeEvent } from "../LibVlcPlayer.types";
 
-export function convertNativeEvent<T>(event: NativeEvent<T>): LibVlcEvent<T> {
+export function convertNativeEvent<T>(event: NativeEvent<T>) {
   const { target, timeStamp, ...nativeEvent } = event.nativeEvent;
   return nativeEvent;
 }

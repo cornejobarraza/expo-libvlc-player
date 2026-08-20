@@ -7,7 +7,7 @@ import {
 } from "expo-screen-orientation";
 import { useEffect, useState } from "react";
 
-function getFullScreen(orientation: Orientation): boolean {
+function getFullScreen(orientation: Orientation) {
   return orientation === Orientation.LANDSCAPE_LEFT || orientation === Orientation.LANDSCAPE_RIGHT;
 }
 

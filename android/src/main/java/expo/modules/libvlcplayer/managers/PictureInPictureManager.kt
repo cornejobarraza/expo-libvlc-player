@@ -327,7 +327,7 @@ class PictureInPictureManager(
         }
     }
 
-    private fun isPictureInPictureSupported(): Boolean =
+    private fun isPictureInPictureSupported() =
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
             activity.packageManager.hasSystemFeature(
                 android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE,

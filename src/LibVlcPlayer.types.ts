@@ -175,8 +175,6 @@ export interface NativeEvent<T> {
   nativeEvent: T & NativeEventProps;
 }
 
-export type LibVlcEvent<T> = Omit<T, "target" | "timeStamp">;
-
 export interface Buffering {
   value: number;
 }
