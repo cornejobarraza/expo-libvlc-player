@@ -1,8 +1,8 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-import { type IconMapping, type IconSymbolProps } from "./types";
+import { type SymbolMapping, type IconSymbolProps } from "./types";
 
-const MAPPING = {
+const SYMBOLS = {
   "play.fill": "play-arrow",
   "pause.fill": "pause",
   "stop.fill": "stop",
@@ -10,8 +10,8 @@ const MAPPING = {
   "backward.fill": "fast-rewind",
   "speaker.1.fill": "volume-down",
   "speaker.3.fill": "volume-up",
-} as IconMapping;
+} as SymbolMapping;
 
 export function IconSymbol({ style, name, size = 24, color }: IconSymbolProps) {
-  return <MaterialIcons style={style} name={MAPPING[name]} size={size} color={color} />;
+  return <MaterialIcons style={style} name={SYMBOLS[name]} size={size} color={color} />;
 }

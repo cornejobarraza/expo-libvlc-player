@@ -12,8 +12,8 @@ interface WithExpoLibVlcPlayerProps {
 }
 
 const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network";
+const SUPPORT_PIP_PERMISSION = "android:supportsPictureInPicture";
 const AUDIO_BACKGROUND_MODE = "audio";
-const PICTURE_CONFIG_MANIFEST = "android:supportsPictureInPicture";
 
 const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
   config,
@@ -26,9 +26,9 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
       const activity = AndroidConfig.Manifest.getMainActivityOrThrow(config.modResults);
 
       if (supportsPictureInPicture) {
-        activity.$[PICTURE_CONFIG_MANIFEST] = "true";
+        activity.$[SUPPORT_PIP_PERMISSION] = "true";
       } else {
-        Reflect.deleteProperty(activity.$, PICTURE_CONFIG_MANIFEST);
+        Reflect.deleteProperty(activity.$, SUPPORT_PIP_PERMISSION);
       }
     }
 

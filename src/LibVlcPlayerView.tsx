@@ -14,7 +14,7 @@ import { convertNativeEvent } from "./utils/events";
 const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
   requireNativeView("ExpoLibVlcPlayer");
 
-const RENDERING_CHILDREN_WARNING =
+const CHILDREN_WARNING =
   "The <LibVlcPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the LibVlcPlayer, consider using absolute positioning";
 
 const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
@@ -40,7 +40,7 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
   const [warned, setWarned] = useState<boolean>(false);
 
   if (children && !warned) {
-    console.warn(RENDERING_CHILDREN_WARNING);
+    console.warn(CHILDREN_WARNING);
     setWarned(true);
   }
 

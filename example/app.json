@@ -17,9 +17,7 @@
       "supportsTablet": true
     },
     "plugins": [
-      ["../app.plugin.js"],
-      ["expo-font"],
-      ["expo-status-bar"]
+      "../app.plugin.js"
     ]
   }
 }

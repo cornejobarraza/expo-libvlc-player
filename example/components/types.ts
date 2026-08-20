@@ -6,7 +6,7 @@ import { type OpaqueColorValue, type StyleProp, type TextStyle } from "react-nat
 
 export type MaterialIcon = ComponentProps<typeof MaterialIcons>["name"];
 
-export type IconMapping = Record<SFSymbol, MaterialIcon>;
+export type SymbolMapping = Record<SFSymbol, MaterialIcon>;
 
 export interface IconSymbolProps {
   style?: StyleProp<TextStyle>;
