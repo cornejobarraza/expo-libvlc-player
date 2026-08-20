@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.6 - 2026-08-20
+
+### 💡 Others
+
+- Bumped Expo dependency to 57.0.15
+
 ## 57.0.5 - 2026-08-20
 
 ### 🛠 Breaking changes
