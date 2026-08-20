@@ -6,16 +6,6 @@ import {
   type LibVlcPlayerViewNativeProps,
   type LibVlcPlayerViewProps,
   type VideoAspectRatio,
-  type NativeEvent,
-  type Buffering,
-  type Error,
-  type Dialog,
-  type Time,
-  type Position,
-  type MediaTracks,
-  type Recording,
-  type Snapshot,
-  type MediaInfo,
 } from "./LibVlcPlayer.types";
 import { convertAspectRatio } from "./utils/aspect";
 import { parseNativeSource } from "./utils/assets";
@@ -25,116 +15,82 @@ const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
   requireNativeView("ExpoLibVlcPlayer");
 
 const RENDERING_CHILDREN_WARNING =
-  "The <LibVlcPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the LibVlcPlayer, consider using absolute positioning.";
+  "The <LibVlcPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the LibVlcPlayer, consider using absolute positioning";
 
 const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
-  const [mediaRatio, setMediaRatio] = useState<VideoAspectRatio>(props.fallbackRatio);
-  const [loggedWarning, setLoggedWarning] = useState<boolean>(false);
+  const {
+    fallbackRatio,
+    children,
+    aspectRatio,
+    style,
+    source,
+    slaves,
+    onBuffering,
+    onEncounteredError,
+    onDialogDisplay,
+    onTimeChanged,
+    onPositionChanged,
+    onESAdded,
+    onRecordChanged,
+    onSnapshotTaken,
+    onFirstPlay,
+  } = props;
 
-  if (props.children && !loggedWarning) {
+  const [autoRatio, setAutoRatio] = useState<VideoAspectRatio>(fallbackRatio);
+  const [warned, setWarned] = useState<boolean>(false);
+
+  if (children && !warned) {
     console.warn(RENDERING_CHILDREN_WARNING);
-    setLoggedWarning(true);
+    setWarned(true);
   }
 
-  const onBuffering = (event: NativeEvent<Buffering>) => {
-    const nativeEvent = convertNativeEvent(event);
-
-    if (props.onBuffering) {
-      props.onBuffering(nativeEvent);
-    }
-  };
-
-  const onEncounteredError = (event: NativeEvent<Error>) => {
-    const nativeEvent = convertNativeEvent(event);
-
-    if (props.onEncounteredError) {
-      props.onEncounteredError(nativeEvent);
-    }
-  };
-
-  const onDialogDisplay = (event: NativeEvent<Dialog>) => {
-    const nativeEvent = convertNativeEvent(event);
-
-    if (props.onDialogDisplay) {
-      props.onDialogDisplay(nativeEvent);
-    }
-  };
-
-  const onTimeChanged = (event: NativeEvent<Time>) => {
-    const nativeEvent = convertNativeEvent(event);
-
-    if (props.onTimeChanged) {
-      props.onTimeChanged(nativeEvent);
-    }
-  };
-
-  const onPositionChanged = (event: NativeEvent<Position>) => {
-    const nativeEvent = convertNativeEvent(event);
-
-    if (props.onPositionChanged) {
-      props.onPositionChanged(nativeEvent);
-    }
-  };
-
-  const onESAdded = (event: NativeEvent<MediaTracks>) => {
-    const nativeEvent = convertNativeEvent(event);
-
-    if (props.onESAdded) {
-      props.onESAdded(nativeEvent);
-    }
-  };
-
-  const onRecordChanged = (event: NativeEvent<Recording>) => {
-    const nativeEvent = convertNativeEvent(event);
-
-    if (props.onRecordChanged) {
-      props.onRecordChanged(nativeEvent);
-    }
-  };
-
-  const onSnapshotTaken = (event: NativeEvent<Snapshot>) => {
-    const nativeEvent = convertNativeEvent(event);
-
-    if (props.onSnapshotTaken) {
-      props.onSnapshotTaken(nativeEvent);
-    }
-  };
-
-  const onFirstPlay = (event: NativeEvent<MediaInfo>) => {
-    const nativeEvent = convertNativeEvent(event);
-    const nativeRatio = nativeEvent.width / nativeEvent.height;
-
-    if (props.onFirstPlay) {
-      props.onFirstPlay(nativeEvent);
-    }
-
-    setMediaRatio(nativeRatio || props.fallbackRatio);
-  };
-
-  const propRatio = props.aspectRatio;
-  const aspectRatio = propRatio === "auto" ? mediaRatio : propRatio;
-  const nativeRatio = convertAspectRatio(aspectRatio);
+  const viewRatio = aspectRatio === "auto" ? autoRatio : aspectRatio;
 
   return (
-    <View style={[props.style, { aspectRatio: nativeRatio }]}>
+    <View style={[style, { aspectRatio: convertAspectRatio(viewRatio) }]}>
       <NativeView
         {...props}
         ref={ref}
-        style={[props.style, { height: "100%" }]}
-        source={parseNativeSource(props.source)}
-        slaves={props.slaves?.map((slave) => ({
+        style={[style, { height: "100%" }]}
+        source={parseNativeSource(source)}
+        slaves={slaves?.map((slave) => ({
           ...slave,
           source: parseNativeSource(slave.source),
         }))}
-        onBuffering={onBuffering}
-        onEncounteredError={onEncounteredError}
-        onDialogDisplay={onDialogDisplay}
-        onTimeChanged={onTimeChanged}
-        onPositionChanged={onPositionChanged}
-        onESAdded={onESAdded}
-        onRecordChanged={onRecordChanged}
-        onSnapshotTaken={onSnapshotTaken}
-        onFirstPlay={onFirstPlay}
+        onBuffering={(event) => {
+          onBuffering?.(convertNativeEvent(event));
+        }}
+        onEncounteredError={(event) => {
+          onEncounteredError?.(convertNativeEvent(event));
+        }}
+        onDialogDisplay={(event) => {
+          onDialogDisplay?.(convertNativeEvent(event));
+        }}
+        onTimeChanged={(event) => {
+          onTimeChanged?.(convertNativeEvent(event));
+        }}
+        onPositionChanged={(event) => {
+          onPositionChanged?.(convertNativeEvent(event));
+        }}
+        onESAdded={(event) => {
+          onESAdded?.(convertNativeEvent(event));
+        }}
+        onRecordChanged={(event) => {
+          onRecordChanged?.(convertNativeEvent(event));
+        }}
+        onSnapshotTaken={(event) => {
+          onSnapshotTaken?.(convertNativeEvent(event));
+        }}
+        onFirstPlay={(event) => {
+          const mediaInfo = convertNativeEvent(event);
+          const mediaRatio = mediaInfo.width / mediaInfo.height;
+
+          const validRatio = mediaRatio > 0 && mediaRatio < Infinity;
+          const autoRatio = validRatio ? mediaRatio : fallbackRatio;
+
+          setAutoRatio(autoRatio);
+          onFirstPlay?.(mediaInfo);
+        }}
       />
     </View>
   );
