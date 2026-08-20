@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.5 - 2026-08-20
+
+### 🛠 Breaking changes
+
+- Removed unused LibVlcEvent type
+
 ## 57.0.4 - 2026-08-19
 
 ### 🛠 Breaking changes
