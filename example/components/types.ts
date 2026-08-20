@@ -24,8 +24,3 @@ export interface VlcPlayerProps {
   source: LibVlcSource;
   fullScreen?: boolean;
 }
-
-export interface PlayerControl {
-  name: SFSymbol;
-  onPress: () => void;
-}

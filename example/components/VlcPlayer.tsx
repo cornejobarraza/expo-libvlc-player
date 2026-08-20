@@ -4,7 +4,7 @@ import { ActivityIndicator, Alert, Image, StyleSheet, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { VlcControl } from "./VlcControl";
-import { type VlcPlayerProps, type PlayerControl } from "./types";
+import { type VlcControlProps, type VlcPlayerProps } from "./types";
 
 const MIN_VOLUME = 0;
 const MAX_VOLUME = 100;
@@ -22,7 +22,7 @@ export function VlcPlayer({ source, fullScreen }: VlcPlayerProps) {
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
 
-  const PLAYER_CONTROLS: PlayerControl[] = [
+  const PLAYER_CONTROLS: VlcControlProps[] = [
     {
       name: "backward.fill",
       onPress: () => {
