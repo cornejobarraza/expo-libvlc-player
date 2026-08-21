@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.7 - 2026-08-21
+
+### 🐛 Bug fixes
+
+- Fixed auto aspect ratio
+
 ## 57.0.6 - 2026-08-20
 
 ### 💡 Others
