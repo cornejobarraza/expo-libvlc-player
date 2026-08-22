@@ -28,6 +28,34 @@
 | Android / Android TV | 7+      |
 | iOS / Apple TV       | 16.4+   |
 
+#### Can I use this library with older Expo SDK versions?
+
+Previous versions may be supported by configuring how the app is compiled.
+
+#### Example app.json with config plugin
+
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "buildToolsVersion": "36.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "16.4"
+          }
+        }
+      ]
+    ]
+  }
+}
+```
+
 ## Installation
 
 ```
