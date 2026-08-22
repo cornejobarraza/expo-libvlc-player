@@ -94,6 +94,7 @@ export function VlcPlayer({ source, fullScreen }: VlcPlayerProps) {
             setPlaying(false);
           }}
           onStopped={() => {
+            setBuffering(false);
             setPlaying(false);
             setTime(0);
           }}
