@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.8 - 2026-08-22
+
+### 💡 Others
+
+- Updated README to improve documentation
+
 ## 57.0.7 - 2026-08-21
 
 ### 🐛 Bug fixes
