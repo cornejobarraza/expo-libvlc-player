@@ -30,7 +30,7 @@
 
 #### Can I use this library with older Expo SDK versions?
 
-Previous versions may be supported by configuring how the app is compiled.
+Previous versions may be supported by changing how you compile the app.
 
 #### Example app.json with config plugin
 
