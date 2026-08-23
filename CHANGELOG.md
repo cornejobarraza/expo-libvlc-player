@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.10 - 2026-08-23
+
+### 🎉 New features
+
+- Added typed config plugin
+
 ## 57.0.9 - 2026-08-23
 
 ### 🐛 Bug fixes
