@@ -13,6 +13,7 @@ import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.enums.AudioMixingMode
 import kotlinx.coroutines.launch
 import org.videolan.libvlc.MediaPlayer
+import java.util.WeakHashMap
 
 class AudioFocusManager(
     private val appContext: AppContext,
@@ -39,7 +40,7 @@ class AudioFocusManager(
 
     var currentMixingMode: AudioMixingMode = AudioMixingMode.AUTO
 
-    var oldVolume: Int = MediaPlayerConstants.MAX_PLAYER_VOLUME
+    private val preDuckVolumes: MutableMap<MediaPlayer, Int> = WeakHashMap()
 
     override fun onAudioFocusChange(focusChange: Int) {
         appContext.mainQueue.launch {
@@ -187,14 +188,20 @@ class AudioFocusManager(
     private fun duckPlayer(mediaPlayer: MediaPlayer?) {
         mediaPlayer?.let { player ->
             val volume = player.getVolume()
-            player.setVolume(volume / 2)
+
+            if (volume > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
+                preDuckVolumes[player] = volume
+                player.setVolume(volume / 2)
+            }
         }
     }
 
     private fun unduckPlayer(mediaPlayer: MediaPlayer?) {
         mediaPlayer?.let { player ->
+            val restoredVolume = preDuckVolumes.remove(player) ?: return
+
             if (player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
-                player.setVolume(oldVolume)
+                player.setVolume(restoredVolume)
             }
         }
     }
