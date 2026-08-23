@@ -184,8 +184,7 @@ class LibVlcPlayerView(
         mediaPlayer = MediaPlayer(libVLC!!)
         attachPlayerLayout(playerLayout)
         setPlayerListener(mediaPlayer!!)
-        addPlayerSlaves(slaves)
-        setupPlayer()
+        setupPlayer(addSlaves = true)
 
         try {
             URI(source)
@@ -327,8 +326,12 @@ class LibVlcPlayerView(
         }
     }
 
-    fun setupPlayer() {
+    fun setupPlayer(addSlaves: Boolean? = false) {
         post {
+            if (addSlaves == true) {
+                addPlayerSlaves(slaves)
+            }
+
             mediaPlayer?.let { player ->
                 if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
                     player.setScale(scale.toFloat())
