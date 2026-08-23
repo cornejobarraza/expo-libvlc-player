@@ -2,14 +2,13 @@ import { type VideoAspectRatio } from "../LibVlcPlayer.types";
 
 export function convertAspectRatio(ratio?: VideoAspectRatio) {
   if (typeof ratio === "string") {
-    const numbers = ratio.split(":");
+    const [sWidth, sHeight] = ratio.split(":");
 
-    if (numbers.length === 2) {
-      const [width, height] = numbers.map(Number);
+    if (sWidth !== undefined && sHeight !== undefined) {
+      const width = Number(sWidth);
+      const height = Number(sHeight);
 
-      const hasVideoSize = width > 0 && height > 0;
-
-      if (hasVideoSize) {
+      if (width > 0 && height > 0) {
         return width / height;
       }
     }

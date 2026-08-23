@@ -16,5 +16,5 @@
 /eslint.config.js
 /lint-staged.config.js
 /package-lock.json
-/tsconfig.eslint.json
-tsconfig.tsbuildinfo
+/tsconfig.*.json
+*.tsbuildinfo

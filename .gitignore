@@ -59,4 +59,4 @@ yarn-error.log
 /*.tgz
 
 # Other
-tsconfig.tsbuildinfo
+*.tsbuildinfo

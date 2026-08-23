@@ -6,13 +6,15 @@ import {
   type ConfigPlugin,
 } from "expo/config-plugins";
 
-interface WithExpoLibVlcPlayerProps {
+export interface WithExpoLibVlcPlayerProps {
+  /** A string to set the `NSLocalNetworkUsageDescription` permission message on iOS */
   localNetworkPermission?: string;
+  /** A boolean value to enable Picture-in-Picture (PiP) on Android and iOS */
   supportsPictureInPicture?: boolean;
 }
 
 const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network";
-const SUPPORT_PIP_PERMISSION = "android:supportsPictureInPicture";
+const PIP_MANIFEST_ATTRIBUTE = "android:supportsPictureInPicture";
 const AUDIO_BACKGROUND_MODE = "audio";
 
 const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
@@ -26,9 +28,9 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
       const activity = AndroidConfig.Manifest.getMainActivityOrThrow(config.modResults);
 
       if (supportsPictureInPicture) {
-        activity.$[SUPPORT_PIP_PERMISSION] = "true";
+        activity.$[PIP_MANIFEST_ATTRIBUTE] = "true";
       } else {
-        Reflect.deleteProperty(activity.$, SUPPORT_PIP_PERMISSION);
+        Reflect.deleteProperty(activity.$, PIP_MANIFEST_ATTRIBUTE);
       }
     }
 
