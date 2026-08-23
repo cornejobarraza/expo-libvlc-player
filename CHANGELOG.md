@@ -10,6 +10,17 @@
 
 ### 💡 Others
 
+## 57.0.9 - 2026-08-23
+
+### 🐛 Bug fixes
+
+- Fixed player ducking on Android
+- Fixed PiP layout on Android
+
+### 💡 Others
+
+- Updated README to improve documentation
+
 ## 57.0.8 - 2026-08-22
 
 ### 💡 Others
