@@ -46,7 +46,7 @@ class PictureInPictureManager(
             }
         }
 
-    private val rootChildrenVisibility: MutableMap<Int, Int> = mutableMapOf()
+    private val rootChildrenVisibility: MutableMap<View, Int> = mutableMapOf()
 
     private val context: Context?
         get() = pipView?.context
@@ -268,8 +268,8 @@ class PictureInPictureManager(
 
         for (i in 0 until rootView.childCount) {
             val child = rootView.getChildAt(i)
-            rootChildrenVisibility[child.id] = child.visibility
-            rootView.getChildAt(i).visibility = View.GONE
+            rootChildrenVisibility[child] = child.visibility
+            child.visibility = View.GONE
         }
 
         rootView.addView(pictureLayout)
@@ -293,12 +293,8 @@ class PictureInPictureManager(
 
         rootView.removeView(pictureLayout)
 
-        for (i in 0 until rootView.childCount) {
-            val child = rootView.getChildAt(i)
-
-            rootChildrenVisibility[child.id]?.let { visibility ->
-                child.visibility = visibility
-            }
+        rootChildrenVisibility.forEach { (child, visibility) ->
+            child.visibility = visibility
         }
 
         rootChildrenVisibility.clear()
