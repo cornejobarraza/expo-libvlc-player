@@ -4,7 +4,6 @@
     "strict": true,
     "paths": {
       "expo-libvlc-player": ["../src/index"],
-      "expo-libvlc-player/plugin": ["../plugin/src/index"],
       "expo-libvlc-player/*": ["../src/*"]
     }
   }
