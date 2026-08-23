@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.11 - 2026-08-23
+
+### 🐛 Bug fixes
+
+- Fixed slaves during player creation
+
 ## 57.0.10 - 2026-08-23
 
 ### 🎉 New features
