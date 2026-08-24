@@ -439,14 +439,14 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     slaves?: Slave[];
     /**
-     * Sets the player audio and subtitle delays
+     * Sets the player audio and subtitle delays in microseconds
      *
      * @example
      *
      * ```tsx
      * const delays = {
-     *   audio: 125,
-     *   subtitle: 250,
+     *   audio: 500_000,
+     *   subtitle: 1_000_000,
      * };
      *
      * <LibVlcPlayerView
@@ -479,7 +479,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     rate?: number;
     /**
-     * Sets the initial player time. Must be a number equal or greater than `0`
+     * Sets the initial player time in milliseconds. Must be a number equal or greater than `0`
      *
      * @default 0
      */

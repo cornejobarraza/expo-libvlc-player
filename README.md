@@ -179,13 +179,13 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `options`          | Sets the options to initialize the media with. See the [VideoLAN Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
 | `tracks`           | Sets the player audio, video, and subtitle tracks. See [`Tracks`](#tracks) for more                                               | `undefined` |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
-| `delays`           | Sets the player audio and subtitle delays. See [`Delays`](#delays) for more                                                       | `0`         |
+| `delays`           | Sets the player audio and subtitle delays in microseconds. See [`Delays`](#delays) for more                                       | `0`         |
 | `scale`            | Sets the player scaling factor. Must be a number equal or greater than `0`                                                        | `0`         |
 | `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio, number, or auto. If auto, a fallback ratio value must be provided         | `undefined` |
 | `fallbackRatio`    | Sets the fallback aspect ratio. Must be a valid ratio or number                                                                   | `undefined` |
 | `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
 | `rate`             | Sets the player rate. Must be a number equal or greater than `1`                                                                  | `1`         |
-| `time`             | Sets the initial player time. Must be a number equal or greater than `0`                                                          | `0`         |
+| `time`             | Sets the initial player time in milliseconds. Must be a number equal or greater than `0`                                          | `0`         |
 | `volume`           | Sets the player volume. Must be a number between `0` and `100`                                                                    | `100`       |
 | `mute`             | Sets the player volume to `0` when `true` and previous value is restored when `false`                                             | `false`     |
 | `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
