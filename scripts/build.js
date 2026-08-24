@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const { spawnSyncWithAutoShell } = require("./utils");
 
 const ARGS = process.argv.slice(2);
