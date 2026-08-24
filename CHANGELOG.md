@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.13 - 2026-08-24
+
+### 🐛 Bug fixes
+
+- Fixed missing build output
+
 ## 57.0.12 - 2026-08-24
 
 ### 🎉 New features
