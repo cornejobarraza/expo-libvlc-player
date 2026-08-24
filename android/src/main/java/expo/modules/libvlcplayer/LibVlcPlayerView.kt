@@ -18,6 +18,7 @@ import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.enums.VideoContentFit
 import expo.modules.libvlcplayer.managers.MediaPlayerManager
+import expo.modules.libvlcplayer.records.Delays
 import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
@@ -245,9 +246,9 @@ class LibVlcPlayerView(
         val videoTrack = tracks?.video
         val spuTrack = tracks?.subtitle
 
-        audioTrack?.let { audioTrack -> selectTrack(audioTrack, IMedia.Track.Type.Audio) }
-        videoTrack?.let { videoTrack -> selectTrack(videoTrack, IMedia.Track.Type.Video) }
-        spuTrack?.let { spuTrack -> selectTrack(spuTrack, IMedia.Track.Type.Text) }
+        audioTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Audio) }
+        videoTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Video) }
+        spuTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Text) }
     }
 
     fun addPlayerSlaves(slaves: List<Slave>) {
@@ -270,6 +271,16 @@ class LibVlcPlayerView(
             }
 
             mediaPlayer?.addSlave(slaveType, Uri.parse(source), selected)
+        }
+    }
+
+    fun setPlayerDelays() {
+        mediaPlayer?.let { player ->
+            val audioDelay = delays?.audio
+            val spuDelay = delays?.subtitle
+
+            audioDelay?.let { delay -> player.setAudioDelay(delay) }
+            spuDelay?.let { delay -> player.setSpuDelay(delay) }
         }
     }
 
@@ -446,6 +457,12 @@ class LibVlcPlayerView(
             if (!newSlaves.isEmpty()) {
                 addPlayerSlaves(newSlaves)
             }
+        }
+
+    var delays: Delays? = null
+        set(value) {
+            field = value
+            setPlayerDelays()
         }
 
     var scale: Double = MediaPlayerConstants.DEFAULT_PLAYER_SCALE
@@ -717,6 +734,8 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                                 setupPlayer()
 
                                 setPlayerTracks()
+
+                                setPlayerDelays()
 
                                 retryUntil { isLastAttempt ->
                                     if (hasMediaLength || isLastAttempt) {
