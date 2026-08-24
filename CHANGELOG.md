@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.16 - 2026-08-24
+
+### 💡 Others
+
+- Updated Delays type to interface
+
 ## 57.0.15 - 2026-08-24
 
 ### 💡 Others
