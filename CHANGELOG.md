@@ -6,11 +6,15 @@
 
 ### 🎉 New features
 
-- Added delays player prop
-
 ### 🐛 Bug fixes
 
 ### 💡 Others
+
+## 57.0.14 - 2026-08-24
+
+### 🎉 New features
+
+- Added delays player prop
 
 ## 57.0.13 - 2026-08-24
 
