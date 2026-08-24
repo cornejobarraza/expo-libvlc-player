@@ -63,6 +63,10 @@ public class LibVlcPlayerModule: Module {
                 view.slaves = slaves
             }
 
+            Prop("delays") { (view: LibVlcPlayerView, delays: Delays?) in
+                view.delays = delays
+            }
+
             Prop("scale", MediaPlayerConstants.defaultPlayerScale) { (view: LibVlcPlayerView, scale: Double) in
                 view.scale = scale
             }

@@ -160,6 +160,16 @@ class LibVlcPlayerView: ExpoView {
         }
     }
 
+    func setPlayerDelays() {
+        if let player = mediaPlayer {
+            let audioDelay = delays?.audio
+            let textDelay = delays?.subtitle
+
+            if let audioDelay { player.currentAudioPlaybackDelay = NSInteger(audioDelay) }
+            if let textDelay { player.currentVideoSubTitleDelay = NSInteger(textDelay) }
+        }
+    }
+
     func setContentFit(drawable: MediaPlayerDrawable) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -338,6 +348,12 @@ class LibVlcPlayerView: ExpoView {
             if !newSlaves.isEmpty {
                 addPlayerSlaves(newSlaves)
             }
+        }
+    }
+
+    var delays: Delays? {
+        didSet {
+            setPlayerDelays()
         }
     }
 
@@ -562,6 +578,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                         setupPlayer()
 
                         setPlayerTracks()
+
+                        setPlayerDelays()
 
                         retryUntil { [weak self] isLastAttempt in
                             guard let self else { return true }

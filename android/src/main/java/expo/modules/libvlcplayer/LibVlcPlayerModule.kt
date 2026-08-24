@@ -9,6 +9,7 @@ import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.enums.VideoContentFit
 import expo.modules.libvlcplayer.managers.MediaPlayerManager
+import expo.modules.libvlcplayer.records.Delays
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
 
@@ -80,6 +81,10 @@ class LibVlcPlayerModule : Module() {
 
                 Prop("slaves", mutableListOf()) { view: LibVlcPlayerView, slaves: MutableList<Slave> ->
                     view.slaves = slaves
+                }
+
+                Prop("delays") { view: LibVlcPlayerView, delays: Delays? ->
+                    view.delays = delays
                 }
 
                 Prop("scale", MediaPlayerConstants.DEFAULT_PLAYER_SCALE) { view: LibVlcPlayerView, scale: Double ->

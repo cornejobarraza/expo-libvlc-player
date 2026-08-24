@@ -105,6 +105,8 @@ export interface Slave {
   selected?: boolean;
 }
 
+export type Delays = Omit<Tracks, "video">;
+
 export type VideoAspectRatio = `${number}:${number}` | number | undefined;
 
 /**
@@ -321,6 +323,7 @@ export type LibVlcPlayerViewNativeProps = ViewProps &
     options?: string[];
     tracks?: Tracks;
     slaves?: Slave[];
+    delays?: Delays;
     scale?: number;
     contentFit?: VideoContentFit;
     rate?: number;
@@ -392,7 +395,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     options?: string[];
     /**
-     * Sets the player audio, video and subtitle tracks
+     * Sets the player audio, video, and subtitle tracks
      *
      * @example
      *
@@ -435,6 +438,26 @@ export type LibVlcPlayerViewProps = ViewProps &
      * @default []
      */
     slaves?: Slave[];
+    /**
+     * Sets the player audio and subtitle delays
+     *
+     * @example
+     *
+     * ```tsx
+     * const delays = {
+     *   audio: 125,
+     *   subtitle: 250,
+     * };
+     *
+     * <LibVlcPlayerView
+     *   source={BIG_BUCK_BUNNY}
+     *   delays={delays}
+     * />
+     * ```
+     *
+     * @default undefined
+     */
+    delays?: Delays;
     /**
      * Sets the player scaling factor. Must be a number equal or greater than `0`
      *

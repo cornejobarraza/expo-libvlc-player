@@ -6,6 +6,8 @@
 
 ### 🎉 New features
 
+- Added delays player prop
+
 ### 🐛 Bug fixes
 
 ### 💡 Others
