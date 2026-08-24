@@ -8,6 +8,7 @@ const SUBTARGETS = ["plugin"];
 
 console.log("🏗️  Preparing module");
 fs.rmSync(path.join(process.cwd(), "build"), { recursive: true, force: true });
+fs.rmSync(path.join(process.cwd(), ".tsbuildinfo"), { force: true });
 run("tsc");
 
 for (const target of SUBTARGETS) {
@@ -16,6 +17,7 @@ for (const target of SUBTARGETS) {
   if (fs.existsSync(targetDir) && fs.existsSync(path.join(targetDir, "tsconfig.json"))) {
     console.log(`🏗️  Preparing ${target}`);
     fs.rmSync(path.join(targetDir, "build"), { recursive: true, force: true });
+    fs.rmSync(path.join(targetDir, ".tsbuildinfo"), { force: true });
     run("tsc", ["--build", targetDir]);
   }
 }
