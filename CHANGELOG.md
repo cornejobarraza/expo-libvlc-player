@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.15 - 2026-08-24
+
+### 💡 Others
+
+- Added time units in documentation
+
 ## 57.0.14 - 2026-08-24
 
 ### 🎉 New features
