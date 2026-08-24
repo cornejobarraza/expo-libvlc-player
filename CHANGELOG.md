@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 57.0.12 - 2026-08-24
+
+### 🎉 New features
+
+- Added Stopped event payload
+
+### 💡 Others
+
+- Bumped Expo dependency to 57.0.16
+
 ## 57.0.11 - 2026-08-23
 
 ### 🐛 Bug fixes
