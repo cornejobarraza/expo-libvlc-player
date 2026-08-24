@@ -105,7 +105,10 @@ export interface Slave {
   selected?: boolean;
 }
 
-export type Delays = Omit<Tracks, "video">;
+export interface Delays {
+  audio?: number;
+  subtitle?: number;
+}
 
 export type VideoAspectRatio = `${number}:${number}` | number | undefined;
 

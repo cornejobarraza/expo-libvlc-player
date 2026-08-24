@@ -239,7 +239,10 @@ interface Slave {
 #### `Delays`
 
 ```ts
-type Delay = Omit<Tracks, "video">;
+interface Delays {
+  audio?: number;
+  subtitle?: number;
+}
 ```
 
 #### `Buffering`
