@@ -48,6 +48,8 @@ import org.videolan.libvlc.Dialog as VLCDialog
 private val DISPLAY_MANAGER: DisplayManager? = null
 private val ENABLE_SUBTITLES: Boolean = true
 private val USE_TEXTURE_VIEW: Boolean = true
+private val STOP_REASON_PLAYER: String = "player"
+private val STOP_REASON_USER: String = "user"
 
 class LibVlcPlayerView(
     context: Context,
@@ -63,12 +65,12 @@ class LibVlcPlayerView(
 
     var firstPlay: Boolean = true
     private var shouldInit: Boolean = true
-    var shouldRepeat: Boolean = true
+    var stopReason: String = STOP_REASON_PLAYER
 
     val onBuffering by EventDispatcher()
     val onPlaying by EventDispatcher<Unit>()
     val onPaused by EventDispatcher<Unit>()
-    val onStopped by EventDispatcher<Unit>()
+    val onStopped by EventDispatcher()
     val onEncounteredError by EventDispatcher()
     val onDialogDisplay by EventDispatcher<Dialog>()
     val onTimeChanged by EventDispatcher()
@@ -557,7 +559,7 @@ class LibVlcPlayerView(
     }
 
     fun stop() {
-        shouldRepeat = false
+        stopReason = STOP_REASON_USER
         mediaPlayer?.stop()
     }
 
@@ -750,17 +752,17 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                         }
 
                         if (type == Event.Stopped) {
-                            onStopped(Unit)
+                            onStopped(mapOf("reason" to stopReason))
 
                             resetPlayer()
 
                             firstPlay = true
 
-                            if (repeat && shouldRepeat) {
+                            if (repeat && stopReason != STOP_REASON_USER) {
                                 player.play()
                             }
 
-                            shouldRepeat = true
+                            stopReason = STOP_REASON_PLAYER
                         }
 
                         MediaPlayerManager.keepAwakeManager.toggleKeepAwake()

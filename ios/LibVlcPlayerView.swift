@@ -3,6 +3,8 @@ import UIKit
 import VLCKit
 
 private let dialogCustomUI: Bool = true
+private let stopReasonPlayer: String = "player"
+private let stopReasonUser: String = "user"
 
 class LibVlcPlayerView: ExpoView {
     private let playerDrawable: MediaPlayerDrawable = .init()
@@ -17,7 +19,7 @@ class LibVlcPlayerView: ExpoView {
 
     var firstPlay: Bool = true
     private var shouldInit: Bool = true
-    private var shouldRepeat: Bool = true
+    private var stopReason: String = stopReasonPlayer
 
     let onBuffering = EventDispatcher()
     let onPlaying = EventDispatcher()
@@ -437,7 +439,7 @@ class LibVlcPlayerView: ExpoView {
     }
 
     func stop() {
-        shouldRepeat = false
+        stopReason = stopReasonUser
         mediaPlayer?.stop()
     }
 
@@ -601,15 +603,15 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                 }
 
                 if newState == .stopped {
-                    onStopped()
+                    onStopped(["reason": stopReason])
 
                     firstPlay = true
 
-                    if Repeat, shouldRepeat {
+                    if Repeat, stopReason != stopReasonUser {
                         player.play()
                     }
 
-                    shouldRepeat = true
+                    stopReason = stopReasonPlayer
                 }
 
                 MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()

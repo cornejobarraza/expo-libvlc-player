@@ -179,6 +179,10 @@ export interface Buffering {
   value: number;
 }
 
+export interface Stopped {
+  reason: "player" | "user";
+}
+
 export interface Error {
   message: string;
 }
@@ -245,7 +249,7 @@ type PausedListener = () => void;
 /**
  * @hidden
  */
-type StoppedListener = () => void;
+type StoppedListener = (event: NativeEvent<Stopped>) => void;
 
 /**
  * @hidden
@@ -510,7 +514,7 @@ export type LibVlcPlayerViewProps = ViewProps &
     /**
      * Called after the `Stopped` player event
      */
-    onStopped?: () => void;
+    onStopped?: (event: Stopped) => void;
     /**
      * Called after the `EncounteredError` player event
      */

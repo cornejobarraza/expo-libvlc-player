@@ -28,6 +28,7 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
     source,
     slaves,
     onBuffering,
+    onStopped,
     onEncounteredError,
     onDialogDisplay,
     onTimeChanged,
@@ -61,6 +62,9 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
         }))}
         onBuffering={(event) => {
           onBuffering?.(convertNativeEvent(event));
+        }}
+        onStopped={(event) => {
+          onStopped?.(convertNativeEvent(event));
         }}
         onEncounteredError={(event) => {
           onEncounteredError?.(convertNativeEvent(event));
