@@ -21,10 +21,10 @@ import expo.modules.libvlcplayer.managers.MediaPlayerManager
 import expo.modules.libvlcplayer.records.Delays
 import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.MediaInfo
+import expo.modules.libvlcplayer.records.MediaTrack
 import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
-import expo.modules.libvlcplayer.records.Track
 import expo.modules.libvlcplayer.records.Tracks
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -375,9 +375,9 @@ class LibVlcPlayerView(
     fun getMediaTracks(): MediaTracks {
         val player = mediaPlayer ?: return MediaTracks()
 
-        val audios = player.getAudioTracks()?.map { track -> Track(id = track.id, name = track.name) }
-        val videos = player.getVideoTracks()?.map { track -> Track(id = track.id, name = track.name) }
-        val subtitles = player.getSpuTracks()?.map { track -> Track(id = track.id, name = track.name) }
+        val audios = player.getAudioTracks()?.map { track -> MediaTrack(id = track.id, name = track.name) }
+        val videos = player.getVideoTracks()?.map { track -> MediaTrack(id = track.id, name = track.name) }
+        val subtitles = player.getSpuTracks()?.map { track -> MediaTrack(id = track.id, name = track.name) }
 
         val audio = audios ?: emptyList()
         val video = videos ?: emptyList()

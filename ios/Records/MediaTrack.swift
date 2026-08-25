@@ -1,6 +1,6 @@
 import ExpoModulesCore
 
-struct Track: Record {
+struct MediaTrack: Record {
     @Field
     var id: Int = 0
 

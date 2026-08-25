@@ -177,9 +177,9 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | `source`           | Sets the source of the media to be played. Set to `null` to release the player                                                    |             |
 | `options`          | Sets the options to initialize the media with. See the [VideoLAN Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
-| `tracks`           | Sets the player audio, video, and subtitle tracks. See [`Tracks`](#tracks) for more                                               | `undefined` |
+| `tracks`           | Sets the player audio, video, and subtitle track indexes. See [`Tracks`](#tracks) for more                                        | `undefined` |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
-| `delays`           | Sets the player audio and subtitle delays in microseconds. See [`Delays`](#delays) for more                                       | `0`         |
+| `delays`           | Sets the player audio and subtitle delay values in microseconds. See [`Delays`](#delays) for more                                 | `undefined` |
 | `scale`            | Sets the player scaling factor. Must be a number equal or greater than `0`                                                        | `0`         |
 | `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio, number, or auto. If auto, a fallback ratio value must be provided         | `undefined` |
 | `fallbackRatio`    | Sets the fallback aspect ratio. Must be a valid ratio or number                                                                   | `undefined` |
@@ -290,10 +290,10 @@ interface Position {
 }
 ```
 
-#### `Track`
+#### `MediaTrack`
 
 ```ts
-interface Track {
+interface MediaTrack {
   id: number;
   name: string;
 }
@@ -303,9 +303,9 @@ interface Track {
 
 ```ts
 interface MediaTracks {
-  audio: Track[];
-  video: Track[];
-  subtitle: Track[];
+  audio: MediaTrack[];
+  video: MediaTrack[];
+  subtitle: MediaTrack[];
 }
 ```
 

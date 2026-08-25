@@ -214,15 +214,15 @@ export interface Recording {
   isRecording: boolean;
 }
 
-export interface Track {
+export interface MediaTrack {
   id: number;
   name: string;
 }
 
 export interface MediaTracks {
-  audio: Track[];
-  video: Track[];
-  subtitle: Track[];
+  audio: MediaTrack[];
+  video: MediaTrack[];
+  subtitle: MediaTrack[];
 }
 
 export interface MediaInfo {
@@ -394,7 +394,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     options?: string[];
     /**
-     * Sets the player audio, video, and subtitle tracks
+     * Sets the player audio, video, and subtitle track indexes
      *
      * @example
      *
@@ -438,7 +438,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     slaves?: Slave[];
     /**
-     * Sets the player audio and subtitle delays in microseconds
+     * Sets the player audio and subtitle delay values in microseconds
      *
      * @example
      *

@@ -2,11 +2,11 @@ import ExpoModulesCore
 
 struct MediaTracks: Record {
     @Field
-    var audio: [Track] = []
+    var audio: [MediaTrack] = []
 
     @Field
-    var video: [Track] = []
+    var video: [MediaTrack] = []
 
     @Field
-    var subtitle: [Track] = []
+    var subtitle: [MediaTrack] = []
 }

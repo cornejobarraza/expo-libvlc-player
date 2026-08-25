@@ -250,15 +250,15 @@ class LibVlcPlayerView: ExpoView {
     func getMediaTracks() -> MediaTracks {
         guard let player = mediaPlayer else { return MediaTracks() }
 
-        let disableTrack = Track(id: -1, name: "Disable")
+        let disableTrack = MediaTrack(id: -1, name: "Disable")
 
         let audios = player.audioTracks.enumerated()
         let videos = player.videoTracks.enumerated()
         let subtitles = player.textTracks.enumerated()
 
-        let audio = [disableTrack] + audios.map { index, audio in Track(id: index, name: audio.trackName) }
-        let video = [disableTrack] + videos.map { index, video in Track(id: index, name: video.trackName) }
-        let subtitle = [disableTrack] + subtitles.map { index, subtitle in Track(id: index, name: subtitle.trackName) }
+        let audio = [disableTrack] + audios.map { index, audio in MediaTrack(id: index, name: audio.trackName) }
+        let video = [disableTrack] + videos.map { index, video in MediaTrack(id: index, name: video.trackName) }
+        let subtitle = [disableTrack] + subtitles.map { index, subtitle in MediaTrack(id: index, name: subtitle.trackName) }
 
         return MediaTracks(
             audio: audio,
