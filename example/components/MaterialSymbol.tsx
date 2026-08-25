@@ -12,6 +12,6 @@ const SYMBOLS = {
   "speaker.3.fill": "volume-up",
 } as SymbolMapping;
 
-export function IconSymbol({ style, name, size = 24, color }: IconSymbolProps) {
+export function MaterialSymbol({ style, name, size = 24, color }: IconSymbolProps) {
   return <MaterialIcons style={style} name={SYMBOLS[name]} size={size} color={color} />;
 }
