@@ -200,7 +200,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onBuffering`             | Called after the `Buffering` player event                    | [`Buffering`](#buffering)     |
 | `onPlaying`               | Called after the `Playing` player event                      |                               |
 | `onPaused`                | Called after the `Paused` player event                       |                               |
-| `onStopped`               | Called after the `Stopped` player event                      | [`Stopped`](#stopped)         |
+| `onStopped`               | Called after the `Stopped` player event                      |                               |
 | `onEncounteredError`      | Called after the `EncounteredError` player event             | [`Error`](#error)             |
 | `onDialogDisplay`         | Called after a dialog needs to be displayed                  | [`Dialog`](#dialog)           |
 | `onTimeChanged`           | Called after the `TimeChanged` player event                  | [`Time`](#time)               |
@@ -250,14 +250,6 @@ interface Delays {
 ```ts
 interface Buffering {
   value: number;
-}
-```
-
-#### `Stopped`
-
-```ts
-interface Stopped {
-  reason: "player" | "user";
 }
 ```
 
