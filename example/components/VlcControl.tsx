@@ -13,7 +13,7 @@ export const VlcControl = ({ name, onPress }: VlcControlProps) => {
 
 const styles = StyleSheet.create({
   control: {
-    backgroundColor: "#0f0f0f",
+    backgroundColor: "#1a1a1a",
     justifyContent: "center",
     paddingVertical: 4,
     paddingHorizontal: 8,
