@@ -11,7 +11,7 @@
     "open:android": "node scripts/open-android.js",
     "open:ios": "node scripts/open-ios.js",
     "prepare": "husky && node scripts/prepare.js",
-    "patch": "node scripts/verify.js && npm version patch"
+    "patch": "node scripts/patch.js"
   },
   "keywords": [
     "react-native",
