@@ -356,6 +356,18 @@ A custom message can be provided for the `NSLocalNetworkUsageDescription` key in
 
 https://code.videolan.org/videolan/vlc-ios/-/issues/893
 
+## Contributing
+
+Contributions are always welcome. Please raise any issues or fix them by creating a pull request.
+
+## Development
+
+Install [Ktlint](https://github.com/ktlint/ktlint) and [SwiftFormat](https://github.com/nicklockwood/swiftformat) for linting native code:
+
+```
+brew install ktlint swiftformat
+```
+
 ## Disclaimer
 
 This project is not affiliated with, endorsed by, or officially supported by VideoLAN. The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with the following LibVLC bindings:
@@ -368,10 +380,6 @@ For official VLC products and support, please visit [videolan.org](https://www.v
 ## Credits
 
 This library is inspired by existing projects such as [react-native-vlc-media-player](https://github.com/razorRun/react-native-vlc-media-player) and [expo-video](https://github.com/expo/expo/tree/main/packages/expo-video).
-
-## Contributing
-
-Contributions are always welcome. Please raise any issues or fix them by creating a pull request.
 
 ## License
 
