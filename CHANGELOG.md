@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 57.0.18 - 2026-08-26
+
+### 🛠 Breaking changes
+
+- Renamed type Track to MediaTrack
+
+### 💡 Others
+
+- Updated README to improve documentation
+
 ## 57.0.17 - 2026-08-25
 
 ### 🛠 Breaking changes
