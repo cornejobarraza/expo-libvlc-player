@@ -10,14 +10,17 @@
 
 ### 💡 Others
 
-## 57.0.19 - 2026-08-26
-
-### 🛠 Breaking changes
-
-- Upgraded libvlcjni to 4.0.0-eap29
+## 57.0.20 - 2026-08-26
 
 ### 💡 Others
 
+- Removed breaking change entry
+
+## 57.0.19 - 2026-08-26
+
+### 💡 Others
+
+- Upgraded libvlcjni to 4.0.0-eap29
 - Bumped Expo dependency to 57.0.17
 
 ## 57.0.18 - 2026-08-26
