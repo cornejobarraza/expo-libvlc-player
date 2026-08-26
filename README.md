@@ -368,6 +368,8 @@ Install [Ktlint](https://github.com/ktlint/ktlint) and [SwiftFormat](https://git
 brew install ktlint swiftformat
 ```
 
+LibVLC might not render correctly on emulators or simulators. Please test on a real device.
+
 ## Disclaimer
 
 This project is not affiliated with, endorsed by, or officially supported by VideoLAN. The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with the following LibVLC bindings:
