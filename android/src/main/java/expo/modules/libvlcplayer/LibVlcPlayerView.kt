@@ -223,18 +223,10 @@ class LibVlcPlayerView(
         type: Int,
     ) {
         mediaPlayer?.let { player ->
-            when (type) {
-                IMedia.Track.Type.Audio -> {
-                    player.setAudioTrack(index)
-                }
-
-                IMedia.Track.Type.Video -> {
-                    player.setVideoTrack(index)
-                }
-
-                IMedia.Track.Type.Text -> {
-                    player.setSpuTrack(index)
-                }
+            if (index == -1) {
+                player.unselectTrackType(type)
+            } else {
+                player.selectTrack(index.toString())
             }
         }
     }
@@ -375,13 +367,15 @@ class LibVlcPlayerView(
     fun getMediaTracks(): MediaTracks {
         val player = mediaPlayer ?: return MediaTracks()
 
-        val audios = player.getAudioTracks()?.map { track -> MediaTrack(id = track.id, name = track.name) }
-        val videos = player.getVideoTracks()?.map { track -> MediaTrack(id = track.id, name = track.name) }
-        val subtitles = player.getSpuTracks()?.map { track -> MediaTrack(id = track.id, name = track.name) }
+        val disableTrack = MediaTrack(id = -1, name = "Disable")
 
-        val audio = audios ?: emptyList()
-        val video = videos ?: emptyList()
-        val subtitle = subtitles ?: emptyList()
+        val audios = player.getTracks(IMedia.Track.Type.Audio)?.mapIndexed { index, track -> MediaTrack(id = index, name = track.name) }
+        val videos = player.getTracks(IMedia.Track.Type.Video)?.mapIndexed { index, track -> MediaTrack(id = index, name = track.name) }
+        val subtitles = player.getTracks(IMedia.Track.Type.Text)?.mapIndexed { index, track -> MediaTrack(id = index, name = track.name) }
+
+        val audio = listOf(disableTrack) + (audios ?: emptyList())
+        val video = listOf(disableTrack) + (videos ?: emptyList())
+        val subtitle = listOf(disableTrack) + (subtitles ?: emptyList())
 
         return MediaTracks(
             audio = audio,
@@ -406,7 +400,7 @@ class LibVlcPlayerView(
     }
 
     fun getVideoSize(): Size {
-        val video = mediaPlayer?.getCurrentVideoTrack() ?: return Size(0, 0)
+        val video = mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Video) as? IMedia.VideoTrack ?: return Size(0, 0)
         return Size(video.width, video.height)
     }
 
@@ -594,13 +588,13 @@ class LibVlcPlayerView(
     fun record(path: String?) {
         mediaPlayer?.let { player ->
             if (path != null) {
-                val success = player.record(path)
+                val success = player.record(path, true)
 
                 if (!success) {
                     onEncounteredError(mapOf("message" to "Media could not be recorded"))
                 }
             } else {
-                player.record(null)
+                player.record(null, false)
             }
         }
     }
