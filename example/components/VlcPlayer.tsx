@@ -13,7 +13,7 @@ const VOLUME_STEP = 10;
 const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
-export function VlcPlayer({ source, fullScreen }: VlcPlayerProps) {
+export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(false);
   const [time, setTime] = useState<number>(DEFAULT_TIME);
@@ -121,11 +121,11 @@ export function VlcPlayer({ source, fullScreen }: VlcPlayerProps) {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   libVlc: {
-    gap: 20,
+    gap: 24,
   },
   libVlcFull: {
     alignItems: "center",
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   player: {
-    backgroundColor: "black",
+    backgroundColor: "#000000",
     borderRadius: 12,
   },
   controls: {
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   controlsFull: {
     ...StyleSheet.absoluteFill,
-    bottom: 20,
+    bottom: 24,
     alignItems: "flex-end",
     zIndex: 9999,
   },

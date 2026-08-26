@@ -11,12 +11,7 @@
 </p>
 
 <p align="center">
-  <img style="height: 600px; margin: 0 8px;" alt="Android example" src="example/assets/android.png">
-  <img style="height: 600px; margin: 0 8px;" alt="iOS example" src="example/assets/ios.png">
-</p>
-
-<p align="center">
-  <i>Screenshots taken from the <a href="example">Example App</a> on Android and iOS</i>
+  <img alt="Example App" src="example/assets/player.png">
 </p>
 
 ### Supported versions
@@ -140,7 +135,7 @@ import LibVlcPlayerModule from "expo-libvlc-player";
 LibVlcPlayerModule.isPictureInPictureSupported();
 ```
 
-_See the [Example App](example) for additional usage._
+See the [Example App](example) for additional usage.
 
 ### Module functions
 
