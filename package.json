@@ -36,11 +36,11 @@
     "@types/react": "^19.2.18",
     "eslint": "^9.39.5",
     "eslint-config-universe": "^16.0.0",
-    "expo": "~57.0.16",
+    "expo": "~57.0.17",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
-    "react-native": "0.86.2",
+    "react-native": "0.86.3",
     "typescript": "~6.0.3"
   },
   "peerDependencies": {
