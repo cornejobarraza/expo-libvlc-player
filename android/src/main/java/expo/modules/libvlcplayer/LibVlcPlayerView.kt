@@ -111,7 +111,8 @@ class LibVlcPlayerView(
         setContentFit(layout = pictureLayout)
     }
 
-    fun getTextureView(layout: VLCVideoLayout): TextureView? = layout.findViewById(org.videolan.R.id.texture_video)
+    fun getTextureView(layout: VLCVideoLayout): TextureView? =
+        layout.findViewById(org.videolan.R.id.texture_video)
 
     fun addPlayerLayout(layout: VLCVideoLayout) {
         val parent = playerLayout.parent as? ViewGroup
@@ -369,9 +370,25 @@ class LibVlcPlayerView(
 
         val disableTrack = MediaTrack(id = -1, name = "Disable")
 
-        val audios = player.getTracks(IMedia.Track.Type.Audio)?.mapIndexed { index, track -> MediaTrack(id = index, name = track.name) }
-        val videos = player.getTracks(IMedia.Track.Type.Video)?.mapIndexed { index, track -> MediaTrack(id = index, name = track.name) }
-        val subtitles = player.getTracks(IMedia.Track.Type.Text)?.mapIndexed { index, track -> MediaTrack(id = index, name = track.name) }
+        val audios =
+            player
+                .getTracks(
+                    IMedia.Track.Type.Audio,
+                )?.mapIndexed { index, track -> MediaTrack(id = index, name = track.name) }
+        val videos =
+            player.getTracks(IMedia.Track.Type.Video)?.mapIndexed {
+                index,
+                track,
+                ->
+                MediaTrack(id = index, name = track.name)
+            }
+        val subtitles =
+            player.getTracks(IMedia.Track.Type.Text)?.mapIndexed {
+                index,
+                track,
+                ->
+                MediaTrack(id = index, name = track.name)
+            }
 
         val audio = listOf(disableTrack) + (audios ?: emptyList())
         val video = listOf(disableTrack) + (videos ?: emptyList())
@@ -400,7 +417,9 @@ class LibVlcPlayerView(
     }
 
     fun getVideoSize(): Size {
-        val video = mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Video) as? IMedia.VideoTrack ?: return Size(0, 0)
+        val video =
+            mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Video) as? IMedia.VideoTrack
+                ?: return Size(0, 0)
         return Size(video.width, video.height)
     }
 

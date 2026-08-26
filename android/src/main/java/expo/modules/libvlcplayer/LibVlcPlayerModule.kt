@@ -71,7 +71,10 @@ class LibVlcPlayerModule : Module() {
                     view.source = source
                 }
 
-                Prop("options", mutableListOf()) { view: LibVlcPlayerView, options: MutableList<String> ->
+                Prop(
+                    "options",
+                    mutableListOf(),
+                ) { view: LibVlcPlayerView, options: MutableList<String> ->
                     view.options = options
                 }
 
@@ -79,7 +82,10 @@ class LibVlcPlayerModule : Module() {
                     view.tracks = tracks
                 }
 
-                Prop("slaves", mutableListOf()) { view: LibVlcPlayerView, slaves: MutableList<Slave> ->
+                Prop(
+                    "slaves",
+                    mutableListOf(),
+                ) { view: LibVlcPlayerView, slaves: MutableList<Slave> ->
                     view.slaves = slaves
                 }
 
@@ -87,23 +93,38 @@ class LibVlcPlayerModule : Module() {
                     view.delays = delays
                 }
 
-                Prop("scale", MediaPlayerConstants.DEFAULT_PLAYER_SCALE) { view: LibVlcPlayerView, scale: Double ->
+                Prop(
+                    "scale",
+                    MediaPlayerConstants.DEFAULT_PLAYER_SCALE,
+                ) { view: LibVlcPlayerView, scale: Double ->
                     view.scale = scale
                 }
 
-                Prop("contentFit", VideoContentFit.CONTAIN) { view: LibVlcPlayerView, contentFit: VideoContentFit ->
+                Prop(
+                    "contentFit",
+                    VideoContentFit.CONTAIN,
+                ) { view: LibVlcPlayerView, contentFit: VideoContentFit ->
                     view.contentFit = contentFit
                 }
 
-                Prop("rate", MediaPlayerConstants.DEFAULT_PLAYER_RATE) { view: LibVlcPlayerView, rate: Double ->
+                Prop(
+                    "rate",
+                    MediaPlayerConstants.DEFAULT_PLAYER_RATE,
+                ) { view: LibVlcPlayerView, rate: Double ->
                     view.rate = rate
                 }
 
-                Prop("time", MediaPlayerConstants.DEFAULT_PLAYER_TIME) { view: LibVlcPlayerView, time: Int ->
+                Prop(
+                    "time",
+                    MediaPlayerConstants.DEFAULT_PLAYER_TIME,
+                ) { view: LibVlcPlayerView, time: Int ->
                     view.time = time
                 }
 
-                Prop("volume", MediaPlayerConstants.MAX_PLAYER_VOLUME) { view: LibVlcPlayerView, volume: Int ->
+                Prop(
+                    "volume",
+                    MediaPlayerConstants.MAX_PLAYER_VOLUME,
+                ) { view: LibVlcPlayerView, volume: Int ->
                     view.volume = volume
                 }
 
@@ -111,7 +132,10 @@ class LibVlcPlayerModule : Module() {
                     view.mute = mute
                 }
 
-                Prop("audioMixingMode", AudioMixingMode.AUTO) { view: LibVlcPlayerView, audioMixingMode: AudioMixingMode ->
+                Prop(
+                    "audioMixingMode",
+                    AudioMixingMode.AUTO,
+                ) { view: LibVlcPlayerView, audioMixingMode: AudioMixingMode ->
                     view.audioMixingMode = audioMixingMode
                 }
 
@@ -123,7 +147,10 @@ class LibVlcPlayerModule : Module() {
                     view.autoplay = autoplay
                 }
 
-                Prop("pictureInPicture", false) { view: LibVlcPlayerView, pictureInPicture: Boolean ->
+                Prop(
+                    "pictureInPicture",
+                    false,
+                ) { view: LibVlcPlayerView, pictureInPicture: Boolean ->
                     view.pictureInPicture = pictureInPicture
                 }
 
@@ -164,7 +191,9 @@ class LibVlcPlayerModule : Module() {
                     view.postAction(action)
                 }
 
-                AsyncFunction("postLogin") { view: LibVlcPlayerView, username: String, password: String, store: Boolean? ->
+                AsyncFunction(
+                    "postLogin",
+                ) { view: LibVlcPlayerView, username: String, password: String, store: Boolean? ->
                     view.postLogin(username, password, store)
                 }
 

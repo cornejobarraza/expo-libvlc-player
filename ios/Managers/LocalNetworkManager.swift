@@ -44,7 +44,10 @@ class LocalNetworkManager {
         return Array(ipv6AddressesOfBroadcastCapableInterfaces()
             .filter { isIPv6AddressLinkLocal($0) }
             .map { var addr = $0; addr.sin6_port = UInt16(9).bigEndian; return addr }
-            .map { [setIPv6LinkLocalAddressHostPart(of: $0, to: r1), setIPv6LinkLocalAddressHostPart(of: $0, to: r2)] }
+            .map { [
+                setIPv6LinkLocalAddressHostPart(of: $0, to: r1),
+                setIPv6LinkLocalAddressHostPart(of: $0, to: r2),
+            ] }
             .joined())
     }
 
@@ -55,7 +58,9 @@ class LocalNetworkManager {
     /// that is, the `interface ID` as defined in Section 2.5.6 of [RFC
     /// 4291](https://tools.ietf.org/html/rfc4291)).  Thus, the host part parameter
     /// must be exactly 8 bytes.
-    private func setIPv6LinkLocalAddressHostPart(of address: sockaddr_in6, to hostPart: [UInt8]) -> sockaddr_in6 {
+    private func setIPv6LinkLocalAddressHostPart(of address: sockaddr_in6,
+                                                 to hostPart: [UInt8]) -> sockaddr_in6
+    {
         precondition(hostPart.count == 8)
         var result = address
         withUnsafeMutableBytes(of: &result.sin6_addr) { buf in

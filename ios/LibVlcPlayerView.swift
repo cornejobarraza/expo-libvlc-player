@@ -256,9 +256,18 @@ class LibVlcPlayerView: ExpoView {
         let videos = player.videoTracks.enumerated()
         let subtitles = player.textTracks.enumerated()
 
-        let audio = [disableTrack] + audios.map { index, audio in MediaTrack(id: index, name: audio.trackName) }
-        let video = [disableTrack] + videos.map { index, video in MediaTrack(id: index, name: video.trackName) }
-        let subtitle = [disableTrack] + subtitles.map { index, subtitle in MediaTrack(id: index, name: subtitle.trackName) }
+        let audio = [disableTrack] + audios.map { index, audio in MediaTrack(
+            id: index,
+            name: audio.trackName
+        ) }
+        let video = [disableTrack] + videos.map { index, video in MediaTrack(
+            id: index,
+            name: video.trackName
+        ) }
+        let subtitle = [disableTrack] + subtitles.map { index, subtitle in MediaTrack(
+            id: index,
+            name: subtitle.trackName
+        ) }
 
         return MediaTracks(
             audio: audio,
@@ -488,7 +497,11 @@ class LibVlcPlayerView: ExpoView {
             let snapshotPath = path + "/vlc-snapshot-\(timestamp).jpg"
             let video = CGSize(width: 0, height: 0) // Use original window size
 
-            mediaPlayer?.saveVideoSnapshot(at: snapshotPath, withWidth: Int32(video.width), andHeight: Int32(video.height))
+            mediaPlayer?.saveVideoSnapshot(
+                at: snapshotPath,
+                withWidth: Int32(video.width),
+                andHeight: Int32(video.height)
+            )
 
             let fileExists = FileManager.default.fileExists(atPath: snapshotPath)
 
@@ -511,7 +524,12 @@ class LibVlcPlayerView: ExpoView {
 
     func postLogin(_ username: String, _ password: String, _ store: Bool? = false) {
         if let dialog = vlcDialog, let reference = vlcDialogRef {
-            dialog.postUsername(username, andPassword: password, forDialogReference: reference, store: store ?? false)
+            dialog.postUsername(
+                username,
+                andPassword: password,
+                forDialogReference: reference,
+                store: store ?? false
+            )
             vlcDialogRef = nil
         }
     }
@@ -557,7 +575,12 @@ class LibVlcPlayerView: ExpoView {
         let expDelay = delay * MediaPlayerConstants.expDelayMultiplier
 
         DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
-            self?.retryUntil(maxRetries: maxRetries, retry: retry + 1, delay: expDelay, block: block)
+            self?.retryUntil(
+                maxRetries: maxRetries,
+                retry: retry + 1,
+                delay: expDelay,
+                block: block
+            )
         }
     }
 }
@@ -604,7 +627,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
                             guard let self else { return true }
 
                             if hasMediaVolume {
-                                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+                                MediaPlayerManager.shared.audioSessionManager
+                                    .setAppropriateAudioSession()
                             }
 
                             return hasMediaVolume

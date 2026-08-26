@@ -1,2 +1,3 @@
 --disable numberFormatting
 --disable wrapIfStatementBodies
+--max-width 100

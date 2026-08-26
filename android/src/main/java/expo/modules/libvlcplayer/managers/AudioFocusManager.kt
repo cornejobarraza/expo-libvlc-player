@@ -114,7 +114,11 @@ class AudioFocusManager(
         }
 
         return mixingModes.reduce { currentAudioMixingMode, next ->
-            next.takeIf { nextAudioMixingMode -> nextAudioMixingMode.priority > currentAudioMixingMode.priority } ?: currentAudioMixingMode
+            next.takeIf { nextAudioMixingMode ->
+                nextAudioMixingMode.priority >
+                    currentAudioMixingMode.priority
+            }
+                ?: currentAudioMixingMode
         }
     }
 

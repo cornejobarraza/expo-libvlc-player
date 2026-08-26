@@ -67,7 +67,10 @@ public class LibVlcPlayerModule: Module {
                 view.delays = delays
             }
 
-            Prop("scale", MediaPlayerConstants.defaultPlayerScale) { (view: LibVlcPlayerView, scale: Double) in
+            Prop("scale", MediaPlayerConstants.defaultPlayerScale) { (
+                view: LibVlcPlayerView,
+                scale: Double
+            ) in
                 view.scale = scale
             }
 
@@ -75,15 +78,24 @@ public class LibVlcPlayerModule: Module {
                 view.contentFit = contentFit
             }
 
-            Prop("rate", MediaPlayerConstants.defaultPlayerRate) { (view: LibVlcPlayerView, rate: Double) in
+            Prop("rate", MediaPlayerConstants.defaultPlayerRate) { (
+                view: LibVlcPlayerView,
+                rate: Double
+            ) in
                 view.rate = rate
             }
 
-            Prop("time", MediaPlayerConstants.defaultPlayerTime) { (view: LibVlcPlayerView, time: Int) in
+            Prop("time", MediaPlayerConstants.defaultPlayerTime) { (
+                view: LibVlcPlayerView,
+                time: Int
+            ) in
                 view.time = time
             }
 
-            Prop("volume", MediaPlayerConstants.maxPlayerVolume) { (view: LibVlcPlayerView, volume: Int) in
+            Prop("volume", MediaPlayerConstants.maxPlayerVolume) { (
+                view: LibVlcPlayerView,
+                volume: Int
+            ) in
                 view.volume = volume
             }
 
@@ -91,7 +103,10 @@ public class LibVlcPlayerModule: Module {
                 view.mute = mute
             }
 
-            Prop("audioMixingMode", .auto) { (view: LibVlcPlayerView, audioMixingMode: AudioMixingMode) in
+            Prop("audioMixingMode", .auto) { (
+                view: LibVlcPlayerView,
+                audioMixingMode: AudioMixingMode
+            ) in
                 view.audioMixingMode = audioMixingMode
             }
 
@@ -139,7 +154,12 @@ public class LibVlcPlayerModule: Module {
                 view.postAction(action)
             }
 
-            AsyncFunction("postLogin") { (view: LibVlcPlayerView, username: String, password: String, store: Bool?) in
+            AsyncFunction("postLogin") { (
+                view: LibVlcPlayerView,
+                username: String,
+                password: String,
+                store: Bool?
+            ) in
                 view.postLogin(username, password, store)
             }
 

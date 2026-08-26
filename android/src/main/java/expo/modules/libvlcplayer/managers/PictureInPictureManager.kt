@@ -108,14 +108,22 @@ class PictureInPictureManager(
                     intent: Intent?,
                 ) {
                     mediaPlayer?.let { player ->
-                        val canReceiveActions = intent != null && intent.action == MediaPlayerConstants.ACTION_PIP_CONTROL
+                        val canReceiveActions =
+                            intent != null &&
+                                intent.action == MediaPlayerConstants.ACTION_PIP_CONTROL
 
                         if (canReceiveActions) {
-                            val controlType = intent.getIntExtra(MediaPlayerConstants.EXTRA_CONTROL_TYPE, 0)
+                            val controlType =
+                                intent.getIntExtra(
+                                    MediaPlayerConstants.EXTRA_CONTROL_TYPE,
+                                    0,
+                                )
 
                             when (controlType) {
                                 MediaPlayerConstants.EXTRA_CONTROL_REWIND -> {
-                                    player.setTime(player.getTime() - MediaPlayerConstants.SEEK_STEP_MS)
+                                    player.setTime(
+                                        player.getTime() - MediaPlayerConstants.SEEK_STEP_MS,
+                                    )
                                 }
 
                                 MediaPlayerConstants.EXTRA_CONTROL_PLAY -> {
@@ -127,7 +135,9 @@ class PictureInPictureManager(
                                 }
 
                                 MediaPlayerConstants.EXTRA_CONTROL_FORWARD -> {
-                                    player.setTime(player.getTime() + MediaPlayerConstants.SEEK_STEP_MS)
+                                    player.setTime(
+                                        player.getTime() + MediaPlayerConstants.SEEK_STEP_MS,
+                                    )
                                 }
                             }
                         }
@@ -189,7 +199,12 @@ class PictureInPictureManager(
         if (!canSetActions) return
 
         val rewindControl = MediaPlayerConstants.EXTRA_CONTROL_REWIND
-        val playbackControl = if (isPlaying) MediaPlayerConstants.EXTRA_CONTROL_PAUSE else MediaPlayerConstants.EXTRA_CONTROL_PLAY
+        val playbackControl =
+            if (isPlaying) {
+                MediaPlayerConstants.EXTRA_CONTROL_PAUSE
+            } else {
+                MediaPlayerConstants.EXTRA_CONTROL_PLAY
+            }
         val forwardControl = MediaPlayerConstants.EXTRA_CONTROL_FORWARD
 
         val rewindRes = R.drawable.fast_rewind_24px
@@ -248,7 +263,12 @@ class PictureInPictureManager(
         val actions =
             listOf(
                 RemoteAction(rewindIcon, rewindTitle, rewindDescription, rewindPendingIntent),
-                RemoteAction(playbackIcon, playbackTitle, playbackDescription, playbackPendingIntent),
+                RemoteAction(
+                    playbackIcon,
+                    playbackTitle,
+                    playbackDescription,
+                    playbackPendingIntent,
+                ),
                 RemoteAction(forwardIcon, forwardTitle, forwardDescription, forwardPendingIntent),
             )
 
@@ -277,7 +297,10 @@ class PictureInPictureManager(
         pipView?.let { view ->
             // Black screen workaround
             view.detachPlayerLayout()
-            view.postDelayed({ view.attachPlayerLayout(pictureLayout) }, MediaPlayerConstants.ATTACH_DELAY_MS)
+            view.postDelayed(
+                { view.attachPlayerLayout(pictureLayout) },
+                MediaPlayerConstants.ATTACH_DELAY_MS,
+            )
         }
     }
 
@@ -330,6 +353,8 @@ class PictureInPictureManager(
             )
 }
 
-class PictureInPictureUnsupportedException : CodedException("Picture-in-Picture (PiP) mode is not supported on this device")
+class PictureInPictureUnsupportedException :
+    CodedException("Picture-in-Picture (PiP) mode is not supported on this device")
 
-class PictureInPictureUnallowedException : CodedException("Picture-in-Picture (PiP) mode must be allowed on this player")
+class PictureInPictureUnallowedException :
+    CodedException("Picture-in-Picture (PiP) mode must be allowed on this player")

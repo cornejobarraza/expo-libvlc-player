@@ -19,7 +19,8 @@ class AudioSessionManager {
     private func setAudioSession() {
         let audioSession = AVAudioSession.sharedInstance()
         let audioMixingMode = findAudioMixingMode()
-        var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession.categoryOptions
+        var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession
+            .categoryOptions
 
         let anyPlayingView = expoViews.allObjects.contains { view in
             playerRequiresCategory(view.mediaPlayer)
@@ -43,9 +44,15 @@ class AudioSessionManager {
             audioSessionCategoryOptions.remove(.duckOthers)
         }
 
-        if audioSession.categoryOptions != audioSessionCategoryOptions || audioSession.category != .playback || audioSession.mode != .moviePlayback {
+        if audioSession.categoryOptions != audioSessionCategoryOptions || audioSession
+            .category != .playback || audioSession.mode != .moviePlayback
+        {
             do {
-                try audioSession.setCategory(.playback, mode: .moviePlayback, options: audioSessionCategoryOptions)
+                try audioSession.setCategory(
+                    .playback,
+                    mode: .moviePlayback,
+                    options: audioSessionCategoryOptions
+                )
             } catch {
                 log.warn("Failed to set audio session category")
             }
@@ -76,7 +83,9 @@ class AudioSessionManager {
             return nil
         }
 
-        for view in playingViews where (audioMixingMode.priority()) < view.audioMixingMode.priority() {
+        for view in playingViews
+            where (audioMixingMode.priority()) < view.audioMixingMode.priority()
+        {
             audioMixingMode = view.audioMixingMode
         }
 
