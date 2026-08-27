@@ -4,9 +4,10 @@ import expo.modules.kotlin.records.Field
 import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
-class MediaTracks(
-    @Field var audio: List<MediaTrack> = emptyList(),
-    @Field var video: List<MediaTrack> = emptyList(),
-    @Field var subtitle: List<MediaTrack> = emptyList(),
+class MediaMetadata(
+    @Field var title: String? = "",
+    @Field var artist: String? = "",
+    @Field var album: String? = "",
+    @Field var artworkURL: String? = "",
 ) : Record,
     Serializable

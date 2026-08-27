@@ -232,7 +232,16 @@ export interface VideoInfo {
   bitrate: number;
 }
 
-export interface MediaInfo extends VideoInfo {
+export interface MediaMetadata {
+  title?: string;
+  artist?: string;
+  album?: string;
+  artworkURL?: string;
+}
+
+export interface MediaInfo {
+  video: VideoInfo;
+  metadata: MediaMetadata;
   length: number;
   seekable: boolean;
 }

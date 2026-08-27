@@ -299,16 +299,28 @@ class LibVlcPlayerView: ExpoView {
         )
     }
 
+    func getMediaMetadata() -> MediaMetadata {
+        guard let metaData = mediaPlayer?.media?.metaData else {
+            return MediaMetadata()
+        }
+
+        return MediaMetadata(
+            title: metaData.title,
+            artist: metaData.artist,
+            album: metaData.album,
+            artworkURL: metaData.artworkURL?.absoluteString
+        )
+    }
+
     func getMediaInfo() -> MediaInfo {
         let video = getVideoInfo()
+        let metadata = getMediaMetadata()
         let length = getMediaLength()
         let seekable = mediaPlayer?.isSeekable ?? false
 
         return MediaInfo(
-            width: video.width,
-            height: video.height,
-            frameRate: video.frameRate,
-            bitrate: video.bitrate,
+            video: video,
+            metadata: metadata,
             length: length,
             seekable: seekable
         )

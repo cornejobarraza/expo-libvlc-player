@@ -21,6 +21,7 @@ import expo.modules.libvlcplayer.managers.MediaPlayerManager
 import expo.modules.libvlcplayer.records.Delays
 import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.MediaInfo
+import expo.modules.libvlcplayer.records.MediaMetadata
 import expo.modules.libvlcplayer.records.MediaTrack
 import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Recording
@@ -423,16 +424,26 @@ class LibVlcPlayerView(
         )
     }
 
+    fun getMediaMetadata(): MediaMetadata {
+        val media = mediaPlayer?.media ?: return MediaMetadata()
+
+        return MediaMetadata(
+            title = media.getMeta(IMedia.Meta.Title),
+            artist = media.getMeta(IMedia.Meta.Artist),
+            album = media.getMeta(IMedia.Meta.Album),
+            artworkURL = media.getMeta(IMedia.Meta.ArtworkURL),
+        )
+    }
+
     fun getMediaInfo(): MediaInfo {
         val video = getVideoInfo()
+        val metadata = getMediaMetadata()
         val length = getMediaLength()
         val seekable = mediaPlayer?.isSeekable() ?: false
 
         return MediaInfo(
-            width = video.width,
-            height = video.height,
-            frameRate = video.frameRate,
-            bitrate = video.bitrate,
+            video = video,
+            metadata = metadata,
             length = length,
             seekable = seekable,
         )

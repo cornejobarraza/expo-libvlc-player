@@ -14,7 +14,7 @@ export type MaterialIcon = ComponentProps<typeof MaterialIcons>["name"];
 
 export type SymbolMapping = Record<SFSymbol, MaterialIcon>;
 
-export interface MaterialSymbolProps {
+export interface IconProps {
   style?: StyleProp<TextStyle>;
   name: SFSymbol;
   size?: number;

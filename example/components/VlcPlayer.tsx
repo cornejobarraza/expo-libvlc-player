@@ -1,6 +1,5 @@
-import { LibVlcPlayerView, type LibVlcPlayerViewRef } from "expo-libvlc-player";
-import { ALL_FORMATS, Input, type MetadataTags, UrlSource } from "mediabunny";
-import React, { useEffect, useRef, useState } from "react";
+import { LibVlcPlayerView, type LibVlcPlayerViewRef, type MediaMetadata } from "expo-libvlc-player";
+import React, { useRef, useState } from "react";
 import { ActivityIndicator, Alert, Image, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -16,35 +15,14 @@ const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
 export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
-  const input =
-    source !== null
-      ? new Input({
-          formats: ALL_FORMATS,
-          source: new UrlSource(source as string),
-        })
-      : null;
-
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(false);
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
   const [background, setBackground] = useState<boolean>(false);
 
-  const [metadata, setMetadata] = useState<MetadataTags | undefined>(undefined);
-  const [reading, setReading] = useState<boolean>(false);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        setReading(true);
-        const metadata = await input?.getMetadataTags();
-        setMetadata(metadata);
-        setReading(false);
-      } catch {
-        setReading(false);
-      }
-    })();
-  }, []);
+  const [metadata, setMetadata] = useState<MediaMetadata | null>(null);
+  const [parsing, setParsing] = useState<boolean>(true);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
 
@@ -87,6 +65,8 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
     },
   ];
 
+  const showTitle = metadata?.title != null && metadata.title !== "";
+  const showArtist = metadata?.artist != null && metadata.artist !== "";
   const showPoster = (!playing && background) || time === 0;
   const insets = useSafeAreaInsets();
 
@@ -94,14 +74,14 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
     <View style={[styles.libVlc, fullScreen && styles.libVlcFull]}>
       {!fullScreen && (
         <View style={styles.header}>
-          {!reading ? (
+          {!parsing ? (
             <React.Fragment>
-              {metadata?.title !== undefined && (
+              {showTitle && (
                 <Text style={styles.title} numberOfLines={1}>
                   {metadata.title}
                 </Text>
               )}
-              {metadata?.artist !== undefined && (
+              {showArtist && (
                 <Text style={styles.artist} numberOfLines={1}>
                   {metadata.artist}
                 </Text>
@@ -155,6 +135,10 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
           }}
           onBackground={() => {
             setBackground(true);
+          }}
+          onFirstPlay={(info) => {
+            setMetadata(info.metadata);
+            setParsing(false);
           }}
         />
       </View>

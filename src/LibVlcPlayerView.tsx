@@ -85,7 +85,7 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
         }}
         onFirstPlay={(event) => {
           const mediaInfo = convertNativeEvent(event);
-          const mediaRatio = mediaInfo.width / mediaInfo.height;
+          const mediaRatio = mediaInfo.video.width / mediaInfo.video.height;
 
           const validRatio = mediaRatio > 0 && mediaRatio < Infinity;
           const autoRatio = validRatio ? mediaRatio : fallbackRatio;

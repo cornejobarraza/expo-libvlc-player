@@ -1,12 +1,12 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-import { MaterialSymbol } from "./MaterialSymbol";
+import { Icon } from "./Icon";
 import { type VlcControlProps } from "./types";
 
 export const VlcControl = ({ name, onPress }: VlcControlProps) => {
   return (
     <TouchableOpacity style={styles.control} onPress={onPress}>
-      <MaterialSymbol color="#f1f1f1" name={name} />
+      <Icon color="#f1f1f1" name={name} />
     </TouchableOpacity>
   );
 };

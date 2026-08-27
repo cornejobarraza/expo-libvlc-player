@@ -332,10 +332,23 @@ interface VideoInfo {
 }
 ```
 
+#### `MediaMetadata`
+
+```ts
+interface MediaMetadata {
+  title?: string;
+  artist?: string;
+  album?: string;
+  artworkURL?: string;
+}
+```
+
 #### `MediaInfo`
 
 ```ts
-interface MediaInfo extends VideoInfo {
+interface MediaInfo {
+  video: VideoInfo;
+  metadata: MediaMetadata;
   length: number;
   seekable: boolean;
 }
@@ -377,7 +390,7 @@ Install [Ktlint](https://github.com/ktlint/ktlint) and [SwiftFormat](https://git
 brew install ktlint swiftformat
 ```
 
-LibVLC might not render correctly on emulators or simulators. Please test on a real device.
+LibVLC might not render properly on emulators or simulators. Please test on a real device.
 
 ## Disclaimer
 

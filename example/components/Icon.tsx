@@ -1,6 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-import { type SymbolMapping, type MaterialSymbolProps } from "./types";
+import { type SymbolMapping, type IconProps } from "./types";
 
 const SYMBOLS = {
   "play.fill": "play-arrow",
@@ -12,6 +12,6 @@ const SYMBOLS = {
   "speaker.3.fill": "volume-up",
 } as SymbolMapping;
 
-export const MaterialSymbol = ({ style, name, size = 24, color }: MaterialSymbolProps) => {
+export const Icon = ({ style, name, size = 24, color }: IconProps) => {
   return <MaterialIcons style={style} name={SYMBOLS[name]} size={size} color={color} />;
 };
