@@ -1,6 +1,6 @@
 import ExpoModulesCore
 
-struct MediaInfo: Record {
+struct VideoInfo: Record {
     @Field
     var width: Int = 0
 
@@ -12,10 +12,4 @@ struct MediaInfo: Record {
 
     @Field
     var bitrate: Int = 0
-
-    @Field
-    var length: Int = 0
-
-    @Field
-    var seekable: Bool = false
 }

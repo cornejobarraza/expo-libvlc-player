@@ -321,12 +321,21 @@ interface Snapshot {
 }
 ```
 
+#### `VideoInfo`
+
+```ts
+interface VideoInfo {
+  width: number;
+  height: number;
+  frameRate: number;
+  bitrate: number;
+}
+```
+
 #### `MediaInfo`
 
 ```ts
-interface MediaInfo {
-  width: number;
-  height: number;
+interface MediaInfo extends VideoInfo {
   length: number;
   seekable: boolean;
 }

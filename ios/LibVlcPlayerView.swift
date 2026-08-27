@@ -174,11 +174,11 @@ class LibVlcPlayerView: ExpoView {
 
             var transform: CGAffineTransform = .identity
 
-            let video = getVideoSize()
+            let video = getVideoInfo()
 
             if hasVideoSize == true {
                 let viewAspect = drawable.frame.size.width / drawable.frame.size.height
-                let videoAspect = video.width / video.height
+                let videoAspect = CGFloat(video.width) / CGFloat(video.height)
 
                 switch contentFit {
                 case .contain:
@@ -280,22 +280,38 @@ class LibVlcPlayerView: ExpoView {
         Int(mediaPlayer?.media?.length.intValue ?? 0)
     }
 
+    func getVideoInfo() -> VideoInfo {
+        guard let track = mediaPlayer?.videoTracks.first(where: { $0.isSelected }),
+              let video = track.video
+        else {
+            return VideoInfo()
+        }
+
+        let frameRate = video.frameRateDenominator != 0 ?
+            video.frameRate / video.frameRateDenominator :
+            0
+
+        return VideoInfo(
+            width: Int(video.width),
+            height: Int(video.height),
+            frameRate: Int(frameRate),
+            bitrate: Int(track.bitrate)
+        )
+    }
+
     func getMediaInfo() -> MediaInfo {
-        let video = getVideoSize()
+        let video = getVideoInfo()
         let length = getMediaLength()
         let seekable = mediaPlayer?.isSeekable ?? false
 
         return MediaInfo(
-            width: Int(video.width),
-            height: Int(video.height),
+            width: video.width,
+            height: video.height,
+            frameRate: video.frameRate,
+            bitrate: video.bitrate,
             length: length,
             seekable: seekable
         )
-    }
-
-    func getVideoSize() -> CGSize {
-        guard let size = mediaPlayer?.videoSize else { return CGSize(width: 0, height: 0) }
-        return size
     }
 
     func resetVideoTrack() {
@@ -311,7 +327,7 @@ class LibVlcPlayerView: ExpoView {
     }
 
     var hasVideoSize: Bool {
-        let video = getVideoSize()
+        let video = getVideoInfo()
         return video.width > 0 && video.height > 0
     }
 

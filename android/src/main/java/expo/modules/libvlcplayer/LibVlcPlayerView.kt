@@ -26,6 +26,7 @@ import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
+import expo.modules.libvlcplayer.records.VideoInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -280,7 +281,7 @@ class LibVlcPlayerView(
             val view = getTextureView(layout) ?: return@post
             val matrix = Matrix()
 
-            val video = getVideoSize()
+            val video = getVideoInfo()
 
             if (hasVideoSize) {
                 val viewWidth = view.width.toFloat()
@@ -403,29 +404,43 @@ class LibVlcPlayerView(
 
     fun getMediaLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
 
+    fun getVideoInfo(): VideoInfo {
+        val video =
+            mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Video) as? IMedia.VideoTrack
+                ?: return VideoInfo()
+        val frameRate =
+            if (video.frameRateDen != 0) {
+                video.frameRateNum / video.frameRateDen
+            } else {
+                0
+            }
+
+        return VideoInfo(
+            width = video.width,
+            height = video.height,
+            frameRate = frameRate,
+            bitrate = video.bitrate,
+        )
+    }
+
     fun getMediaInfo(): MediaInfo {
-        val video = getVideoSize()
+        val video = getVideoInfo()
         val length = getMediaLength()
         val seekable = mediaPlayer?.isSeekable() ?: false
 
         return MediaInfo(
             width = video.width,
             height = video.height,
+            frameRate = video.frameRate,
+            bitrate = video.bitrate,
             length = length,
             seekable = seekable,
         )
     }
 
-    fun getVideoSize(): Size {
-        val video =
-            mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Video) as? IMedia.VideoTrack
-                ?: return Size(0, 0)
-        return Size(video.width, video.height)
-    }
-
     val hasVideoSize: Boolean
         get() {
-            val video = getVideoSize()
+            val video = getVideoInfo()
             return video.width > 0 && video.height > 0
         }
 
@@ -625,7 +640,7 @@ class LibVlcPlayerView(
             if (!hasVideoSize) throw Exception()
 
             val surface = Surface(view.surfaceTexture)
-            val video = getVideoSize()
+            val video = getVideoInfo()
             val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
 
             PixelCopy.request(
