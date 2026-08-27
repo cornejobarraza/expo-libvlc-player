@@ -25,6 +25,7 @@ module.exports = defineConfig([
         "error",
         { enableAutofixRemoval: { imports: true }, ignoreRestSiblings: true },
       ],
+      "react/jsx-fragments": ["warn", "element"],
       "no-unused-vars": "off",
     },
   },

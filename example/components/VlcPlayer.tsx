@@ -1,8 +1,10 @@
 import { LibVlcPlayerView, type LibVlcPlayerViewRef } from "expo-libvlc-player";
-import { useRef, useState } from "react";
+import { ALL_FORMATS, Input, type MetadataTags, UrlSource } from "mediabunny";
+import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Image, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Text } from "./Text";
 import { VlcControl } from "./VlcControl";
 import { type VlcControlProps, type VlcPlayerProps } from "./types";
 
@@ -14,11 +16,35 @@ const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
 export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
+  const input =
+    source !== null
+      ? new Input({
+          formats: ALL_FORMATS,
+          source: new UrlSource(source as string),
+        })
+      : null;
+
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(false);
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
   const [background, setBackground] = useState<boolean>(false);
+
+  const [metadata, setMetadata] = useState<MetadataTags | undefined>(undefined);
+  const [reading, setReading] = useState<boolean>(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setReading(true);
+        const metadata = await input?.getMetadataTags();
+        setMetadata(metadata);
+        setReading(false);
+      } catch {
+        setReading(false);
+      }
+    })();
+  }, []);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
 
@@ -66,6 +92,29 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
 
   return (
     <View style={[styles.libVlc, fullScreen && styles.libVlcFull]}>
+      {!fullScreen && (
+        <View style={styles.header}>
+          {!reading ? (
+            <React.Fragment>
+              {metadata?.title !== undefined && (
+                <Text style={styles.title} numberOfLines={1}>
+                  {metadata.title}
+                </Text>
+              )}
+              {metadata?.artist !== undefined && (
+                <Text style={styles.artist} numberOfLines={1}>
+                  {metadata.artist}
+                </Text>
+              )}
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <Text.Loading width="50%" height={styles.title.lineHeight} />
+              <Text.Loading width="75%" height={styles.artist.lineHeight} />
+            </React.Fragment>
+          )}
+        </View>
+      )}
       <View style={styles.container}>
         {showPoster && (
           <View style={styles.poster}>
@@ -130,6 +179,20 @@ const styles = StyleSheet.create({
   libVlcFull: {
     alignItems: "center",
     position: "relative",
+  },
+  header: {
+    gap: 8,
+  },
+  title: {
+    color: "#f1f1f1",
+    fontSize: 20,
+    lineHeight: 24,
+    fontWeight: "bold",
+  },
+  artist: {
+    color: "#f1f1f1",
+    fontSize: 16,
+    lineHeight: 20,
   },
   container: {
     position: "relative",

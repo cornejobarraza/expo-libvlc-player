@@ -22,8 +22,8 @@ switch (process.platform) {
       if (!fs.existsSync(studioSh)) {
         console.error(
           `⛔️  Android Studio not found at ${studioSh}.\n` +
-          `Check that the ANDROID_STUDIO environment variable points to your Android Studio installation directory, ` +
-          `or open the project manually in Android Studio: ${projectPath}`
+            `Check that the ANDROID_STUDIO environment variable points to your Android Studio installation directory, ` +
+            `or open the project manually in Android Studio: ${projectPath}`
         );
         process.exit(1);
       }
@@ -68,8 +68,8 @@ switch (process.platform) {
       if (!studioSh) {
         console.error(
           `⛔️  Android Studio not found.\n` +
-          `Set the ANDROID_STUDIO environment variable to your Android Studio installation directory, ` +
-          `or open the project manually in Android Studio: ${projectPath}`
+            `Set the ANDROID_STUDIO environment variable to your Android Studio installation directory, ` +
+            `or open the project manually in Android Studio: ${projectPath}`
         );
         process.exit(1);
       }
@@ -86,8 +86,8 @@ switch (process.platform) {
     if (!require("fs").existsSync(studioExe)) {
       console.error(
         `⛔️  Android Studio not found at ${studioExe}.\n` +
-        `Set the ANDROID_STUDIO environment variable to your Android Studio installation directory, ` +
-        `or open the project manually in Android Studio: ${projectPath}`
+          `Set the ANDROID_STUDIO environment variable to your Android Studio installation directory, ` +
+          `or open the project manually in Android Studio: ${projectPath}`
       );
       process.exit(1);
     }

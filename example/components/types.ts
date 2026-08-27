@@ -23,7 +23,7 @@ export interface MaterialSymbolProps {
 
 export type TextComponent = (props: TextProps) => React.JSX.Element;
 
-export type LoadingTextProps = {
+export type TextLoadingProps = {
   width?: DimensionValue;
   height?: number;
 };
