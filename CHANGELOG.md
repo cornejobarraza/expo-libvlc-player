@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.21 - 2026-08-27
+
+### 🎉 New features
+
+- Added VideoInfo record and type
+
 ## 57.0.20 - 2026-08-26
 
 ### 💡 Others
