@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.22 - 2026-08-27
+
+### 🛠 Breaking changes
+
+- Added video and metadata to MediaInfo
+
 ## 57.0.21 - 2026-08-27
 
 ### 🎉 New features
