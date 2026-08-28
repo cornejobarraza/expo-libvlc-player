@@ -15,14 +15,13 @@ const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
 export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
-  const [buffering, setBuffering] = useState<boolean>(false);
-  const [playing, setPlaying] = useState<boolean>(false);
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
+  const [buffering, setBuffering] = useState<boolean>(false);
+  const [playing, setPlaying] = useState<boolean>(false);
   const [background, setBackground] = useState<boolean>(false);
-
-  const [metadata, setMetadata] = useState<MediaMetadata | null>(null);
   const [parsing, setParsing] = useState<boolean>(true);
+  const [metadata, setMetadata] = useState<MediaMetadata | null>(null);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
 
@@ -123,12 +122,16 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
             setPlaying(false);
           }}
           onStopped={() => {
+            setTime(0);
             setBuffering(false);
             setPlaying(false);
-            setTime(0);
+            setBackground(false);
+            setParsing(false);
           }}
           onEncounteredError={({ message }) => {
             Alert.alert("Error", message);
+            setBuffering(false);
+            setParsing(false);
           }}
           onTimeChanged={({ value }) => {
             setTime(value);
