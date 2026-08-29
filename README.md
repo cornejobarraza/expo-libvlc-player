@@ -113,10 +113,7 @@ Create a basic player:
 ```tsx
 import { LibVlcPlayerView } from "expo-libvlc-player";
 
-const BIG_BUCK_BUNNY =
-  "https://mirror.umd.edu/xbmc/demo-files/BBB/bbb_sunflower_1080p_30fps_normal.mp4";
-
-return <LibVlcPlayerView source={BIG_BUCK_BUNNY} />;
+return <LibVlcPlayerView source={require("./assets/bbb.mp4")} />;
 ```
 
 Trigger the local network privacy alert on iOS:

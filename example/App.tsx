@@ -6,9 +6,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { VlcPlayer } from "./components/VlcPlayer";
 import { useFullScreen } from "./hooks/useFullScreen";
 
-const BIG_BUCK_BUNNY =
-  "https://mirror.umd.edu/xbmc/demo-files/BBB/bbb_sunflower_1080p_30fps_normal.mp4";
-
 export default function App() {
   const fullScreen = useFullScreen();
 
@@ -18,7 +15,7 @@ export default function App() {
     <SafeAreaProvider>
       <View style={{ ...styles.app, padding }}>
         <StatusBar style="light" hidden={fullScreen} />
-        <VlcPlayer source={BIG_BUCK_BUNNY} fullScreen={fullScreen} />
+        <VlcPlayer source={require("./assets/bbb.mp4")} fullScreen={fullScreen} />
         <NavigationBar style="light" hidden={fullScreen} />
       </View>
     </SafeAreaProvider>

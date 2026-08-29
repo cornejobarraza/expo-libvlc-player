@@ -381,10 +381,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      * @example
      *
      * ```tsx
-     * const BIG_BUCK_BUNNY =
-     *   "https://mirror.umd.edu/xbmc/demo-files/BBB/bbb_sunflower_1080p_30fps_normal.mp4";
-     *
-     * <LibVlcPlayerView source={BIG_BUCK_BUNNY} />
+     * <LibVlcPlayerView source={require("./assets/bbb.mp4")} />
      * ```
      */
     source: LibVlcSource;
