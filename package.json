@@ -11,7 +11,8 @@
     "open:android": "node scripts/open-android.js",
     "open:ios": "node scripts/open-ios.js",
     "prepare": "husky && node scripts/prepare.js",
-    "patch": "node scripts/patch.js"
+    "patch": "node scripts/patch.js",
+    "test": "jest"
   },
   "keywords": [
     "react-native",
@@ -33,11 +34,15 @@
   "license": "MIT",
   "homepage": "https://github.com/cornejobarraza/expo-libvlc-player#readme",
   "devDependencies": {
+    "@testing-library/react-native": "^14.0.1",
+    "@types/jest": "29.5.14",
     "@types/react": "^19.2.18",
     "eslint": "^9.39.5",
     "eslint-config-universe": "^16.0.0",
     "expo": "~57.0.17",
     "husky": "^9.1.7",
+    "jest": "~29.7.0",
+    "jest-expo": "~57.0.5",
     "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
     "react-native": "0.86.3",
@@ -47,5 +52,8 @@
     "expo": "*",
     "react": "*",
     "react-native": "*"
+  },
+  "jest": {
+    "preset": "jest-expo"
   }
 }

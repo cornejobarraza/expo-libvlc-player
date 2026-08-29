@@ -5,7 +5,9 @@
     "jsx": "react-native",
     "outDir": "./build",
     "rootDir": "./src",
-    "sourceMap": true
+    "sourceMap": true,
+    "types": ["jest"]
   },
-  "include": ["./src"]
+  "include": ["./src"],
+  "exclude": ["./src/**/__tests__"]
 }

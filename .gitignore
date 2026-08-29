@@ -46,6 +46,9 @@ example/ios/
 # Ruby
 example/vendor/
 
+# Jest
+coverage/**/*
+
 # node.js
 node_modules/
 npm-debug.log

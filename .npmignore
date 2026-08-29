@@ -9,6 +9,10 @@
 /android/build/
 /example/
 
+# Tests
+__tests__/
+coverage/**/*
+
 # Other
 /.editorconfig
 /.prettierrc
