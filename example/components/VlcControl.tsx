@@ -5,7 +5,7 @@ import { type VlcControlProps } from "./types";
 
 export const VlcControl = ({ name, onPress }: VlcControlProps) => {
   return (
-    <TouchableOpacity style={styles.control} onPress={onPress}>
+    <TouchableOpacity style={styles.control} onPress={onPress} testID={name}>
       <Icon color="#f1f1f1" name={name} />
     </TouchableOpacity>
   );

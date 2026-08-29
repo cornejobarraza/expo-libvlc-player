@@ -96,7 +96,7 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
       )}
       <View style={styles.container}>
         {showPoster && (
-          <View style={styles.poster}>
+          <View style={styles.poster} testID="poster">
             <Image
               style={[styles.image, fullScreen && { borderRadius: 0 }]}
               source={require("../assets/bbb.png")}

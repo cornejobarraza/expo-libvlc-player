@@ -1,0 +1,38 @@
+appId: expo.modules.libvlcplayer.example
+---
+- launchApp:
+    clearState: true
+
+- assertVisible:
+    id: "poster"
+
+- extendedWaitUntil:
+    notVisible:
+      id: "poster"
+    timeout: 100000
+
+- assertVisible:
+    id: "pause.fill"
+
+- tapOn:
+    id: "pause.fill"
+- extendedWaitUntil:
+    visible:
+      id: "play.fill"
+    timeout: 10000
+
+- tapOn:
+    id: "play.fill"
+- extendedWaitUntil:
+    visible:
+      id: "pause.fill"
+    timeout: 10000
+
+- tapOn:
+    id: "stop.fill"
+- extendedWaitUntil:
+    visible:
+      id: "poster"
+    timeout: 10000
+- assertVisible:
+    id: "play.fill"

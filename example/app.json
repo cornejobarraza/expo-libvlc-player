@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "android": {
+      "package": "expo.modules.libvlcplayer.example",
       "adaptiveIcon": {
         "backgroundColor": "#e6f4fe",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -14,6 +15,7 @@
       }
     },
     "ios": {
+      "bundleIdentifier": "expo.modules.libvlcplayer.example",
       "supportsTablet": true
     }
   }

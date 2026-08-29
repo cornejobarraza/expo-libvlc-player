@@ -4,7 +4,8 @@
   "scripts": {
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "prebuild": "expo prebuild --clean"
+    "prebuild": "expo prebuild --clean",
+    "test": "maestro test .maestro"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
