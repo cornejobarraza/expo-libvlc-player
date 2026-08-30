@@ -7,9 +7,19 @@ import {
 } from "expo/config-plugins";
 
 export interface WithExpoLibVlcPlayerProps {
-  /** A string to set the `NSLocalNetworkUsageDescription` permission message on iOS */
+  /**
+   * A string to set the `NSLocalNetworkUsageDescription` permission message
+   * 
+   * @default "Allow $(PRODUCT_NAME) to access your local network"
+   * 
+   * @platform ios
+   */
   localNetworkPermission?: string;
-  /** A boolean value to enable Picture-in-Picture (PiP) on Android and iOS */
+  /**
+   * A boolean to enable Picture-in-Picture (PiP) support
+   * 
+   * @default undefined
+   */
   supportsPictureInPicture?: boolean;
 }
 
