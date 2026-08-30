@@ -10,6 +10,13 @@
 
 ### 💡 Others
 
+## 57.0.25 - 2026-08-30
+
+### 💡 Others
+
+- Added LibVlcSource type documentation
+- Removed redundant JSDoc comments
+
 ## 57.0.24 - 2026-08-29
 
 ### 💡 Others
