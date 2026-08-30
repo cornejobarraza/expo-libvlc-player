@@ -132,15 +132,11 @@ type AspectRatioProps =
        *
        * If auto, a fallback ratio must be provided
        *
-       * @example "auto"
-       *
        * @default undefined
        */
       aspectRatio: "auto";
       /**
        * Sets the fallback aspect ratio. Must be a valid ratio or number
-       *
-       * @example "16:9"
        *
        * @default undefined
        */
@@ -152,15 +148,11 @@ type AspectRatioProps =
        *
        * If auto, a fallback ratio must be provided
        *
-       * @example "auto"
-       *
        * @default undefined
        */
       aspectRatio?: VideoAspectRatio;
       /**
        * Sets the fallback aspect ratio. Must be a valid ratio or number
-       *
-       * @example "16:9"
        *
        * @default undefined
        */
@@ -377,12 +369,6 @@ export type LibVlcPlayerViewProps = ViewProps &
     ref?: React.RefObject<LibVlcPlayerViewRef | null>;
     /**
      * Sets the source of the media to be played, or `null` to release the player
-     *
-     * @example
-     *
-     * ```tsx
-     * <LibVlcPlayerView source={require("./assets/bbb.mp4")} />
-     * ```
      */
     source: LibVlcSource;
     /**
@@ -396,7 +382,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      * const options = ["--network-caching=1000"];
      *
      * <LibVlcPlayerView
-     *   source={BIG_BUCK_BUNNY}
+     *   {...props}
      *   options={options}
      * />
      * ```
@@ -417,7 +403,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      * };
      *
      * <LibVlcPlayerView
-     *   source={BIG_BUCK_BUNNY}
+     *   {...props}
      *   tracks={tracks}
      * />
      * ```
@@ -440,7 +426,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      * ];
      *
      * <LibVlcPlayerView
-     *   source={BIG_BUCK_BUNNY}
+     *   {...props}
      *   slaves={slaves}
      * />
      * ```
@@ -460,7 +446,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      * };
      *
      * <LibVlcPlayerView
-     *   source={BIG_BUCK_BUNNY}
+     *   {...props}
      *   delays={delays}
      * />
      * ```
@@ -476,8 +462,6 @@ export type LibVlcPlayerViewProps = ViewProps &
     scale?: number;
     /**
      * Sets how the video should be scaled to fit in the container
-     *
-     * @example "cover"
      *
      * @default "contain"
      */
@@ -508,8 +492,6 @@ export type LibVlcPlayerViewProps = ViewProps &
     mute?: boolean;
     /**
      * Determines how the player will interact with other audio playing in the system
-     *
-     * @example "doNotMix"
      *
      * @default "auto"
      */
