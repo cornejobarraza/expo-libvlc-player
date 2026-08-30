@@ -167,7 +167,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 | Prop               | Description                                                                                                                       | Default     |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `source`           | Sets the source of the media to be played. Set to `null` to release the player                                                    |             |
+| `source`           | Sets the source of the media to be played, or `null` to release the player. See [`LibVlcSource`](#libvlcsource) for more                                                    |             |
 | `options`          | Sets the options to initialize the media with. See the [VideoLAN Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
 | `tracks`           | Sets the player audio, video, and subtitle track indexes. See [`Tracks`](#tracks) for more                                        | `undefined` |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
@@ -207,6 +207,12 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onPictureInPictureStop`  | Called after the player exits Picture-in-Picture (PiP) mode  |                               |
 
 ### Module types
+
+#### `LibVlcSource`
+
+```ts
+type LibVlcSource = string | number | null;
+```
 
 #### `Tracks`
 

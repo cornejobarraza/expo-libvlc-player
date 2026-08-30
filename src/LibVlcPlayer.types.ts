@@ -376,7 +376,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     ref?: React.RefObject<LibVlcPlayerViewRef | null>;
     /**
-     * Sets the source of the media to be played. Set to `null` to release the player
+     * Sets the source of the media to be played, or `null` to release the player
      *
      * @example
      *
