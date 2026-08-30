@@ -130,7 +130,7 @@ type AspectRatioProps =
       /**
        * Sets the container aspect ratio. Must be a valid ratio, number, or auto.
        *
-       * If auto, a fallback ratio value must be provided
+       * If auto, a fallback ratio must be provided
        *
        * @example "auto"
        *
@@ -150,7 +150,7 @@ type AspectRatioProps =
       /**
        * Sets the container aspect ratio. Must be a valid ratio, number, or auto.
        *
-       * If auto, a fallback ratio value must be provided
+       * If auto, a fallback ratio must be provided
        *
        * @example "auto"
        *
@@ -469,7 +469,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     delays?: Delays;
     /**
-     * Sets the player scaling factor. Must be a number equal or greater than `0`
+     * Sets the player scaling factor. Must be a valid number
      *
      * @default 0
      */
@@ -483,7 +483,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     contentFit?: VideoContentFit;
     /**
-     * Sets the player rate. Must be a number equal or greater than `1`
+     * Sets the player playback rate. Must be a valid number
      *
      * @default 1
      */
@@ -501,7 +501,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     volume?: number;
     /**
-     * Sets the player volume to `0` when `true` and previous value is restored when `false`
+     * Sets the player volume to `0` when `true` and restores previous volume when `false`
      *
      * @default false
      */

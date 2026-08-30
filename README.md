@@ -14,7 +14,7 @@
   <img alt="Example App" src="example/assets/player.png">
 </p>
 
-### Supported versions
+## Supported versions
 
 | Platform             | Version |
 | -------------------- | ------- |
@@ -23,7 +23,7 @@
 | Android / Android TV | 7+      |
 | iOS / Apple TV       | 16.4+   |
 
-#### Can I use this library with older Expo SDK versions?
+### Can I use this library with older Expo SDK versions?
 
 Previous versions may be supported by changing how you compile the app.
 
@@ -101,10 +101,10 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 
 #### Configurable properties
 
-| Name                       | Description                                                                                                                                                                                                                                                                                                                                                     | Default                                                |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `localNetworkPermission`   | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                                                                  | `"Allow $(PRODUCT_NAME) to access your local network"` |
-| `supportsPictureInPicture` | A boolean value to enable Picture-in-Picture (PiP) on Android and iOS. If `true`, it adds the `android:supportsPictureInPicture` property on Android and the `audio` key to the `UIBackgroundModes` array in the Info.plist file on iOS. If `false`, it removes the property on Android and the key on iOS. When `undefined`, the configuration is not modified | `undefined`                                            |
+| Name                       | Description                                                                                                                                                                                                                                                                                                                                               | Default                                                |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `localNetworkPermission`   | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                                                            | `"Allow $(PRODUCT_NAME) to access your local network"` |
+| `supportsPictureInPicture` | A boolean to enable Picture-in-Picture (PiP) on Android and iOS. If `true`, it adds the `android:supportsPictureInPicture` property on Android and the `audio` key to the `UIBackgroundModes` array in the Info.plist file on iOS. If `false`, it removes the property on Android and the key on iOS. When `undefined`, the configuration is not modified | `undefined`                                            |
 
 ## Usage
 
@@ -172,14 +172,14 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `tracks`           | Sets the player audio, video, and subtitle track indexes. See [`Tracks`](#tracks) for more                                        | `undefined` |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
 | `delays`           | Sets the player audio and subtitle delay values in microseconds. See [`Delays`](#delays) for more                                 | `undefined` |
-| `scale`            | Sets the player scaling factor. Must be a number equal or greater than `0`                                                        | `0`         |
-| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio, number, or auto. If auto, a fallback ratio value must be provided         | `undefined` |
+| `scale`            | Sets the player scaling factor. Must be a valid number                                                                            | `0`         |
+| `aspectRatio`      | Sets the container aspect ratio. Must be a valid ratio, number, or auto. If auto, a fallback ratio must be provided               | `undefined` |
 | `fallbackRatio`    | Sets the fallback aspect ratio. Must be a valid ratio or number                                                                   | `undefined` |
 | `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
-| `rate`             | Sets the player rate. Must be a number equal or greater than `1`                                                                  | `1`         |
+| `rate`             | Sets the player playback rate. Must be a valid number                                                                             | `1`         |
 | `time`             | Sets the initial player time in milliseconds. Must be a number equal or greater than `0`                                          | `0`         |
 | `volume`           | Sets the player volume. Must be a number between `0` and `100`                                                                    | `100`       |
-| `mute`             | Sets the player volume to `0` when `true` and previous value is restored when `false`                                             | `false`     |
+| `mute`             | Sets the player volume to `0` when `true` and restores previous volume when `false`                                               | `false`     |
 | `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
 | `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
