@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.27 - 2026-08-30
+
+### 💡 Others
+
+- Updated config plugin JSDoc comments
+
 ## 57.0.26 - 2026-08-30
 
 ### 💡 Others
