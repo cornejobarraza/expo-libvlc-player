@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.24 - 2026-08-29
+
+### 💡 Others
+
+- Updated some props documentation
+
 ## 57.0.23 - 2026-08-29
 
 ### 💡 Others
