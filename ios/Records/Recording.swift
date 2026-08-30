@@ -1,9 +1,9 @@
 import ExpoModulesCore
 
 struct Recording: Record {
-    @Field
-    var path: String? = ""
+  @Field
+  var path: String? = ""
 
-    @Field
-    var isRecording: Bool = false
+  @Field
+  var isRecording: Bool = false
 }

@@ -5,826 +5,826 @@ import VLCKit
 private let dialogCustomUI: Bool = true
 
 class LibVlcPlayerView: ExpoView {
-    private let playerDrawable: MediaPlayerDrawable = .init()
-    private var pictureDrawable: PictureInPictureDrawable!
+  private let playerDrawable: MediaPlayerDrawable = .init()
+  private var pictureDrawable: PictureInPictureDrawable!
 
-    var library: VLCLibrary?
-    var mediaPlayer: VLCMediaPlayer?
-    var vlcDialog: VLCDialogProvider?
-    var vlcDialogRef: NSValue?
+  var library: VLCLibrary?
+  var mediaPlayer: VLCMediaPlayer?
+  var vlcDialog: VLCDialogProvider?
+  var vlcDialogRef: NSValue?
 
-    var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
+  var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
 
-    var firstPlay: Bool = true
-    private var shouldInit: Bool = true
-    private var userStop: Bool = false
+  var firstPlay: Bool = true
+  private var shouldInit: Bool = true
+  private var userStop: Bool = false
 
-    let onBuffering = EventDispatcher()
-    let onPlaying = EventDispatcher()
-    let onPaused = EventDispatcher()
-    let onStopped = EventDispatcher()
-    let onEncounteredError = EventDispatcher()
-    let onDialogDisplay = EventDispatcher()
-    let onTimeChanged = EventDispatcher()
-    let onPositionChanged = EventDispatcher()
-    let onESAdded = EventDispatcher()
-    let onRecordChanged = EventDispatcher()
-    let onSnapshotTaken = EventDispatcher()
-    let onFirstPlay = EventDispatcher()
-    let onForeground = EventDispatcher()
-    let onBackground = EventDispatcher()
-    let onPictureInPictureStart = EventDispatcher()
-    let onPictureInPictureStop = EventDispatcher()
+  let onBuffering = EventDispatcher()
+  let onPlaying = EventDispatcher()
+  let onPaused = EventDispatcher()
+  let onStopped = EventDispatcher()
+  let onEncounteredError = EventDispatcher()
+  let onDialogDisplay = EventDispatcher()
+  let onTimeChanged = EventDispatcher()
+  let onPositionChanged = EventDispatcher()
+  let onESAdded = EventDispatcher()
+  let onRecordChanged = EventDispatcher()
+  let onSnapshotTaken = EventDispatcher()
+  let onFirstPlay = EventDispatcher()
+  let onForeground = EventDispatcher()
+  let onBackground = EventDispatcher()
+  let onPictureInPictureStart = EventDispatcher()
+  let onPictureInPictureStop = EventDispatcher()
 
-    required init(appContext: AppContext? = nil) {
-        super.init(appContext: appContext)
+  required init(appContext: AppContext? = nil) {
+    super.init(appContext: appContext)
 
-        pictureDrawable = PictureInPictureDrawable(self)
-        clipsToBounds = true
+    pictureDrawable = PictureInPictureDrawable(self)
+    clipsToBounds = true
 
-        MediaPlayerManager.shared.registerExpoView(self)
+    MediaPlayerManager.shared.registerExpoView(self)
+  }
+
+  deinit {
+    MediaPlayerManager.shared.unregisterExpoView(self)
+    destroyPlayer()
+  }
+
+  override var bounds: CGRect {
+    didSet {
+      playerDrawable.transform = .identity
+      playerDrawable.frame = bounds
+      setContentFit(drawable: playerDrawable)
+
+      pictureDrawable.transform = .identity
+      pictureDrawable.frame = bounds
+      setContentFit(drawable: pictureDrawable)
+    }
+  }
+
+  func initPlayer() {
+    if shouldInit {
+      destroyPlayer()
+
+      if source != nil {
+        createPlayer()
+      }
+    }
+  }
+
+  func createPlayer() {
+    let drawable = pictureInPicture
+      ? pictureDrawable!
+      : playerDrawable
+
+    library = VLCLibrary()
+    mediaPlayer = VLCMediaPlayer(library: library!)
+    mediaPlayer!.drawable = drawable
+    mediaPlayer!.delegate = self
+    setupPlayer(addSlaves: true)
+
+    vlcDialog = VLCDialogProvider(library: library!, customUI: dialogCustomUI)
+    vlcDialog!.customRenderer = self
+
+    guard let source, let url = URL(string: source) else {
+      onEncounteredError(["message": "Invalid source, media could not be set"])
+      return
     }
 
-    deinit {
-        MediaPlayerManager.shared.unregisterExpoView(self)
-        destroyPlayer()
-    }
+    var args = options
+    args.normalizeOptions()
+    args.toggleStartPausedOption(autoplay)
 
-    override var bounds: CGRect {
-        didSet {
-            playerDrawable.transform = .identity
-            playerDrawable.frame = bounds
-            setContentFit(drawable: playerDrawable)
+    let media = VLCMedia(url: url)
+    args.forEach { arg in media!.addOption(arg) }
+    mediaPlayer!.media = media
+    mediaPlayer!.play()
 
-            pictureDrawable.transform = .identity
-            pictureDrawable.frame = bounds
-            setContentFit(drawable: pictureDrawable)
+    firstPlay = true
+    shouldInit = false
+
+    subviews.forEach { view in view.removeFromSuperview() }
+    addSubview(drawable)
+  }
+
+  func destroyPlayer() {
+    library = nil
+    mediaPlayer?.stop()
+    mediaPlayer = nil
+    vlcDialog?.customRenderer = nil
+    vlcDialog = nil
+  }
+
+  func selectTrack(_ index: Int, _ type: VLCMedia.TrackType) {
+    if let player = mediaPlayer {
+      if index == -1 {
+        switch type {
+        case .audio: player.deselectAllAudioTracks()
+        case .video: player.deselectAllVideoTracks()
+        case .text: player.deselectAllTextTracks()
+        default: break
         }
+      } else {
+        player.selectTrack(at: index, type: type)
+      }
     }
+  }
 
-    func initPlayer() {
-        if shouldInit {
-            destroyPlayer()
+  func setPlayerTracks() {
+    let audioTrack = tracks?.audio
+    let videoTrack = tracks?.video
+    let textTrack = tracks?.subtitle
 
-            if source != nil {
-                createPlayer()
-            }
+    if let audioTrack { selectTrack(audioTrack, .audio) }
+    if let videoTrack { selectTrack(videoTrack, .video) }
+    if let textTrack { selectTrack(textTrack, .text) }
+  }
+
+  func addPlayerSlaves(_ slaves: [Slave]) {
+    for slave in slaves {
+      let source = slave.source
+      let type = slave.type
+      let slaveType = type == "subtitle" ?
+        VLCMediaPlaybackSlaveType.subtitle :
+        VLCMediaPlaybackSlaveType.audio
+      let selected = slave.selected ?? false
+
+      guard let url = URL(string: source) else {
+        onEncounteredError(["message": "Invalid source, \(type) could not be added"])
+        continue
+      }
+
+      mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
+    }
+  }
+
+  func setPlayerDelays() {
+    if let player = mediaPlayer {
+      let audioDelay = delays?.audio
+      let textDelay = delays?.subtitle
+
+      if let audioDelay { player.currentAudioPlaybackDelay = NSInteger(audioDelay) }
+      if let textDelay { player.currentVideoSubTitleDelay = NSInteger(textDelay) }
+    }
+  }
+
+  func setContentFit(drawable: MediaPlayerDrawable) {
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+
+      var transform: CGAffineTransform = .identity
+
+      let video = getVideoInfo()
+
+      if hasVideoSize == true {
+        let viewAspect = drawable.frame.size.width / drawable.frame.size.height
+        let videoAspect = CGFloat(video.width) / CGFloat(video.height)
+
+        switch contentFit {
+        case .contain:
+          // No transformation required
+          break
+        case .cover:
+          let scale = videoAspect > viewAspect ?
+            videoAspect / viewAspect :
+            viewAspect / videoAspect
+
+          transform = CGAffineTransform(scaleX: scale, y: scale)
+        case .fill:
+          var scaleX = 1.0
+          var scaleY = 1.0
+
+          if videoAspect > viewAspect {
+            scaleY = videoAspect / viewAspect
+          } else {
+            scaleX = viewAspect / videoAspect
+          }
+
+          transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
         }
+      }
+
+      drawable.transform = transform
     }
+  }
 
-    func createPlayer() {
-        let drawable = pictureInPicture
-            ? pictureDrawable!
-            : playerDrawable
+  func setupPlayer(addSlaves: Bool? = false) {
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
 
-        library = VLCLibrary()
-        mediaPlayer = VLCMediaPlayer(library: library!)
-        mediaPlayer!.drawable = drawable
-        mediaPlayer!.delegate = self
-        setupPlayer(addSlaves: true)
+      if addSlaves == true {
+        addPlayerSlaves(slaves)
+      }
 
-        vlcDialog = VLCDialogProvider(library: library!, customUI: dialogCustomUI)
-        vlcDialog!.customRenderer = self
-
-        guard let source, let url = URL(string: source) else {
-            onEncounteredError(["message": "Invalid source, media could not be set"])
-            return
-        }
-
-        var args = options
-        args.normalizeOptions()
-        args.toggleStartPausedOption(autoplay)
-
-        let media = VLCMedia(url: url)
-        args.forEach { arg in media!.addOption(arg) }
-        mediaPlayer!.media = media
-        mediaPlayer!.play()
-
-        firstPlay = true
-        shouldInit = false
-
-        subviews.forEach { view in view.removeFromSuperview() }
-        addSubview(drawable)
-    }
-
-    func destroyPlayer() {
-        library = nil
-        mediaPlayer?.stop()
-        mediaPlayer = nil
-        vlcDialog?.customRenderer = nil
-        vlcDialog = nil
-    }
-
-    func selectTrack(_ index: Int, _ type: VLCMedia.TrackType) {
-        if let player = mediaPlayer {
-            if index == -1 {
-                switch type {
-                case .audio: player.deselectAllAudioTracks()
-                case .video: player.deselectAllVideoTracks()
-                case .text: player.deselectAllTextTracks()
-                default: break
-                }
-            } else {
-                player.selectTrack(at: index, type: type)
-            }
-        }
-    }
-
-    func setPlayerTracks() {
-        let audioTrack = tracks?.audio
-        let videoTrack = tracks?.video
-        let textTrack = tracks?.subtitle
-
-        if let audioTrack { selectTrack(audioTrack, .audio) }
-        if let videoTrack { selectTrack(videoTrack, .video) }
-        if let textTrack { selectTrack(textTrack, .text) }
-    }
-
-    func addPlayerSlaves(_ slaves: [Slave]) {
-        for slave in slaves {
-            let source = slave.source
-            let type = slave.type
-            let slaveType = type == "subtitle" ?
-                VLCMediaPlaybackSlaveType.subtitle :
-                VLCMediaPlaybackSlaveType.audio
-            let selected = slave.selected ?? false
-
-            guard let url = URL(string: source) else {
-                onEncounteredError(["message": "Invalid source, \(type) could not be added"])
-                continue
-            }
-
-            mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
-        }
-    }
-
-    func setPlayerDelays() {
-        if let player = mediaPlayer {
-            let audioDelay = delays?.audio
-            let textDelay = delays?.subtitle
-
-            if let audioDelay { player.currentAudioPlaybackDelay = NSInteger(audioDelay) }
-            if let textDelay { player.currentVideoSubTitleDelay = NSInteger(textDelay) }
-        }
-    }
-
-    func setContentFit(drawable: MediaPlayerDrawable) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-
-            var transform: CGAffineTransform = .identity
-
-            let video = getVideoInfo()
-
-            if hasVideoSize == true {
-                let viewAspect = drawable.frame.size.width / drawable.frame.size.height
-                let videoAspect = CGFloat(video.width) / CGFloat(video.height)
-
-                switch contentFit {
-                case .contain:
-                    // No transformation required
-                    break
-                case .cover:
-                    let scale = videoAspect > viewAspect ?
-                        videoAspect / viewAspect :
-                        viewAspect / videoAspect
-
-                    transform = CGAffineTransform(scaleX: scale, y: scale)
-                case .fill:
-                    var scaleX = 1.0
-                    var scaleY = 1.0
-
-                    if videoAspect > viewAspect {
-                        scaleY = videoAspect / viewAspect
-                    } else {
-                        scaleX = viewAspect / videoAspect
-                    }
-
-                    transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
-                }
-            }
-
-            drawable.transform = transform
-        }
-    }
-
-    func setupPlayer(addSlaves: Bool? = false) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-
-            if addSlaves == true {
-                addPlayerSlaves(slaves)
-            }
-
-            if let player = mediaPlayer {
-                if scale != MediaPlayerConstants.defaultPlayerScale {
-                    player.scaleFactor = Float(scale)
-                }
-
-                if rate != MediaPlayerConstants.defaultPlayerRate {
-                    player.rate = Float(rate)
-                }
-
-                if time != MediaPlayerConstants.defaultPlayerTime {
-                    player.time = VLCTime(int: Int32(time))
-                }
-
-                // Negative volume workaround
-                retryUntil { [weak self] _ in
-                    guard let self else { return true }
-
-                    let newVolume = mute ?
-                        MediaPlayerConstants.minPlayerVolume :
-                        volume
-
-                    player.audio?.volume = Int32(newVolume)
-
-                    return false
-                }
-
-                time = MediaPlayerConstants.defaultPlayerTime
-            }
-        }
-    }
-
-    func getMediaTracks() -> MediaTracks {
-        guard let player = mediaPlayer else { return MediaTracks() }
-
-        let disableTrack = MediaTrack(id: -1, name: "Disable")
-
-        let audios = player.audioTracks.enumerated()
-        let videos = player.videoTracks.enumerated()
-        let subtitles = player.textTracks.enumerated()
-
-        let audio = [disableTrack] + audios.map { index, audio in MediaTrack(
-            id: index,
-            name: audio.trackName
-        ) }
-        let video = [disableTrack] + videos.map { index, video in MediaTrack(
-            id: index,
-            name: video.trackName
-        ) }
-        let subtitle = [disableTrack] + subtitles.map { index, subtitle in MediaTrack(
-            id: index,
-            name: subtitle.trackName
-        ) }
-
-        return MediaTracks(
-            audio: audio,
-            video: video,
-            subtitle: subtitle
-        )
-    }
-
-    func getMediaLength() -> Int {
-        Int(mediaPlayer?.media?.length.intValue ?? 0)
-    }
-
-    func getVideoInfo() -> VideoInfo {
-        guard let track = mediaPlayer?.videoTracks.first(where: { $0.isSelected }),
-              let video = track.video
-        else {
-            return VideoInfo()
+      if let player = mediaPlayer {
+        if scale != MediaPlayerConstants.defaultPlayerScale {
+          player.scaleFactor = Float(scale)
         }
 
-        let frameRate = video.frameRateDenominator != 0 ?
-            video.frameRate / video.frameRateDenominator :
-            0
-
-        return VideoInfo(
-            width: Int(video.width),
-            height: Int(video.height),
-            frameRate: Int(frameRate),
-            bitrate: Int(track.bitrate)
-        )
-    }
-
-    func getMediaMetadata() -> MediaMetadata {
-        guard let metaData = mediaPlayer?.media?.metaData else {
-            return MediaMetadata()
+        if rate != MediaPlayerConstants.defaultPlayerRate {
+          player.rate = Float(rate)
         }
 
-        return MediaMetadata(
-            title: metaData.title,
-            artist: metaData.artist,
-            album: metaData.album,
-            artworkURL: metaData.artworkURL?.absoluteString
-        )
-    }
-
-    func getMediaInfo() -> MediaInfo {
-        let video = getVideoInfo()
-        let metadata = getMediaMetadata()
-        let length = getMediaLength()
-        let seekable = mediaPlayer?.isSeekable ?? false
-
-        return MediaInfo(
-            video: video,
-            metadata: metadata,
-            length: length,
-            seekable: seekable
-        )
-    }
-
-    func resetVideoTrack() {
-        guard let player = mediaPlayer,
-              let videoTrack = player.videoTracks.first(where: { track in track.isSelected })
-        else { return }
-
-        videoTrack.isSelected = false
-        videoTrack.isSelectedExclusively = true
-
-        // Black screen workaround
-        player.time = VLCTime(int: player.time.intValue)
-    }
-
-    var hasVideoSize: Bool {
-        let video = getVideoInfo()
-        return video.width > 0 && video.height > 0
-    }
-
-    var hasMediaLength: Bool {
-        let length = getMediaLength()
-        return length > 0
-    }
-
-    var hasMediaVolume: Bool {
-        let volume = mediaPlayer?.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
-        return volume > MediaPlayerConstants.minPlayerVolume
-    }
-
-    var source: String? {
-        didSet {
-            shouldInit = true
+        if time != MediaPlayerConstants.defaultPlayerTime {
+          player.time = VLCTime(int: Int32(time))
         }
-    }
 
-    var options: [String] = .init() {
-        didSet {
-            shouldInit = true
+        // Negative volume workaround
+        retryUntil { [weak self] _ in
+          guard let self else { return true }
+
+          let newVolume = mute ?
+            MediaPlayerConstants.minPlayerVolume :
+            volume
+
+          player.audio?.volume = Int32(newVolume)
+
+          return false
         }
+
+        time = MediaPlayerConstants.defaultPlayerTime
+      }
+    }
+  }
+
+  func getMediaTracks() -> MediaTracks {
+    guard let player = mediaPlayer else { return MediaTracks() }
+
+    let disableTrack = MediaTrack(id: -1, name: "Disable")
+
+    let audios = player.audioTracks.enumerated()
+    let videos = player.videoTracks.enumerated()
+    let subtitles = player.textTracks.enumerated()
+
+    let audio = [disableTrack] + audios.map { index, audio in MediaTrack(
+      id: index,
+      name: audio.trackName
+    ) }
+    let video = [disableTrack] + videos.map { index, video in MediaTrack(
+      id: index,
+      name: video.trackName
+    ) }
+    let subtitle = [disableTrack] + subtitles.map { index, subtitle in MediaTrack(
+      id: index,
+      name: subtitle.trackName
+    ) }
+
+    return MediaTracks(
+      audio: audio,
+      video: video,
+      subtitle: subtitle
+    )
+  }
+
+  func getMediaLength() -> Int {
+    Int(mediaPlayer?.media?.length.intValue ?? 0)
+  }
+
+  func getVideoInfo() -> VideoInfo {
+    guard let track = mediaPlayer?.videoTracks.first(where: { $0.isSelected }),
+          let video = track.video
+    else {
+      return VideoInfo()
     }
 
-    var tracks: Tracks? {
-        didSet {
-            setPlayerTracks()
-        }
+    let frameRate = video.frameRateDenominator != 0 ?
+      video.frameRate / video.frameRateDenominator :
+      0
+
+    return VideoInfo(
+      width: Int(video.width),
+      height: Int(video.height),
+      frameRate: Int(frameRate),
+      bitrate: Int(track.bitrate)
+    )
+  }
+
+  func getMediaMetadata() -> MediaMetadata {
+    guard let metaData = mediaPlayer?.media?.metaData else {
+      return MediaMetadata()
     }
 
-    private var _slaves: [Slave] = .init()
+    return MediaMetadata(
+      title: metaData.title,
+      artist: metaData.artist,
+      album: metaData.album,
+      artworkURL: metaData.artworkURL?.absoluteString
+    )
+  }
 
-    var slaves: [Slave] {
-        get { _slaves }
-        set {
-            let newSlaves = newValue.filter { slave in !_slaves.contains(slave) }
+  func getMediaInfo() -> MediaInfo {
+    let video = getVideoInfo()
+    let metadata = getMediaMetadata()
+    let length = getMediaLength()
+    let seekable = mediaPlayer?.isSeekable ?? false
 
-            _slaves += newSlaves
+    return MediaInfo(
+      video: video,
+      metadata: metadata,
+      length: length,
+      seekable: seekable
+    )
+  }
 
-            if !newSlaves.isEmpty {
-                addPlayerSlaves(newSlaves)
-            }
-        }
+  func resetVideoTrack() {
+    guard let player = mediaPlayer,
+          let videoTrack = player.videoTracks.first(where: { track in track.isSelected })
+    else { return }
+
+    videoTrack.isSelected = false
+    videoTrack.isSelectedExclusively = true
+
+    // Black screen workaround
+    player.time = VLCTime(int: player.time.intValue)
+  }
+
+  var hasVideoSize: Bool {
+    let video = getVideoInfo()
+    return video.width > 0 && video.height > 0
+  }
+
+  var hasMediaLength: Bool {
+    let length = getMediaLength()
+    return length > 0
+  }
+
+  var hasMediaVolume: Bool {
+    let volume = mediaPlayer?.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
+    return volume > MediaPlayerConstants.minPlayerVolume
+  }
+
+  var source: String? {
+    didSet {
+      shouldInit = true
     }
+  }
 
-    var delays: Delays? {
-        didSet {
-            setPlayerDelays()
-        }
+  var options: [String] = .init() {
+    didSet {
+      shouldInit = true
     }
+  }
 
-    var scale: Double = MediaPlayerConstants.defaultPlayerScale {
-        didSet {
-            mediaPlayer?.scaleFactor = Float(scale)
-        }
+  var tracks: Tracks? {
+    didSet {
+      setPlayerTracks()
     }
+  }
 
-    var contentFit: VideoContentFit = .contain {
-        didSet {
-            setContentFit(drawable: playerDrawable)
-            setContentFit(drawable: pictureDrawable)
-        }
+  private var _slaves: [Slave] = .init()
+
+  var slaves: [Slave] {
+    get { _slaves }
+    set {
+      let newSlaves = newValue.filter { slave in !_slaves.contains(slave) }
+
+      _slaves += newSlaves
+
+      if !newSlaves.isEmpty {
+        addPlayerSlaves(newSlaves)
+      }
     }
+  }
 
-    var rate: Double = MediaPlayerConstants.defaultPlayerRate {
-        didSet {
-            mediaPlayer?.rate = Float(rate)
-        }
+  var delays: Delays? {
+    didSet {
+      setPlayerDelays()
     }
+  }
 
-    var time: Int = MediaPlayerConstants.defaultPlayerTime
-
-    var _volume: Int = MediaPlayerConstants.maxPlayerVolume
-
-    var volume: Int {
-        get { _volume }
-        set {
-            let oldValue = _volume
-            let newVolume = max(
-                MediaPlayerConstants.minPlayerVolume,
-                min(MediaPlayerConstants.maxPlayerVolume, newValue)
-            )
-
-            _volume = newVolume
-
-            if mute { return }
-
-            mediaPlayer?.audio?.volume = Int32(newVolume)
-
-            let hadVolume = oldValue > MediaPlayerConstants.minPlayerVolume
-            let hasVolume = newVolume > MediaPlayerConstants.minPlayerVolume
-
-            if hadVolume != hasVolume {
-                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-            }
-        }
+  var scale: Double = MediaPlayerConstants.defaultPlayerScale {
+    didSet {
+      mediaPlayer?.scaleFactor = Float(scale)
     }
+  }
 
-    var mute: Bool = false {
-        didSet {
-            if mute {
-                oldVolume = volume
-            }
-
-            let newVolume = mute ?
-                MediaPlayerConstants.minPlayerVolume :
-                oldVolume
-
-            mediaPlayer?.audio?.volume = Int32(newVolume)
-            MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-        }
+  var contentFit: VideoContentFit = .contain {
+    didSet {
+      setContentFit(drawable: playerDrawable)
+      setContentFit(drawable: pictureDrawable)
     }
+  }
 
-    var audioMixingMode: AudioMixingMode = .auto {
-        didSet {
-            MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-        }
+  var rate: Double = MediaPlayerConstants.defaultPlayerRate {
+    didSet {
+      mediaPlayer?.rate = Float(rate)
     }
+  }
 
-    var Repeat: Bool = false
+  var time: Int = MediaPlayerConstants.defaultPlayerTime
 
-    var autoplay: Bool = true
+  var _volume: Int = MediaPlayerConstants.maxPlayerVolume
 
-    var pictureInPicture: Bool = false {
-        didSet {
-            shouldInit = true
-        }
+  var volume: Int {
+    get { _volume }
+    set {
+      let oldValue = _volume
+      let newVolume = max(
+        MediaPlayerConstants.minPlayerVolume,
+        min(MediaPlayerConstants.maxPlayerVolume, newValue)
+      )
+
+      _volume = newVolume
+
+      if mute { return }
+
+      mediaPlayer?.audio?.volume = Int32(newVolume)
+
+      let hadVolume = oldValue > MediaPlayerConstants.minPlayerVolume
+      let hasVolume = newVolume > MediaPlayerConstants.minPlayerVolume
+
+      if hadVolume != hasVolume {
+        MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+      }
     }
+  }
 
-    func play() {
-        if let player = mediaPlayer {
-            if !autoplay {
-                player.play()
-            }
+  var mute: Bool = false {
+    didSet {
+      if mute {
+        oldVolume = volume
+      }
 
-            player.play()
-        }
+      let newVolume = mute ?
+        MediaPlayerConstants.minPlayerVolume :
+        oldVolume
+
+      mediaPlayer?.audio?.volume = Int32(newVolume)
+      MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
     }
+  }
 
-    func pause() {
-        mediaPlayer?.pause()
+  var audioMixingMode: AudioMixingMode = .auto {
+    didSet {
+      MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
     }
+  }
 
-    func pauseReset() {
-        mediaPlayer?.pause()
-        resetVideoTrack()
+  var Repeat: Bool = false
+
+  var autoplay: Bool = true
+
+  var pictureInPicture: Bool = false {
+    didSet {
+      shouldInit = true
     }
+  }
 
-    func stop() {
-        userStop = true
-        mediaPlayer?.stop()
+  func play() {
+    if let player = mediaPlayer {
+      if !autoplay {
+        player.play()
+      }
+
+      player.play()
     }
+  }
 
-    func seek(_ value: Double, _ type: String? = "time") {
-        if let player = mediaPlayer {
-            if type == "position" {
-                player.position = value
-            } else {
-                player.time = VLCTime(int: Int32(value))
-            }
-        }
+  func pause() {
+    mediaPlayer?.pause()
+  }
+
+  func pauseReset() {
+    mediaPlayer?.pause()
+    resetVideoTrack()
+  }
+
+  func stop() {
+    userStop = true
+    mediaPlayer?.stop()
+  }
+
+  func seek(_ value: Double, _ type: String? = "time") {
+    if let player = mediaPlayer {
+      if type == "position" {
+        player.position = value
+      } else {
+        player.time = VLCTime(int: Int32(value))
+      }
     }
+  }
 
-    func record(_ path: String?) {
-        if let player = mediaPlayer {
-            if let path {
-                player.startRecording(atPath: path)
-            } else {
-                player.stopRecording()
-            }
-        } else {
-            onEncounteredError(["message": "Media could not be recorded"])
-        }
+  func record(_ path: String?) {
+    if let player = mediaPlayer {
+      if let path {
+        player.startRecording(atPath: path)
+      } else {
+        player.stopRecording()
+      }
+    } else {
+      onEncounteredError(["message": "Media could not be recorded"])
     }
+  }
 
-    func snapshot(_ path: String) {
-        if hasVideoSize {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
-            let timestamp = dateFormatter.string(from: Date())
+  func snapshot(_ path: String) {
+    if hasVideoSize {
+      let dateFormatter = DateFormatter()
+      dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
+      let timestamp = dateFormatter.string(from: Date())
 
-            let snapshotPath = path + "/vlc-snapshot-\(timestamp).jpg"
-            let video = CGSize(width: 0, height: 0) // Use original window size
+      let snapshotPath = path + "/vlc-snapshot-\(timestamp).jpg"
+      let video = CGSize(width: 0, height: 0) // Use original window size
 
-            mediaPlayer?.saveVideoSnapshot(
-                at: snapshotPath,
-                withWidth: Int32(video.width),
-                andHeight: Int32(video.height)
-            )
+      mediaPlayer?.saveVideoSnapshot(
+        at: snapshotPath,
+        withWidth: Int32(video.width),
+        andHeight: Int32(video.height)
+      )
 
-            let fileExists = FileManager.default.fileExists(atPath: snapshotPath)
+      let fileExists = FileManager.default.fileExists(atPath: snapshotPath)
 
-            if fileExists {
-                onSnapshotTaken(["path": snapshotPath])
-            } else {
-                onEncounteredError(["message": "Snapshot could not be taken"])
-            }
-        } else {
-            onEncounteredError(["message": "Snapshot could not be taken"])
-        }
+      if fileExists {
+        onSnapshotTaken(["path": snapshotPath])
+      } else {
+        onEncounteredError(["message": "Snapshot could not be taken"])
+      }
+    } else {
+      onEncounteredError(["message": "Snapshot could not be taken"])
     }
+  }
 
-    func postAction(_ action: Int) {
-        if let dialog = vlcDialog, let reference = vlcDialogRef {
-            dialog.postAction(Int32(action), forDialogReference: reference)
-            vlcDialogRef = nil
-        }
+  func postAction(_ action: Int) {
+    if let dialog = vlcDialog, let reference = vlcDialogRef {
+      dialog.postAction(Int32(action), forDialogReference: reference)
+      vlcDialogRef = nil
     }
+  }
 
-    func postLogin(_ username: String, _ password: String, _ store: Bool? = false) {
-        if let dialog = vlcDialog, let reference = vlcDialogRef {
-            dialog.postUsername(
-                username,
-                andPassword: password,
-                forDialogReference: reference,
-                store: store ?? false
-            )
-            vlcDialogRef = nil
-        }
+  func postLogin(_ username: String, _ password: String, _ store: Bool? = false) {
+    if let dialog = vlcDialog, let reference = vlcDialogRef {
+      dialog.postUsername(
+        username,
+        andPassword: password,
+        forDialogReference: reference,
+        store: store ?? false
+      )
+      vlcDialogRef = nil
     }
+  }
 
-    func dismiss() {
-        if let dialog = vlcDialog, let reference = vlcDialogRef {
-            dialog.dismissDialog(withReference: reference)
-            vlcDialogRef = nil
-        }
+  func dismiss() {
+    if let dialog = vlcDialog, let reference = vlcDialogRef {
+      dialog.dismissDialog(withReference: reference)
+      vlcDialogRef = nil
     }
+  }
 
-    func startPictureInPicture() throws {
-        try pictureDrawable.startPictureInPicture()
+  func startPictureInPicture() throws {
+    try pictureDrawable.startPictureInPicture()
+  }
+
+  func stopPictureInPicture() {
+    pictureDrawable.stopPictureInPicture()
+  }
+
+  func onStartPictureInPicture() {
+    onPictureInPictureStart()
+  }
+
+  func onStopPictureInPicture() {
+    if mediaPlayer?.isPlaying == false {
+      resetVideoTrack()
     }
+    onPictureInPictureStop()
+  }
 
-    func stopPictureInPicture() {
-        pictureDrawable.stopPictureInPicture()
+  func retryUntil(
+    maxRetries: Int = MediaPlayerConstants.maxRetryCount,
+    retry: Int = 0,
+    delay: Double = MediaPlayerConstants.retryDelayMs,
+    block: @escaping (_ isLastAttempt: Bool) -> Bool
+  ) {
+    let isLastAttempt = retry > maxRetries
+
+    if block(isLastAttempt) || isLastAttempt { return }
+
+    let deadDelay = DispatchTimeInterval.milliseconds(Int(delay))
+    let deadline = DispatchTime.now() + deadDelay
+    let expDelay = delay * MediaPlayerConstants.expDelayMultiplier
+
+    DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
+      self?.retryUntil(
+        maxRetries: maxRetries,
+        retry: retry + 1,
+        delay: expDelay,
+        block: block
+      )
     }
-
-    func onStartPictureInPicture() {
-        onPictureInPictureStart()
-    }
-
-    func onStopPictureInPicture() {
-        if mediaPlayer?.isPlaying == false {
-            resetVideoTrack()
-        }
-        onPictureInPictureStop()
-    }
-
-    func retryUntil(
-        maxRetries: Int = MediaPlayerConstants.maxRetryCount,
-        retry: Int = 0,
-        delay: Double = MediaPlayerConstants.retryDelayMs,
-        block: @escaping (_ isLastAttempt: Bool) -> Bool
-    ) {
-        let isLastAttempt = retry > maxRetries
-
-        if block(isLastAttempt) || isLastAttempt { return }
-
-        let deadDelay = DispatchTimeInterval.milliseconds(Int(delay))
-        let deadline = DispatchTime.now() + deadDelay
-        let expDelay = delay * MediaPlayerConstants.expDelayMultiplier
-
-        DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
-            self?.retryUntil(
-                maxRetries: maxRetries,
-                retry: retry + 1,
-                delay: expDelay,
-                block: block
-            )
-        }
-    }
+  }
 }
 
 extension LibVlcPlayerView: VLCMediaPlayerDelegate {
-    func mediaPlayerStateChanged(_ newState: VLCMediaPlayerState) {
-        if let player = mediaPlayer {
-            switch newState {
-            case .playing,
-                 .paused,
-                 .stopped:
-                if newState == .playing {
-                    onPlaying()
+  func mediaPlayerStateChanged(_ newState: VLCMediaPlayerState) {
+    if let player = mediaPlayer {
+      switch newState {
+      case .playing,
+           .paused,
+           .stopped:
+        if newState == .playing {
+          onPlaying()
 
-                    if firstPlay {
-                        setupPlayer()
+          if firstPlay {
+            setupPlayer()
 
-                        setPlayerTracks()
+            setPlayerTracks()
 
-                        setPlayerDelays()
+            setPlayerDelays()
 
-                        retryUntil { [weak self] isLastAttempt in
-                            guard let self else { return true }
+            retryUntil { [weak self] isLastAttempt in
+              guard let self else { return true }
 
-                            if hasMediaLength || isLastAttempt {
-                                onFirstPlay(getMediaInfo())
-                            }
+              if hasMediaLength || isLastAttempt {
+                onFirstPlay(getMediaInfo())
+              }
 
-                            return hasMediaLength
-                        }
-
-                        retryUntil { [weak self] _ in
-                            guard let self else { return true }
-
-                            if hasVideoSize {
-                                setContentFit(drawable: playerDrawable)
-                                setContentFit(drawable: pictureDrawable)
-                            }
-
-                            return hasVideoSize
-                        }
-
-                        retryUntil { [weak self] _ in
-                            guard let self else { return true }
-
-                            if hasMediaVolume {
-                                MediaPlayerManager.shared.audioSessionManager
-                                    .setAppropriateAudioSession()
-                            }
-
-                            return hasMediaVolume
-                        }
-
-                        firstPlay = false
-                    }
-                }
-
-                if newState == .paused {
-                    onPaused()
-                }
-
-                if newState == .stopped {
-                    onStopped()
-
-                    firstPlay = true
-
-                    if Repeat, !userStop {
-                        player.play()
-                    }
-
-                    userStop = false
-                }
-
-                MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
-                MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-                pictureDrawable.updatePipState()
-            case .error:
-                onEncounteredError(["message": "Player encountered an error"])
-
-                player.stop()
-            default:
-                break
+              return hasMediaLength
             }
+
+            retryUntil { [weak self] _ in
+              guard let self else { return true }
+
+              if hasVideoSize {
+                setContentFit(drawable: playerDrawable)
+                setContentFit(drawable: pictureDrawable)
+              }
+
+              return hasVideoSize
+            }
+
+            retryUntil { [weak self] _ in
+              guard let self else { return true }
+
+              if hasMediaVolume {
+                MediaPlayerManager.shared.audioSessionManager
+                  .setAppropriateAudioSession()
+              }
+
+              return hasMediaVolume
+            }
+
+            firstPlay = false
+          }
         }
-    }
 
-    func mediaPlayerBufferingChanged(_ buffering: Float) {
-        onBuffering(["value": buffering])
-    }
+        if newState == .paused {
+          onPaused()
+        }
 
-    func mediaPlayerLengthChanged(_: Int64) {
+        if newState == .stopped {
+          onStopped()
+
+          firstPlay = true
+
+          if Repeat, !userStop {
+            player.play()
+          }
+
+          userStop = false
+        }
+
+        MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
+        MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
         pictureDrawable.updatePipState()
+      case .error:
+        onEncounteredError(["message": "Player encountered an error"])
+
+        player.stop()
+      default:
+        break
+      }
     }
+  }
 
-    func mediaPlayerTimeChanged(_: Notification) {
-        if let player = mediaPlayer {
-            onTimeChanged(["value": player.time.intValue])
+  func mediaPlayerBufferingChanged(_ buffering: Float) {
+    onBuffering(["value": buffering])
+  }
 
-            onPositionChanged(["value": player.position])
-        }
+  func mediaPlayerLengthChanged(_: Int64) {
+    pictureDrawable.updatePipState()
+  }
+
+  func mediaPlayerTimeChanged(_: Notification) {
+    if let player = mediaPlayer {
+      onTimeChanged(["value": player.time.intValue])
+
+      onPositionChanged(["value": player.position])
     }
+  }
 
-    func mediaPlayerTrackAdded(_: String, with _: VLCMedia.TrackType) {
-        onESAdded(getMediaTracks())
-    }
+  func mediaPlayerTrackAdded(_: String, with _: VLCMedia.TrackType) {
+    onESAdded(getMediaTracks())
+  }
 
-    func mediaPlayerStartedRecording(_: VLCMediaPlayer) {
-        let recording = Recording(
-            path: nil,
-            isRecording: true
-        )
+  func mediaPlayerStartedRecording(_: VLCMediaPlayer) {
+    let recording = Recording(
+      path: nil,
+      isRecording: true
+    )
 
-        onRecordChanged(recording)
-    }
+    onRecordChanged(recording)
+  }
 
-    func mediaPlayer(recordingStoppedAt path: String) {
-        let recording = Recording(
-            path: path,
-            isRecording: false
-        )
+  func mediaPlayer(recordingStoppedAt path: String) {
+    let recording = Recording(
+      path: path,
+      isRecording: false
+    )
 
-        onRecordChanged(recording)
-    }
+    onRecordChanged(recording)
+  }
 }
 
 extension LibVlcPlayerView: VLCCustomDialogRendererProtocol {
-    func showError(
-        withTitle title: String,
-        message: String
-    ) {
-        let dialog = Dialog(
-            title: title,
-            text: message,
-            type: "error"
-        )
+  func showError(
+    withTitle title: String,
+    message: String
+  ) {
+    let dialog = Dialog(
+      title: title,
+      text: message,
+      type: "error"
+    )
 
-        onDialogDisplay(dialog)
-    }
+    onDialogDisplay(dialog)
+  }
 
-    func showLogin(
-        withTitle title: String,
-        message: String,
-        defaultUsername _: String?,
-        askingForStorage _: Bool,
-        withReference reference: NSValue
-    ) {
-        vlcDialogRef = reference
+  func showLogin(
+    withTitle title: String,
+    message: String,
+    defaultUsername _: String?,
+    askingForStorage _: Bool,
+    withReference reference: NSValue
+  ) {
+    vlcDialogRef = reference
 
-        let dialog = Dialog(
-            title: title,
-            text: message,
-            type: "login"
-        )
+    let dialog = Dialog(
+      title: title,
+      text: message,
+      type: "login"
+    )
 
-        onDialogDisplay(dialog)
-    }
+    onDialogDisplay(dialog)
+  }
 
-    func showQuestion(
-        withTitle title: String,
-        message: String,
-        type _: VLCDialogQuestionType,
-        cancel: String?,
-        action1String: String?,
-        action2String: String?,
-        withReference reference: NSValue
-    ) {
-        vlcDialogRef = reference
+  func showQuestion(
+    withTitle title: String,
+    message: String,
+    type _: VLCDialogQuestionType,
+    cancel: String?,
+    action1String: String?,
+    action2String: String?,
+    withReference reference: NSValue
+  ) {
+    vlcDialogRef = reference
 
-        let dialog = Dialog(
-            title: title,
-            text: message,
-            type: "question",
-            cancelText: cancel,
-            action1Text: action1String,
-            action2Text: action2String
-        )
+    let dialog = Dialog(
+      title: title,
+      text: message,
+      type: "question",
+      cancelText: cancel,
+      action1Text: action1String,
+      action2Text: action2String
+    )
 
-        onDialogDisplay(dialog)
-    }
+    onDialogDisplay(dialog)
+  }
 
-    func showProgress(
-        withTitle _: String,
-        message _: String,
-        isIndeterminate _: Bool,
-        position _: Float,
-        cancel _: String?,
-        withReference _: NSValue
-    ) {}
+  func showProgress(
+    withTitle _: String,
+    message _: String,
+    isIndeterminate _: Bool,
+    position _: Float,
+    cancel _: String?,
+    withReference _: NSValue
+  ) {}
 
-    func updateProgress(
-        withReference _: NSValue,
-        message _: String?,
-        position _: Float
-    ) {}
+  func updateProgress(
+    withReference _: NSValue,
+    message _: String?,
+    position _: Float
+  ) {}
 
-    func cancelDialog(withReference _: NSValue) {}
+  func cancelDialog(withReference _: NSValue) {}
 }
 
 private extension [String] {
-    mutating func normalizeOptions() {
-        self = map { option in
-            if !option.hasPrefix(":") {
-                ":" + option.drop { character in character == "-" }
-            } else {
-                option
-            }
-        }
+  mutating func normalizeOptions() {
+    self = map { option in
+      if !option.hasPrefix(":") {
+        ":" + option.drop { character in character == "-" }
+      } else {
+        option
+      }
     }
+  }
 }
 
 private extension [String] {
-    mutating func toggleStartPausedOption(_ autoplay: Bool) {
-        let hasOption = self.contains(":start-paused")
+  mutating func toggleStartPausedOption(_ autoplay: Bool) {
+    let hasOption = self.contains(":start-paused")
 
-        if !autoplay, !hasOption {
-            append(":start-paused")
-        }
+    if !autoplay, !hasOption {
+      append(":start-paused")
     }
+  }
 }

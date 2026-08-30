@@ -5,7 +5,7 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 class MediaTrack(
-    @Field val id: Int = 0,
-    @Field val name: String = "",
+  @Field val id: Int = 0,
+  @Field val name: String = "",
 ) : Record,
-    Serializable
+  Serializable

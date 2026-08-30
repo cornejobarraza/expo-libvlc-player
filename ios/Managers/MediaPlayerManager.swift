@@ -1,41 +1,41 @@
 import Foundation
 
 class MediaPlayerManager {
-    static let shared = MediaPlayerManager()
+  static let shared = MediaPlayerManager()
 
-    let localNetworkManager = LocalNetworkManager()
-    let audioSessionManager = AudioSessionManager()
-    let keepAwakeManager = KeepAwakeManager()
+  let localNetworkManager = LocalNetworkManager()
+  let audioSessionManager = AudioSessionManager()
+  let keepAwakeManager = KeepAwakeManager()
 
-    let expoViews = NSHashTable<LibVlcPlayerView>.weakObjects()
+  let expoViews = NSHashTable<LibVlcPlayerView>.weakObjects()
 
-    func registerExpoView(_ view: LibVlcPlayerView) {
-        expoViews.add(view)
+  func registerExpoView(_ view: LibVlcPlayerView) {
+    expoViews.add(view)
+  }
+
+  func unregisterExpoView(_ view: LibVlcPlayerView) {
+    expoViews.remove(view)
+  }
+
+  func onModuleDestroy() {
+    for view in expoViews.allObjects {
+      view.destroyPlayer()
     }
+  }
 
-    func unregisterExpoView(_ view: LibVlcPlayerView) {
-        expoViews.remove(view)
+  func onModuleForeground() {
+    for view in expoViews.allObjects {
+      view.onForeground()
     }
+  }
 
-    func onModuleDestroy() {
-        for view in expoViews.allObjects {
-            view.destroyPlayer()
-        }
+  func onModuleBackground() {
+    for view in expoViews.allObjects {
+      view.onBackground()
+
+      if !view.pictureInPicture {
+        view.pauseReset()
+      }
     }
-
-    func onModuleForeground() {
-        for view in expoViews.allObjects {
-            view.onForeground()
-        }
-    }
-
-    func onModuleBackground() {
-        for view in expoViews.allObjects {
-            view.onBackground()
-
-            if !view.pictureInPicture {
-                view.pauseReset()
-            }
-        }
-    }
+  }
 }

@@ -1,3 +1,4 @@
 --disable numberFormatting
 --disable wrapIfStatementBodies
 --max-width 100
+--indent 2

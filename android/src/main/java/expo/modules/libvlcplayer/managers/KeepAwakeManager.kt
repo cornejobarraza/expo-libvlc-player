@@ -6,38 +6,38 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.exception.Exceptions
 
 class KeepAwakeManager(
-    private val appContext: AppContext,
+  private val appContext: AppContext,
 ) {
-    private val activity: Activity
-        get() = appContext.currentActivity ?: throw Exceptions.MissingActivity()
+  private val activity: Activity
+    get() = appContext.currentActivity ?: throw Exceptions.MissingActivity()
 
-    private val anyPlayingView: Boolean
-        get() =
-            MediaPlayerManager.expoViews.any { view ->
-                view.mediaPlayer?.isPlaying() == true
-            }
+  private val anyPlayingView: Boolean
+    get() =
+      MediaPlayerManager.expoViews.any { view ->
+        view.mediaPlayer?.isPlaying() == true
+      }
 
-    private fun activateKeepAwake() {
-        activity.let { activity ->
-            activity.runOnUiThread {
-                activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            }
-        }
+  private fun activateKeepAwake() {
+    activity.let { activity ->
+      activity.runOnUiThread {
+        activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      }
     }
+  }
 
-    private fun deactivateKeepAwake() {
-        activity.let { activity ->
-            activity.runOnUiThread {
-                activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            }
-        }
+  private fun deactivateKeepAwake() {
+    activity.let { activity ->
+      activity.runOnUiThread {
+        activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      }
     }
+  }
 
-    fun toggleKeepAwake() {
-        if (anyPlayingView) {
-            activateKeepAwake()
-        } else {
-            deactivateKeepAwake()
-        }
+  fun toggleKeepAwake() {
+    if (anyPlayingView) {
+      activateKeepAwake()
+    } else {
+      deactivateKeepAwake()
     }
+  }
 }
