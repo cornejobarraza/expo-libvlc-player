@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.26 - 2026-08-30
+
+### 💡 Others
+
+- Added indentation rules for native linters
+
 ## 57.0.25 - 2026-08-30
 
 ### 💡 Others
