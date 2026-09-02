@@ -17,6 +17,10 @@
     "ios": {
       "bundleIdentifier": "expo.modules.libvlcplayer.example",
       "supportsTablet": true
-    }
+    },
+    "plugins": [
+      "../app.plugin.js",
+      "expo-font"
+    ]
   }
 }

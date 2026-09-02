@@ -14,6 +14,9 @@ const VOLUME_STEP = 10;
 const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
+/** Android Emulator black screen workaround */
+const AVCODEC_OPTION = ":codec=avcodec";
+
 export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
@@ -109,6 +112,7 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
           ref={playerRef}
           style={[styles.player, fullScreen && { borderRadius: 0 }]}
           source={source}
+          options={[AVCODEC_OPTION]}
           aspectRatio="16:9"
           volume={volume}
           onBuffering={({ value }) => {
@@ -136,12 +140,12 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
           onTimeChanged={({ value }) => {
             setTime(value);
           }}
-          onBackground={() => {
-            setBackground(true);
-          }}
           onFirstPlay={(info) => {
             setMetadata(info.metadata);
             setParsing(false);
+          }}
+          onBackground={() => {
+            setBackground(true);
           }}
         />
       </View>
