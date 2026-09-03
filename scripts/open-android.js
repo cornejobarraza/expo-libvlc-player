@@ -29,20 +29,13 @@ switch (process.platform) {
       }
     } else {
       const possiblePaths = [
-        // Tarball install in home directory
         `${home}/android-studio/bin/studio.sh`,
-        // Common system-wide installs
         "/opt/android-studio/bin/studio.sh",
         "/usr/local/android-studio/bin/studio.sh",
-        // snap
         "/snap/android-studio/current/bin/studio.sh",
-        // JetBrains Toolbox 2.x (flat layout)
         `${home}/.local/share/JetBrains/Toolbox/apps/android-studio/bin/studio.sh`,
-        // JetBrains Toolbox 2.x (with channel subdirectory still present)
         `${home}/.local/share/JetBrains/Toolbox/apps/android-studio/ch-0/bin/studio.sh`,
-        // Flatpak (user install)
         `${home}/.local/share/flatpak/app/com.google.AndroidStudio/current/active/files/extra/android-studio/bin/studio.sh`,
-        // Flatpak (system install)
         "/var/lib/flatpak/app/com.google.AndroidStudio/current/active/files/extra/android-studio/bin/studio.sh",
       ];
 

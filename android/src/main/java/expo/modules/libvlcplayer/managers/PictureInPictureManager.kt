@@ -295,7 +295,6 @@ class PictureInPictureManager(
     rootView.addView(pictureLayout)
 
     pipView?.let { view ->
-      // Black screen workaround
       view.detachPlayerLayout()
       view.postDelayed(
         { view.attachPlayerLayout(pictureLayout) },

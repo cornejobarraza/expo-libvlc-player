@@ -45,7 +45,7 @@ object MediaPlayerManager {
       view.onForeground(Unit)
 
       if (view.pictureInPicture) {
-        view.cancelPauseJob()
+        view.cancelPauseDelay()
       }
     }
   }
@@ -55,7 +55,7 @@ object MediaPlayerManager {
       view.onBackground(Unit)
 
       if (view.pictureInPicture) {
-        view.pauseJob()
+        view.pauseDelay()
       } else {
         view.pause()
       }

@@ -1,6 +1,7 @@
 package expo.modules.libvlcplayer
 
 import android.content.Context
+import android.content.res.AssetFileDescriptor
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.net.Uri
@@ -58,7 +59,9 @@ class LibVlcPlayerView(
 ) : ExpoView(context, appContext) {
   val playerLayout: VLCVideoLayout = VLCVideoLayout(context)
   val pictureLayout: VLCVideoLayout = VLCVideoLayout(context)
-  private var pauseCoroutine: Job? = null
+
+  private var pauseJob: Job? = null
+  private var sourceFd: AssetFileDescriptor? = null
 
   var libVLC: LibVLC? = null
   var mediaPlayer: MediaPlayer? = null
@@ -111,6 +114,60 @@ class LibVlcPlayerView(
 
     setContentFit(layout = playerLayout)
     setContentFit(layout = pictureLayout)
+  }
+
+  // Release builds bundle assets into res/raw
+  @Suppress("DiscouragedApi")
+  private fun getSourceId(source: String): Int? {
+    if (Uri.parse(source).scheme != null) return null
+
+    val identifier = context.resources.getIdentifier(source, "raw", context.packageName)
+
+    return identifier.takeIf { it != 0 }
+  }
+
+  private fun openSourceFd(source: String): AssetFileDescriptor? {
+    val sourceId = getSourceId(source) ?: return null
+
+    sourceFd =
+      try {
+        context.resources.openRawResourceFd(sourceId)
+      } catch (_: Exception) {
+        null
+      }
+
+    return sourceFd
+  }
+
+  private fun createMedia(
+    libVLC: LibVLC,
+    source: String,
+  ): Media {
+    val file = openSourceFd(source)
+
+    return if (file != null) {
+      Media(libVLC, file)
+    } else {
+      Media(libVLC, Uri.parse(source))
+    }
+  }
+
+  private fun getSourceUri(source: String): Uri {
+    val sourceUri = Uri.parse(source)
+    val sourceId = getSourceId(source) ?: return sourceUri
+    val cacheDir = File(context.cacheDir, MediaPlayerConstants.SOURCE_CACHE_DIR)
+    val file = File(cacheDir, source)
+
+    try {
+      cacheDir.mkdirs()
+      context.resources.openRawResource(sourceId).use { input ->
+        FileOutputStream(file).use { output -> input.copyTo(output) }
+      }
+    } catch (_: Exception) {
+      return sourceUri
+    }
+
+    return Uri.fromFile(file)
   }
 
   fun getTextureView(layout: VLCVideoLayout): TextureView? =
@@ -201,8 +258,8 @@ class LibVlcPlayerView(
     args.normalizeOptions()
     args.toggleStartPausedOption(autoplay)
 
-    val media = Media(libVLC!!, Uri.parse(source!!))
-    args.forEach { arg -> media!!.addOption(arg) }
+    val media = createMedia(libVLC!!, source!!)
+    args.forEach { arg -> media.addOption(arg) }
     mediaPlayer!!.setMedia(media)
     media.release()
     mediaPlayer!!.play()
@@ -218,6 +275,8 @@ class LibVlcPlayerView(
     libVLC = null
     mediaPlayer?.release()
     mediaPlayer = null
+    sourceFd?.close()
+    sourceFd = null
     removeAllViews()
   }
 
@@ -263,7 +322,7 @@ class LibVlcPlayerView(
         return@forEach
       }
 
-      mediaPlayer?.addSlave(slaveType, Uri.parse(source), selected)
+      mediaPlayer?.addSlave(slaveType, getSourceUri(source), selected)
     }
   }
 
@@ -598,18 +657,18 @@ class LibVlcPlayerView(
     mediaPlayer?.pause()
   }
 
-  fun pauseJob() {
-    cancelPauseJob()
+  fun pauseDelay() {
+    cancelPauseDelay()
 
-    pauseCoroutine =
+    pauseJob =
       CoroutineScope(Dispatchers.Main).launch {
         delay(MediaPlayerConstants.PAUSE_DELAY_MS)
         mediaPlayer?.pause()
       }
   }
 
-  fun cancelPauseJob() {
-    pauseCoroutine?.cancel()
+  fun cancelPauseDelay() {
+    pauseJob?.cancel()
   }
 
   fun stop() {
@@ -924,7 +983,7 @@ private fun MutableList<String>.normalizeOptions() {
   val normalized =
     map { option ->
       if (!option.startsWith(":")) {
-        ":" + option.dropWhile { character -> character == '-' } // Single quotes required
+        ":" + option.dropWhile { character -> character == '-' }
       } else {
         option
       }
