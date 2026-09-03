@@ -367,12 +367,6 @@ The current workaround attaches the View back to the player but causes a brief b
 
 https://code.videolan.org/videolan/vlc-android/-/issues/1495
 
-On iOS, the `VLCKit` player deselects the video track after pausing in the background.
-
-The current workaround selects the video track back but causes a brief black screen.
-
-https://code.videolan.org/videolan/VLCKit/-/issues/743
-
 #### Local network
 
 On iOS, the `VLCKit` player interacts with the local network to discover media servers by default.

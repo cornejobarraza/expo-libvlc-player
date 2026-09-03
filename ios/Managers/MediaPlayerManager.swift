@@ -34,7 +34,7 @@ class MediaPlayerManager {
       view.onBackground()
 
       if !view.pictureInPicture {
-        view.pauseReset()
+        view.pause()
       }
     }
   }

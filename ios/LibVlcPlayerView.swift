@@ -326,18 +326,6 @@ class LibVlcPlayerView: ExpoView {
     )
   }
 
-  func resetVideoTrack() {
-    guard let player = mediaPlayer,
-          let videoTrack = player.videoTracks.first(where: { track in track.isSelected })
-    else { return }
-
-    videoTrack.isSelected = false
-    videoTrack.isSelectedExclusively = true
-
-    // Black screen workaround
-    player.time = VLCTime(int: player.time.intValue)
-  }
-
   var hasVideoSize: Bool {
     let video = getVideoInfo()
     return video.width > 0 && video.height > 0
@@ -484,11 +472,6 @@ class LibVlcPlayerView: ExpoView {
     mediaPlayer?.pause()
   }
 
-  func pauseReset() {
-    mediaPlayer?.pause()
-    resetVideoTrack()
-  }
-
   func stop() {
     userStop = true
     mediaPlayer?.stop()
@@ -582,9 +565,6 @@ class LibVlcPlayerView: ExpoView {
   }
 
   func onStopPictureInPicture() {
-    if mediaPlayer?.isPlaying == false {
-      resetVideoTrack()
-    }
     onPictureInPictureStop()
   }
 
