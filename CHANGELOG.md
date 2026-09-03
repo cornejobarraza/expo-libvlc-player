@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 57.0.30 - 2026-09-03
+
+### 🐛 Bug fixes
+
+- Fixed bundled assets on Android
+
+### 💡 Others
+
+- Removed outdated iOS workarounds
+
 ## 57.0.29 - 2026-09-02
 
 ### 💡 Others
