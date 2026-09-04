@@ -310,7 +310,10 @@ class PictureInPictureManager(
 
     pipView?.let { view ->
       view.detachPlayerLayout()
-      view.post { view.attachPlayerLayout(playerLayout) }
+      view.postDelayed(
+        { view.attachPlayerLayout(playerLayout) },
+        MediaPlayerConstants.ATTACH_DELAY_MS,
+      )
     }
 
     rootView.removeView(pictureLayout)
