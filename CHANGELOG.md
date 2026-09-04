@@ -10,15 +10,18 @@
 
 ### 💡 Others
 
+## 57.0.32 - 2026-09-03
+
+### 💡 Others
+
+- Updated README to improve documentation
+
 ## 57.0.31 - 2026-09-03
 
 ### 🐛 Bug fixes
 
 - Fixed initial negative volume on Android
-
-### 💡 Others
-
-- Add delayed post for PiP exit on Android
+- Added delay for PiP exit on Android
 
 ## 57.0.30 - 2026-09-03
 
