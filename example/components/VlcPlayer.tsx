@@ -11,24 +11,27 @@ const MIN_VOLUME = 0;
 const MAX_VOLUME = 100;
 const VOLUME_STEP = 10;
 
+const MAX_BUFFER = 1;
 const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
-/** Android Emulator video codec */
+// Android Emulator specific codec
 const AVCODEC_OPTION = ":codec=avcodec";
 
 export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
-  const [time, setTime] = useState<number>(DEFAULT_TIME);
-  const [volume, setVolume] = useState<number>(MAX_VOLUME);
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(false);
-  const [background, setBackground] = useState<boolean>(false);
+  const [backgrounded, setBackgrounded] = useState<boolean>(false);
+  const [time, setTime] = useState<number>(DEFAULT_TIME);
+  const [volume, setVolume] = useState<number>(MAX_VOLUME);
   const [parsing, setParsing] = useState<boolean>(true);
   const [metadata, setMetadata] = useState<MediaMetadata | null>(null);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
 
-  const PLAYER_CONTROLS: VlcControlProps[] = [
+  const { bottom: paddingBottom } = useSafeAreaInsets();
+
+  const playerControls: VlcControlProps[] = [
     {
       name: "backward.fill",
       onPress: () => {
@@ -45,13 +48,14 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
       name: playing ? "pause.fill" : "play.fill",
       onPress: () => {
         playerRef.current?.[playing ? "pause" : "play"]();
-        setBackground(false);
+        setBackgrounded(false);
       },
     },
     {
       name: "stop.fill",
       onPress: () => {
         playerRef.current?.stop();
+        setBackgrounded(false);
       },
     },
     {
@@ -70,8 +74,7 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
 
   const showTitle = metadata?.title != null && metadata.title !== "";
   const showArtist = metadata?.artist != null && metadata.artist !== "";
-  const showPoster = (!playing && background) || time === 0;
-  const insets = useSafeAreaInsets();
+  const showPoster = (!playing && backgrounded) || time === DEFAULT_TIME;
 
   return (
     <View style={[styles.libVlc, fullScreen && styles.libVlcFull]}>
@@ -102,7 +105,7 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
         {showPoster && (
           <View style={styles.poster} testID="poster">
             <Image
-              style={[styles.image, fullScreen && { borderRadius: 0 }]}
+              style={[styles.image, !fullScreen ? styles.rounded : styles.square]}
               source={require("../assets/bbb.png")}
               resizeMode="contain"
             />
@@ -111,13 +114,13 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
           ref={playerRef}
-          style={[styles.player, fullScreen && { borderRadius: 0 }]}
+          style={[styles.player, !fullScreen ? styles.rounded : styles.square]}
           source={source}
           options={[AVCODEC_OPTION]}
           aspectRatio="16:9"
           volume={volume}
           onBuffering={({ value }) => {
-            setBuffering(value < 1);
+            setBuffering(value < MAX_BUFFER);
           }}
           onPlaying={() => {
             setPlaying(true);
@@ -126,8 +129,8 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
             setPlaying(false);
           }}
           onStopped={() => {
-            setTime(0);
             setPlaying(false);
+            setTime(DEFAULT_TIME);
           }}
           onEncounteredError={({ message }) => {
             Alert.alert("Error", message);
@@ -142,18 +145,15 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
             setParsing(false);
           }}
           onBackground={() => {
-            setBackground(true);
+            setBackgrounded(true);
           }}
         />
       </View>
       <View
-        style={[
-          styles.controls,
-          fullScreen && [styles.controlsFull, { paddingBottom: insets.bottom }],
-        ]}>
+        style={[styles.controls, fullScreen && styles.overlay, fullScreen && { paddingBottom }]}>
         {/* eslint-disable-next-line react-hooks/refs */}
-        {PLAYER_CONTROLS.map((control, index) => (
-          <VlcControl key={index} name={control.name} onPress={control.onPress} />
+        {playerControls.map(({ name, onPress }) => (
+          <VlcControl key={name} name={name} onPress={onPress} />
         ))}
       </View>
     </View>
@@ -196,11 +196,15 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-    borderRadius: 12,
   },
   player: {
     backgroundColor: "#000000",
+  },
+  rounded: {
     borderRadius: 12,
+  },
+  square: {
+    borderRadius: 0,
   },
   controls: {
     flexDirection: "row",
@@ -208,7 +212,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
   },
-  controlsFull: {
+  overlay: {
     ...StyleSheet.absoluteFill,
     bottom: 24,
     alignItems: "flex-end",
