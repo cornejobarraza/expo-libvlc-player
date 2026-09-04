@@ -9,15 +9,15 @@ import {
 export interface WithExpoLibVlcPlayerProps {
   /**
    * A string to set the `NSLocalNetworkUsageDescription` permission message
-   * 
+   *
    * @default "Allow $(PRODUCT_NAME) to access your local network"
-   * 
+   *
    * @platform ios
    */
   localNetworkPermission?: string;
   /**
    * A boolean to enable Picture-in-Picture (PiP) support
-   * 
+   *
    * @default undefined
    */
   supportsPictureInPicture?: boolean;

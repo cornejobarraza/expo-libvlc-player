@@ -14,7 +14,7 @@ const VOLUME_STEP = 10;
 const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
-/** For Android Emulator compatibility */
+/** Android Emulator video codec */
 const AVCODEC_OPTION = ":codec=avcodec";
 
 export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
@@ -45,6 +45,7 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
       name: playing ? "pause.fill" : "play.fill",
       onPress: () => {
         playerRef.current?.[playing ? "pause" : "play"]();
+        setBackground(false);
       },
     },
     {
@@ -120,17 +121,13 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
           }}
           onPlaying={() => {
             setPlaying(true);
-            setBackground(false);
           }}
           onPaused={() => {
             setPlaying(false);
           }}
           onStopped={() => {
             setTime(0);
-            setBuffering(false);
             setPlaying(false);
-            setBackground(false);
-            setParsing(false);
           }}
           onEncounteredError={({ message }) => {
             Alert.alert("Error", message);
