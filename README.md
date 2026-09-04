@@ -27,7 +27,7 @@
 
 Previous versions may be supported by changing how you compile the app.
 
-#### Example app.json with config plugin
+#### Example app.json for older SDKs
 
 ```json
 {
@@ -53,7 +53,7 @@ Previous versions may be supported by changing how you compile the app.
 
 ## Installation
 
-```
+```sh
 npm install expo-libvlc-player
 ```
 
@@ -73,7 +73,7 @@ Run `npx pod-install` after installing the npm package.
 
 Set the `EXPO_TV` environment variable, and run prebuild to make the TV modifications to the project.
 
-```
+```sh
 EXPO_TV=1 npx expo prebuild --clean
 ```
 
@@ -104,7 +104,7 @@ You can configure `expo-libvlc-player` using its built-in config plugin if you u
 | Name                       | Description                                                                                                                                                                                                                                                                                                                                  | Default                                                |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
 | `localNetworkPermission`   | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                                               | `"Allow $(PRODUCT_NAME) to access your local network"` |
-| `supportsPictureInPicture` | A boolean to enable Picture-in-Picture (PiP) support. If `true`, it adds the `android:supportsPictureInPicture` property on Android and the `audio` key to the `UIBackgroundModes` array in the Info.plist file on iOS. If `false`, it removes the property on Android and the key on iOS. If `undefined`, the configuration is not modified | `undefined`                                            |
+| `supportsPictureInPicture` | A boolean to enable Picture-in-Picture (PiP) support. If `true`, it adds the `android:supportsPictureInPicture` attribute on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the attribute on Android and the mode on iOS. If `undefined`, the configuration is not modified | `undefined`                                            |
 
 ## Usage
 
@@ -371,7 +371,7 @@ https://code.videolan.org/videolan/vlc-android/-/issues/1495
 
 On iOS, the `VLCKit` player interacts with the local network to discover media servers by default.
 
-A custom message can be provided for the `NSLocalNetworkUsageDescription` key in the Info.plist file.
+A custom message can be provided for the `NSLocalNetworkUsageDescription` key in the **Info.plist** file.
 
 https://code.videolan.org/videolan/vlc-ios/-/issues/893
 
@@ -383,7 +383,7 @@ Contributions are always welcome. Please raise any issues or fix them by creatin
 
 Install [Ktlint](https://github.com/ktlint/ktlint) and [SwiftFormat](https://github.com/nicklockwood/swiftformat) for linting native code:
 
-```
+```sh
 brew install ktlint swiftformat
 ```
 
