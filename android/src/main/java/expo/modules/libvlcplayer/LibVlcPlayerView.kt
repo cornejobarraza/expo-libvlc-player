@@ -410,7 +410,8 @@ class LibVlcPlayerView(
           player.setTime(time.toLong())
         }
 
-        if (volume != MediaPlayerConstants.MAX_PLAYER_VOLUME || mute) {
+        // Negative volume workaround
+        retryUntil {
           val newVolume =
             if (mute) {
               MediaPlayerConstants.MIN_PLAYER_VOLUME
@@ -419,6 +420,8 @@ class LibVlcPlayerView(
             }
 
           player.setVolume(newVolume)
+
+          return@retryUntil false
         }
 
         time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
@@ -799,11 +802,12 @@ class LibVlcPlayerView(
 
     if (block(isLastAttempt) || isLastAttempt) return
 
-    val expDelay = delay * MediaPlayerConstants.EXP_DELAY_MULTIPLIER
-    val postDelay = delay.toLong()
+    val wait = if (retry > 0) delay else 0.0
+    val nextDelay = if (retry > 0) delay * MediaPlayerConstants.EXP_DELAY_MULTIPLIER else delay
+    val postDelay = wait.toLong()
 
     postDelayed({
-      retryUntil(maxRetries, retry + 1, expDelay, block)
+      retryUntil(maxRetries, retry + 1, nextDelay, block)
     }, postDelay)
   }
 }

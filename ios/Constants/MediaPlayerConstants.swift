@@ -6,6 +6,6 @@ enum MediaPlayerConstants {
   static let maxPlayerVolume: Int = 100
 
   static let expDelayMultiplier: Double = 1.5
-  static let retryDelayMs: Double = 300.0
-  static let maxRetryCount: Int = 3
+  static let retryDelayMs: Double = 500.0
+  static let maxRetryCount: Int = 2
 }

@@ -578,15 +578,15 @@ class LibVlcPlayerView: ExpoView {
 
     if block(isLastAttempt) || isLastAttempt { return }
 
-    let deadDelay = DispatchTimeInterval.milliseconds(Int(delay))
-    let deadline = DispatchTime.now() + deadDelay
-    let expDelay = delay * MediaPlayerConstants.expDelayMultiplier
+    let wait = retry > 0 ? delay : 0
+    let nextDelay = retry > 0 ? delay * MediaPlayerConstants.expDelayMultiplier : delay
+    let deadline = DispatchTime.now() + DispatchTimeInterval.milliseconds(Int(wait))
 
     DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
       self?.retryUntil(
         maxRetries: maxRetries,
         retry: retry + 1,
-        delay: expDelay,
+        delay: nextDelay,
         block: block
       )
     }
