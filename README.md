@@ -74,7 +74,7 @@ Run `npx pod-install` after installing the npm package.
 Set the `EXPO_TV` environment variable, and run prebuild to make the TV modifications to the project.
 
 ```sh
-EXPO_TV=1 npx expo prebuild --clean
+EXPO_TV=1 npx expo prebuild
 ```
 
 ### Configuration in app config

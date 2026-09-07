@@ -4,7 +4,7 @@
   "scripts": {
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "prebuild": "expo prebuild --clean",
+    "prebuild": "expo prebuild",
     "test": "maestro test .maestro"
   },
   "dependencies": {
