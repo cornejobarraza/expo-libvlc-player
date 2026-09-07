@@ -52,14 +52,16 @@ class LibVlcPlayerView: ExpoView {
 
   override var bounds: CGRect {
     didSet {
-      playerDrawable.transform = .identity
-      playerDrawable.frame = bounds
-      setContentFit(drawable: playerDrawable)
-
-      pictureDrawable.transform = .identity
-      pictureDrawable.frame = bounds
-      setContentFit(drawable: pictureDrawable)
+      applyBounds()
+      applyContentFit()
     }
+  }
+
+  func applyBounds() {
+    playerDrawable.transform = .identity
+    playerDrawable.frame = bounds
+    pictureDrawable.transform = .identity
+    pictureDrawable.frame = bounds
   }
 
   func initPlayer() {
@@ -206,6 +208,11 @@ class LibVlcPlayerView: ExpoView {
 
       drawable.transform = transform
     }
+  }
+
+  func applyContentFit() {
+    setContentFit(drawable: playerDrawable)
+    setContentFit(drawable: pictureDrawable)
   }
 
   func setupPlayer(addSlaves: Bool? = false) {
@@ -388,8 +395,7 @@ class LibVlcPlayerView: ExpoView {
 
   var contentFit: VideoContentFit = .contain {
     didSet {
-      setContentFit(drawable: playerDrawable)
-      setContentFit(drawable: pictureDrawable)
+      applyContentFit()
     }
   }
 
@@ -624,8 +630,7 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
               guard let self else { return true }
 
               if hasVideoSize {
-                setContentFit(drawable: playerDrawable)
-                setContentFit(drawable: pictureDrawable)
+                applyContentFit()
               }
 
               return hasVideoSize

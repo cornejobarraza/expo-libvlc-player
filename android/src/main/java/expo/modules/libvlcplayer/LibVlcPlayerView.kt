@@ -112,8 +112,7 @@ class LibVlcPlayerView(
   ) {
     super.onSizeChanged(w, h, oldw, oldh)
 
-    setContentFit(layout = playerLayout)
-    setContentFit(layout = pictureLayout)
+    applyContentFit()
   }
 
   // Release builds bundle assets into res/raw
@@ -391,6 +390,11 @@ class LibVlcPlayerView(
     }
   }
 
+  fun applyContentFit() {
+    setContentFit(layout = playerLayout)
+    setContentFit(layout = pictureLayout)
+  }
+
   fun setupPlayer(addSlaves: Boolean? = false) {
     post {
       if (addSlaves == true) {
@@ -573,8 +577,7 @@ class LibVlcPlayerView(
   var contentFit: VideoContentFit = VideoContentFit.CONTAIN
     set(value) {
       field = value
-      setContentFit(layout = playerLayout)
-      setContentFit(layout = pictureLayout)
+      applyContentFit()
     }
 
   var rate: Double = MediaPlayerConstants.DEFAULT_PLAYER_RATE
@@ -847,8 +850,7 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
 
                                 retryUntil {
                                     if (hasVideoSize) {
-                                        setContentFit(layout = playerLayout)
-                                        setContentFit(layout = pictureLayout)
+                                        applyContentFit()
                                     }
 
                                     return@retryUntil hasVideoSize
