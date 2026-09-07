@@ -10,6 +10,13 @@
 
 ### 💡 Others
 
+## 57.0.34 - 2026-09-07
+
+### 💡 Others
+
+- Refactored content fit logic
+- Reordered props for consistency
+
 ## 57.0.33 - 2026-09-04
 
 ### 💡 Others
