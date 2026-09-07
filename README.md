@@ -400,7 +400,7 @@ For official VLC products and support, please visit [videolan.org](https://www.v
 
 ## Credits
 
-This library is inspired by existing projects such as [react-native-vlc-media-player](https://github.com/razorRun/react-native-vlc-media-player) and [expo-video](https://github.com/expo/expo/tree/main/packages/expo-video).
+This library is inspired by existing projects such as [react-native-vlc-media-player](https://github.com/razorRun/react-native-vlc-media-player) and [expo-video](https://docs.expo.dev/versions/latest/sdk/video/).
 
 ## License
 
