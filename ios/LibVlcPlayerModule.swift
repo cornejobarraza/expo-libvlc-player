@@ -55,12 +55,12 @@ public class LibVlcPlayerModule: Module {
         view.options = options
       }
 
-      Prop("tracks") { (view: LibVlcPlayerView, tracks: Tracks?) in
-        view.tracks = tracks
-      }
-
       Prop("slaves", .init()) { (view: LibVlcPlayerView, slaves: [Slave]) in
         view.slaves = slaves
+      }
+
+      Prop("tracks") { (view: LibVlcPlayerView, tracks: Tracks?) in
+        view.tracks = tracks
       }
 
       Prop("delays") { (view: LibVlcPlayerView, delays: Delays?) in

@@ -78,15 +78,15 @@ class LibVlcPlayerModule : Module() {
           view.options = options
         }
 
-        Prop("tracks") { view: LibVlcPlayerView, tracks: Tracks? ->
-          view.tracks = tracks
-        }
-
         Prop(
           "slaves",
           mutableListOf(),
         ) { view: LibVlcPlayerView, slaves: MutableList<Slave> ->
           view.slaves = slaves
+        }
+
+        Prop("tracks") { view: LibVlcPlayerView, tracks: Tracks? ->
+          view.tracks = tracks
         }
 
         Prop("delays") { view: LibVlcPlayerView, delays: Delays? ->

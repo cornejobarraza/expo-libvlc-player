@@ -115,6 +115,24 @@ class LibVlcPlayerView: ExpoView {
     vlcDialog = nil
   }
 
+  func addPlayerSlaves(_ slaves: [Slave]) {
+    for slave in slaves {
+      let source = slave.source
+      let type = slave.type
+      let slaveType = type == "subtitle" ?
+        VLCMediaPlaybackSlaveType.subtitle :
+        VLCMediaPlaybackSlaveType.audio
+      let selected = slave.selected ?? false
+
+      guard let url = URL(string: source) else {
+        onEncounteredError(["message": "Invalid source, \(type) could not be added"])
+        continue
+      }
+
+      mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
+    }
+  }
+
   func selectTrack(_ index: Int, _ type: VLCMedia.TrackType) {
     if let player = mediaPlayer {
       if index == -1 {
@@ -138,24 +156,6 @@ class LibVlcPlayerView: ExpoView {
     if let audioTrack { selectTrack(audioTrack, .audio) }
     if let videoTrack { selectTrack(videoTrack, .video) }
     if let textTrack { selectTrack(textTrack, .text) }
-  }
-
-  func addPlayerSlaves(_ slaves: [Slave]) {
-    for slave in slaves {
-      let source = slave.source
-      let type = slave.type
-      let slaveType = type == "subtitle" ?
-        VLCMediaPlaybackSlaveType.subtitle :
-        VLCMediaPlaybackSlaveType.audio
-      let selected = slave.selected ?? false
-
-      guard let url = URL(string: source) else {
-        onEncounteredError(["message": "Invalid source, \(type) could not be added"])
-        continue
-      }
-
-      mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
-    }
   }
 
   func setPlayerDelays() {
@@ -353,12 +353,6 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  var tracks: Tracks? {
-    didSet {
-      setPlayerTracks()
-    }
-  }
-
   private var _slaves: [Slave] = .init()
 
   var slaves: [Slave] {
@@ -371,6 +365,12 @@ class LibVlcPlayerView: ExpoView {
       if !newSlaves.isEmpty {
         addPlayerSlaves(newSlaves)
       }
+    }
+  }
+
+  var tracks: Tracks? {
+    didSet {
+      setPlayerTracks()
     }
   }
 

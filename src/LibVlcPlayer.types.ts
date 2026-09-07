@@ -48,7 +48,7 @@ export interface LibVlcPlayerViewRef {
    */
   readonly snapshot: (path: string) => Promise<void>;
   /**
-   * Posts an answer to a `Dialog`
+   * Posts an answer to a question dialog
    *
    * @param action - Must be either `1` or `2`
    *
@@ -56,17 +56,17 @@ export interface LibVlcPlayerViewRef {
    */
   readonly postAction: (action: 1 | 2) => Promise<void>;
   /**
-   * Posts a username and password to a login `Dialog`
+   * Posts a username and password to a login dialog
    *
-   * @param username - Must be a valid username, can't be empty
-   * @param password - Must be a valid password, can be empty
-   * @param store - If `true`, store the credentials
+   * @param username - Can't be empty
+   * @param password - Can be empty
+   * @param store - Whether to store the credentials
    *
    * @returns A promise which resolves to `void`
    */
   readonly postLogin: (username: string, password: string, store?: boolean) => Promise<void>;
   /**
-   * Dismisses a `Dialog`
+   * Dismisses the current dialog
    *
    * @returns A promise which resolves to `void`
    */
@@ -326,8 +326,8 @@ export type LibVlcPlayerViewNativeProps = ViewProps &
     ref?: React.Ref<LibVlcPlayerViewRef>;
     source?: LibVlcSource;
     options?: string[];
-    tracks?: Tracks;
     slaves?: Slave[];
+    tracks?: Tracks;
     delays?: Delays;
     scale?: number;
     contentFit?: VideoContentFit;
@@ -391,27 +391,6 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     options?: string[];
     /**
-     * Sets the player audio, video, and subtitle track indexes
-     *
-     * @example
-     *
-     * ```tsx
-     * const tracks = {
-     *   audio: -1,
-     *   video: 1,
-     *   subtitle: 1,
-     * };
-     *
-     * <LibVlcPlayerView
-     *   {...props}
-     *   tracks={tracks}
-     * />
-     * ```
-     *
-     * @default undefined
-     */
-    tracks?: Tracks;
-    /**
      * Sets the player audio and subtitle slaves
      *
      * @example
@@ -434,6 +413,27 @@ export type LibVlcPlayerViewProps = ViewProps &
      * @default []
      */
     slaves?: Slave[];
+    /**
+     * Sets the player audio, video, and subtitle track indexes
+     *
+     * @example
+     *
+     * ```tsx
+     * const tracks = {
+     *   audio: -1,
+     *   video: 1,
+     *   subtitle: 1,
+     * };
+     *
+     * <LibVlcPlayerView
+     *   {...props}
+     *   tracks={tracks}
+     * />
+     * ```
+     *
+     * @default undefined
+     */
+    tracks?: Tracks;
     /**
      * Sets the player audio and subtitle delay values in microseconds
      *
@@ -535,7 +535,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     onEncounteredError?: (event: Error) => void;
     /**
-     * Called after a `Dialog` needs to be displayed
+     * Called after a dialog needs to be displayed
      */
     onDialogDisplay?: (event: Dialog) => void;
     /**

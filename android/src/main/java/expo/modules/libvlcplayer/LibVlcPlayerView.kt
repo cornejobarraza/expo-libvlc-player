@@ -280,29 +280,6 @@ class LibVlcPlayerView(
     removeAllViews()
   }
 
-  fun selectTrack(
-    index: Int,
-    type: Int,
-  ) {
-    mediaPlayer?.let { player ->
-      if (index == -1) {
-        player.unselectTrackType(type)
-      } else {
-        player.selectTrack(index.toString())
-      }
-    }
-  }
-
-  fun setPlayerTracks() {
-    val audioTrack = tracks?.audio
-    val videoTrack = tracks?.video
-    val spuTrack = tracks?.subtitle
-
-    audioTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Audio) }
-    videoTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Video) }
-    spuTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Text) }
-  }
-
   fun addPlayerSlaves(slaves: List<Slave>) {
     slaves.forEach { slave ->
       val source = slave.source
@@ -324,6 +301,29 @@ class LibVlcPlayerView(
 
       mediaPlayer?.addSlave(slaveType, getSourceUri(source), selected)
     }
+  }
+
+  fun selectTrack(
+    index: Int,
+    type: Int,
+  ) {
+    mediaPlayer?.let { player ->
+      if (index == -1) {
+        player.unselectTrackType(type)
+      } else {
+        player.selectTrack(index.toString())
+      }
+    }
+  }
+
+  fun setPlayerTracks() {
+    val audioTrack = tracks?.audio
+    val videoTrack = tracks?.video
+    val spuTrack = tracks?.subtitle
+
+    audioTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Audio) }
+    videoTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Video) }
+    spuTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Text) }
   }
 
   fun setPlayerDelays() {
@@ -541,12 +541,6 @@ class LibVlcPlayerView(
       shouldInit = true
     }
 
-  var tracks: Tracks? = null
-    set(value) {
-      field = value
-      setPlayerTracks()
-    }
-
   var slaves: MutableList<Slave> = mutableListOf()
     set(value) {
       val newSlaves = value.filter { slave -> slave !in field }
@@ -556,6 +550,12 @@ class LibVlcPlayerView(
       if (!newSlaves.isEmpty()) {
         addPlayerSlaves(newSlaves)
       }
+    }
+
+  var tracks: Tracks? = null
+    set(value) {
+      field = value
+      setPlayerTracks()
     }
 
   var delays: Delays? = null
