@@ -10,6 +10,17 @@
 
 ### 💡 Others
 
+## 57.0.35 - 2026-09-08
+
+### 🐛 Bug fixes
+
+- Fixed duplicate slaves on select change
+
+### 💡 Others
+
+- Bumped Expo dependency to 57.0.21
+- Removed unused equatable protocols
+
 ## 57.0.34 - 2026-09-07
 
 ### 💡 Others
