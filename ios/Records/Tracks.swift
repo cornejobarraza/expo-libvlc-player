@@ -1,6 +1,6 @@
 import ExpoModulesCore
 
-struct Tracks: Record, Equatable {
+struct Tracks: Record {
   @Field
   var audio: Int = 0
 
@@ -9,11 +9,4 @@ struct Tracks: Record, Equatable {
 
   @Field
   var subtitle: Int = 0
-
-  // swiftformat:disable:next redundantEquatable
-  static func == (lhs: Tracks, rhs: Tracks) -> Bool {
-    lhs.audio == rhs.audio &&
-      lhs.video == rhs.video &&
-      lhs.subtitle == rhs.subtitle
-  }
 }
