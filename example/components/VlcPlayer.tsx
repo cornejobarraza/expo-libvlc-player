@@ -1,3 +1,4 @@
+import { isDevice } from "expo-device";
 import { LibVlcPlayerView, type LibVlcPlayerViewRef, type MediaMetadata } from "expo-libvlc-player";
 import React, { useRef, useState } from "react";
 import { ActivityIndicator, Alert, Image, StyleSheet, View } from "react-native";
@@ -15,8 +16,8 @@ const MAX_BUFFER = 1;
 const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
-// FFmpeg software decoder
-const AVCODEC_OPTION = ":codec=avcodec";
+// Use software decoding for development
+const OPTIONS = !isDevice ? [":codec=avcodec"] : undefined;
 
 export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
   const [buffering, setBuffering] = useState<boolean>(false);
@@ -116,7 +117,7 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
           ref={playerRef}
           style={[styles.player, !fullScreen ? styles.rounded : styles.square]}
           source={source}
-          options={[AVCODEC_OPTION]}
+          options={OPTIONS}
           aspectRatio="16:9"
           volume={volume}
           onBuffering={({ value }) => {
