@@ -365,7 +365,10 @@ class LibVlcPlayerView: ExpoView {
   var slaves: [Slave] {
     get { _slaves }
     set {
-      let newSlaves = newValue.filter { slave in !_slaves.contains(slave) }
+      let newSlaves = newValue.filter { slave in
+        !_slaves
+          .contains { existing in existing.source == slave.source && existing.type == slave.type }
+      }
 
       _slaves += newSlaves
 

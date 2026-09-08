@@ -547,7 +547,10 @@ class LibVlcPlayerView(
 
   var slaves: MutableList<Slave> = mutableListOf()
     set(value) {
-      val newSlaves = value.filter { slave -> slave !in field }
+      val newSlaves =
+        value.filter { slave ->
+          field.none { existing -> existing.source == slave.source && existing.type == slave.type }
+        }
 
       field = field.apply { addAll(newSlaves) }
 
