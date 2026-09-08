@@ -15,7 +15,7 @@ const MAX_BUFFER = 1;
 const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
-// Android Emulator specific codec
+// FFmpeg software decoder
 const AVCODEC_OPTION = ":codec=avcodec";
 
 export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
