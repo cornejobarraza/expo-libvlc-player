@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.38 - 2026-09-09
+
+### 🐛 Bug fixes
+
+- Removed bad undefined types
+
 ## 57.0.37 - 2026-09-09
 
 ### 🐛 Bug fixes
