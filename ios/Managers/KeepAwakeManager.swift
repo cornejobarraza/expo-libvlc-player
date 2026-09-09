@@ -1,6 +1,4 @@
 class KeepAwakeManager {
-  static let shared = KeepAwakeManager()
-
   private lazy var expoViews = MediaPlayerManager.shared.expoViews
 
   private func activateKeepAwake() {

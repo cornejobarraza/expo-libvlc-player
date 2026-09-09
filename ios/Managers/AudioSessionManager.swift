@@ -4,8 +4,6 @@ import Foundation
 import VLCKit
 
 class AudioSessionManager {
-  static let shared = AudioSessionManager()
-
   private static let managerQueue = DispatchQueue(label: "audioManagerQueue")
 
   private lazy var expoViews = MediaPlayerManager.shared.expoViews

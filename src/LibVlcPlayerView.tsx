@@ -10,6 +10,7 @@ import {
 import { convertAspectRatio } from "./utils/aspect";
 import { parseNativeSource } from "./utils/assets";
 import { convertNativeEvent } from "./utils/events";
+import { useTimeoutRef } from "./utils/timeout";
 
 const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
   requireNativeView("ExpoLibVlcPlayer");
@@ -40,6 +41,8 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
 
   const [autoRatio, setAutoRatio] = useState<VideoAspectRatio>(fallbackRatio);
   const [warned, setWarned] = useState<boolean>(false);
+
+  const ratioTimeoutRef = useTimeoutRef();
 
   if (children && !warned) {
     console.warn(CHILDREN_WARNING);
@@ -88,10 +91,10 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
           const mediaRatio = mediaInfo.video.width / mediaInfo.video.height;
 
           const validRatio = mediaRatio > 0 && mediaRatio < Infinity;
-          const autoRatio = validRatio ? mediaRatio : fallbackRatio;
+          const nextRatio = validRatio ? mediaRatio : fallbackRatio;
 
           // View resizing workaround
-          setTimeout(() => setAutoRatio(autoRatio), RATIO_TIMEOUT);
+          ratioTimeoutRef.current = setTimeout(() => setAutoRatio(nextRatio), RATIO_TIMEOUT);
           onFirstPlay?.(mediaInfo);
         }}
       />

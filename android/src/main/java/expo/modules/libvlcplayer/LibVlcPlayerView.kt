@@ -244,7 +244,7 @@ class LibVlcPlayerView(
     mediaPlayer = MediaPlayer(libVLC!!)
     attachPlayerLayout(playerLayout)
     setPlayerListener(mediaPlayer!!)
-    setupPlayer(addSlaves = true)
+    addPlayerSlaves(slaves)
 
     try {
       URI(source)
@@ -270,12 +270,14 @@ class LibVlcPlayerView(
   }
 
   fun destroyPlayer() {
+    cancelPauseDelay()
+    sourceFd?.close()
+    sourceFd = null
     libVLC?.release()
     libVLC = null
     mediaPlayer?.release()
     mediaPlayer = null
-    sourceFd?.close()
-    sourceFd = null
+    vlcDialog = null
     removeAllViews()
   }
 
@@ -395,12 +397,8 @@ class LibVlcPlayerView(
     setContentFit(layout = pictureLayout)
   }
 
-  fun setupPlayer(addSlaves: Boolean? = false) {
+  fun setupPlayer() {
     post {
-      if (addSlaves == true) {
-        addPlayerSlaves(slaves)
-      }
-
       mediaPlayer?.let { player ->
         if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
           player.setScale(scale.toFloat())

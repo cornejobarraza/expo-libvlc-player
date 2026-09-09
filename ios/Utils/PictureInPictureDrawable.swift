@@ -3,14 +3,14 @@ import ExpoModulesCore
 import VLCKit
 
 class PictureInPictureDrawable: MediaPlayerDrawable {
-  private var expoView: LibVlcPlayerView!
+  private weak var expoView: LibVlcPlayerView?
 
   private var mediaPlayer: VLCMediaPlayer? {
-    expoView.mediaPlayer
+    expoView?.mediaPlayer
   }
 
   private var pictureInPicture: Bool {
-    expoView.pictureInPicture
+    expoView?.pictureInPicture ?? false
   }
 
   private weak var pipController: VLCPictureInPictureWindowControlling?

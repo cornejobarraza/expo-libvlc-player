@@ -83,7 +83,7 @@ class LibVlcPlayerView: ExpoView {
     mediaPlayer = VLCMediaPlayer(library: library!)
     mediaPlayer!.drawable = drawable
     mediaPlayer!.delegate = self
-    setupPlayer(addSlaves: true)
+    addPlayerSlaves(slaves)
 
     vlcDialog = VLCDialogProvider(library: library!, customUI: dialogCustomUI)
     vlcDialog!.customRenderer = self
@@ -215,13 +215,9 @@ class LibVlcPlayerView: ExpoView {
     setContentFit(drawable: pictureDrawable)
   }
 
-  func setupPlayer(addSlaves: Bool? = false) {
+  func setupPlayer() {
     DispatchQueue.main.async { [weak self] in
       guard let self else { return }
-
-      if addSlaves == true {
-        addPlayerSlaves(slaves)
-      }
 
       if let player = mediaPlayer {
         if scale != MediaPlayerConstants.defaultPlayerScale {
