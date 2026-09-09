@@ -19,7 +19,7 @@ object MediaPlayerConstants {
 
   const val ATTACH_DELAY_MS: Long = 300L
   const val PAUSE_DELAY_MS: Long = 1_000L
-  const val EXP_DELAY_MULTIPLIER: Double = 2
+  const val EXP_DELAY_MULTIPLIER: Double = 2.0
   const val RETRY_DELAY_MS: Double = 150.0
   const val MAX_RETRY_COUNT: Int = 2
 }
