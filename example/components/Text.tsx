@@ -1,43 +1,41 @@
 import { Text as RNText, type TextProps } from "react-native";
 import Animated, { css, useReducedMotion } from "react-native-reanimated";
 
-import { type TextLoadingProps, type TextComponent } from "./types";
+import { type LoadingProps, type TextComponent } from "./types";
 
-const TextLoading = ({ width = "50%", height = 16 }: TextLoadingProps) => {
+const Loading = ({ width, height }: LoadingProps) => {
   const reducedMotion = useReducedMotion();
 
   return (
     <Animated.View
       style={[
-        styles.placeholder,
+        styles.loading,
         { width, height, borderRadius: height / 4 },
-        reducedMotion ? styles.static : styles.pulse,
+        reducedMotion ? styles.static : styles.animation,
       ]}
     />
   );
 };
 
-export const Text: TextComponent & { Loading: typeof TextLoading } = Object.assign(
+export const Text: TextComponent & { Loading: typeof Loading } = Object.assign(
   (props: TextProps) => <RNText {...props} />,
-  {
-    Loading: TextLoading,
-  }
+  { Loading }
 );
 
 const pulse = css.keyframes({
-  "0%": { opacity: 0.25 },
+  "0%": { opacity: 0.3 },
   "50%": { opacity: 0.6 },
-  "100%": { opacity: 0.25 },
+  "100%": { opacity: 0.3 },
 });
 
 const styles = css.create({
-  placeholder: {
+  loading: {
     backgroundColor: "#f1f1f1",
   },
   static: {
     opacity: 0.4,
   },
-  pulse: {
+  animation: {
     animationName: pulse,
     animationDuration: "1200ms",
     animationTimingFunction: "ease-in-out",

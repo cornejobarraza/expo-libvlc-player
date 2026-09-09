@@ -4,9 +4,9 @@ import React, { useRef, useState } from "react";
 import { ActivityIndicator, Alert, Image, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Control } from "./Control";
 import { Text } from "./Text";
-import { VlcControl } from "./VlcControl";
-import { type VlcControlProps, type VlcPlayerProps } from "./types";
+import { type ControlProps, type PlayerProps } from "./types";
 
 const MIN_VOLUME = 0;
 const MAX_VOLUME = 100;
@@ -19,7 +19,7 @@ const SEEK_STEP = 10_000;
 // Use software decoding for development
 const OPTIONS = !isDevice ? [":codec=avcodec"] : undefined;
 
-export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
+export const Player = ({ source, fullScreen }: PlayerProps) => {
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(false);
   const [backgrounded, setBackgrounded] = useState<boolean>(false);
@@ -32,7 +32,7 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
 
   const { bottom: paddingBottom } = useSafeAreaInsets();
 
-  const playerControls: VlcControlProps[] = [
+  const playerControls: ControlProps[] = [
     {
       name: "backward.fill",
       onPress: () => {
@@ -78,7 +78,7 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
   const showPoster = (!playing && backgrounded) || time === DEFAULT_TIME;
 
   return (
-    <View style={[styles.libVlc, fullScreen && styles.libVlcFull]}>
+    <View style={[styles.player, fullScreen && styles.fullScreen]}>
       {!fullScreen && (
         <View style={styles.header}>
           {!parsing ? (
@@ -115,7 +115,7 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
           ref={playerRef}
-          style={[styles.player, !fullScreen ? styles.rounded : styles.square]}
+          style={[styles.view, !fullScreen ? styles.rounded : styles.square]}
           source={source}
           options={OPTIONS}
           aspectRatio="16:9"
@@ -154,7 +154,7 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
         style={[styles.controls, fullScreen && styles.overlay, fullScreen && { paddingBottom }]}>
         {/* eslint-disable-next-line react-hooks/refs */}
         {playerControls.map(({ name, onPress }) => (
-          <VlcControl key={name} name={name} onPress={onPress} />
+          <Control key={name} name={name} onPress={onPress} />
         ))}
       </View>
     </View>
@@ -162,10 +162,10 @@ export const VlcPlayer = ({ source, fullScreen }: VlcPlayerProps) => {
 };
 
 const styles = StyleSheet.create({
-  libVlc: {
+  player: {
     gap: 24,
   },
-  libVlcFull: {
+  fullScreen: {
     alignItems: "center",
     position: "relative",
   },
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  player: {
+  view: {
     backgroundColor: "#000000",
   },
   rounded: {

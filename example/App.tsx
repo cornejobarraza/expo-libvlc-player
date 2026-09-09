@@ -3,7 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { VlcPlayer } from "./components/VlcPlayer";
+import { Player } from "./components/Player";
 import { useFullScreen } from "./hooks/useFullScreen";
 
 export default function App() {
@@ -15,7 +15,7 @@ export default function App() {
     <SafeAreaProvider>
       <View style={{ ...styles.app, padding }}>
         <StatusBar style="light" hidden={fullScreen} />
-        <VlcPlayer source={require("./assets/bbb.mp4")} fullScreen={fullScreen} />
+        <Player source={require("./assets/bbb.mp4")} fullScreen={fullScreen} />
         <NavigationBar style="light" hidden={fullScreen} />
       </View>
     </SafeAreaProvider>

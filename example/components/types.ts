@@ -10,6 +10,11 @@ import {
   type TextStyle,
 } from "react-native";
 
+export interface ControlProps {
+  name: SFSymbol;
+  onPress?: () => void;
+}
+
 export type MaterialIcon = ComponentProps<typeof MaterialIcons>["name"];
 
 export type SymbolMapping = Record<SFSymbol, MaterialIcon>;
@@ -18,22 +23,17 @@ export interface IconProps {
   style?: StyleProp<TextStyle>;
   name: SFSymbol;
   size?: number;
-  color: string | OpaqueColorValue;
+  color: OpaqueColorValue | string;
 }
 
-export type TextComponent = (props: TextProps) => React.JSX.Element;
-
-export type TextLoadingProps = {
-  width?: DimensionValue;
-  height?: number;
-};
-
-export interface VlcControlProps {
-  name: SFSymbol;
-  onPress?: () => void;
-}
-
-export interface VlcPlayerProps {
+export interface PlayerProps {
   source: LibVlcSource;
   fullScreen?: boolean;
 }
+
+export type LoadingProps = {
+  width: DimensionValue;
+  height: number;
+};
+
+export type TextComponent = (props: TextProps) => React.JSX.Element;
