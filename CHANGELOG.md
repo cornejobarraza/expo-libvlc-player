@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.37 - 2026-09-09
+
+### 🐛 Bug fixes
+
+- Fixed Double constant regression
+
 ## 57.0.36 - 2026-09-08
 
 ### 🐛 Bug fixes
