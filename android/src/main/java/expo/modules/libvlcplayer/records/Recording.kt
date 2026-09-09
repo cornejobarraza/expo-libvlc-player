@@ -5,7 +5,7 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 class Recording(
-  @Field val path: String? = "",
+  @Field val path: String? = null,
   @Field val isRecording: Boolean = false,
 ) : Record,
   Serializable

@@ -11,11 +11,11 @@ struct Dialog: Record {
   var type: String = ""
 
   @Field
-  var cancelText: String? = ""
+  var cancelText: String? = nil
 
   @Field
-  var action1Text: String? = ""
+  var action1Text: String? = nil
 
   @Field
-  var action2Text: String? = ""
+  var action2Text: String? = nil
 }

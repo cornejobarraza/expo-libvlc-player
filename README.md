@@ -266,9 +266,9 @@ interface Dialog {
   title: string;
   text: string;
   type: "error" | "login" | "question";
-  cancelText?: string;
-  action1Text?: string;
-  action2Text?: string;
+  cancelText: string | null;
+  action1Text: string | null;
+  action2Text: string | null;
 }
 ```
 
@@ -339,10 +339,10 @@ interface VideoInfo {
 
 ```ts
 interface MediaMetadata {
-  title?: string;
-  artist?: string;
-  album?: string;
-  artworkURL?: string;
+  title: string | null;
+  artist: string | null;
+  album: string | null;
+  artworkURL: string | null;
 }
 ```
 

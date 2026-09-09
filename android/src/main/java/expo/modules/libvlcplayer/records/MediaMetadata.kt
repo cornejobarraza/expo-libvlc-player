@@ -5,9 +5,9 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 class MediaMetadata(
-  @Field var title: String? = "",
-  @Field var artist: String? = "",
-  @Field var album: String? = "",
-  @Field var artworkURL: String? = "",
+  @Field var title: String? = null,
+  @Field var artist: String? = null,
+  @Field var album: String? = null,
+  @Field var artworkURL: String? = null,
 ) : Record,
   Serializable

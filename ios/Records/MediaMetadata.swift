@@ -2,14 +2,14 @@ import ExpoModulesCore
 
 struct MediaMetadata: Record {
   @Field
-  var title: String? = ""
+  var title: String? = nil
 
   @Field
-  var artist: String? = ""
+  var artist: String? = nil
 
   @Field
-  var album: String? = ""
+  var album: String? = nil
 
   @Field
-  var artworkURL: String? = ""
+  var artworkURL: String? = nil
 }

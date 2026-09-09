@@ -196,9 +196,9 @@ export interface Dialog {
   title: string;
   text: string;
   type: "error" | "login" | "question";
-  cancelText?: string;
-  action1Text?: string;
-  action2Text?: string;
+  cancelText: string | null;
+  action1Text: string | null;
+  action2Text: string | null;
 }
 
 export interface Recording {
@@ -225,10 +225,10 @@ export interface VideoInfo {
 }
 
 export interface MediaMetadata {
-  title?: string;
-  artist?: string;
-  album?: string;
-  artworkURL?: string;
+  title: string | null;
+  artist: string | null;
+  album: string | null;
+  artworkURL: string | null;
 }
 
 export interface MediaInfo {
