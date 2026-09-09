@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.36 - 2026-09-08
+
+### 🐛 Bug fixes
+
+- Updated negative volume workaround
+
 ## 57.0.35 - 2026-09-08
 
 ### 🐛 Bug fixes
