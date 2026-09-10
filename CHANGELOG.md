@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.39 - 2026-09-10
+
+### 🐛 Bug fixes
+
+- Added missing plugin type declaration
+
 ## 57.0.38 - 2026-09-09
 
 ### 🐛 Bug fixes
