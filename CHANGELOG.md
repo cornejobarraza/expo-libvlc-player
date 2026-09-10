@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.40 - 2026-09-10
+
+### 🐛 Bug fixes
+
+- Increased auto ratio timeout delay
+
 ## 57.0.39 - 2026-09-10
 
 ### 🐛 Bug fixes
