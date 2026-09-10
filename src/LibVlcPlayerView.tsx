@@ -94,7 +94,9 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
           const nextRatio = validRatio ? mediaRatio : fallbackRatio;
 
           // View resizing workaround
-          ratioTimeoutRef.current = setTimeout(() => setAutoRatio(nextRatio), RATIO_TIMEOUT);
+          const ratioTimeout = setTimeout(() => setAutoRatio(nextRatio), RATIO_TIMEOUT);
+          ratioTimeoutRef.current = ratioTimeout;
+
           onFirstPlay?.(mediaInfo);
         }}
       />

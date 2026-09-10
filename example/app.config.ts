@@ -20,5 +20,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: "expo.modules.libvlcplayer.example",
     supportsTablet: true,
   },
-  plugins: ["../app.plugin.js", "expo-font"],
+  plugins: ["expo-font"],
 });
