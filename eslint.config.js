@@ -13,7 +13,7 @@ module.exports = defineConfig([
     },
   },
   {
-    files: ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
+    files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parserOptions: {
         project: ["./tsconfig.eslint.json", "./example/tsconfig.json"],
