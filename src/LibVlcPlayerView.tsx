@@ -18,7 +18,7 @@ const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
 const CHILDREN_WARNING =
   "The <LibVlcPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the LibVlcPlayer, consider using absolute positioning";
 
-const RATIO_TIMEOUT = 250;
+const RATIO_DELAY = 300;
 
 const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
   const {
@@ -94,7 +94,7 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
           const nextRatio = validRatio ? mediaRatio : fallbackRatio;
 
           // View resizing workaround
-          const ratioTimeout = setTimeout(() => setAutoRatio(nextRatio), RATIO_TIMEOUT);
+          const ratioTimeout = setTimeout(() => setAutoRatio(nextRatio), RATIO_DELAY);
           ratioTimeoutRef.current = ratioTimeout;
 
           onFirstPlay?.(mediaInfo);
