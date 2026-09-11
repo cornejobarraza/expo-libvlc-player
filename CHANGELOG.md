@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.43 - 2026-09-11
+
+### 💡 Others
+
+- Fixed View functions table
+
 ## 57.0.42 - 2026-09-11
 
 ### 🐛 Bug fixes
