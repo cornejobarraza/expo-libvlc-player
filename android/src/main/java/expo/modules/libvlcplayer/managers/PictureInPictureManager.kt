@@ -359,4 +359,4 @@ class PictureInPictureUnsupportedException :
   CodedException("Picture-in-Picture (PiP) mode is not supported on this device")
 
 class PictureInPictureUnallowedException :
-  CodedException("Picture-in-Picture (PiP) mode must be allowed on this player")
+  CodedException("Picture-in-Picture (PiP) mode must be allowed for this player")

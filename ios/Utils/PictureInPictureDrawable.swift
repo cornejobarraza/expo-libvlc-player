@@ -111,6 +111,6 @@ final class PictureInPictureUnsupportedException: Exception, @unchecked Sendable
 
 final class PictureInPictureUnallowedException: Exception, @unchecked Sendable {
   override var reason: String {
-    "Picture-in-Picture (PiP) mode must be allowed on this player"
+    "Picture-in-Picture (PiP) mode must be allowed for this player"
   }
 }
