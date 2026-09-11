@@ -25,7 +25,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Sets the time or position of the current player
    *
-   * @param value - Must be a number equal or greater than `0`
+   * @param value - Must be `0` or greater
    * @param type - Defaults to time
    *
    * @returns A promise which resolves to `void`
@@ -34,7 +34,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Starts or stops recording the current media
    *
-   * @param path - Must be a valid directory or `undefined` to stop recording
+   * @param path - Must be a valid directory, or `undefined` to stop recording
    *
    * @returns A promise which resolves to `void`
    */
@@ -50,7 +50,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Posts an answer to a question dialog
    *
-   * @param action - Must be either `1` or `2`
+   * @param action - Which dialog action to perform
    *
    * @returns A promise which resolves to `void`
    */
@@ -74,7 +74,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Enters Picture-in-Picture (PiP) mode
    *
-   * @note Config plugin has to be configured for Picture-in-Picture (PiP) to work
+   * @note Config plugin has to be configured for PiP to work
    *
    * @returns A promise which resolves to `void`
    */
@@ -128,15 +128,15 @@ type NativeAspectRatioProps =
 type AspectRatioProps =
   | {
       /**
-       * Sets the container aspect ratio. Must be a valid ratio, number, or auto.
+       * Sets the container aspect ratio.
        *
-       * If auto, a fallback ratio must be provided
+       * When set to auto, a fallback ratio is required
        *
        * @default undefined
        */
       aspectRatio: "auto";
       /**
-       * Sets the fallback aspect ratio. Must be a valid ratio or number
+       * Sets the fallback aspect ratio
        *
        * @default undefined
        */
@@ -144,15 +144,15 @@ type AspectRatioProps =
     }
   | {
       /**
-       * Sets the container aspect ratio. Must be a valid ratio, number, or auto.
+       * Sets the container aspect ratio.
        *
-       * If auto, a fallback ratio must be provided
+       * When set to auto, a fallback ratio is required
        *
        * @default undefined
        */
       aspectRatio?: VideoAspectRatio;
       /**
-       * Sets the fallback aspect ratio. Must be a valid ratio or number
+       * Sets the fallback aspect ratio
        *
        * @default undefined
        */
@@ -455,7 +455,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     delays?: Delays;
     /**
-     * Sets the player scaling factor. Must be a valid number
+     * Sets the player scaling factor
      *
      * @default 0
      */
@@ -467,19 +467,19 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     contentFit?: VideoContentFit;
     /**
-     * Sets the player playback rate. Must be a valid number
+     * Sets the player playback rate
      *
      * @default 1
      */
     rate?: number;
     /**
-     * Sets the initial player time in milliseconds. Must be a number equal or greater than `0`
+     * Sets the initial player time in milliseconds. Must be `0` or greater
      *
      * @default 0
      */
     time?: number;
     /**
-     * Sets the player volume. Must be a number between `0` and `100`
+     * Sets the player volume. Must be between `0` and `100`
      *
      * @default 100
      */
