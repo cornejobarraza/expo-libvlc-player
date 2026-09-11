@@ -10,6 +10,17 @@
 
 ### 💡 Others
 
+## 57.0.42 - 2026-09-11
+
+### 🐛 Bug fixes
+
+- Fixed login password parameter
+
+### 💡 Others
+
+- Updated PiP exception wording
+- Updated module documentation
+
 ## 57.0.41 - 2026-09-11
 
 ### 💡 Others
