@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.node",
+  "extends": "./node",
   "compilerOptions": {
     "sourceMap": false
   }

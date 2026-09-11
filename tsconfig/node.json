@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.base",
+  "extends": "./base",
   "compilerOptions": {
     "declarationMap": false,
     "inlineSources": false,

@@ -1,11 +1,9 @@
 {
-  "extends": "./tsconfig.base",
+  "extends": "./tsconfig/base",
   "compilerOptions": {
-    "declarationMap": true,
-    "jsx": "react-native",
+    "composite": true,
     "outDir": "./build",
     "rootDir": "./src",
-    "sourceMap": true,
     "types": ["jest"]
   },
   "include": ["./src"],

@@ -1,10 +1,10 @@
 {
-  "extends": "../tsconfig.plugin",
+  "extends": "../tsconfig/plugin",
   "compilerOptions": {
     "composite": true,
     "outDir": "./build",
     "rootDir": "./src",
-    "types": ["node", "jest"]
+    "types": ["jest"]
   },
   "include": ["./src"],
   "exclude": ["./src/**/__tests__"]

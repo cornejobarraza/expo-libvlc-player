@@ -3,6 +3,7 @@
     "allowSyntheticDefaultImports": true,
     "customConditions": ["expo-source"],
     "declaration": true,
+    "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
@@ -16,6 +17,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": false,
     "skipLibCheck": true,
+    "sourceMap": true,
     "strict": true,
     "tsBuildInfoFile": "${configDir}/.tsbuildinfo"
   }

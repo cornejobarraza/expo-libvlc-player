@@ -9,7 +9,11 @@
 /android/build/
 /example/
 
-# Tests
+# TypeScript
+/tsconfig/
+*.tsbuildinfo
+
+# Jest
 __tests__/
 coverage/**/*
 
@@ -21,5 +25,3 @@ coverage/**/*
 /eslint.config.js
 /lint-staged.config.js
 /package-lock.json
-/tsconfig.*.json
-*.tsbuildinfo

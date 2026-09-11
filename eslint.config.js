@@ -16,7 +16,7 @@ module.exports = defineConfig([
     files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parserOptions: {
-        project: ["./tsconfig.eslint.json", "./example/tsconfig.json"],
+        project: ["./tsconfig/eslint.json", "./example/tsconfig.json"],
       },
     },
     rules: {
