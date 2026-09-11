@@ -56,7 +56,6 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
       name: "stop.fill",
       onPress: () => {
         playerRef.current?.stop();
-        setBackgrounded(false);
       },
     },
     {

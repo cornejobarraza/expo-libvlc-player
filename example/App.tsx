@@ -8,7 +8,6 @@ import { useFullScreen } from "./hooks/useFullScreen";
 
 export default function App() {
   const fullScreen = useFullScreen();
-
   const padding = !fullScreen ? styles.app.padding : undefined;
 
   return (
