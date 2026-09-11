@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.41 - 2026-09-11
+
+### 💡 Others
+
+- Bumped Expo dependency to 57.0.22
+
 ## 57.0.40 - 2026-09-10
 
 ### 🐛 Bug fixes
