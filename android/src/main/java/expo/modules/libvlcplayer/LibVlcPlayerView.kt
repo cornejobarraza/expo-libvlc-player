@@ -762,13 +762,13 @@ class LibVlcPlayerView(
 
   fun postLogin(
     username: String,
-    password: String,
+    password: String?,
     store: Boolean? = false,
   ) {
     vlcDialog?.let { dialog ->
       when (dialog) {
         is VLCDialog.LoginDialog -> {
-          dialog.postLogin(username, password, store ?: false)
+          dialog.postLogin(username, password ?: "", store ?: false)
           vlcDialog = null
         }
       }

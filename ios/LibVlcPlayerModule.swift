@@ -157,7 +157,7 @@ public class LibVlcPlayerModule: Module {
       AsyncFunction("postLogin") { (
         view: LibVlcPlayerView,
         username: String,
-        password: String,
+        password: String?,
         store: Bool?
       ) in
         view.postLogin(username, password, store)
