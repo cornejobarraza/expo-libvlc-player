@@ -34,6 +34,10 @@ function git(args, options = {}) {
   return result.stdout;
 }
 
+function hasChanges(diffArgs, paths) {
+  return git(["diff", ...diffArgs, "--name-only", "--", ...paths]).trim().length > 0;
+}
+
 function pack(cwd) {
   const result = run("npm", ["pack", "--dry-run", "--json"], {
     cwd,
@@ -46,10 +50,6 @@ function pack(cwd) {
   const data = JSON.parse(result.stdout.slice(jsonStart));
 
   return data[0].files.map((file) => file.path);
-}
-
-function patch() {
-  run("npm", ["version", "patch"]);
 }
 
 function packAtRef(ref) {
@@ -73,6 +73,14 @@ function packAtRef(ref) {
   }
 }
 
+function test() {
+  run("npm", ["run", "test"], { cwd: path.join(REPO_ROOT, "example") });
+}
+
+function patch() {
+  run("npm", ["version", "patch"]);
+}
+
 function trackedFiles(paths) {
   if (paths.length === 0) return new Set();
   const result = git(["ls-files", "-z", "--", ...paths]);
@@ -81,9 +89,15 @@ function trackedFiles(paths) {
 
 function main() {
   const options = parseArgs(process.argv.slice(2));
+  const inWorkingTree = options.ref === "HEAD";
   const latestTag = git(["describe", "--tags", "--abbrev=0"]).trim();
   const tag = options.tag || latestTag;
-  const inWorkingTree = options.ref === "HEAD";
+  const diffArgs = inWorkingTree ? [tag] : [tag, options.ref];
+
+  if (!hasChanges(diffArgs, ["CHANGELOG.md"])) {
+    console.error("Update CHANGELOG.md before patching");
+    process.exit(1);
+  }
 
   console.log(`Latest tag: ${tag}`);
   console.log(`Comparing against: ${options.ref}${inWorkingTree ? " (working tree)" : ""}`);
@@ -108,7 +122,6 @@ function main() {
   const trackedDiffPaths = diffPaths.filter((file) => !untracked.has(file));
 
   if (trackedDiffPaths.length > 0) {
-    const diffArgs = inWorkingTree ? [tag] : [tag, options.ref];
     const fullArgs = ["diff", ...diffArgs, "--stat", "--", ...trackedDiffPaths];
     const lineBreak = !options.dry ? "\n" : "";
     const diffOutput = git(fullArgs);
@@ -118,7 +131,7 @@ function main() {
       process.stdout.write(`${diffOutput}${lineBreak}`);
 
       if (added.length > 0 || removed.length > 0) {
-        console.log(`\n⚠️  Tarball contents changed${lineBreak}`);
+        console.warn(`\n⚠️  Tarball contents changed${lineBreak}`);
       }
     } else {
       console.log(`\nNo files changed${lineBreak}`);
@@ -126,6 +139,15 @@ function main() {
   }
 
   if (!options.dry) {
+    const android = hasChanges(diffArgs, ["android"]);
+    const ios = hasChanges(diffArgs, ["ios"]);
+    const darwin = process.platform === "darwin";
+
+    if (android) console.log("Running Android tests");
+    if (ios && darwin) console.log("Running iOS tests");
+    if (ios && !darwin) console.log("Skipping iOS tests");
+
+    if (android || ios) test(diffArgs);
     patch();
   }
 }
