@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.45 - 2026-09-11
+
+### 💡 Others
+
+- Replaced README \<br\> with \<div\>
+
 ## 57.0.44 - 2026-09-11
 
 ### 💡 Others
