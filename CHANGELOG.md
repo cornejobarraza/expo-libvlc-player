@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.44 - 2026-09-11
+
+### 💡 Others
+
+- Reoredered some player logic
+
 ## 57.0.43 - 2026-09-11
 
 ### 💡 Others
