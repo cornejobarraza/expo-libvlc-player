@@ -159,8 +159,7 @@ class LibVlcPlayerModule : Module() {
         }
 
         OnViewDestroys { view: LibVlcPlayerView ->
-          MediaPlayerManager.unregisterExpoView(view)
-          view.destroyPlayer()
+          view.deinit()
         }
 
         AsyncFunction("play") { view: LibVlcPlayerView ->

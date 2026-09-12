@@ -92,15 +92,18 @@ class LibVlcPlayerView(
     MediaPlayerManager.registerExpoView(this)
   }
 
+  fun deinit() {
+    MediaPlayerManager.unregisterExpoView(this)
+    destroyPlayer()
+  }
+
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
-
     attachPlayerLayout(playerLayout)
   }
 
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
-
     detachPlayerLayout()
   }
 
@@ -111,13 +114,12 @@ class LibVlcPlayerView(
     oldh: Int,
   ) {
     super.onSizeChanged(w, h, oldw, oldh)
-
     applyContentFit()
   }
 
   // Release builds bundle assets into res/raw
   @Suppress("DiscouragedApi")
-  private fun getSourceId(source: String): Int? {
+  fun getSourceId(source: String): Int? {
     if (Uri.parse(source).scheme != null) return null
 
     val identifier = context.resources.getIdentifier(source, "raw", context.packageName)
@@ -125,7 +127,7 @@ class LibVlcPlayerView(
     return identifier.takeIf { it != 0 }
   }
 
-  private fun openSourceFd(source: String): AssetFileDescriptor? {
+  fun openSourceFd(source: String): AssetFileDescriptor? {
     val sourceId = getSourceId(source) ?: return null
 
     sourceFd =
@@ -138,7 +140,7 @@ class LibVlcPlayerView(
     return sourceFd
   }
 
-  private fun createMedia(
+  fun createMedia(
     libVLC: LibVLC,
     source: String,
   ): Media {
@@ -151,7 +153,7 @@ class LibVlcPlayerView(
     }
   }
 
-  private fun getSourceUri(source: String): Uri {
+  fun getSourceUri(source: String): Uri {
     val sourceUri = Uri.parse(source)
     val sourceId = getSourceId(source) ?: return sourceUri
     val cacheDir = File(context.cacheDir, MediaPlayerConstants.SOURCE_CACHE_DIR)
@@ -281,6 +283,40 @@ class LibVlcPlayerView(
     removeAllViews()
   }
 
+  fun setupPlayer() {
+    post {
+      mediaPlayer?.let { player ->
+        if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
+          player.setScale(scale.toFloat())
+        }
+
+        if (rate != MediaPlayerConstants.DEFAULT_PLAYER_RATE) {
+          player.setRate(rate.toFloat())
+        }
+
+        if (time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
+          player.setTime(time.toLong())
+        }
+
+        // Negative volume workaround
+        retryUntil {
+          val newVolume =
+            if (mute) {
+              MediaPlayerConstants.MIN_PLAYER_VOLUME
+            } else {
+              volume
+            }
+
+          player.setVolume(newVolume)
+
+          return@retryUntil false
+        }
+
+        time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
+      }
+    }
+  }
+
   fun addPlayerSlaves(slaves: List<Slave>) {
     slaves.forEach { slave ->
       val source = slave.source
@@ -397,40 +433,6 @@ class LibVlcPlayerView(
     setContentFit(layout = pictureLayout)
   }
 
-  fun setupPlayer() {
-    post {
-      mediaPlayer?.let { player ->
-        if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
-          player.setScale(scale.toFloat())
-        }
-
-        if (rate != MediaPlayerConstants.DEFAULT_PLAYER_RATE) {
-          player.setRate(rate.toFloat())
-        }
-
-        if (time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
-          player.setTime(time.toLong())
-        }
-
-        // Negative volume workaround
-        retryUntil {
-          val newVolume =
-            if (mute) {
-              MediaPlayerConstants.MIN_PLAYER_VOLUME
-            } else {
-              volume
-            }
-
-          player.setVolume(newVolume)
-
-          return@retryUntil false
-        }
-
-        time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
-      }
-    }
-  }
-
   fun getMediaTracks(): MediaTracks {
     val player = mediaPlayer ?: return MediaTracks()
 
@@ -467,8 +469,6 @@ class LibVlcPlayerView(
     )
   }
 
-  fun getMediaLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
-
   fun getVideoInfo(): VideoInfo {
     val video =
       mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Video) as? IMedia.VideoTrack
@@ -498,6 +498,8 @@ class LibVlcPlayerView(
       artworkURL = media.getMeta(IMedia.Meta.ArtworkURL),
     )
   }
+
+  fun getMediaLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
 
   fun getMediaInfo(): MediaInfo {
     val video = getVideoInfo()
@@ -836,18 +838,8 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
 
                             if (firstPlay) {
                                 setupPlayer()
-
                                 setPlayerTracks()
-
                                 setPlayerDelays()
-
-                                retryUntil { isLastAttempt ->
-                                    if (hasMediaLength || isLastAttempt) {
-                                        onFirstPlay(getMediaInfo())
-                                    }
-
-                                    return@retryUntil hasMediaLength
-                                }
 
                                 retryUntil {
                                     if (hasVideoSize) {
@@ -865,6 +857,14 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                                     return@retryUntil hasMediaVolume
                                 }
 
+                                retryUntil { isLastAttempt ->
+                                    if (hasMediaLength || isLastAttempt) {
+                                        onFirstPlay(getMediaInfo())
+                                    }
+
+                                    return@retryUntil hasMediaLength
+                                }
+
                                 firstPlay = false
                             }
                         }
@@ -874,16 +874,14 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
                         }
 
                         if (type == Event.Stopped) {
-                            onStopped(Unit)
-
                             resetPlayer()
-
-                            firstPlay = true
+                            onStopped(Unit)
 
                             if (repeat && !userStop) {
                                 player.play()
                             }
 
+                            firstPlay = true
                             userStop = false
                         }
 
@@ -898,7 +896,6 @@ fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
 
                     Event.EncounteredError -> {
                         onEncounteredError(mapOf("message" to "Player encountered an error"))
-
                         player.stop()
                     }
 

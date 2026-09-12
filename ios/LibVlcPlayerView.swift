@@ -38,10 +38,8 @@ class LibVlcPlayerView: ExpoView {
 
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
-
     pictureDrawable = PictureInPictureDrawable(self)
     clipsToBounds = true
-
     MediaPlayerManager.shared.registerExpoView(self)
   }
 
@@ -115,6 +113,41 @@ class LibVlcPlayerView: ExpoView {
     mediaPlayer = nil
     vlcDialog?.customRenderer = nil
     vlcDialog = nil
+  }
+
+  func setupPlayer() {
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+
+      if let player = mediaPlayer {
+        if scale != MediaPlayerConstants.defaultPlayerScale {
+          player.scaleFactor = Float(scale)
+        }
+
+        if rate != MediaPlayerConstants.defaultPlayerRate {
+          player.rate = Float(rate)
+        }
+
+        if time != MediaPlayerConstants.defaultPlayerTime {
+          player.time = VLCTime(int: Int32(time))
+        }
+
+        // Negative volume workaround
+        retryUntil { [weak self] _ in
+          guard let self else { return true }
+
+          let newVolume = mute ?
+            MediaPlayerConstants.minPlayerVolume :
+            volume
+
+          player.audio?.volume = Int32(newVolume)
+
+          return false
+        }
+
+        time = MediaPlayerConstants.defaultPlayerTime
+      }
+    }
   }
 
   func addPlayerSlaves(_ slaves: [Slave]) {
@@ -215,41 +248,6 @@ class LibVlcPlayerView: ExpoView {
     setContentFit(drawable: pictureDrawable)
   }
 
-  func setupPlayer() {
-    DispatchQueue.main.async { [weak self] in
-      guard let self else { return }
-
-      if let player = mediaPlayer {
-        if scale != MediaPlayerConstants.defaultPlayerScale {
-          player.scaleFactor = Float(scale)
-        }
-
-        if rate != MediaPlayerConstants.defaultPlayerRate {
-          player.rate = Float(rate)
-        }
-
-        if time != MediaPlayerConstants.defaultPlayerTime {
-          player.time = VLCTime(int: Int32(time))
-        }
-
-        // Negative volume workaround
-        retryUntil { [weak self] _ in
-          guard let self else { return true }
-
-          let newVolume = mute ?
-            MediaPlayerConstants.minPlayerVolume :
-            volume
-
-          player.audio?.volume = Int32(newVolume)
-
-          return false
-        }
-
-        time = MediaPlayerConstants.defaultPlayerTime
-      }
-    }
-  }
-
   func getMediaTracks() -> MediaTracks {
     guard let player = mediaPlayer else { return MediaTracks() }
 
@@ -277,10 +275,6 @@ class LibVlcPlayerView: ExpoView {
       video: video,
       subtitle: subtitle
     )
-  }
-
-  func getMediaLength() -> Int {
-    Int(mediaPlayer?.media?.length.intValue ?? 0)
   }
 
   func getVideoInfo() -> VideoInfo {
@@ -313,6 +307,10 @@ class LibVlcPlayerView: ExpoView {
       album: metaData.album,
       artworkURL: metaData.artworkURL?.absoluteString
     )
+  }
+
+  func getMediaLength() -> Int {
+    Int(mediaPlayer?.media?.length.intValue ?? 0)
   }
 
   func getMediaInfo() -> MediaInfo {
@@ -610,20 +608,8 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
 
           if firstPlay {
             setupPlayer()
-
             setPlayerTracks()
-
             setPlayerDelays()
-
-            retryUntil { [weak self] isLastAttempt in
-              guard let self else { return true }
-
-              if hasMediaLength || isLastAttempt {
-                onFirstPlay(getMediaInfo())
-              }
-
-              return hasMediaLength
-            }
 
             retryUntil { [weak self] _ in
               guard let self else { return true }
@@ -646,6 +632,16 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
               return hasMediaVolume
             }
 
+            retryUntil { [weak self] isLastAttempt in
+              guard let self else { return true }
+
+              if hasMediaLength || isLastAttempt {
+                onFirstPlay(getMediaInfo())
+              }
+
+              return hasMediaLength
+            }
+
             firstPlay = false
           }
         }
@@ -657,12 +653,11 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
         if newState == .stopped {
           onStopped()
 
-          firstPlay = true
-
           if Repeat, !userStop {
             player.play()
           }
 
+          firstPlay = true
           userStop = false
         }
 
@@ -690,7 +685,6 @@ extension LibVlcPlayerView: VLCMediaPlayerDelegate {
   func mediaPlayerTimeChanged(_: Notification) {
     if let player = mediaPlayer {
       onTimeChanged(["value": player.time.intValue])
-
       onPositionChanged(["value": player.position])
     }
   }
