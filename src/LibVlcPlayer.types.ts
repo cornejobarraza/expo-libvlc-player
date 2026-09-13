@@ -93,16 +93,16 @@ export type LibVlcSource = string | number | null;
 
 export type LibVlcSlaveSource = string | number;
 
-export interface Tracks {
-  audio?: number;
-  video?: number;
-  subtitle?: number;
-}
-
 export interface Slave {
   source: LibVlcSlaveSource;
   type: "audio" | "subtitle";
   selected?: boolean;
+}
+
+export interface Tracks {
+  audio?: number;
+  video?: number;
+  subtitle?: number;
 }
 
 export interface Delays {
@@ -180,18 +180,6 @@ export interface Error {
   message: string;
 }
 
-export interface Time {
-  value: number;
-}
-
-export interface Position {
-  value: number;
-}
-
-export interface Snapshot {
-  path: string;
-}
-
 export interface Dialog {
   title: string;
   text: string;
@@ -201,9 +189,12 @@ export interface Dialog {
   action2Text: string | null;
 }
 
-export interface Recording {
-  path: string | null;
-  isRecording: boolean;
+export interface Time {
+  value: number;
+}
+
+export interface Position {
+  value: number;
 }
 
 export interface MediaTrack {
@@ -217,6 +208,15 @@ export interface MediaTracks {
   subtitle: MediaTrack[];
 }
 
+export interface Recording {
+  path: string | null;
+  isRecording: boolean;
+}
+
+export interface Snapshot {
+  path: string;
+}
+
 export interface Media {
   bitrate: number;
   length: number;
@@ -226,7 +226,6 @@ export interface Media {
 export interface Metadata {
   title: string | null;
   artist: string | null;
-  album: string | null;
   artworkURL: string | null;
 }
 
@@ -271,6 +270,11 @@ type EncounteredErrorListener = (event: NativeEvent<Error>) => void;
 /**
  * @hidden
  */
+type DialogDisplayListener = (event: NativeEvent<Dialog>) => void;
+
+/**
+ * @hidden
+ */
 type TimeChangedListener = (event: NativeEvent<Time>) => void;
 
 /**
@@ -292,11 +296,6 @@ type RecordChangedListener = (event: NativeEvent<Recording>) => void;
  * @hidden
  */
 type SnapshotTakenListener = (event: NativeEvent<Snapshot>) => void;
-
-/**
- * @hidden
- */
-type DialogDisplayListener = (event: NativeEvent<Dialog>) => void;
 
 /**
  * @hidden
