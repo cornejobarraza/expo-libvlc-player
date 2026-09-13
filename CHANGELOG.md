@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 57.0.46 - 2026-09-12
+
+### 🛠 Breaking changes
+
+- Refactored MediaInfo payload
+
+### 💡 Others
+
+- Reordered some module types
+
 ## 57.0.45 - 2026-09-11
 
 ### 💡 Others
