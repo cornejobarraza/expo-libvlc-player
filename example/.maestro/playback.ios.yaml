@@ -1,4 +1,4 @@
-appId: expo.modules.libvlcplayer.example
+appId: expo.modules.libvlcplayer.ios
 ---
 - launchApp:
     clearState: true

@@ -8,7 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: "portrait",
   icon: "./assets/icon.png",
   android: {
-    package: "expo.modules.libvlcplayer.example",
+    package: "expo.modules.libvlcplayer.android",
     adaptiveIcon: {
       backgroundColor: "#e6f4fe",
       foregroundImage: "./assets/android-icon-foreground.png",
@@ -17,7 +17,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
   },
   ios: {
-    bundleIdentifier: "expo.modules.libvlcplayer.example",
+    bundleIdentifier: "expo.modules.libvlcplayer.ios",
     supportsTablet: true,
   },
   plugins: ["expo-font"],

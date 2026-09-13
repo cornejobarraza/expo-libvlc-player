@@ -6,15 +6,17 @@ const path = require("path");
 
 const { run } = require("./utils");
 
-const REPO_ROOT = path.resolve(__dirname, "..");
+const darwin = process.platform === "darwin";
+const repo_root = path.resolve(__dirname, "..");
 
 function parseArgs(argv) {
-  const options = { tag: null, ref: "HEAD", dry: false };
+  const options = { tag: null, ref: "HEAD", dryRun: false, skipTests: false };
 
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--tag") options.tag = argv[++i];
     else if (argv[i] === "--ref") options.ref = argv[++i];
-    else if (argv[i] === "--dry-run") options.dry = !options.dry;
+    else if (argv[i] === "--dry-run") options.dryRun = !options.dryRun;
+    else if (argv[i] === "--skip-tests") options.skipTests = !options.skipTests;
     else {
       console.error(`Unknown argument: ${argv[i]}`);
       process.exit(1);
@@ -26,7 +28,7 @@ function parseArgs(argv) {
 
 function git(args, options = {}) {
   const result = run("git", args, {
-    cwd: REPO_ROOT,
+    cwd: repo_root,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
     ...options,
@@ -59,7 +61,7 @@ function packAtRef(ref) {
   try {
     try {
       fs.symlinkSync(
-        path.join(REPO_ROOT, "node_modules"),
+        path.join(repo_root, "node_modules"),
         path.join(tmpDir, "node_modules"),
         process.platform === "win32" ? "junction" : "dir"
       );
@@ -73,8 +75,30 @@ function packAtRef(ref) {
   }
 }
 
-function test() {
-  run("npm", ["run", "test"], { cwd: path.join(REPO_ROOT, "example") });
+function test(platform) {
+  run("npm", ["run", `test:${platform}`], { cwd: path.join(repo_root, "example") });
+}
+
+function tests(diffArgs) {
+  if (hasChanges(diffArgs, ["android"])) {
+    if (!darwin) {
+      console.log("Running Android tests");
+      test("android");
+      console.log("");
+    } else {
+      console.log("Skipping Android tests\n");
+    }
+  }
+
+  if (hasChanges(diffArgs, ["ios"])) {
+    if (darwin) {
+      console.log("Running iOS tests");
+      test("ios");
+      console.log("");
+    } else {
+      console.log("Skipping iOS tests\n");
+    }
+  }
 }
 
 function patch() {
@@ -103,7 +127,7 @@ function main() {
   console.log(`Comparing against: ${options.ref}${inWorkingTree ? " (working tree)" : ""}`);
 
   const tagFiles = new Set(packAtRef(tag));
-  const refFiles = new Set(inWorkingTree ? pack(REPO_ROOT) : packAtRef(options.ref));
+  const refFiles = new Set(inWorkingTree ? pack(repo_root) : packAtRef(options.ref));
 
   const added = [...refFiles].filter((file) => !tagFiles.has(file)).sort();
   const removed = [...tagFiles].filter((file) => !refFiles.has(file)).sort();
@@ -123,7 +147,7 @@ function main() {
 
   if (trackedDiffPaths.length > 0) {
     const fullArgs = ["diff", ...diffArgs, "--stat", "--", ...trackedDiffPaths];
-    const lineBreak = !options.dry ? "\n" : "";
+    const lineBreak = !options.dryRun ? "\n" : "";
     const diffOutput = git(fullArgs);
 
     if (diffOutput) {
@@ -131,23 +155,18 @@ function main() {
       process.stdout.write(`${diffOutput}${lineBreak}`);
 
       if (added.length > 0 || removed.length > 0) {
-        console.warn(`\n⚠️  Tarball contents changed${lineBreak}`);
+        console.warn(`⚠️  Tarball contents changed${lineBreak}`);
       }
     } else {
       console.log(`\nNo files changed${lineBreak}`);
     }
   }
 
-  if (!options.dry) {
-    const android = hasChanges(diffArgs, ["android"]);
-    const ios = hasChanges(diffArgs, ["ios"]);
-    const darwin = process.platform === "darwin";
+  if (!options.dryRun) {
+    if (!options.skipTests) {
+      tests(diffArgs);
+    }
 
-    if (android) console.log("Running Android tests");
-    if (ios && darwin) console.log("Running iOS tests");
-    if (ios && !darwin) console.log("Skipping iOS tests");
-
-    if (android || ios) test(diffArgs);
     patch();
   }
 }
