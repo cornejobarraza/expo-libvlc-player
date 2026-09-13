@@ -1,6 +1,6 @@
 import ExpoModulesCore
 
-struct MediaMetadata: Record {
+struct Metadata: Record {
   @Field
   var title: String? = nil
 

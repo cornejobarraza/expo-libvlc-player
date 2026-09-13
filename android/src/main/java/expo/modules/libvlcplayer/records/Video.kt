@@ -4,7 +4,7 @@ import expo.modules.kotlin.records.Field
 import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
-class VideoInfo(
+class Video(
   @Field var width: Int = 0,
   @Field var height: Int = 0,
   @Field var frameRate: Int = 0,

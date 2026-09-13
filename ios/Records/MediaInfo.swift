@@ -2,14 +2,11 @@ import ExpoModulesCore
 
 struct MediaInfo: Record {
   @Field
-  var video: VideoInfo = .init()
+  var media: Media = .init()
 
   @Field
-  var metadata: MediaMetadata = .init()
+  var metadata: Metadata = .init()
 
   @Field
-  var length: Int = 0
-
-  @Field
-  var seekable: Bool = false
+  var video: Video = .init()
 }

@@ -1,6 +1,6 @@
 import ExpoModulesCore
 
-struct VideoInfo: Record {
+struct Video: Record {
   @Field
   var width: Int = 0
 

@@ -209,7 +209,7 @@ class LibVlcPlayerView: ExpoView {
 
       var transform: CGAffineTransform = .identity
 
-      let video = getVideoInfo()
+      let video = getVideo()
 
       if hasVideoSize == true {
         let viewAspect = drawable.frame.size.width / drawable.frame.size.height
@@ -277,63 +277,83 @@ class LibVlcPlayerView: ExpoView {
     )
   }
 
-  func getVideoInfo() -> VideoInfo {
-    guard let track = mediaPlayer?.videoTracks.first(where: { $0.isSelected }),
-          let video = track.video
-    else {
-      return VideoInfo()
-    }
-
-    let frameRate = video.frameRateDenominator != 0 ?
-      video.frameRate / video.frameRateDenominator :
-      0
-
-    return VideoInfo(
-      width: Int(video.width),
-      height: Int(video.height),
-      frameRate: Int(frameRate),
-      bitrate: Int(track.bitrate)
-    )
-  }
-
-  func getMediaMetadata() -> MediaMetadata {
-    guard let metaData = mediaPlayer?.media?.metaData else {
-      return MediaMetadata()
-    }
-
-    return MediaMetadata(
-      title: metaData.title,
-      artist: metaData.artist,
-      album: metaData.album,
-      artworkURL: metaData.artworkURL?.absoluteString
-    )
-  }
-
-  func getMediaLength() -> Int {
-    Int(mediaPlayer?.media?.length.intValue ?? 0)
-  }
-
-  func getMediaInfo() -> MediaInfo {
-    let video = getVideoInfo()
-    let metadata = getMediaMetadata()
-    let length = getMediaLength()
+  func getMedia() -> Media {
+    let bitrate = Int(mediaPlayer?.audioTracks.first(where: { track in
+      track.isSelected
+    })?.bitrate ?? 0)
+    let length = Int(mediaPlayer?.media?.length.intValue ?? 0)
     let seekable = mediaPlayer?.isSeekable ?? false
 
-    return MediaInfo(
-      video: video,
-      metadata: metadata,
+    return Media(
+      bitrate: bitrate,
       length: length,
       seekable: seekable
     )
   }
 
+  func getMetadata() -> Metadata {
+    guard let metaData = mediaPlayer?.media?.metaData else {
+      return Metadata()
+    }
+
+    let title = metaData.title
+    let artist = metaData.artist
+    let album = metaData.album
+    let artworkURL = metaData.artworkURL?.absoluteString
+
+    return Metadata(
+      title: title,
+      artist: artist,
+      album: album,
+      artworkURL: artworkURL
+    )
+  }
+
+  func getVideo() -> Video {
+    guard let track = mediaPlayer?.videoTracks.first(where: { track in track.isSelected }),
+          let video = track.video
+    else {
+      return Video()
+    }
+
+    let width = Int(video.width)
+    let height = Int(video.height)
+    let frameRate = video.frameRateDenominator != 0 ?
+      Int(video.frameRate / video.frameRateDenominator) :
+      0
+    let bitrate = Int(track.bitrate)
+
+    return Video(
+      width: width,
+      height: height,
+      frameRate: frameRate,
+      bitrate: bitrate
+    )
+  }
+
+  func getMediaInfo() -> MediaInfo {
+    let media = getMedia()
+    let metadata = getMetadata()
+    let video = getVideo()
+
+    return MediaInfo(
+      media: media,
+      metadata: metadata,
+      video: video
+    )
+  }
+
+  func getLength() -> Int {
+    Int(mediaPlayer?.media?.length.intValue ?? 0)
+  }
+
   var hasVideoSize: Bool {
-    let video = getVideoInfo()
+    let video = getVideo()
     return video.width > 0 && video.height > 0
   }
 
   var hasMediaLength: Bool {
-    let length = getMediaLength()
+    let length = getLength()
     return length > 0
   }
 

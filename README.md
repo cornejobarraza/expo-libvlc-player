@@ -324,21 +324,20 @@ interface Snapshot {
 }
 ```
 
-#### `VideoInfo`
+#### `Media`
 
 ```ts
-interface VideoInfo {
-  width: number;
-  height: number;
-  frameRate: number;
+interface Media {
   bitrate: number;
+  length: number;
+  seekable: boolean;
 }
 ```
 
-#### `MediaMetadata`
+#### `Metadata`
 
 ```ts
-interface MediaMetadata {
+interface Metadata {
   title: string | null;
   artist: string | null;
   album: string | null;
@@ -346,14 +345,24 @@ interface MediaMetadata {
 }
 ```
 
+#### `Video`
+
+```ts
+interface Video {
+  width: number;
+  height: number;
+  frameRate: number;
+  bitrate: number;
+}
+```
+
 #### `MediaInfo`
 
 ```ts
 interface MediaInfo {
-  video: VideoInfo;
-  metadata: MediaMetadata;
-  length: number;
-  seekable: boolean;
+  media: Media;
+  metadata: Metadata;
+  video: Video;
 }
 ```
 

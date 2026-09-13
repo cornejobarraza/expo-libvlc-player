@@ -1,5 +1,5 @@
 import { isDevice } from "expo-device";
-import { LibVlcPlayerView, type LibVlcPlayerViewRef, type MediaMetadata } from "expo-libvlc-player";
+import { LibVlcPlayerView, type LibVlcPlayerViewRef, type Metadata } from "expo-libvlc-player";
 import React, { useRef, useState } from "react";
 import { ActivityIndicator, Alert, Image, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -26,7 +26,7 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
   const [parsing, setParsing] = useState<boolean>(true);
-  const [metadata, setMetadata] = useState<MediaMetadata | null>(null);
+  const [metadata, setMetadata] = useState<Metadata | null>(null);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
 

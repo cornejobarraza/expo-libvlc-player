@@ -217,25 +217,30 @@ export interface MediaTracks {
   subtitle: MediaTrack[];
 }
 
-export interface VideoInfo {
-  width: number;
-  height: number;
-  frameRate: number;
+export interface Media {
   bitrate: number;
+  length: number;
+  seekable: boolean;
 }
 
-export interface MediaMetadata {
+export interface Metadata {
   title: string | null;
   artist: string | null;
   album: string | null;
   artworkURL: string | null;
 }
 
+export interface Video {
+  width: number;
+  height: number;
+  frameRate: number;
+  bitrate: number;
+}
+
 export interface MediaInfo {
-  video: VideoInfo;
-  metadata: MediaMetadata;
-  length: number;
-  seekable: boolean;
+  media: Media;
+  metadata: Metadata;
+  video: Video;
 }
 
 /**

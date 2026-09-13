@@ -21,21 +21,21 @@ import expo.modules.libvlcplayer.enums.VideoContentFit
 import expo.modules.libvlcplayer.managers.MediaPlayerManager
 import expo.modules.libvlcplayer.records.Delays
 import expo.modules.libvlcplayer.records.Dialog
+import expo.modules.libvlcplayer.records.Media
 import expo.modules.libvlcplayer.records.MediaInfo
-import expo.modules.libvlcplayer.records.MediaMetadata
 import expo.modules.libvlcplayer.records.MediaTrack
 import expo.modules.libvlcplayer.records.MediaTracks
+import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
-import expo.modules.libvlcplayer.records.VideoInfo
+import expo.modules.libvlcplayer.records.Video
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.videolan.libvlc.LibVLC
-import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.MediaPlayer.Event
 import org.videolan.libvlc.MediaPlayer.EventListener
@@ -48,6 +48,7 @@ import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import org.videolan.libvlc.Dialog as VLCDialog
+import org.videolan.libvlc.Media as VLCMedia
 
 private val DISPLAY_MANAGER: DisplayManager? = null
 private val ENABLE_SUBTITLES: Boolean = true
@@ -143,13 +144,13 @@ class LibVlcPlayerView(
   fun createMedia(
     libVLC: LibVLC,
     source: String,
-  ): Media {
+  ): VLCMedia {
     val file = openSourceFd(source)
 
     return if (file != null) {
-      Media(libVLC, file)
+      VLCMedia(libVLC, file)
     } else {
-      Media(libVLC, Uri.parse(source))
+      VLCMedia(libVLC, Uri.parse(source))
     }
   }
 
@@ -378,7 +379,7 @@ class LibVlcPlayerView(
       val view = getTextureView(layout) ?: return@post
       val matrix = Matrix()
 
-      val video = getVideoInfo()
+      val video = getVideo()
 
       if (hasVideoSize) {
         val viewWidth = view.width.toFloat()
@@ -469,10 +470,41 @@ class LibVlcPlayerView(
     )
   }
 
-  fun getVideoInfo(): VideoInfo {
+  fun getMedia(): Media {
+    val bitrate =
+      (mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Audio) as? IMedia.AudioTrack)?.bitrate ?: 0
+    val length = (mediaPlayer?.getLength() ?: 0).toInt()
+    val seekable = mediaPlayer?.isSeekable() ?: false
+
+    return Media(
+      bitrate = bitrate,
+      length = length,
+      seekable = seekable,
+    )
+  }
+
+  fun getMetadata(): Metadata {
+    val media = mediaPlayer?.media ?: return Metadata()
+
+    val title = media.getMeta(IMedia.Meta.Title)
+    val artist = media.getMeta(IMedia.Meta.Artist)
+    val album = media.getMeta(IMedia.Meta.Album)
+    val artworkURL = media.getMeta(IMedia.Meta.ArtworkURL)
+
+    return Metadata(
+      title = title,
+      artist = artist,
+      album = album,
+      artworkURL = artworkURL,
+    )
+  }
+
+  fun getVideo(): Video {
     val video =
-      mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Video) as? IMedia.VideoTrack
-        ?: return VideoInfo()
+      mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Video) as? IMedia.VideoTrack ?: return Video()
+
+    val width = video.width
+    val height = video.height
     val frameRate =
       if (video.frameRateDen != 0) {
         video.frameRateNum / video.frameRateDen
@@ -480,50 +512,36 @@ class LibVlcPlayerView(
         0
       }
 
-    return VideoInfo(
-      width = video.width,
-      height = video.height,
+    return Video(
+      width = width,
+      height = height,
       frameRate = frameRate,
-      bitrate = video.bitrate,
     )
   }
-
-  fun getMediaMetadata(): MediaMetadata {
-    val media = mediaPlayer?.media ?: return MediaMetadata()
-
-    return MediaMetadata(
-      title = media.getMeta(IMedia.Meta.Title),
-      artist = media.getMeta(IMedia.Meta.Artist),
-      album = media.getMeta(IMedia.Meta.Album),
-      artworkURL = media.getMeta(IMedia.Meta.ArtworkURL),
-    )
-  }
-
-  fun getMediaLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
 
   fun getMediaInfo(): MediaInfo {
-    val video = getVideoInfo()
-    val metadata = getMediaMetadata()
-    val length = getMediaLength()
-    val seekable = mediaPlayer?.isSeekable() ?: false
+    val media = getMedia()
+    val metadata = getMetadata()
+    val video = getVideo()
 
     return MediaInfo(
-      video = video,
+      media = media,
       metadata = metadata,
-      length = length,
-      seekable = seekable,
+      video = video,
     )
   }
+
+  fun getLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
 
   val hasVideoSize: Boolean
     get() {
-      val video = getVideoInfo()
+      val video = getVideo()
       return video.width > 0 && video.height > 0
     }
 
   val hasMediaLength: Boolean
     get() {
-      val length = getMediaLength()
+      val length = getLength()
       return length > 0
     }
 
@@ -719,7 +737,7 @@ class LibVlcPlayerView(
       if (!hasVideoSize) throw Exception()
 
       val surface = Surface(view.surfaceTexture)
-      val video = getVideoInfo()
+      val video = getVideo()
       val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
 
       PixelCopy.request(
