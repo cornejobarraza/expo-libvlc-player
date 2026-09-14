@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 57.0.47 - 2026-09-13
+
+### 🛠 Breaking changes
+
+- Removed bad media bitrate property
+
+### 🐛 Bug fixes
+
+- Added missing video bitrate on Android
+
 ## 57.0.46 - 2026-09-12
 
 ### 🛠 Breaking changes
