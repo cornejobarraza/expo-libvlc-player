@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.49 - 2026-09-14
+
+### 💡 Others
+
+- Refactored LibVlcPlayer out of View
+
 ## 57.0.48 - 2026-09-13
 
 ### 🐛 Bug fixes
