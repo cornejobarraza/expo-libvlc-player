@@ -164,7 +164,7 @@ class PictureInPictureManager(
 
   fun setPipParams() {
     val view = pipView ?: return
-    val texture = view.getTextureView(view.playerLayout)
+    val texture = view.getTextureView(view.video)
     val canSetParams = isPictureInPictureSupported() && texture != null
 
     if (!canSetParams) return
@@ -283,7 +283,7 @@ class PictureInPictureManager(
   }
 
   fun layoutForPipEnter() {
-    val pictureLayout = pipView?.pictureLayout ?: return
+    val picture = pipView?.picture ?: return
     val rootView = activity.findViewById<ViewGroup>(android.R.id.content)
 
     for (i in 0 until rootView.childCount) {
@@ -292,31 +292,31 @@ class PictureInPictureManager(
       child.visibility = View.GONE
     }
 
-    rootView.addView(pictureLayout)
+    rootView.addView(picture)
 
     pipView?.let { view ->
-      view.detachPlayerLayout()
+      view.detachPlayerView()
       view.postDelayed(
-        { view.attachPlayerLayout(pictureLayout) },
+        { view.attachPlayerView(picture) },
         MediaPlayerConstants.ATTACH_DELAY_MS,
       )
     }
   }
 
   fun layoutForPipExit() {
-    val playerLayout = pipView?.playerLayout ?: return
-    val pictureLayout = pipView?.pictureLayout ?: return
+    val video = pipView?.video ?: return
+    val picture = pipView?.picture ?: return
     val rootView = activity.findViewById<ViewGroup>(android.R.id.content)
 
     pipView?.let { view ->
-      view.detachPlayerLayout()
+      view.detachPlayerView()
       view.postDelayed(
-        { view.attachPlayerLayout(playerLayout) },
+        { view.attachPlayerView(video) },
         MediaPlayerConstants.ATTACH_DELAY_MS,
       )
     }
 
-    rootView.removeView(pictureLayout)
+    rootView.removeView(picture)
 
     rootChildrenVisibility.forEach { (child, visibility) ->
       child.visibility = visibility

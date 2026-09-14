@@ -39,8 +39,8 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
     onFirstPlay,
   } = props;
 
-  const [autoRatio, setAutoRatio] = useState<VideoAspectRatio>(fallbackRatio);
   const [warned, setWarned] = useState<boolean>(false);
+  const [autoRatio, setAutoRatio] = useState<VideoAspectRatio>(fallbackRatio);
 
   const ratioTimeoutRef = useTimeoutRef();
 

@@ -324,6 +324,17 @@ interface Snapshot {
 }
 ```
 
+#### `Video`
+
+```ts
+interface Video {
+  width: number;
+  height: number;
+  frameRate: number;
+  bitrate: number;
+}
+```
+
 #### `Media`
 
 ```ts
@@ -344,24 +355,13 @@ interface Metadata {
 }
 ```
 
-#### `Video`
-
-```ts
-interface Video {
-  width: number;
-  height: number;
-  frameRate: number;
-  bitrate: number;
-}
-```
-
 #### `MediaInfo`
 
 ```ts
 interface MediaInfo {
+  video: Video;
   media: Media;
   metadata: Metadata;
-  video: Video;
 }
 ```
 

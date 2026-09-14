@@ -217,6 +217,13 @@ export interface Snapshot {
   path: string;
 }
 
+export interface Video {
+  width: number;
+  height: number;
+  frameRate: number;
+  bitrate: number;
+}
+
 export interface Media {
   length: number;
   seekable: boolean;
@@ -229,17 +236,10 @@ export interface Metadata {
   artworkURL: string | null;
 }
 
-export interface Video {
-  width: number;
-  height: number;
-  frameRate: number;
-  bitrate: number;
-}
-
 export interface MediaInfo {
+  video: Video;
   media: Media;
   metadata: Metadata;
-  video: Video;
 }
 
 /**

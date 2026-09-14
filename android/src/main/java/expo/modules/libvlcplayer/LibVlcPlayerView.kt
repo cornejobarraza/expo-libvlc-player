@@ -1,17 +1,11 @@
 package expo.modules.libvlcplayer
 
 import android.content.Context
-import android.content.res.AssetFileDescriptor
 import android.graphics.Bitmap
-import android.graphics.Matrix
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import android.util.Size
 import android.view.PixelCopy
 import android.view.Surface
-import android.view.TextureView
-import android.view.ViewGroup
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
@@ -23,54 +17,32 @@ import expo.modules.libvlcplayer.records.Delays
 import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.Media
 import expo.modules.libvlcplayer.records.MediaInfo
-import expo.modules.libvlcplayer.records.MediaTrack
 import expo.modules.libvlcplayer.records.MediaTracks
-import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
-import expo.modules.libvlcplayer.records.Video
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.MediaPlayer
-import org.videolan.libvlc.MediaPlayer.Event
-import org.videolan.libvlc.MediaPlayer.EventListener
-import org.videolan.libvlc.interfaces.IMedia
-import org.videolan.libvlc.util.DisplayManager
 import org.videolan.libvlc.util.VLCVideoLayout
 import java.io.File
 import java.io.FileOutputStream
-import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import org.videolan.libvlc.Dialog as VLCDialog
-import org.videolan.libvlc.Media as VLCMedia
-
-private val DISPLAY_MANAGER: DisplayManager? = null
-private val ENABLE_SUBTITLES: Boolean = true
-private val USE_TEXTURE_VIEW: Boolean = true
 
 class LibVlcPlayerView(
   context: Context,
   appContext: AppContext,
 ) : ExpoView(context, appContext) {
-  val playerLayout: VLCVideoLayout = VLCVideoLayout(context)
-  val pictureLayout: VLCVideoLayout = VLCVideoLayout(context)
+  private val player = LibVlcPlayer(this)
 
-  private var pauseJob: Job? = null
-  private var sourceFd: AssetFileDescriptor? = null
+  val mediaPlayer: MediaPlayer?
+    get() = player.mediaPlayer
 
-  var libVLC: LibVLC? = null
-  var mediaPlayer: MediaPlayer? = null
-  var vlcDialog: VLCDialog? = null
+  val video: VLCVideoLayout
+    get() = player.video
 
-  var firstPlay: Boolean = true
-  private var shouldInit: Boolean = true
-  var userStop: Boolean = false
+  val picture: VLCVideoLayout
+    get() = player.picture
 
   val onBuffering by EventDispatcher()
   val onPlaying by EventDispatcher<Unit>()
@@ -100,12 +72,12 @@ class LibVlcPlayerView(
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
-    attachPlayerLayout(playerLayout)
+    attachPlayerView(video)
   }
 
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
-    detachPlayerLayout()
+    detachPlayerView()
   }
 
   override fun onSizeChanged(
@@ -115,451 +87,37 @@ class LibVlcPlayerView(
     oldh: Int,
   ) {
     super.onSizeChanged(w, h, oldw, oldh)
-    applyContentFit()
+    player.applyContentFit()
   }
 
-  // Release builds bundle assets into res/raw
-  @Suppress("DiscouragedApi")
-  fun getSourceId(source: String): Int? {
-    if (Uri.parse(source).scheme != null) return null
+  fun getTextureView(layout: VLCVideoLayout) = player.getTextureView(layout)
 
-    val identifier = context.resources.getIdentifier(source, "raw", context.packageName)
+  fun attachPlayerView(layout: VLCVideoLayout) = player.attachPlayerView(layout)
 
-    return identifier.takeIf { it != 0 }
-  }
+  fun detachPlayerView() = player.detachPlayerView()
 
-  fun openSourceFd(source: String): AssetFileDescriptor? {
-    val sourceId = getSourceId(source) ?: return null
+  fun initPlayer() = player.initPlayer()
 
-    sourceFd =
-      try {
-        context.resources.openRawResourceFd(sourceId)
-      } catch (_: Exception) {
-        null
-      }
+  fun destroyPlayer() = player.destroyPlayer()
 
-    return sourceFd
-  }
+  fun pauseDelay() = player.pauseDelay()
 
-  fun createMedia(
-    libVLC: LibVLC,
-    source: String,
-  ): VLCMedia {
-    val file = openSourceFd(source)
+  fun cancelPauseDelay() = player.cancelPauseDelay()
 
-    return if (file != null) {
-      VLCMedia(libVLC, file)
-    } else {
-      VLCMedia(libVLC, Uri.parse(source))
-    }
-  }
+  fun onStartPictureInPicture() = player.onStartPictureInPicture()
 
-  fun getSourceUri(source: String): Uri {
-    val sourceUri = Uri.parse(source)
-    val sourceId = getSourceId(source) ?: return sourceUri
-    val cacheDir = File(context.cacheDir, MediaPlayerConstants.SOURCE_CACHE_DIR)
-    val file = File(cacheDir, source)
-
-    try {
-      cacheDir.mkdirs()
-      context.resources.openRawResource(sourceId).use { input ->
-        FileOutputStream(file).use { output -> input.copyTo(output) }
-      }
-    } catch (_: Exception) {
-      return sourceUri
-    }
-
-    return Uri.fromFile(file)
-  }
-
-  fun getTextureView(layout: VLCVideoLayout): TextureView? =
-    layout.findViewById(org.videolan.R.id.texture_video)
-
-  fun addPlayerLayout(layout: VLCVideoLayout) {
-    val parent = playerLayout.parent as? ViewGroup
-
-    if (parent == null) {
-      addView(layout)
-    }
-  }
-
-  fun removePlayerLayout() {
-    val parent = playerLayout.parent as? ViewGroup
-
-    if (parent != null) {
-      removeView(playerLayout)
-    }
-  }
-
-  fun resetPlayer() {
-    detachPlayer()
-    attachPlayer()
-  }
-
-  fun attachPlayer() {
-    attachPlayerLayout(playerLayout)
-    addPlayerLayout(playerLayout)
-  }
-
-  fun detachPlayer() {
-    detachPlayerLayout()
-    removePlayerLayout()
-  }
-
-  fun attachPlayerLayout(layout: VLCVideoLayout) {
-    mediaPlayer?.let { player ->
-      val attached = player.getVLCVout().areViewsAttached()
-
-      if (!attached) {
-        player.attachViews(layout, DISPLAY_MANAGER, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
-      }
-    }
-  }
-
-  fun detachPlayerLayout() {
-    mediaPlayer?.let { player ->
-      val attached = player.getVLCVout().areViewsAttached()
-
-      if (attached) {
-        player.detachViews()
-      }
-    }
-  }
-
-  fun initPlayer() {
-    if (shouldInit) {
-      destroyPlayer()
-
-      if (source != null) {
-        createPlayer()
-      }
-    }
-  }
-
-  fun createPlayer() {
-    if (pictureInPicture) {
-      MediaPlayerManager.pictureInPictureManager.setupPipView(this)
-    }
-
-    libVLC = LibVLC(context)
-    setDialogCallbacks(libVLC!!)
-
-    mediaPlayer = MediaPlayer(libVLC!!)
-    attachPlayerLayout(playerLayout)
-    setPlayerListener(mediaPlayer!!)
-    addPlayerSlaves(slaves)
-
-    try {
-      URI(source)
-    } catch (_: Exception) {
-      onEncounteredError(mapOf("message" to "Invalid source, media could not be set"))
-      return
-    }
-
-    var args = options
-    args.normalizeOptions()
-    args.toggleStartPausedOption(autoplay)
-
-    val media = createMedia(libVLC!!, source!!)
-    args.forEach { arg -> media.addOption(arg) }
-    mediaPlayer!!.setMedia(media)
-    media.release()
-    mediaPlayer!!.play()
-
-    firstPlay = true
-    shouldInit = false
-
-    addPlayerLayout(playerLayout)
-  }
-
-  fun destroyPlayer() {
-    cancelPauseDelay()
-    sourceFd?.close()
-    sourceFd = null
-    libVLC?.release()
-    libVLC = null
-    mediaPlayer?.release()
-    mediaPlayer = null
-    vlcDialog = null
-    removeAllViews()
-  }
-
-  fun setupPlayer() {
-    post {
-      mediaPlayer?.let { player ->
-        if (scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
-          player.setScale(scale.toFloat())
-        }
-
-        if (rate != MediaPlayerConstants.DEFAULT_PLAYER_RATE) {
-          player.setRate(rate.toFloat())
-        }
-
-        if (time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
-          player.setTime(time.toLong())
-        }
-
-        // Negative volume workaround
-        retryUntil {
-          val newVolume =
-            if (mute) {
-              MediaPlayerConstants.MIN_PLAYER_VOLUME
-            } else {
-              volume
-            }
-
-          player.setVolume(newVolume)
-
-          return@retryUntil false
-        }
-
-        time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
-      }
-    }
-  }
-
-  fun addPlayerSlaves(slaves: List<Slave>) {
-    slaves.forEach { slave ->
-      val source = slave.source
-      val type = slave.type
-      val slaveType =
-        if (type == "subtitle") {
-          IMedia.Slave.Type.Subtitle
-        } else {
-          IMedia.Slave.Type.Audio
-        }
-      val selected = slave.selected ?: false
-
-      try {
-        URI(source)
-      } catch (_: Exception) {
-        onEncounteredError(mapOf("message" to "Invalid source, $type could not be added"))
-        return@forEach
-      }
-
-      mediaPlayer?.addSlave(slaveType, getSourceUri(source), selected)
-    }
-  }
-
-  fun selectTrack(
-    index: Int,
-    type: Int,
-  ) {
-    mediaPlayer?.let { player ->
-      if (index == -1) {
-        player.unselectTrackType(type)
-      } else {
-        player.selectTrack(index.toString())
-      }
-    }
-  }
-
-  fun setPlayerTracks() {
-    val audioTrack = tracks?.audio
-    val videoTrack = tracks?.video
-    val spuTrack = tracks?.subtitle
-
-    audioTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Audio) }
-    videoTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Video) }
-    spuTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Text) }
-  }
-
-  fun setPlayerDelays() {
-    mediaPlayer?.let { player ->
-      val audioDelay = delays?.audio
-      val spuDelay = delays?.subtitle
-
-      audioDelay?.let { delay -> player.setAudioDelay(delay) }
-      spuDelay?.let { delay -> player.setSpuDelay(delay) }
-    }
-  }
-
-  fun setContentFit(layout: VLCVideoLayout) {
-    post {
-      val view = getTextureView(layout) ?: return@post
-      val matrix = Matrix()
-
-      val video = getVideo()
-
-      if (hasVideoSize) {
-        val viewWidth = view.width.toFloat()
-        val viewHeight = view.height.toFloat()
-
-        val videoWidth = video.width.toFloat()
-        val videoHeight = video.height.toFloat()
-
-        val viewAspect = viewWidth / viewHeight
-        val videoAspect = videoWidth / videoHeight
-
-        val pivotX = viewWidth / 2f
-        val pivotY = viewHeight / 2f
-
-        when (contentFit) {
-          VideoContentFit.CONTAIN -> {
-            // No scaling required
-          }
-
-          VideoContentFit.COVER -> {
-            val scale =
-              if (videoAspect > viewAspect) {
-                videoAspect / viewAspect
-              } else {
-                viewAspect / videoAspect
-              }
-
-            matrix.setScale(scale, scale, pivotX, pivotY)
-          }
-
-          VideoContentFit.FILL -> {
-            var scaleX = 1f
-            var scaleY = 1f
-
-            if (videoAspect > viewAspect) {
-              scaleY = videoAspect / viewAspect
-            } else {
-              scaleX = viewAspect / videoAspect
-            }
-
-            matrix.setScale(scaleX, scaleY, pivotX, pivotY)
-          }
-        }
-      }
-
-      view.setTransform(matrix)
-    }
-  }
-
-  fun applyContentFit() {
-    setContentFit(layout = playerLayout)
-    setContentFit(layout = pictureLayout)
-  }
-
-  fun getMediaTracks(): MediaTracks {
-    val player = mediaPlayer ?: return MediaTracks()
-
-    val disableTrack = MediaTrack(id = -1, name = "Disable")
-
-    val audios =
-      player
-        .getTracks(
-          IMedia.Track.Type.Audio,
-        )?.mapIndexed { index, track -> MediaTrack(id = index, name = track.name) }
-    val videos =
-      player.getTracks(IMedia.Track.Type.Video)?.mapIndexed {
-        index,
-        track,
-        ->
-        MediaTrack(id = index, name = track.name)
-      }
-    val subtitles =
-      player.getTracks(IMedia.Track.Type.Text)?.mapIndexed {
-        index,
-        track,
-        ->
-        MediaTrack(id = index, name = track.name)
-      }
-
-    val audio = listOf(disableTrack) + (audios ?: emptyList())
-    val video = listOf(disableTrack) + (videos ?: emptyList())
-    val subtitle = listOf(disableTrack) + (subtitles ?: emptyList())
-
-    return MediaTracks(
-      audio = audio,
-      video = video,
-      subtitle = subtitle,
-    )
-  }
-
-  fun getMedia(): Media {
-    val length = (mediaPlayer?.getLength() ?: 0).toInt()
-    val seekable = mediaPlayer?.isSeekable() ?: false
-
-    return Media(
-      length = length,
-      seekable = seekable,
-    )
-  }
-
-  fun getMetadata(): Metadata {
-    val media = mediaPlayer?.media ?: return Metadata()
-
-    val title = media.getMeta(IMedia.Meta.Title)
-    val artist = media.getMeta(IMedia.Meta.Artist)
-    val album = media.getMeta(IMedia.Meta.Album)
-    val artworkURL = media.getMeta(IMedia.Meta.ArtworkURL)
-
-    return Metadata(
-      title = title,
-      artist = artist,
-      album = album,
-      artworkURL = artworkURL,
-    )
-  }
-
-  fun getVideo(): Video {
-    val video =
-      mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Video) as? IMedia.VideoTrack ?: return Video()
-
-    val width = video.width
-    val height = video.height
-    val frameRate =
-      if (video.frameRateDen != 0) {
-        video.frameRateNum / video.frameRateDen
-      } else {
-        0
-      }
-    val bitrate = video.bitrate
-
-    return Video(
-      width = width,
-      height = height,
-      frameRate = frameRate,
-      bitrate = bitrate,
-    )
-  }
-
-  fun getMediaInfo(): MediaInfo {
-    val media = getMedia()
-    val metadata = getMetadata()
-    val video = getVideo()
-
-    return MediaInfo(
-      media = media,
-      metadata = metadata,
-      video = video,
-    )
-  }
-
-  fun getLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
-
-  val hasVideoSize: Boolean
-    get() {
-      val video = getVideo()
-      return video.width > 0 && video.height > 0
-    }
-
-  val hasMediaLength: Boolean
-    get() {
-      val length = getLength()
-      return length > 0
-    }
-
-  val hasMediaVolume: Boolean
-    get() {
-      val volume = mediaPlayer?.getVolume() ?: MediaPlayerConstants.MIN_PLAYER_VOLUME
-      return volume > MediaPlayerConstants.MIN_PLAYER_VOLUME
-    }
+  fun onStopPictureInPicture() = player.onStopPictureInPicture()
 
   var source: String? = null
     set(value) {
       field = value
-      shouldInit = true
+      player.shouldInit = true
     }
 
   var options: MutableList<String> = mutableListOf()
     set(value) {
       field = value
-      shouldInit = true
+      player.shouldInit = true
     }
 
   var slaves: MutableList<Slave> = mutableListOf()
@@ -572,20 +130,20 @@ class LibVlcPlayerView(
       field = field.apply { addAll(newSlaves) }
 
       if (!newSlaves.isEmpty()) {
-        addPlayerSlaves(newSlaves)
+        player.addPlayerSlaves(newSlaves)
       }
     }
 
   var tracks: Tracks? = null
     set(value) {
       field = value
-      setPlayerTracks()
+      player.setPlayerTracks()
     }
 
   var delays: Delays? = null
     set(value) {
       field = value
-      setPlayerDelays()
+      player.setPlayerDelays()
     }
 
   var scale: Double = MediaPlayerConstants.DEFAULT_PLAYER_SCALE
@@ -597,7 +155,7 @@ class LibVlcPlayerView(
   var contentFit: VideoContentFit = VideoContentFit.CONTAIN
     set(value) {
       field = value
-      applyContentFit()
+      player.applyContentFit()
     }
 
   var rate: Double = MediaPlayerConstants.DEFAULT_PLAYER_RATE
@@ -666,7 +224,7 @@ class LibVlcPlayerView(
   var pictureInPicture: Boolean = false
     set(value) {
       field = value
-      shouldInit = true
+      player.shouldInit = true
     }
 
   fun play() {
@@ -683,22 +241,8 @@ class LibVlcPlayerView(
     mediaPlayer?.pause()
   }
 
-  fun pauseDelay() {
-    cancelPauseDelay()
-
-    pauseJob =
-      CoroutineScope(Dispatchers.Main).launch {
-        delay(MediaPlayerConstants.PAUSE_DELAY_MS)
-        mediaPlayer?.pause()
-      }
-  }
-
-  fun cancelPauseDelay() {
-    pauseJob?.cancel()
-  }
-
   fun stop() {
-    userStop = true
+    player.userStop = true
     mediaPlayer?.stop()
   }
 
@@ -731,12 +275,12 @@ class LibVlcPlayerView(
 
   fun snapshot(path: String) {
     try {
-      val view = getTextureView(playerLayout) ?: throw Exception()
+      val view = getTextureView(video) ?: throw Exception()
 
-      if (!hasVideoSize) throw Exception()
+      if (!player.hasVideoSize) throw Exception()
 
       val surface = Surface(view.surfaceTexture)
-      val video = getVideo()
+      val video = player.getVideo()
       val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
 
       PixelCopy.request(
@@ -769,11 +313,11 @@ class LibVlcPlayerView(
   }
 
   fun postAction(action: Int) {
-    vlcDialog?.let { dialog ->
+    player.vlcDialog?.let { dialog ->
       when (dialog) {
         is VLCDialog.QuestionDialog -> {
           dialog.postAction(action)
-          vlcDialog = null
+          player.vlcDialog = null
         }
       }
     }
@@ -784,241 +328,24 @@ class LibVlcPlayerView(
     password: String?,
     store: Boolean? = false,
   ) {
-    vlcDialog?.let { dialog ->
+    player.vlcDialog?.let { dialog ->
       when (dialog) {
         is VLCDialog.LoginDialog -> {
           dialog.postLogin(username, password ?: "", store ?: false)
-          vlcDialog = null
+          player.vlcDialog = null
         }
       }
     }
   }
 
   fun dismiss() {
-    vlcDialog?.let { dialog ->
+    player.vlcDialog?.let { dialog ->
       dialog.dismiss()
-      vlcDialog = null
+      player.vlcDialog = null
     }
   }
 
   fun startPictureInPicture() {
     MediaPlayerManager.pictureInPictureManager.startPictureInPicture(this)
-  }
-
-  fun onStartPictureInPicture() {
-    MediaPlayerManager.pictureInPictureManager.layoutForPipEnter()
-    onPictureInPictureStart(Unit)
-  }
-
-  fun onStopPictureInPicture() {
-    MediaPlayerManager.pictureInPictureManager.layoutForPipExit()
-    onPictureInPictureStop(Unit)
-  }
-
-  fun retryUntil(
-    maxRetries: Int = MediaPlayerConstants.MAX_RETRY_COUNT,
-    retry: Int = 0,
-    delay: Double = MediaPlayerConstants.RETRY_DELAY_MS,
-    block: (isLastAttempt: Boolean) -> Boolean,
-  ) {
-    val isLastAttempt = retry > maxRetries
-
-    if (block(isLastAttempt) || isLastAttempt) return
-
-    val wait = if (retry > 0) delay else 0.0
-    val nextDelay = if (retry > 0) delay * MediaPlayerConstants.EXP_DELAY_MULTIPLIER else delay
-    val postDelay = wait.toLong()
-
-    postDelayed({
-      retryUntil(maxRetries, retry + 1, nextDelay, block)
-    }, postDelay)
-  }
-}
-
-fun LibVlcPlayerView.setPlayerListener(mediaPlayer: MediaPlayer?) {
-  mediaPlayer?.let { player ->
-    player.setEventListener(
-      EventListener { event ->
-        val type = event.type
-
-        @Suppress("ktlint")
-                when (type) {
-                    Event.Buffering -> {
-                        onBuffering(mapOf("value" to event.getBuffering()))
-                    }
-
-                    Event.Playing,
-                    Event.Paused,
-                    Event.Stopped -> {
-                        if (type == Event.Playing) {
-                            onPlaying(Unit)
-
-                            if (firstPlay) {
-                                setupPlayer()
-                                setPlayerTracks()
-                                setPlayerDelays()
-
-                                retryUntil {
-                                    if (hasVideoSize) {
-                                        applyContentFit()
-                                    }
-
-                                    return@retryUntil hasVideoSize
-                                }
-
-                                retryUntil {
-                                    if (hasMediaVolume) {
-                                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-                                    }
-
-                                    return@retryUntil hasMediaVolume
-                                }
-
-                                retryUntil { isLastAttempt ->
-                                    if (hasMediaLength || isLastAttempt) {
-                                        onFirstPlay(getMediaInfo())
-                                    }
-
-                                    return@retryUntil hasMediaLength
-                                }
-
-                                firstPlay = false
-                            }
-                        }
-
-                        if (type == Event.Paused) {
-                            onPaused(Unit)
-                        }
-
-                        if (type == Event.Stopped) {
-                            resetPlayer()
-                            onStopped(Unit)
-
-                            if (repeat && !userStop) {
-                                player.play()
-                            }
-
-                            firstPlay = true
-                            userStop = false
-                        }
-
-                        MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
-                        MediaPlayerManager.audioFocusManager.updateAudioFocus()
-                        MediaPlayerManager.pictureInPictureManager.setPipActions()
-                    }
-
-                    Event.EndReached -> {
-                        player.stop()
-                    }
-
-                    Event.EncounteredError -> {
-                        onEncounteredError(mapOf("message" to "Player encountered an error"))
-                        player.stop()
-                    }
-
-                    Event.TimeChanged -> {
-                        onTimeChanged(mapOf("value" to player.getTime().toInt()))
-                    }
-
-                    Event.PositionChanged -> {
-                        onPositionChanged(mapOf("value" to player.getPosition()))
-                    }
-
-                    Event.ESAdded -> {
-                        onESAdded(getMediaTracks())
-                    }
-
-                    Event.RecordChanged -> {
-                        val recording =
-                            Recording(
-                                path = event.getRecordPath(),
-                                isRecording = event.getRecording(),
-                            )
-
-                        onRecordChanged(recording)
-                    }
-                }
-      },
-    )
-  }
-}
-
-fun LibVlcPlayerView.setDialogCallbacks(ILibVLC: LibVLC?) {
-  ILibVLC?.let { libVLC ->
-    VLCDialog.setCallbacks(
-      libVLC,
-      object : VLCDialog.Callbacks {
-        override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
-          vlcDialog = dialog
-
-          val dialog =
-            Dialog(
-              title = dialog.getTitle(),
-              text = dialog.getText(),
-              type = "error",
-            )
-
-          onDialogDisplay(dialog)
-        }
-
-        override fun onDisplay(dialog: VLCDialog.LoginDialog) {
-          vlcDialog = dialog
-
-          val dialog =
-            Dialog(
-              title = dialog.getTitle(),
-              text = dialog.getText(),
-              type = "login",
-            )
-
-          onDialogDisplay(dialog)
-        }
-
-        override fun onDisplay(dialog: VLCDialog.QuestionDialog) {
-          vlcDialog = dialog
-
-          val dialog =
-            Dialog(
-              title = dialog.getTitle(),
-              text = dialog.getText(),
-              type = "question",
-              cancelText = dialog.getCancelText(),
-              action1Text = dialog.getAction1Text(),
-              action2Text = dialog.getAction2Text(),
-            )
-
-          onDialogDisplay(dialog)
-        }
-
-        override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
-
-        override fun onCanceled(dialog: VLCDialog) {}
-
-        override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
-      },
-    )
-  }
-}
-
-private fun MutableList<String>.normalizeOptions() {
-  val normalized =
-    map { option ->
-      if (!option.startsWith(":")) {
-        ":" + option.dropWhile { character -> character == '-' }
-      } else {
-        option
-      }
-    }
-
-  for (i in indices) {
-    this[i] = normalized[i]
-  }
-}
-
-private fun MutableList<String>.toggleStartPausedOption(autoplay: Boolean) {
-  val hasOption = contains(":start-paused")
-
-  if (!autoplay && !hasOption) {
-    add(":start-paused")
   }
 }
