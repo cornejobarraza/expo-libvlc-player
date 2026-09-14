@@ -26,6 +26,12 @@ function parseArgs(argv) {
   return options;
 }
 
+function trackedFiles(paths) {
+  if (paths.length === 0) return new Set();
+  const result = git(["ls-files", "-z", "--", ...paths]);
+  return new Set(result.split("\0").filter(Boolean));
+}
+
 function git(args, options = {}) {
   const result = run("git", args, {
     cwd: repo_root,
@@ -105,23 +111,14 @@ function patch() {
   run("npm", ["version", "patch"]);
 }
 
-function trackedFiles(paths) {
-  if (paths.length === 0) return new Set();
-  const result = git(["ls-files", "-z", "--", ...paths]);
-  return new Set(result.split("\0").filter(Boolean));
-}
-
-function main() {
-  const options = parseArgs(process.argv.slice(2));
-  const inWorkingTree = options.ref === "HEAD";
-  const latestTag = git(["describe", "--tags", "--abbrev=0"]).trim();
-  const tag = options.tag || latestTag;
-  const diffArgs = inWorkingTree ? [tag] : [tag, options.ref];
-
+function diff(options, diffArgs) {
   if (!hasChanges(diffArgs, ["CHANGELOG.md"])) {
     console.error("Update CHANGELOG.md before patching");
     process.exit(1);
   }
+
+  const tag = diffArgs[0];
+  const inWorkingTree = options.ref === "HEAD";
 
   console.log(`Latest tag: ${tag}`);
   console.log(`Comparing against: ${options.ref}${inWorkingTree ? " (working tree)" : ""}`);
@@ -155,20 +152,31 @@ function main() {
       process.stdout.write(`${diffOutput}${lineBreak}`);
 
       if (added.length > 0 || removed.length > 0) {
-        console.warn(`⚠️  Tarball contents changed${lineBreak}`);
+        console.warn(`\n⚠️  Tarball contents changed${lineBreak}`);
       }
     } else {
       console.log(`\nNo files changed${lineBreak}`);
     }
   }
+}
 
-  if (!options.dryRun) {
-    if (!options.skipTests) {
-      tests(diffArgs);
-    }
+function version(options, diffArgs) {
+  const { dryRun, skipTests } = options;
+  if (!dryRun && !skipTests) tests(diffArgs);
+  if (!dryRun) patch();
+}
 
-    patch();
-  }
+function main() {
+  git(["fetch", "origin", "--tags", "--force"]);
+
+  const options = parseArgs(process.argv.slice(2));
+  const latestTag = git(["describe", "--tags", "--abbrev=0"]).trim();
+
+  const tag = options.tag || latestTag;
+  const diffArgs = options.ref === "HEAD" ? [tag] : [tag, options.ref];
+
+  diff(options, diffArgs);
+  version(options, diffArgs);
 }
 
 main();
