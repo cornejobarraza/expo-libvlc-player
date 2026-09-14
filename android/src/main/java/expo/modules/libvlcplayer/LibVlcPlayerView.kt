@@ -508,11 +508,13 @@ class LibVlcPlayerView(
       } else {
         0
       }
+    val bitrate = video.bitrate
 
     return Video(
       width = width,
       height = height,
       frameRate = frameRate,
+      bitrate = bitrate,
     )
   }
 
