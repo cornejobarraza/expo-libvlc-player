@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.48 - 2026-09-13
+
+### 🐛 Bug fixes
+
+- Restored Metadata album type
+
 ## 57.0.47 - 2026-09-13
 
 ### 🛠 Breaking changes
