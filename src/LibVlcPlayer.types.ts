@@ -225,6 +225,7 @@ export interface Media {
 export interface Metadata {
   title: string | null;
   artist: string | null;
+  album: string | null;
   artworkURL: string | null;
 }
 
