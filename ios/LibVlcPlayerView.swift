@@ -278,14 +278,10 @@ class LibVlcPlayerView: ExpoView {
   }
 
   func getMedia() -> Media {
-    let bitrate = Int(mediaPlayer?.audioTracks.first(where: { track in
-      track.isSelected
-    })?.bitrate ?? 0)
     let length = Int(mediaPlayer?.media?.length.intValue ?? 0)
     let seekable = mediaPlayer?.isSeekable ?? false
 
     return Media(
-      bitrate: bitrate,
       length: length,
       seekable: seekable
     )

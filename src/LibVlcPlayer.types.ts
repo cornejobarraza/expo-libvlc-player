@@ -218,7 +218,6 @@ export interface Snapshot {
 }
 
 export interface Media {
-  bitrate: number;
   length: number;
   seekable: boolean;
 }

@@ -471,13 +471,10 @@ class LibVlcPlayerView(
   }
 
   fun getMedia(): Media {
-    val bitrate =
-      (mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Audio) as? IMedia.AudioTrack)?.bitrate ?: 0
     val length = (mediaPlayer?.getLength() ?: 0).toInt()
     val seekable = mediaPlayer?.isSeekable() ?: false
 
     return Media(
-      bitrate = bitrate,
       length = length,
       seekable = seekable,
     )

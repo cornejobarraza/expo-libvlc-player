@@ -328,7 +328,6 @@ interface Snapshot {
 
 ```ts
 interface Media {
-  bitrate: number;
   length: number;
   seekable: boolean;
 }
