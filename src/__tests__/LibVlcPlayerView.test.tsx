@@ -124,10 +124,9 @@ describe("LibVlcPlayerView", () => {
           nativeEvent: {
             target: 1,
             timeStamp: 1,
+            media: { length: 1000, seekable: true },
+            metadata: { title: null, artist: null, artworkURL: null },
             video: { width: 1280, height: 720, frameRate: 30, bitrate: 0 },
-            metadata: {},
-            length: 1000,
-            seekable: true,
           },
         });
         jest.runAllTimers();
@@ -150,10 +149,9 @@ describe("LibVlcPlayerView", () => {
           nativeEvent: {
             target: 1,
             timeStamp: 1,
+            media: { length: 0, seekable: false },
+            metadata: { title: null, artist: null, artworkURL: null },
             video: { width: 0, height: 0, frameRate: 0, bitrate: 0 },
-            metadata: {},
-            length: 0,
-            seekable: false,
           },
         });
         jest.runAllTimers();
@@ -242,10 +240,9 @@ describe("LibVlcPlayerView", () => {
       jest.useFakeTimers();
 
       const mediaInfo = {
+        media: { length: 634000, seekable: true },
+        metadata: { title: "Big Buck Bunny", artist: null, artworkURL: null },
         video: { width: 1920, height: 1080, frameRate: 30, bitrate: 5000 },
-        metadata: { title: "Big Buck Bunny" },
-        length: 634000,
-        seekable: true,
       };
 
       const onFirstPlay = jest.fn();
@@ -276,10 +273,9 @@ describe("LibVlcPlayerView", () => {
           props.onFirstPlay?.({
             nativeEvent: {
               ...nativeProps,
+              media: { length: 0, seekable: false },
+              metadata: { title: null, artist: null, artworkURL: null },
               video: { width: 1, height: 1, frameRate: 0, bitrate: 0 },
-              metadata: {},
-              length: 0,
-              seekable: false,
             },
           });
           jest.runAllTimers();

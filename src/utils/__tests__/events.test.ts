@@ -28,10 +28,9 @@ describe(convertNativeEvent, () => {
 
   it("preserves nested event properties", () => {
     const mediaInfo = {
+      media: { length: 634000, seekable: true },
+      metadata: { title: "Big Buck Bunny", artist: null, artworkURL: null },
       video: { width: 1920, height: 1080, frameRate: 30, bitrate: 5000 },
-      metadata: { title: "Big Buck Bunny" },
-      length: 634000,
-      seekable: true,
     };
 
     const event = {
