@@ -10,6 +10,14 @@
 
 ### 💡 Others
 
+## 57.0.50 - 2026-09-15
+
+### 💡 Others
+
+- Bumped Expo dependency to 57.0.23
+- Renamed LibVlcPlayer types file
+- Added player native directory
+
 ## 57.0.49 - 2026-09-14
 
 ### 💡 Others
