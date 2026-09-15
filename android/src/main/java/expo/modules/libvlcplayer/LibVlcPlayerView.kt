@@ -13,6 +13,7 @@ import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.enums.VideoContentFit
 import expo.modules.libvlcplayer.managers.MediaPlayerManager
+import expo.modules.libvlcplayer.player.LibVlcPlayer
 import expo.modules.libvlcplayer.records.Delays
 import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.Media

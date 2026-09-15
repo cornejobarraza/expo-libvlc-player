@@ -1,10 +1,11 @@
-package expo.modules.libvlcplayer
+package expo.modules.libvlcplayer.player
 
 import android.content.res.AssetFileDescriptor
 import android.graphics.Matrix
 import android.net.Uri
 import android.view.TextureView
 import android.view.ViewGroup
+import expo.modules.libvlcplayer.LibVlcPlayerView
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.enums.VideoContentFit
 import expo.modules.libvlcplayer.managers.MediaPlayerManager
@@ -40,7 +41,7 @@ private val ENABLE_SUBTITLES: Boolean = true
 private val USE_TEXTURE_VIEW: Boolean = true
 
 class LibVlcPlayer(
-  private val view: LibVlcPlayerView,
+  val view: LibVlcPlayerView,
 ) {
   private val context = view.context
 
@@ -533,170 +534,170 @@ class LibVlcPlayer(
       retryUntil(maxRetries, retry + 1, nextDelay, block)
     }, postDelay)
   }
+}
 
-  fun setPlayerListener() {
-    mediaPlayer?.let { player ->
-      player.setEventListener(
-        EventListener { event ->
-          val type = event.type
+fun LibVlcPlayer.setPlayerListener() {
+  mediaPlayer?.let { player ->
+    player.setEventListener(
+      EventListener { event ->
+        val type = event.type
 
-          @Suppress("ktlint")
-                    when (type) {
-                        Event.Buffering -> {
-                            view.onBuffering(mapOf("value" to event.getBuffering()))
-                        }
+        when (type) {
+          Event.Buffering -> {
+            view.onBuffering(mapOf("value" to event.getBuffering()))
+          }
 
-                        Event.Playing,
-                        Event.Paused,
-                        Event.Stopped -> {
-                            if (type == Event.Playing) {
-                                view.onPlaying(Unit)
+          Event.Playing,
+          Event.Paused,
+          Event.Stopped,
+          -> {
+            if (type == Event.Playing) {
+              view.onPlaying(Unit)
 
-                                if (firstPlay) {
-                                    setupPlayer()
-                                    setPlayerTracks()
-                                    setPlayerDelays()
+              if (firstPlay) {
+                setupPlayer()
+                setPlayerTracks()
+                setPlayerDelays()
 
-                                    retryUntil {
-                                        if (hasVideoSize) {
-                                            applyContentFit()
-                                        }
+                retryUntil {
+                  if (hasVideoSize) {
+                    applyContentFit()
+                  }
 
-                                        return@retryUntil hasVideoSize
-                                    }
+                  return@retryUntil hasVideoSize
+                }
 
-                                    retryUntil {
-                                        if (hasMediaVolume) {
-                                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
-                                        }
+                retryUntil {
+                  if (hasMediaVolume) {
+                    MediaPlayerManager.audioFocusManager.updateAudioFocus()
+                  }
 
-                                        return@retryUntil hasMediaVolume
-                                    }
+                  return@retryUntil hasMediaVolume
+                }
 
-                                    retryUntil { isLastAttempt ->
-                                        if (hasMediaLength || isLastAttempt) {
-                                            view.onFirstPlay(getMediaInfo())
-                                        }
+                retryUntil { isLastAttempt ->
+                  if (hasMediaLength || isLastAttempt) {
+                    view.onFirstPlay(getMediaInfo())
+                  }
 
-                                        return@retryUntil hasMediaLength
-                                    }
+                  return@retryUntil hasMediaLength
+                }
 
-                                    firstPlay = false
-                                }
-                            }
+                firstPlay = false
+              }
+            }
 
-                            if (type == Event.Paused) {
-                                view.onPaused(Unit)
-                            }
+            if (type == Event.Paused) {
+              view.onPaused(Unit)
+            }
 
-                            if (type == Event.Stopped) {
-                                resetPlayer()
-                                view.onStopped(Unit)
+            if (type == Event.Stopped) {
+              resetPlayer()
+              view.onStopped(Unit)
 
-                                if (view.repeat && !userStop) {
-                                    player.play()
-                                }
+              if (view.repeat && !userStop) {
+                player.play()
+              }
 
-                                firstPlay = true
-                                userStop = false
-                            }
+              firstPlay = true
+              userStop = false
+            }
 
-                            MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
-                            MediaPlayerManager.audioFocusManager.updateAudioFocus()
-                            MediaPlayerManager.pictureInPictureManager.setPipActions()
-                        }
+            MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
+            MediaPlayerManager.audioFocusManager.updateAudioFocus()
+            MediaPlayerManager.pictureInPictureManager.setPipActions()
+          }
 
-                        Event.EndReached -> {
-                            player.stop()
-                        }
+          Event.EndReached -> {
+            player.stop()
+          }
 
-                        Event.EncounteredError -> {
-                            view.onEncounteredError(mapOf("message" to "Player encountered an error"))
-                            player.stop()
-                        }
+          Event.EncounteredError -> {
+            view.onEncounteredError(mapOf("message" to "Player encountered an error"))
+            player.stop()
+          }
 
-                        Event.TimeChanged -> {
-                            view.onTimeChanged(mapOf("value" to player.getTime().toInt()))
-                        }
+          Event.TimeChanged -> {
+            view.onTimeChanged(mapOf("value" to player.getTime().toInt()))
+          }
 
-                        Event.PositionChanged -> {
-                            view.onPositionChanged(mapOf("value" to player.getPosition()))
-                        }
+          Event.PositionChanged -> {
+            view.onPositionChanged(mapOf("value" to player.getPosition()))
+          }
 
-                        Event.ESAdded -> {
-                            view.onESAdded(getMediaTracks())
-                        }
+          Event.ESAdded -> {
+            view.onESAdded(getMediaTracks())
+          }
 
-                        Event.RecordChanged -> {
-                            val recording =
-                                Recording(
-                                    path = event.getRecordPath(),
-                                    isRecording = event.getRecording(),
-                                )
+          Event.RecordChanged -> {
+            val recording =
+              Recording(
+                path = event.getRecordPath(),
+                isRecording = event.getRecording(),
+              )
 
-                            view.onRecordChanged(recording)
-                        }
-                    }
-        },
-      )
-    }
+            view.onRecordChanged(recording)
+          }
+        }
+      },
+    )
   }
+}
 
-  fun setDialogCallbacks() {
-    libVLC?.let { libVLC ->
-      VLCDialog.setCallbacks(
-        libVLC,
-        object : VLCDialog.Callbacks {
-          override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
-            vlcDialog = dialog
+fun LibVlcPlayer.setDialogCallbacks() {
+  libVLC?.let { libVLC ->
+    VLCDialog.setCallbacks(
+      libVLC,
+      object : VLCDialog.Callbacks {
+        override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
+          vlcDialog = dialog
 
-            val dialog =
-              Dialog(
-                title = dialog.getTitle(),
-                text = dialog.getText(),
-                type = "error",
-              )
+          val dialog =
+            Dialog(
+              title = dialog.getTitle(),
+              text = dialog.getText(),
+              type = "error",
+            )
 
-            view.onDialogDisplay(dialog)
-          }
+          view.onDialogDisplay(dialog)
+        }
 
-          override fun onDisplay(dialog: VLCDialog.LoginDialog) {
-            vlcDialog = dialog
+        override fun onDisplay(dialog: VLCDialog.LoginDialog) {
+          vlcDialog = dialog
 
-            val dialog =
-              Dialog(
-                title = dialog.getTitle(),
-                text = dialog.getText(),
-                type = "login",
-              )
+          val dialog =
+            Dialog(
+              title = dialog.getTitle(),
+              text = dialog.getText(),
+              type = "login",
+            )
 
-            view.onDialogDisplay(dialog)
-          }
+          view.onDialogDisplay(dialog)
+        }
 
-          override fun onDisplay(dialog: VLCDialog.QuestionDialog) {
-            vlcDialog = dialog
+        override fun onDisplay(dialog: VLCDialog.QuestionDialog) {
+          vlcDialog = dialog
 
-            val dialog =
-              Dialog(
-                title = dialog.getTitle(),
-                text = dialog.getText(),
-                type = "question",
-                cancelText = dialog.getCancelText(),
-                action1Text = dialog.getAction1Text(),
-                action2Text = dialog.getAction2Text(),
-              )
+          val dialog =
+            Dialog(
+              title = dialog.getTitle(),
+              text = dialog.getText(),
+              type = "question",
+              cancelText = dialog.getCancelText(),
+              action1Text = dialog.getAction1Text(),
+              action2Text = dialog.getAction2Text(),
+            )
 
-            view.onDialogDisplay(dialog)
-          }
+          view.onDialogDisplay(dialog)
+        }
 
-          override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
+        override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
 
-          override fun onCanceled(dialog: VLCDialog) {}
+        override fun onCanceled(dialog: VLCDialog) {}
 
-          override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
-        },
-      )
-    }
+        override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
+      },
+    )
   }
 }
 
