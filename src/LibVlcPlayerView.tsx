@@ -6,7 +6,7 @@ import {
   type LibVlcPlayerViewNativeProps,
   type LibVlcPlayerViewProps,
   type VideoAspectRatio,
-} from "./LibVlcPlayer.types";
+} from "./LibVlcPlayerView.types";
 import { convertAspectRatio } from "./utils/aspect";
 import { parseNativeSource } from "./utils/assets";
 import { convertNativeEvent } from "./utils/events";
@@ -16,88 +16,69 @@ const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
   requireNativeView("ExpoLibVlcPlayer");
 
 const CHILDREN_WARNING =
-  "The <LibVlcPlayerView> component does not support children. This may lead to inconsistent behaviour or crashes. If you want to render content on top of the LibVlcPlayer, consider using absolute positioning";
-
+  "<LibVlcPlayerView> does not support children, which may lead to unexpected behaviour. To render content on top, consider absolute positioning";
 const RATIO_DELAY = 300;
 
 const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
-  const {
-    fallbackRatio,
-    children,
-    aspectRatio,
-    style,
-    source,
-    slaves,
-    onBuffering,
-    onEncounteredError,
-    onDialogDisplay,
-    onTimeChanged,
-    onPositionChanged,
-    onESAdded,
-    onRecordChanged,
-    onSnapshotTaken,
-    onFirstPlay,
-  } = props;
-
-  const [warned, setWarned] = useState<boolean>(false);
-  const [autoRatio, setAutoRatio] = useState<VideoAspectRatio>(fallbackRatio);
+  const [warnedChildren, setWarnedChildren] = useState<boolean>(false);
+  const [autoRatio, setAutoRatio] = useState<VideoAspectRatio>(props.fallbackRatio);
 
   const ratioTimeoutRef = useTimeoutRef();
 
-  if (children && !warned) {
+  if (props.children && !warnedChildren) {
     console.warn(CHILDREN_WARNING);
-    setWarned(true);
+    setWarnedChildren(true);
   }
 
-  const viewRatio = aspectRatio === "auto" ? autoRatio : aspectRatio;
+  const viewRatio = props.aspectRatio === "auto" ? autoRatio : props.aspectRatio;
 
   return (
-    <View style={[style, { aspectRatio: convertAspectRatio(viewRatio) }]}>
+    <View style={[props.style, { aspectRatio: convertAspectRatio(viewRatio) }]}>
       <NativeView
         {...props}
         ref={ref}
-        style={[style, { height: "100%" }]}
-        source={parseNativeSource(source)}
-        slaves={slaves?.map((slave) => ({
+        style={[props.style, { height: "100%" }]}
+        source={parseNativeSource(props.source)}
+        slaves={props.slaves?.map((slave) => ({
           ...slave,
           source: parseNativeSource(slave.source),
         }))}
         onBuffering={(event) => {
-          onBuffering?.(convertNativeEvent(event));
+          props.onBuffering?.(convertNativeEvent(event));
         }}
         onEncounteredError={(event) => {
-          onEncounteredError?.(convertNativeEvent(event));
+          props.onEncounteredError?.(convertNativeEvent(event));
         }}
         onDialogDisplay={(event) => {
-          onDialogDisplay?.(convertNativeEvent(event));
+          props.onDialogDisplay?.(convertNativeEvent(event));
         }}
         onTimeChanged={(event) => {
-          onTimeChanged?.(convertNativeEvent(event));
+          props.onTimeChanged?.(convertNativeEvent(event));
         }}
         onPositionChanged={(event) => {
-          onPositionChanged?.(convertNativeEvent(event));
+          props.onPositionChanged?.(convertNativeEvent(event));
         }}
         onESAdded={(event) => {
-          onESAdded?.(convertNativeEvent(event));
+          props.onESAdded?.(convertNativeEvent(event));
         }}
         onRecordChanged={(event) => {
-          onRecordChanged?.(convertNativeEvent(event));
+          props.onRecordChanged?.(convertNativeEvent(event));
         }}
         onSnapshotTaken={(event) => {
-          onSnapshotTaken?.(convertNativeEvent(event));
+          props.onSnapshotTaken?.(convertNativeEvent(event));
         }}
         onFirstPlay={(event) => {
           const mediaInfo = convertNativeEvent(event);
           const mediaRatio = mediaInfo.video.width / mediaInfo.video.height;
 
           const validRatio = mediaRatio > 0 && mediaRatio < Infinity;
-          const nextRatio = validRatio ? mediaRatio : fallbackRatio;
+          const nextRatio = validRatio ? mediaRatio : props.fallbackRatio;
 
           // View resizing workaround
           const ratioTimeout = setTimeout(() => setAutoRatio(nextRatio), RATIO_DELAY);
           ratioTimeoutRef.current = ratioTimeout;
 
-          onFirstPlay?.(mediaInfo);
+          props.onFirstPlay?.(mediaInfo);
         }}
       />
     </View>

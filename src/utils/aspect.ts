@@ -1,4 +1,4 @@
-import { type VideoAspectRatio } from "../LibVlcPlayer.types";
+import { type VideoAspectRatio } from "../LibVlcPlayerView.types";
 
 export function convertAspectRatio(ratio?: VideoAspectRatio) {
   if (typeof ratio === "string") {

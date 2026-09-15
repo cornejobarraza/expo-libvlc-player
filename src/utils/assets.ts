@@ -1,6 +1,6 @@
 import { Image } from "react-native";
 
-import { type LibVlcSlaveSource, type LibVlcSource } from "../LibVlcPlayer.types";
+import { type LibVlcSlaveSource, type LibVlcSource } from "../LibVlcPlayerView.types";
 
 export function parseNativeSource(source: LibVlcSlaveSource): LibVlcSlaveSource;
 export function parseNativeSource(source: LibVlcSource): LibVlcSource;

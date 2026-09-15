@@ -1,8 +1,6 @@
 import { NativeModule, requireNativeModule } from "expo";
 
-import { type LibVlcPlayerModuleEvents } from "./LibVlcPlayer.types";
-
-declare class LibVlcPlayerModule extends NativeModule<LibVlcPlayerModuleEvents> {
+declare class LibVlcPlayerModule extends NativeModule {
   /**
    * Attempts to trigger the local network privacy alert
    *

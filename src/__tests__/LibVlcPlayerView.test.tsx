@@ -1,8 +1,8 @@
 import { act, render } from "@testing-library/react-native";
 import { Image, StyleSheet, Text } from "react-native";
 
-import { type LibVlcPlayerViewNativeProps } from "../LibVlcPlayer.types";
 import LibVlcPlayerView from "../LibVlcPlayerView";
+import { type LibVlcPlayerViewNativeProps } from "../LibVlcPlayerView.types";
 
 const mockNativeViewRender = jest.fn();
 
