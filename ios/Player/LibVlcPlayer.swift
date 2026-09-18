@@ -5,7 +5,7 @@ import VLCKit
 private let dialogCustomUI: Bool = true
 
 class LibVlcPlayer: NSObject {
-  private weak var view: LibVlcPlayerView?
+  private unowned let view: LibVlcPlayerView
 
   private let video: MediaPlayerDrawable = .init()
   private var picture: PictureInPictureDrawable!
@@ -20,14 +20,12 @@ class LibVlcPlayer: NSObject {
   var userStop: Bool = false
 
   init(_ view: LibVlcPlayerView) {
-    super.init()
     self.view = view
     picture = PictureInPictureDrawable(view)
+    super.init()
   }
 
   func applyBounds() {
-    guard let view else { return }
-
     video.transform = .identity
     video.frame = view.bounds
     picture.transform = .identity
@@ -35,8 +33,6 @@ class LibVlcPlayer: NSObject {
   }
 
   func initPlayer() {
-    guard let view else { return }
-
     if shouldInit {
       destroyPlayer()
 
@@ -47,8 +43,6 @@ class LibVlcPlayer: NSObject {
   }
 
   func createPlayer() {
-    guard let view else { return }
-
     let drawable = view.pictureInPicture
       ? picture!
       : video
@@ -93,7 +87,7 @@ class LibVlcPlayer: NSObject {
 
   func setupPlayer() {
     DispatchQueue.main.async { [weak self] in
-      guard let self, let view else { return }
+      guard let self else { return }
 
       if let player = mediaPlayer {
         if view.scale != MediaPlayerConstants.defaultPlayerScale {
@@ -110,7 +104,7 @@ class LibVlcPlayer: NSObject {
 
         // Negative volume workaround
         retryUntil { [weak self] _ in
-          guard let self, let view = self.view else { return true }
+          guard let self else { return true }
 
           let newVolume = view.mute ?
             MediaPlayerConstants.minPlayerVolume :
@@ -127,8 +121,6 @@ class LibVlcPlayer: NSObject {
   }
 
   func addPlayerSlaves(_ slaves: [Slave]) {
-    guard let view else { return }
-
     for slave in slaves {
       let source = slave.source
       let type = slave.type
@@ -162,8 +154,6 @@ class LibVlcPlayer: NSObject {
   }
 
   func setPlayerTracks() {
-    guard let view else { return }
-
     let audioTrack = view.tracks?.audio
     let videoTrack = view.tracks?.video
     let textTrack = view.tracks?.subtitle
@@ -174,8 +164,6 @@ class LibVlcPlayer: NSObject {
   }
 
   func setPlayerDelays() {
-    guard let view else { return }
-
     if let player = mediaPlayer {
       let audioDelay = view.delays?.audio
       let textDelay = view.delays?.subtitle
@@ -187,7 +175,7 @@ class LibVlcPlayer: NSObject {
 
   func setContentFit(drawable: MediaPlayerDrawable) {
     DispatchQueue.main.async { [weak self] in
-      guard let self, let view else { return }
+      guard let self else { return }
 
       var transform: CGAffineTransform = .identity
 
@@ -375,7 +363,7 @@ class LibVlcPlayer: NSObject {
 
 extension LibVlcPlayer: VLCMediaPlayerDelegate {
   func mediaPlayerStateChanged(_ newState: VLCMediaPlayerState) {
-    guard let view, let player = mediaPlayer else { return }
+    guard let player = mediaPlayer else { return }
 
     switch newState {
     case .playing,
@@ -411,7 +399,7 @@ extension LibVlcPlayer: VLCMediaPlayerDelegate {
           }
 
           retryUntil { [weak self] isLastAttempt in
-            guard let self, let view = self.view else { return true }
+            guard let self else { return true }
 
             if hasMediaLength || isLastAttempt {
               view.onFirstPlay(getMediaInfo())
@@ -452,7 +440,7 @@ extension LibVlcPlayer: VLCMediaPlayerDelegate {
   }
 
   func mediaPlayerBufferingChanged(_ buffering: Float) {
-    view?.onBuffering(["value": buffering])
+    view.onBuffering(["value": buffering])
   }
 
   func mediaPlayerLengthChanged(_: Int64) {
@@ -460,14 +448,14 @@ extension LibVlcPlayer: VLCMediaPlayerDelegate {
   }
 
   func mediaPlayerTimeChanged(_: Notification) {
-    guard let view, let player = mediaPlayer else { return }
+    guard let player = mediaPlayer else { return }
 
     view.onTimeChanged(["value": player.time.intValue])
     view.onPositionChanged(["value": player.position])
   }
 
   func mediaPlayerTrackAdded(_: String, with _: VLCMedia.TrackType) {
-    view?.onESAdded(getMediaTracks())
+    view.onESAdded(getMediaTracks())
   }
 
   func mediaPlayerStartedRecording(_: VLCMediaPlayer) {
@@ -476,7 +464,7 @@ extension LibVlcPlayer: VLCMediaPlayerDelegate {
       isRecording: true
     )
 
-    view?.onRecordChanged(recording)
+    view.onRecordChanged(recording)
   }
 
   func mediaPlayer(recordingStoppedAt path: String) {
@@ -485,7 +473,7 @@ extension LibVlcPlayer: VLCMediaPlayerDelegate {
       isRecording: false
     )
 
-    view?.onRecordChanged(recording)
+    view.onRecordChanged(recording)
   }
 }
 
@@ -500,7 +488,7 @@ extension LibVlcPlayer: VLCCustomDialogRendererProtocol {
       type: "error"
     )
 
-    view?.onDialogDisplay(dialog)
+    view.onDialogDisplay(dialog)
   }
 
   func showLogin(
@@ -518,7 +506,7 @@ extension LibVlcPlayer: VLCCustomDialogRendererProtocol {
       type: "login"
     )
 
-    view?.onDialogDisplay(dialog)
+    view.onDialogDisplay(dialog)
   }
 
   func showQuestion(
@@ -541,7 +529,7 @@ extension LibVlcPlayer: VLCCustomDialogRendererProtocol {
       action2Text: action2String
     )
 
-    view?.onDialogDisplay(dialog)
+    view.onDialogDisplay(dialog)
   }
 
   func showProgress(
