@@ -9,12 +9,12 @@ class PictureInPictureFragment(
   view: LibVlcPlayerView,
 ) : Fragment() {
   val id = "${PictureInPictureFragment::class.java.simpleName}_${UUID.randomUUID()}"
-  private val expoView = WeakReference(view)
+  private val view = WeakReference(view)
 
   override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
     super.onPictureInPictureModeChanged(isInPictureInPictureMode)
 
-    expoView.get()?.let { view ->
+    view.get()?.let { view ->
       if (isInPictureInPictureMode) {
         view.onStartPictureInPicture()
         view.cancelPauseDelay()

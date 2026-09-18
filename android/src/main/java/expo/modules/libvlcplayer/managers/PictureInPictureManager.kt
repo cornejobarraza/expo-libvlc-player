@@ -170,7 +170,7 @@ class PictureInPictureManager(
     if (!canSetParams) return
 
     val ratio = Rational(texture.width, texture.height)
-    val safeRatio = ratio.takeIf { it.toFloat() in 0.41841..2.39 }
+    val safeRatio = ratio.takeIf { ratio -> ratio.toFloat() in 0.41841..2.39 }
 
     val hint = Rect()
     texture.getGlobalVisibleRect(hint)

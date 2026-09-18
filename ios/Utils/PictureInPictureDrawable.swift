@@ -3,21 +3,21 @@ import ExpoModulesCore
 import VLCKit
 
 class PictureInPictureDrawable: MediaPlayerDrawable {
-  private weak var expoView: LibVlcPlayerView?
+  private weak var view: LibVlcPlayerView?
 
   private var mediaPlayer: VLCMediaPlayer? {
-    expoView?.mediaPlayer
+    view?.mediaPlayer
   }
 
   private var pictureInPicture: Bool {
-    expoView?.pictureInPicture ?? false
+    view?.pictureInPicture ?? false
   }
 
   private weak var pipController: VLCPictureInPictureWindowControlling?
 
   init(_ view: LibVlcPlayerView) {
+    self.view = view
     super.init()
-    expoView = view
   }
 
   @available(*, unavailable)
@@ -61,7 +61,7 @@ extension PictureInPictureDrawable: VLCPictureInPictureDrawable {
       pipController = controller
 
       pipController?.stateChangeEventHandler = { [weak self] isStarted in
-        guard let self, let view = expoView else { return }
+        guard let self, let view else { return }
 
         if isStarted {
           view.onStartPictureInPicture()
