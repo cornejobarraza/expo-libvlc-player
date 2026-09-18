@@ -10,6 +10,14 @@
 
 ### 💡 Others
 
+## 57.0.51 - 2026-09-18
+
+### 💡 Others
+
+- Bumped Expo dependency to 57.0.24
+- Renamed View related variables
+- Required LibVlcPlayerView on iOS
+
 ## 57.0.50 - 2026-09-15
 
 ### 💡 Others
