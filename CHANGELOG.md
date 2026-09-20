@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.53 - 2026-09-20
+
+### 💡 Others
+
+- Added missing private modifiers
+
 ## 57.0.52 - 2026-09-20
 
 ### 💡 Others
