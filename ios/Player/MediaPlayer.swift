@@ -4,7 +4,7 @@ import VLCKit
 
 private let dialogCustomUI: Bool = true
 
-class LibVlcPlayer: NSObject {
+class MediaPlayer: NSObject {
   private unowned let view: LibVlcPlayerView
 
   private let video: MediaPlayerDrawable = .init()
@@ -15,9 +15,24 @@ class LibVlcPlayer: NSObject {
   var vlcDialog: VLCDialogProvider?
   var vlcDialogRef: NSValue?
 
+  var userStop: Bool = false
   var firstPlay: Bool = true
   var shouldInit: Bool = true
-  var userStop: Bool = false
+
+  var hasVideoSize: Bool {
+    let video = getVideo()
+    return video.width > 0 && video.height > 0
+  }
+
+  var hasMediaLength: Bool {
+    let length = getLength()
+    return length > 0
+  }
+
+  var hasMediaVolume: Bool {
+    let volume = mediaPlayer?.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
+    return volume > MediaPlayerConstants.minPlayerVolume
+  }
 
   init(_ view: LibVlcPlayerView) {
     self.view = view
@@ -313,21 +328,6 @@ class LibVlcPlayer: NSObject {
     Int(mediaPlayer?.media?.length.intValue ?? 0)
   }
 
-  var hasVideoSize: Bool {
-    let video = getVideo()
-    return video.width > 0 && video.height > 0
-  }
-
-  var hasMediaLength: Bool {
-    let length = getLength()
-    return length > 0
-  }
-
-  var hasMediaVolume: Bool {
-    let volume = mediaPlayer?.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
-    return volume > MediaPlayerConstants.minPlayerVolume
-  }
-
   func startPictureInPicture() throws {
     try picture.startPictureInPicture()
   }
@@ -361,7 +361,7 @@ class LibVlcPlayer: NSObject {
   }
 }
 
-extension LibVlcPlayer: VLCMediaPlayerDelegate {
+extension MediaPlayer: VLCMediaPlayerDelegate {
   func mediaPlayerStateChanged(_ newState: VLCMediaPlayerState) {
     guard let player = mediaPlayer else { return }
 
@@ -423,8 +423,8 @@ extension LibVlcPlayer: VLCMediaPlayerDelegate {
           player.play()
         }
 
-        firstPlay = true
         userStop = false
+        firstPlay = true
       }
 
       MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
@@ -477,7 +477,7 @@ extension LibVlcPlayer: VLCMediaPlayerDelegate {
   }
 }
 
-extension LibVlcPlayer: VLCCustomDialogRendererProtocol {
+extension MediaPlayer: VLCCustomDialogRendererProtocol {
   func showError(
     withTitle title: String,
     message: String

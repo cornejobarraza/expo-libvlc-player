@@ -30,6 +30,7 @@ class PictureInPictureManager(
   private val activity: Activity
     get() = appContext.currentActivity ?: throw Exceptions.MissingActivity()
   private val fragmentActivity = activity as? FragmentActivity
+
   private var pipFragment: PictureInPictureFragment? = null
   private var pipReceiver: BroadcastReceiver? = null
   private var pipView: LibVlcPlayerView? = null
@@ -46,8 +47,6 @@ class PictureInPictureManager(
       }
     }
 
-  private val rootChildrenVisibility: MutableMap<View, Int> = mutableMapOf()
-
   private val context: Context?
     get() = pipView?.context
   private val packageName: String?
@@ -58,6 +57,8 @@ class PictureInPictureManager(
     get() = mediaPlayer?.isPlaying() == true
   private val pictureInPicture: Boolean
     get() = pipView?.pictureInPicture == true
+
+  private val rootChildrenVisibility: MutableMap<View, Int> = mutableMapOf()
 
   fun setupPipView(view: LibVlcPlayerView) {
     pipView = view

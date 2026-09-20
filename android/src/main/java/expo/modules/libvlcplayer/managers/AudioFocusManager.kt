@@ -20,7 +20,6 @@ class AudioFocusManager(
 ) : AudioManager.OnAudioFocusChangeListener {
   private val context: Context
     get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
-
   private val audioManager by lazy {
     context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: run {
       throw CodedException("Failed to get AudioFocusManager service")
@@ -29,17 +28,14 @@ class AudioFocusManager(
 
   private val expoViews: MutableSet<LibVlcPlayerView>
     get() = MediaPlayerManager.expoViews
-
-  private var currentFocusRequest: AudioFocusRequest? = null
-
   private val anyPlayingView: Boolean
     get() =
       expoViews.any { view ->
         playerRequiresFocus(view.mediaPlayer)
       }
 
+  private var currentFocusRequest: AudioFocusRequest? = null
   var currentMixingMode: AudioMixingMode = AudioMixingMode.AUTO
-
   private val preDuckVolumes: MutableMap<MediaPlayer, Int> = WeakHashMap()
 
   override fun onAudioFocusChange(focusChange: Int) {

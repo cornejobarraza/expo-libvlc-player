@@ -13,7 +13,7 @@ import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.enums.VideoContentFit
 import expo.modules.libvlcplayer.managers.MediaPlayerManager
-import expo.modules.libvlcplayer.player.LibVlcPlayer
+import expo.modules.libvlcplayer.player.MediaPlayer
 import expo.modules.libvlcplayer.records.Delays
 import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.Media
@@ -22,26 +22,24 @@ import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
-import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.util.VLCVideoLayout
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import org.videolan.libvlc.Dialog as VLCDialog
+import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
 
 class LibVlcPlayerView(
   context: Context,
   appContext: AppContext,
 ) : ExpoView(context, appContext) {
-  private val player = LibVlcPlayer(this)
+  private val player = MediaPlayer(this)
 
-  val mediaPlayer: MediaPlayer?
+  val mediaPlayer: VLCMediaPlayer?
     get() = player.mediaPlayer
-
   val video: VLCVideoLayout
     get() = player.video
-
   val picture: VLCVideoLayout
     get() = player.picture
 

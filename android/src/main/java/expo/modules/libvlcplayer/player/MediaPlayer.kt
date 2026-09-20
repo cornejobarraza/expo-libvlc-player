@@ -24,7 +24,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.videolan.libvlc.LibVLC
-import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.MediaPlayer.Event
 import org.videolan.libvlc.MediaPlayer.EventListener
 import org.videolan.libvlc.interfaces.IMedia
@@ -35,12 +34,13 @@ import java.io.FileOutputStream
 import java.net.URI
 import org.videolan.libvlc.Dialog as VLCDialog
 import org.videolan.libvlc.Media as VLCMedia
+import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
 
 private val DISPLAY_MANAGER: DisplayManager? = null
 private val ENABLE_SUBTITLES: Boolean = true
 private val USE_TEXTURE_VIEW: Boolean = true
 
-class LibVlcPlayer(
+class MediaPlayer(
   val view: LibVlcPlayerView,
 ) {
   private val context = view.context
@@ -48,19 +48,35 @@ class LibVlcPlayer(
   val video: VLCVideoLayout = VLCVideoLayout(context)
   val picture: VLCVideoLayout = VLCVideoLayout(context)
 
-  private var pauseJob: Job? = null
   private var sourceFd: AssetFileDescriptor? = null
+  private var pauseJob: Job? = null
 
-  var libVLC: LibVLC? = null
-  var mediaPlayer: MediaPlayer? = null
+  var libVlc: LibVLC? = null
+  var mediaPlayer: VLCMediaPlayer? = null
   var vlcDialog: VLCDialog? = null
 
+  var userStop: Boolean = false
   var firstPlay: Boolean = true
   var shouldInit: Boolean = true
-  var userStop: Boolean = false
 
-  // Release builds bundle assets into res/raw
-  @Suppress("DiscouragedApi")
+  val hasVideoSize: Boolean
+    get() {
+      val video = getVideo()
+      return video.width > 0 && video.height > 0
+    }
+
+  val hasMediaLength: Boolean
+    get() {
+      val length = getLength()
+      return length > 0
+    }
+
+  val hasMediaVolume: Boolean
+    get() {
+      val volume = mediaPlayer?.getVolume() ?: MediaPlayerConstants.MIN_PLAYER_VOLUME
+      return volume > MediaPlayerConstants.MIN_PLAYER_VOLUME
+    }
+
   fun getSourceId(source: String): Int? {
     if (Uri.parse(source).scheme != null) return null
 
@@ -83,15 +99,15 @@ class LibVlcPlayer(
   }
 
   fun createMedia(
-    libVLC: LibVLC,
+    libVlc: LibVLC,
     source: String,
   ): VLCMedia {
     val file = openSourceFd(source)
 
     return if (file != null) {
-      VLCMedia(libVLC, file)
+      VLCMedia(libVlc, file)
     } else {
-      VLCMedia(libVLC, Uri.parse(source))
+      VLCMedia(libVlc, Uri.parse(source))
     }
   }
 
@@ -182,10 +198,10 @@ class LibVlcPlayer(
       MediaPlayerManager.pictureInPictureManager.setupPipView(view)
     }
 
-    libVLC = LibVLC(context)
+    libVlc = LibVLC(context)
     setDialogCallbacks()
 
-    mediaPlayer = MediaPlayer(libVLC!!)
+    mediaPlayer = VLCMediaPlayer(libVlc!!)
     setPlayerListener()
 
     attachPlayerView(video)
@@ -202,7 +218,7 @@ class LibVlcPlayer(
     args.normalizeOptions()
     args.toggleStartPausedOption(view.autoplay)
 
-    val media = createMedia(libVLC!!, view.source!!)
+    val media = createMedia(libVlc!!, view.source!!)
     args.forEach { arg -> media.addOption(arg) }
     mediaPlayer!!.setMedia(media)
     media.release()
@@ -218,8 +234,8 @@ class LibVlcPlayer(
     cancelPauseDelay()
     sourceFd?.close()
     sourceFd = null
-    libVLC?.release()
-    libVLC = null
+    libVlc?.release()
+    libVlc = null
     mediaPlayer?.release()
     mediaPlayer = null
     vlcDialog = null
@@ -474,24 +490,6 @@ class LibVlcPlayer(
 
   fun getLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
 
-  val hasVideoSize: Boolean
-    get() {
-      val video = getVideo()
-      return video.width > 0 && video.height > 0
-    }
-
-  val hasMediaLength: Boolean
-    get() {
-      val length = getLength()
-      return length > 0
-    }
-
-  val hasMediaVolume: Boolean
-    get() {
-      val volume = mediaPlayer?.getVolume() ?: MediaPlayerConstants.MIN_PLAYER_VOLUME
-      return volume > MediaPlayerConstants.MIN_PLAYER_VOLUME
-    }
-
   fun pauseDelay() {
     cancelPauseDelay()
 
@@ -536,7 +534,7 @@ class LibVlcPlayer(
   }
 }
 
-fun LibVlcPlayer.setPlayerListener() {
+fun MediaPlayer.setPlayerListener() {
   mediaPlayer?.let { player ->
     player.setEventListener(
       EventListener { event ->
@@ -599,8 +597,8 @@ fun LibVlcPlayer.setPlayerListener() {
                 player.play()
               }
 
-              firstPlay = true
               userStop = false
+              firstPlay = true
             }
 
             MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
@@ -644,10 +642,10 @@ fun LibVlcPlayer.setPlayerListener() {
   }
 }
 
-fun LibVlcPlayer.setDialogCallbacks() {
-  libVLC?.let { libVLC ->
+fun MediaPlayer.setDialogCallbacks() {
+  libVlc?.let { libVlc ->
     VLCDialog.setCallbacks(
-      libVLC,
+      libVlc,
       object : VLCDialog.Callbacks {
         override fun onDisplay(dialog: VLCDialog.ErrorMessage) {
           vlcDialog = dialog

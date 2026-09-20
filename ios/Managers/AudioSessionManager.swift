@@ -27,7 +27,6 @@ class AudioSessionManager {
     let shouldMixOverride = audioMixingMode == .mixWithOthers
     let doNotMixOverride = audioMixingMode == .doNotMix
     let shouldDuckOthers = audioMixingMode == .duckOthers && anyPlayingView
-
     let shouldMixWithOthers = shouldMixOverride || !anyPlayingView
 
     if shouldMixWithOthers && !shouldDuckOthers && !doNotMixOverride {

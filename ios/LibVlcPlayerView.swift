@@ -3,7 +3,7 @@ import UIKit
 import VLCKit
 
 class LibVlcPlayerView: ExpoView {
-  private var player: LibVlcPlayer!
+  private var player: MediaPlayer!
 
   var mediaPlayer: VLCMediaPlayer? {
     player.mediaPlayer
@@ -31,7 +31,7 @@ class LibVlcPlayerView: ExpoView {
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
     clipsToBounds = true
-    player = LibVlcPlayer(self)
+    player = MediaPlayer(self)
     MediaPlayerManager.shared.registerExpoView(self)
   }
 
