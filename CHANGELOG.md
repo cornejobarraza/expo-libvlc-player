@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.52 - 2026-09-20
+
+### 💡 Others
+
+- Renamed LibVlcPlayer to MediaPlayer
+
 ## 57.0.51 - 2026-09-18
 
 ### 💡 Others
