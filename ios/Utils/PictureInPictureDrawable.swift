@@ -103,13 +103,13 @@ extension PictureInPictureDrawable: VLCPictureInPictureMediaControlling {
   }
 }
 
-final class PictureInPictureUnsupportedException: Exception, @unchecked Sendable {
+private final class PictureInPictureUnsupportedException: Exception, @unchecked Sendable {
   override var reason: String {
     "Picture-in-Picture (PiP) mode is not supported on this device"
   }
 }
 
-final class PictureInPictureUnallowedException: Exception, @unchecked Sendable {
+private final class PictureInPictureUnallowedException: Exception, @unchecked Sendable {
   override var reason: String {
     "Picture-in-Picture (PiP) mode must be allowed for this player"
   }

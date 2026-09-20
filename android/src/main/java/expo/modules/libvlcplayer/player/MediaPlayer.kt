@@ -77,7 +77,7 @@ class MediaPlayer(
       return volume > MediaPlayerConstants.MIN_PLAYER_VOLUME
     }
 
-  fun getSourceId(source: String): Int? {
+  private fun getSourceId(source: String): Int? {
     if (Uri.parse(source).scheme != null) return null
 
     val identifier = context.resources.getIdentifier(source, "raw", context.packageName)
@@ -85,7 +85,7 @@ class MediaPlayer(
     return identifier.takeIf { it != 0 }
   }
 
-  fun openSourceFd(source: String): AssetFileDescriptor? {
+  private fun openSourceFd(source: String): AssetFileDescriptor? {
     val sourceId = getSourceId(source) ?: return null
 
     sourceFd =
@@ -98,7 +98,7 @@ class MediaPlayer(
     return sourceFd
   }
 
-  fun createMedia(
+  private fun createMedia(
     libVlc: LibVLC,
     source: String,
   ): VLCMedia {
@@ -111,7 +111,7 @@ class MediaPlayer(
     }
   }
 
-  fun getSourceUri(source: String): Uri {
+  private fun getSourceUri(source: String): Uri {
     val sourceUri = Uri.parse(source)
     val sourceId = getSourceId(source) ?: return sourceUri
     val cacheDir = File(context.cacheDir, MediaPlayerConstants.SOURCE_CACHE_DIR)
@@ -132,7 +132,7 @@ class MediaPlayer(
   fun getTextureView(layout: VLCVideoLayout): TextureView? =
     layout.findViewById(org.videolan.R.id.texture_video)
 
-  fun addPlayerLayout(layout: VLCVideoLayout) {
+  private fun addPlayerView(layout: VLCVideoLayout) {
     val parent = video.parent as? ViewGroup
 
     if (parent == null) {
@@ -140,7 +140,7 @@ class MediaPlayer(
     }
   }
 
-  fun removePlayerView() {
+  private fun removePlayerView() {
     val parent = video.parent as? ViewGroup
 
     if (parent != null) {
@@ -153,12 +153,12 @@ class MediaPlayer(
     attachPlayer()
   }
 
-  fun attachPlayer() {
+  private fun attachPlayer() {
     attachPlayerView(video)
-    addPlayerLayout(video)
+    addPlayerView(video)
   }
 
-  fun detachPlayer() {
+  private fun detachPlayer() {
     detachPlayerView()
     removePlayerView()
   }
@@ -193,7 +193,7 @@ class MediaPlayer(
     }
   }
 
-  fun createPlayer() {
+  private fun createPlayer() {
     if (view.pictureInPicture) {
       MediaPlayerManager.pictureInPictureManager.setupPipView(view)
     }
@@ -227,7 +227,7 @@ class MediaPlayer(
     firstPlay = true
     shouldInit = false
 
-    addPlayerLayout(video)
+    addPlayerView(video)
   }
 
   fun destroyPlayer() {
@@ -299,7 +299,7 @@ class MediaPlayer(
     }
   }
 
-  fun selectTrack(
+  private fun selectTrack(
     index: Int,
     type: Int,
   ) {
@@ -332,7 +332,7 @@ class MediaPlayer(
     }
   }
 
-  fun setContentFit(layout: VLCVideoLayout) {
+  private fun setContentFit(layout: VLCVideoLayout) {
     view.post {
       val textureView = getTextureView(layout) ?: return@post
       val matrix = Matrix()
@@ -428,7 +428,7 @@ class MediaPlayer(
     )
   }
 
-  fun getMedia(): Media {
+  private fun getMedia(): Media {
     val length = (mediaPlayer?.getLength() ?: 0).toInt()
     val seekable = mediaPlayer?.isSeekable() ?: false
 
@@ -438,7 +438,7 @@ class MediaPlayer(
     )
   }
 
-  fun getMetadata(): Metadata {
+  private fun getMetadata(): Metadata {
     val media = mediaPlayer?.media ?: return Metadata()
 
     val title = media.getMeta(IMedia.Meta.Title)
@@ -488,7 +488,7 @@ class MediaPlayer(
     )
   }
 
-  fun getLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
+  private fun getLength(): Int = (mediaPlayer?.getLength() ?: 0).toInt()
 
   fun pauseDelay() {
     cancelPauseDelay()
@@ -534,7 +534,7 @@ class MediaPlayer(
   }
 }
 
-fun MediaPlayer.setPlayerListener() {
+private fun MediaPlayer.setPlayerListener() {
   mediaPlayer?.let { player ->
     player.setEventListener(
       EventListener { event ->
@@ -642,7 +642,7 @@ fun MediaPlayer.setPlayerListener() {
   }
 }
 
-fun MediaPlayer.setDialogCallbacks() {
+private fun MediaPlayer.setDialogCallbacks() {
   libVlc?.let { libVlc ->
     VLCDialog.setCallbacks(
       libVlc,

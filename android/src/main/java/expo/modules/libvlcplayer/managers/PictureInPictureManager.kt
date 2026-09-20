@@ -163,7 +163,7 @@ class PictureInPictureManager(
     }
   }
 
-  fun setPipParams() {
+  private fun setPipParams() {
     val view = pipView ?: return
     val texture = view.getTextureView(view.video)
     val canSetParams = isPictureInPictureSupported() && texture != null
@@ -356,8 +356,8 @@ class PictureInPictureManager(
       )
 }
 
-class PictureInPictureUnsupportedException :
+private class PictureInPictureUnsupportedException :
   CodedException("Picture-in-Picture (PiP) mode is not supported on this device")
 
-class PictureInPictureUnallowedException :
+private class PictureInPictureUnallowedException :
   CodedException("Picture-in-Picture (PiP) mode must be allowed for this player")

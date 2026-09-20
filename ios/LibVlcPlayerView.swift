@@ -9,7 +9,7 @@ class LibVlcPlayerView: ExpoView {
     player.mediaPlayer
   }
 
-  var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
+  private var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
 
   let onBuffering = EventDispatcher()
   let onPlaying = EventDispatcher()
@@ -125,7 +125,7 @@ class LibVlcPlayerView: ExpoView {
 
   var time: Int = MediaPlayerConstants.defaultPlayerTime
 
-  var _volume: Int = MediaPlayerConstants.maxPlayerVolume
+  private var _volume: Int = MediaPlayerConstants.maxPlayerVolume
 
   var volume: Int {
     get { _volume }

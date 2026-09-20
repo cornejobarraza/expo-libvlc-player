@@ -10,13 +10,13 @@ class MediaPlayer: NSObject {
   private let video: MediaPlayerDrawable = .init()
   private var picture: PictureInPictureDrawable!
 
-  var library: VLCLibrary?
+  private var library: VLCLibrary?
   var mediaPlayer: VLCMediaPlayer?
   var vlcDialog: VLCDialogProvider?
   var vlcDialogRef: NSValue?
 
   var userStop: Bool = false
-  var firstPlay: Bool = true
+  private var firstPlay: Bool = true
   var shouldInit: Bool = true
 
   var hasVideoSize: Bool {
@@ -24,12 +24,12 @@ class MediaPlayer: NSObject {
     return video.width > 0 && video.height > 0
   }
 
-  var hasMediaLength: Bool {
+  private var hasMediaLength: Bool {
     let length = getLength()
     return length > 0
   }
 
-  var hasMediaVolume: Bool {
+  private var hasMediaVolume: Bool {
     let volume = mediaPlayer?.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
     return volume > MediaPlayerConstants.minPlayerVolume
   }
@@ -57,7 +57,7 @@ class MediaPlayer: NSObject {
     }
   }
 
-  func createPlayer() {
+  private func createPlayer() {
     let drawable = view.pictureInPicture
       ? picture!
       : video
@@ -100,7 +100,7 @@ class MediaPlayer: NSObject {
     vlcDialog = nil
   }
 
-  func setupPlayer() {
+  private func setupPlayer() {
     DispatchQueue.main.async { [weak self] in
       guard let self else { return }
 
@@ -153,7 +153,7 @@ class MediaPlayer: NSObject {
     }
   }
 
-  func selectTrack(_ index: Int, _ type: VLCMedia.TrackType) {
+  private func selectTrack(_ index: Int, _ type: VLCMedia.TrackType) {
     if let player = mediaPlayer {
       if index == -1 {
         switch type {
@@ -188,7 +188,7 @@ class MediaPlayer: NSObject {
     }
   }
 
-  func setContentFit(drawable: MediaPlayerDrawable) {
+  private func setContentFit(drawable: MediaPlayerDrawable) {
     DispatchQueue.main.async { [weak self] in
       guard let self else { return }
 
@@ -233,7 +233,7 @@ class MediaPlayer: NSObject {
     setContentFit(drawable: picture)
   }
 
-  func getMediaTracks() -> MediaTracks {
+  private func getMediaTracks() -> MediaTracks {
     guard let player = mediaPlayer else { return MediaTracks() }
 
     let disableTrack = MediaTrack(id: -1, name: "Disable")
@@ -262,7 +262,7 @@ class MediaPlayer: NSObject {
     )
   }
 
-  func getMedia() -> Media {
+  private func getMedia() -> Media {
     let length = Int(mediaPlayer?.media?.length.intValue ?? 0)
     let seekable = mediaPlayer?.isSeekable ?? false
 
@@ -272,7 +272,7 @@ class MediaPlayer: NSObject {
     )
   }
 
-  func getMetadata() -> Metadata {
+  private func getMetadata() -> Metadata {
     guard let metaData = mediaPlayer?.media?.metaData else {
       return Metadata()
     }
@@ -290,7 +290,7 @@ class MediaPlayer: NSObject {
     )
   }
 
-  func getVideo() -> Video {
+  private func getVideo() -> Video {
     guard let track = mediaPlayer?.videoTracks.first(where: { track in track.isSelected }),
           let video = track.video
     else {
@@ -312,7 +312,7 @@ class MediaPlayer: NSObject {
     )
   }
 
-  func getMediaInfo() -> MediaInfo {
+  private func getMediaInfo() -> MediaInfo {
     let media = getMedia()
     let metadata = getMetadata()
     let video = getVideo()
@@ -324,7 +324,7 @@ class MediaPlayer: NSObject {
     )
   }
 
-  func getLength() -> Int {
+  private func getLength() -> Int {
     Int(mediaPlayer?.media?.length.intValue ?? 0)
   }
 
@@ -336,7 +336,7 @@ class MediaPlayer: NSObject {
     picture.stopPictureInPicture()
   }
 
-  func retryUntil(
+  private func retryUntil(
     maxRetries: Int = MediaPlayerConstants.maxRetryCount,
     retry: Int = 0,
     delay: Double = MediaPlayerConstants.retryDelayMs,
