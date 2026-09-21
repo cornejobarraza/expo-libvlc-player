@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.54 - 2026-09-21
+
+### 💡 Others
+
+- Updated ignored files
+
 ## 57.0.53 - 2026-09-20
 
 ### 💡 Others
