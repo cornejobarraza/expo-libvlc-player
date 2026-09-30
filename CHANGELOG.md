@@ -10,6 +10,13 @@
 
 ### 💡 Others
 
+## 57.0.55 - 2026-09-30
+
+### 💡 Others
+
+- Bumped VLCKit to 4.0.0a25
+- Bumped Expo dependency to 57.0.26
+
 ## 57.0.54 - 2026-09-21
 
 ### 💡 Others
