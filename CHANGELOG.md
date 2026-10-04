@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.56 - 2026-10-04
+
+### 💡 Others
+
+- Updated some module types
+
 ## 57.0.55 - 2026-09-30
 
 ### 💡 Others
