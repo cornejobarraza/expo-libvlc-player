@@ -1,6 +1,0 @@
-{
-  "extends": "./node",
-  "compilerOptions": {
-    "sourceMap": false
-  }
-}

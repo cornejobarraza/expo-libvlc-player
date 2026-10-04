@@ -1,10 +1,19 @@
 {
-  "extends": "../tsconfig/plugin",
+  "extends": "../tsconfig.base",
   "compilerOptions": {
     "composite": true,
+    "declarationMap": false,
+    "inlineSources": false,
+    "lib": ["es2023"],
+    "module": "nodenext",
+    "moduleResolution": "node16",
     "outDir": "./build",
+    "resolveJsonModule": true,
     "rootDir": "./src",
-    "types": ["jest"]
+    "sourceMap": false,
+    "target": "es2022",
+    "types": ["jest"],
+    "verbatimModuleSyntax": false
   },
   "include": ["./src"],
   "exclude": ["./src/**/__tests__"]
