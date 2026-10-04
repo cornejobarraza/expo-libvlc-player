@@ -5,9 +5,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "prebuild": "expo prebuild",
-    "test": "maestro test .maestro",
-    "test:android": "maestro test .maestro/playback.android.yaml",
-    "test:ios": "maestro test .maestro/playback.ios.yaml"
+    "test": "maestro test .maestro"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",

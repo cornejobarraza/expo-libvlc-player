@@ -1,11 +1,21 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { Icon } from "./Icon";
-import { type ControlProps } from "./types";
+import { type IdMapping, type ControlProps } from "./types";
+
+const IDS = {
+  "play.fill": "play",
+  "pause.fill": "pause",
+  "stop.fill": "stop",
+  "forward.fill": "forward",
+  "backward.fill": "backward",
+  "speaker.1.fill": "speaker.1",
+  "speaker.3.fill": "speaker.3",
+} as IdMapping;
 
 export const Control = ({ name, onPress }: ControlProps) => {
   return (
-    <TouchableOpacity style={styles.control} onPress={onPress} testID={name}>
+    <TouchableOpacity style={styles.control} onPress={onPress} testID={IDS[name]}>
       <Icon color="#f1f1f1" name={name} />
     </TouchableOpacity>
   );

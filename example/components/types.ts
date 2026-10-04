@@ -15,6 +15,8 @@ export interface ControlProps {
   onPress?: () => void;
 }
 
+export type IdMapping = Record<SFSymbol, string>;
+
 export type MaterialIcon = ComponentProps<typeof MaterialIcons>["name"];
 
 export type SymbolMapping = Record<SFSymbol, MaterialIcon>;

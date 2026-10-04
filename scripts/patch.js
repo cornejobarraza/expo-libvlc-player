@@ -82,18 +82,20 @@ function packAtRef(ref) {
 }
 
 function test(platform) {
-  run("npm", ["run", `test:${platform}`], { cwd: path.join(repo_root, "example") });
+  run(
+    "maestro",
+    ["test", "-e", `APP_ID=expo.modules.libvlcplayer.${platform}`, ".maestro/playback.yaml"],
+    {
+      cwd: path.join(repo_root, "example"),
+    }
+  );
 }
 
 function tests(diffArgs) {
   if (hasChanges(diffArgs, ["android"])) {
-    if (!darwin) {
-      console.log("Running Android tests");
-      test("android");
-      console.log("");
-    } else {
-      console.log("Skipping Android tests\n");
-    }
+    console.log("Running Android tests");
+    test("android");
+    console.log("");
   }
 
   if (hasChanges(diffArgs, ["ios"])) {
