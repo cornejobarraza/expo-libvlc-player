@@ -1,6 +1,6 @@
 import { isDevice } from "expo-device";
 import { LibVlcPlayerView, type LibVlcPlayerViewRef, type Metadata } from "expo-libvlc-player";
-import React, { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Image, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -81,7 +81,7 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
       {!fullScreen && (
         <View style={styles.header}>
           {!parsing ? (
-            <React.Fragment>
+            <Fragment>
               {showTitle && (
                 <Text style={styles.title} numberOfLines={1}>
                   {metadata.title}
@@ -92,12 +92,12 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
                   {metadata.artist}
                 </Text>
               )}
-            </React.Fragment>
+            </Fragment>
           ) : (
-            <React.Fragment>
+            <Fragment>
               <Text.Loading width="50%" height={styles.title.lineHeight} />
               <Text.Loading width="75%" height={styles.artist.lineHeight} />
-            </React.Fragment>
+            </Fragment>
           )}
         </View>
       )}

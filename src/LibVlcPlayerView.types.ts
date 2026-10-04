@@ -1,3 +1,4 @@
+import { type Ref } from "react";
 import type { ViewProps } from "react-native";
 
 export interface LibVlcPlayerViewRef {
@@ -125,25 +126,17 @@ type NativeAspectRatioProps =
 type AspectRatioProps =
   | {
       /**
-       * Sets the container aspect ratio.
-       *
-       * When set to auto, a fallback ratio is required
-       *
-       * @default undefined
+       * Sets the container aspect ratio. When auto, a fallback ratio is required
        */
       aspectRatio: "auto";
       /**
        * Sets the fallback aspect ratio
-       *
-       * @default undefined
        */
       fallbackRatio: VideoAspectRatio;
     }
   | {
       /**
-       * Sets the container aspect ratio.
-       *
-       * When set to auto, a fallback ratio is required
+       * Sets the container aspect ratio. When auto, a fallback ratio is required
        *
        * @default undefined
        */
@@ -324,7 +317,7 @@ type PictureInPictureStopListener = () => void;
  */
 export type LibVlcPlayerViewNativeProps = ViewProps &
   NativeAspectRatioProps & {
-    ref?: React.Ref<LibVlcPlayerViewRef>;
+    ref?: Ref<LibVlcPlayerViewRef>;
     source?: LibVlcSource;
     options?: string[];
     slaves?: Slave[];
@@ -361,13 +354,11 @@ export type LibVlcPlayerViewNativeProps = ViewProps &
 export type LibVlcPlayerViewProps = ViewProps &
   AspectRatioProps & {
     /**
-     * Allows getting a ref to the component instance.
+     * Allows getting a ref to the component instance
      *
-     * Once the component unmounts, React will set `ref.current` to `null`
-     *
-     * @see {@link https://react.dev/learn/referencing-values-with-refs#refs-and-the-dom React Docs}
+     * @see {@link https://dev/learn/referencing-values-with-refs#refs-and-the-dom React Docs}
      */
-    ref?: React.RefObject<LibVlcPlayerViewRef | null>;
+    ref?: Ref<LibVlcPlayerViewRef>;
     /**
      * Sets the source of the media to be played, or `null` to release the player
      */
@@ -380,11 +371,9 @@ export type LibVlcPlayerViewProps = ViewProps &
      * @example
      *
      * ```tsx
-     * const options = ["--network-caching=1000"];
-     *
      * <LibVlcPlayerView
      *   {...props}
-     *   options={options}
+     *   options={["--network-caching=1000"]}
      * />
      * ```
      *
@@ -397,17 +386,15 @@ export type LibVlcPlayerViewProps = ViewProps &
      * @example
      *
      * ```tsx
-     * const slaves = [
-     *   {
-     *     source: "file://path/to/subtitle.srt",
-     *     type: "subtitle",
-     *     selected: true,
-     *   },
-     * ];
-     *
      * <LibVlcPlayerView
      *   {...props}
-     *   slaves={slaves}
+     *   slaves={[
+     *     {
+     *       source: "file://path/to/subtitle.srt",
+     *       type: "subtitle",
+     *       selected: true,
+     *     },
+     *   ]}
      * />
      * ```
      *
@@ -420,15 +407,13 @@ export type LibVlcPlayerViewProps = ViewProps &
      * @example
      *
      * ```tsx
-     * const tracks = {
-     *   audio: -1,
-     *   video: 1,
-     *   subtitle: 1,
-     * };
-     *
      * <LibVlcPlayerView
      *   {...props}
-     *   tracks={tracks}
+     *   tracks={{
+     *     audio: -1,
+     *     video: 1,
+     *     subtitle: 1,
+     *   }}
      * />
      * ```
      *
@@ -441,14 +426,12 @@ export type LibVlcPlayerViewProps = ViewProps &
      * @example
      *
      * ```tsx
-     * const delays = {
-     *   audio: 500_000,
-     *   subtitle: 1_000_000,
-     * };
-     *
      * <LibVlcPlayerView
      *   {...props}
-     *   delays={delays}
+     *   delays={{
+     *     audio: 500_000,
+     *     subtitle: 1_000_000,
+     *   }}
      * />
      * ```
      *

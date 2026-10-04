@@ -173,7 +173,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `tracks`           | Sets the player audio, video, and subtitle track indexes. See [`Tracks`](#tracks) for more                                        | `undefined` |
 | `delays`           | Sets the player audio and subtitle delay values in microseconds. See [`Delays`](#delays) for more                                 | `undefined` |
 | `scale`            | Sets the player scaling factor                                                                                                    | `0`         |
-| `aspectRatio`      | Sets the container aspect ratio. When set to auto, a fallback ratio is required                                                   | `undefined` |
+| `aspectRatio`      | Sets the container aspect ratio. When auto, a fallback ratio is required                                                          | `undefined` |
 | `fallbackRatio`    | Sets the fallback aspect ratio                                                                                                    | `undefined` |
 | `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
 | `rate`             | Sets the player playback rate                                                                                                     | `1`         |

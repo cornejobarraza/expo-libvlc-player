@@ -1,7 +1,7 @@
 import { type MaterialIcons } from "@expo/vector-icons";
 import { type LibVlcSource } from "expo-libvlc-player";
 import { type SFSymbol } from "expo-symbols";
-import { type ComponentProps } from "react";
+import { type JSX, type ComponentProps } from "react";
 import {
   type DimensionValue,
   type TextProps,
@@ -38,4 +38,4 @@ export type LoadingProps = {
   height: number;
 };
 
-export type TextComponent = (props: TextProps) => React.JSX.Element;
+export type TextComponent = (props: TextProps) => JSX.Element;

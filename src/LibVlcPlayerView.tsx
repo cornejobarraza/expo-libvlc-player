@@ -12,17 +12,16 @@ import { parseNativeSource } from "./utils/assets";
 import { convertNativeEvent } from "./utils/events";
 import { useTimeoutRef } from "./utils/timeout";
 
+const CHILDREN_WARNING =
+  "<LibVlcPlayerView> does not support children. To render content, consider absolute positioning";
+const RATIO_DELAY = 300;
+
 const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
   requireNativeView("ExpoLibVlcPlayer");
-
-const CHILDREN_WARNING =
-  "<LibVlcPlayerView> does not support children, which may lead to unexpected behaviour. To render content on top, consider absolute positioning";
-const RATIO_DELAY = 300;
 
 const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
   const [warnedChildren, setWarnedChildren] = useState<boolean>(false);
   const [autoRatio, setAutoRatio] = useState<VideoAspectRatio>(props.fallbackRatio);
-
   const ratioTimeoutRef = useTimeoutRef();
 
   if (props.children && !warnedChildren) {
@@ -30,10 +29,16 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
     setWarnedChildren(true);
   }
 
-  const viewRatio = props.aspectRatio === "auto" ? autoRatio : props.aspectRatio;
-
   return (
-    <View style={[props.style, { aspectRatio: convertAspectRatio(viewRatio) }]}>
+    <View
+      style={[
+        props.style,
+        {
+          aspectRatio: convertAspectRatio(
+            props.aspectRatio === "auto" ? autoRatio : props.aspectRatio
+          ),
+        },
+      ]}>
       <NativeView
         {...props}
         ref={ref}
