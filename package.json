@@ -8,11 +8,9 @@
     "build": "node scripts/build.js",
     "clean": "node scripts/clean.js",
     "lint": "eslint src/",
-    "open:android": "node scripts/open-android.js",
-    "open:ios": "node scripts/open-ios.js",
-    "prepare": "husky && node scripts/prepare.js",
     "patch": "node scripts/patch.js",
-    "test": "jest"
+    "prepare": "husky && node scripts/prepare.js",
+    "test": "jest src/"
   },
   "keywords": [
     "react-native",

@@ -1,16 +1,9 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
-
-const SUBTARGETS = ["plugin"];
+const { clean } = require("./utils");
 
 console.log("🧹  Cleaning module");
-fs.rmSync(path.join(process.cwd(), "build"), { recursive: true, force: true });
-fs.rmSync(path.join(process.cwd(), ".tsbuildinfo"), { force: true });
+clean("module");
 
-for (const target of SUBTARGETS) {
-  console.log(`🧹  Cleaning ${target}`);
-  fs.rmSync(path.join(process.cwd(), target, "build"), { recursive: true, force: true });
-  fs.rmSync(path.join(process.cwd(), target, ".tsbuildinfo"), { force: true });
-}
+console.log("🧹  Cleaning plugin");
+clean("plugin");

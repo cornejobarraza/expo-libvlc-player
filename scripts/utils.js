@@ -1,6 +1,20 @@
 #!/usr/bin/env node
 
 const { spawnSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
+
+function clean(target) {
+  switch (target) {
+    case "plugin":
+      fs.rmSync(path.join(process.cwd(), "plugin", "build"), { recursive: true, force: true });
+      fs.rmSync(path.join(process.cwd(), "plugin", ".tsbuildinfo"), { force: true });
+      break;
+    default:
+      fs.rmSync(path.join(process.cwd(), "build"), { recursive: true, force: true });
+      fs.rmSync(path.join(process.cwd(), ".tsbuildinfo"), { force: true });
+  }
+}
 
 // On Windows, executables like tsc are .cmd batch files and cannot be
 // spawned directly as they require shell: true to resolve
@@ -18,4 +32,4 @@ function run(cmd, args = [], options = {}) {
   return result;
 }
 
-module.exports = { spawnSyncWithAutoShell, run };
+module.exports = { clean, spawnSyncWithAutoShell, run };
