@@ -25,7 +25,7 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
   const [backgrounded, setBackgrounded] = useState<boolean>(false);
   const [time, setTime] = useState<number>(DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(MAX_VOLUME);
-  const [parsing, setParsing] = useState<boolean>(true);
+  const [parsing, setParsing] = useState<boolean>(!!source);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
@@ -72,7 +72,6 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
     },
   ];
 
-  const showTitle = metadata?.title != null && metadata.title !== "";
   const showArtist = metadata?.artist != null && metadata.artist !== "";
   const showPoster = (!playing && backgrounded) || time === DEFAULT_TIME;
 
@@ -82,11 +81,9 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
         <View style={styles.header}>
           {!parsing ? (
             <Fragment>
-              {showTitle && (
-                <Text style={styles.title} numberOfLines={1}>
-                  {metadata.title}
-                </Text>
-              )}
+              <Text style={styles.title} numberOfLines={1}>
+                {metadata?.title || "LibVLC Player"}
+              </Text>
               {showArtist && (
                 <Text style={styles.artist} numberOfLines={1}>
                   {metadata.artist}
