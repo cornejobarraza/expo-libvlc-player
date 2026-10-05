@@ -1,22 +1,20 @@
 ---
 name: Bug report
-about: Report an issue to improve the library
-title: ""
+about: Report a bug in the library
 labels: bug
-assignees: ""
 ---
 
 **Describe the bug**
 A clear and concise description of what the bug is.
 
 **To reproduce**
-Steps to reproduce the behavior using a publicly available source.
+Steps to reproduce the bug using a publicly available source.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Screenshot**
+If applicable, add a screenshot to help explain your problem.
 
 **Platform**
 
