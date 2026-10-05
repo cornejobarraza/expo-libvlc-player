@@ -5,7 +5,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "prebuild": "expo prebuild",
-    "test": "maestro test .maestro"
+    "test:android": "maestro test -e APP_ID=expo.modules.libvlcplayer.android .maestro",
+    "test:ios": "maestro test -e APP_ID=expo.modules.libvlcplayer.ios .maestro"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",

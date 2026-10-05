@@ -82,13 +82,7 @@ function packAtRef(ref) {
 }
 
 function test(platform) {
-  run(
-    "maestro",
-    ["test", "-e", `APP_ID=expo.modules.libvlcplayer.${platform}`, ".maestro/playback.yaml"],
-    {
-      cwd: path.join(repo_root, "example"),
-    }
-  );
+  run("npm", ["run", `test:${platform}`], { cwd: path.join(repo_root, "example") });
 }
 
 function tests(diffArgs) {
