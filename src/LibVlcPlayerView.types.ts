@@ -265,6 +265,11 @@ type DialogDisplayListener = (event: NativeEvent<Dialog>) => void;
 /**
  * @hidden
  */
+type DialogCanceledListener = () => void;
+
+/**
+ * @hidden
+ */
 type TimeChangedListener = (event: NativeEvent<Time>) => void;
 
 /**
@@ -339,6 +344,7 @@ export type LibVlcPlayerViewNativeProps = ViewProps &
     onStopped?: StoppedListener;
     onEncounteredError?: EncounteredErrorListener;
     onDialogDisplay?: DialogDisplayListener;
+    onDialogCanceled?: DialogCanceledListener;
     onTimeChanged?: TimeChangedListener;
     onPositionChanged?: PositionChangedListener;
     onESAdded?: ESAddedListener;
@@ -522,6 +528,10 @@ export type LibVlcPlayerViewProps = ViewProps &
      * Called after a dialog is displayed
      */
     onDialogDisplay?: (event: Dialog) => void;
+    /**
+     * Called after a dialog is canceled
+     */
+    onDialogCanceled?: () => void;
     /**
      * Called after the `TimeChanged` player event
      */

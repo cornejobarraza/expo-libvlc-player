@@ -21,6 +21,7 @@ private val PLAYER_EVENTS =
     "onStopped",
     "onEncounteredError",
     "onDialogDisplay",
+    "onDialogCanceled",
     "onTimeChanged",
     "onPositionChanged",
     "onESAdded",

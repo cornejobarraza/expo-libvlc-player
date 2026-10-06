@@ -17,6 +17,7 @@ class LibVlcPlayerView: ExpoView {
   let onStopped = EventDispatcher()
   let onEncounteredError = EventDispatcher()
   let onDialogDisplay = EventDispatcher()
+  let onDialogCanceled = EventDispatcher()
   let onTimeChanged = EventDispatcher()
   let onPositionChanged = EventDispatcher()
   let onESAdded = EventDispatcher()

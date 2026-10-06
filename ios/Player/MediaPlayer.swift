@@ -575,6 +575,7 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
 
     if prevReference == reference {
       vlcDialog = nil
+      view.onDialogCanceled()
     }
   }
 }

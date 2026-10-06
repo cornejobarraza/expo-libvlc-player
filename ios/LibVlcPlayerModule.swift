@@ -8,6 +8,7 @@ private let playerEvents = [
   "onStopped",
   "onEncounteredError",
   "onDialogDisplay",
+  "onDialogCanceled",
   "onTimeChanged",
   "onPositionChanged",
   "onESAdded",

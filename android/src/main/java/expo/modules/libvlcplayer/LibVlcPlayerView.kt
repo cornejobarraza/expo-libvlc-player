@@ -49,6 +49,7 @@ class LibVlcPlayerView(
   val onStopped by EventDispatcher<Unit>()
   val onEncounteredError by EventDispatcher()
   val onDialogDisplay by EventDispatcher<Dialog>()
+  val onDialogCanceled by EventDispatcher<Unit>()
   val onTimeChanged by EventDispatcher()
   val onPositionChanged by EventDispatcher()
   val onESAdded by EventDispatcher<MediaTracks>()

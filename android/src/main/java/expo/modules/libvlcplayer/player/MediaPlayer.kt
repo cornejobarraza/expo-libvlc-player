@@ -728,6 +728,7 @@ private fun MediaPlayer.setDialogCallbacks() {
 
           if (prevDialog === dialog) {
             vlcDialog = null
+            view.onDialogCanceled(Unit)
           }
         }
       },
