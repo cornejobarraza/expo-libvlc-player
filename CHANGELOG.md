@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 57.0.57 - 2026-10-05
+
+### 🛠 Breaking changes
+
+- Added error for missing player or dialog
+
+### 🎉 New features
+
+- Added canceled dialog callback prop
+
 ## 57.0.56 - 2026-10-04
 
 ### 💡 Others
