@@ -14,31 +14,27 @@ import { useTimeoutRef } from "./utils/timeout";
 
 const CHILDREN_WARNING =
   "<LibVlcPlayerView> does not support children. To render content, consider absolute positioning";
-const RATIO_DELAY = 300;
+const RATIO_TIMEOUT = 300;
 
 const NativeView: ComponentType<LibVlcPlayerViewNativeProps> =
   requireNativeView("ExpoLibVlcPlayer");
 
 const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
   const [warnedChildren, setWarnedChildren] = useState<boolean>(false);
-  const [autoRatio, setAutoRatio] = useState<VideoAspectRatio>(props.fallbackRatio);
-  const ratioTimeoutRef = useTimeoutRef();
+  const [mediaRatio, setMediaRatio] = useState<VideoAspectRatio>(undefined);
+
+  const setTimeoutRef = useTimeoutRef();
 
   if (props.children && !warnedChildren) {
     console.warn(CHILDREN_WARNING);
     setWarnedChildren(true);
   }
 
+  const viewRatio =
+    props.aspectRatio === "auto" ? (mediaRatio ?? props.fallbackRatio) : props.aspectRatio;
+
   return (
-    <View
-      style={[
-        props.style,
-        {
-          aspectRatio: convertAspectRatio(
-            props.aspectRatio === "auto" ? autoRatio : props.aspectRatio
-          ),
-        },
-      ]}>
+    <View style={[props.style, { aspectRatio: convertAspectRatio(viewRatio) }]}>
       <NativeView
         {...props}
         ref={ref}
@@ -74,14 +70,16 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
         }}
         onFirstPlay={(event) => {
           const mediaInfo = convertNativeEvent(event);
-          const mediaRatio = mediaInfo.video.width / mediaInfo.video.height;
 
-          const validRatio = mediaRatio > 0 && mediaRatio < Infinity;
-          const nextRatio = validRatio ? mediaRatio : props.fallbackRatio;
+          const { width, height } = mediaInfo.video;
+          const videoRatio = width / height;
+
+          const validRatio = videoRatio > 0 && videoRatio < Infinity;
+          const nextRatio = validRatio ? videoRatio : undefined;
 
           // View resizing workaround
-          const ratioTimeout = setTimeout(() => setAutoRatio(nextRatio), RATIO_DELAY);
-          ratioTimeoutRef.current = ratioTimeout;
+          const handler = () => setMediaRatio(nextRatio);
+          setTimeoutRef(handler, RATIO_TIMEOUT);
 
           props.onFirstPlay?.(mediaInfo);
         }}

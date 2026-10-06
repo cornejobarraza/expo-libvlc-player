@@ -108,7 +108,7 @@ export interface Delays {
   subtitle?: number;
 }
 
-export type VideoAspectRatio = `${number}:${number}` | number | undefined;
+export type VideoAspectRatio = `${number}:${number}` | `${number}/${number}` | number | undefined;
 
 /**
  * @hidden

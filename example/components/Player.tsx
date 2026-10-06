@@ -16,8 +16,9 @@ const MAX_BUFFER = 1;
 const DEFAULT_TIME = 0;
 const SEEK_STEP = 10_000;
 
-// Use software decoding for development
 const OPTIONS = !isDevice ? [":codec=avcodec"] : undefined;
+const ASPECT_RATIO = "16/9";
+const CONTENT_FIT = "contain";
 
 export const Player = ({ source, fullScreen }: PlayerProps) => {
   const [buffering, setBuffering] = useState<boolean>(false);
@@ -29,8 +30,6 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
   const [metadata, setMetadata] = useState<Metadata | null>(null);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
-
-  const { bottom: paddingBottom } = useSafeAreaInsets();
 
   const playerControls: ControlProps[] = [
     {
@@ -74,6 +73,7 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
 
   const showArtist = metadata?.artist != null && metadata.artist !== "";
   const showPoster = (!playing && backgrounded) || time === DEFAULT_TIME;
+  const paddingBottom = useSafeAreaInsets().bottom;
 
   return (
     <View style={[styles.player, fullScreen && styles.fullScreen]}>
@@ -102,9 +102,12 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
         {showPoster && (
           <View style={styles.poster} testID="poster">
             <Image
-              style={[styles.image, !fullScreen ? styles.rounded : styles.square]}
+              style={[
+                styles.image,
+                !fullScreen ? styles.rounded : styles.square,
+                { aspectRatio: ASPECT_RATIO, objectFit: CONTENT_FIT },
+              ]}
               source={require("../assets/bbb.png")}
-              resizeMode="contain"
             />
           </View>
         )}
@@ -114,7 +117,8 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
           style={[styles.view, !fullScreen ? styles.rounded : styles.square]}
           source={source}
           options={OPTIONS}
-          aspectRatio="16:9"
+          aspectRatio={ASPECT_RATIO}
+          contentFit={CONTENT_FIT}
           volume={volume}
           onBuffering={({ value }) => {
             setBuffering(value < MAX_BUFFER);

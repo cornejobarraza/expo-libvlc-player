@@ -7,9 +7,16 @@ describe(convertAspectRatio, () => {
     expect(convertAspectRatio("1:1")).toBe(1);
   });
 
+  it("converts a slash ratio string to a number", () => {
+    expect(convertAspectRatio("16/9")).toBeCloseTo(16 / 9);
+    expect(convertAspectRatio("4/3")).toBeCloseTo(4 / 3);
+    expect(convertAspectRatio("1/1")).toBe(1);
+  });
+
   it("converts a decimal ratio string to a number", () => {
     expect(convertAspectRatio("1.85:1")).toBeCloseTo(1.85);
     expect(convertAspectRatio("2.39:1")).toBeCloseTo(2.39);
+    expect(convertAspectRatio("2.39/1")).toBeCloseTo(2.39);
   });
 
   it("returns numbers unchanged", () => {
@@ -25,6 +32,7 @@ describe(convertAspectRatio, () => {
     expect(convertAspectRatio("0:9")).toBe("0:9");
     expect(convertAspectRatio("16:0")).toBe("16:0");
     expect(convertAspectRatio("0:0")).toBe("0:0");
+    expect(convertAspectRatio("16/0")).toBe("16/0");
   });
 
   it("returns ratio strings with a negative dimension unchanged", () => {

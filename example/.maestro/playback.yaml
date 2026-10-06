@@ -9,7 +9,7 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     notVisible:
       id: "poster"
-    timeout: 3_600
+    timeout: 5_000
 
 - assertVisible:
     id: "pause"
@@ -19,21 +19,21 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible:
       id: "play"
-    timeout: 3_600
+    timeout: 2_500
 
 - tapOn:
     id: "play"
 - extendedWaitUntil:
     visible:
       id: "pause"
-    timeout: 3_600
+    timeout: 2_500
 
 - tapOn:
     id: "stop"
 - extendedWaitUntil:
     visible:
       id: "play"
-    timeout: 3_600
+    timeout: 5_000
 
 - assertVisible:
     id: "poster"

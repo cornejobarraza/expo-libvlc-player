@@ -41,9 +41,16 @@ function getWrapperStyle(json: unknown) {
 
 describe("LibVlcPlayerView", () => {
   beforeEach(() => {
+    mockNativeViewRender.mockClear();
+
     jest
       .spyOn(Image, "resolveAssetSource")
       .mockReturnValue({ uri: SOURCE_URI, width: 0, height: 0, scale: 1 });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
   describe("children warning", () => {
@@ -51,10 +58,6 @@ describe("LibVlcPlayerView", () => {
 
     beforeEach(() => {
       warn = jest.spyOn(console, "warn").mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-      warn.mockRestore();
     });
 
     it("warns once when children are passed", async () => {
@@ -125,7 +128,7 @@ describe("LibVlcPlayerView", () => {
             target: 1,
             timeStamp: 1,
             media: { length: 1000, seekable: true },
-            metadata: { title: null, artist: null, artworkURL: null },
+            metadata: { title: null, artist: null, album: null, artworkURL: null },
             video: { width: 1280, height: 720, frameRate: 30, bitrate: 0 },
           },
         });
@@ -133,8 +136,6 @@ describe("LibVlcPlayerView", () => {
       });
 
       expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 1280 / 720 });
-
-      jest.useRealTimers();
     });
 
     it("keeps the fallback ratio when the media reports invalid dimensions", async () => {
@@ -150,7 +151,7 @@ describe("LibVlcPlayerView", () => {
             target: 1,
             timeStamp: 1,
             media: { length: 0, seekable: false },
-            metadata: { title: null, artist: null, artworkURL: null },
+            metadata: { title: null, artist: null, album: null, artworkURL: null },
             video: { width: 0, height: 0, frameRate: 0, bitrate: 0 },
           },
         });
@@ -158,8 +159,127 @@ describe("LibVlcPlayerView", () => {
       });
 
       expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 16 / 9 });
+    });
+  });
 
-      jest.useRealTimers();
+  describe("auto ratio timing", () => {
+    const firstPlayEvent = (width: number, height: number) => ({
+      nativeEvent: {
+        target: 1,
+        timeStamp: 1,
+        media: { length: 1000, seekable: true },
+        metadata: { title: null, artist: null, album: null, artworkURL: null },
+        video: { width, height, frameRate: 30, bitrate: 0 },
+      },
+    });
+
+    it("waits for the resize delay before adopting the media ratio", async () => {
+      jest.useFakeTimers();
+
+      const { toJSON } = await render(
+        <LibVlcPlayerView source={SOURCE} aspectRatio="auto" fallbackRatio={FALLBACK_RATIO} />
+      );
+
+      await act(async () => {
+        getNativeProps().onFirstPlay?.(firstPlayEvent(1280, 960));
+        jest.advanceTimersByTime(299);
+      });
+
+      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 16 / 9 });
+
+      await act(async () => {
+        jest.advanceTimersByTime(1);
+      });
+
+      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 1280 / 960 });
+    });
+
+    it("ignores the media ratio when aspectRatio is not auto", async () => {
+      jest.useFakeTimers();
+
+      const { toJSON } = await render(<LibVlcPlayerView source={SOURCE} aspectRatio="4:3" />);
+
+      await act(async () => {
+        getNativeProps().onFirstPlay?.(firstPlayEvent(1920, 1080));
+        jest.runAllTimers();
+      });
+
+      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 4 / 3 });
+    });
+
+    it("applies only the latest ratio when onFirstPlay fires again", async () => {
+      jest.useFakeTimers();
+
+      const { toJSON } = await render(
+        <LibVlcPlayerView source={SOURCE} aspectRatio="auto" fallbackRatio={FALLBACK_RATIO} />
+      );
+
+      await act(async () => {
+        getNativeProps().onFirstPlay?.(firstPlayEvent(400, 400));
+        jest.advanceTimersByTime(200);
+        getNativeProps().onFirstPlay?.(firstPlayEvent(1280, 960));
+        jest.advanceTimersByTime(299);
+      });
+
+      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 16 / 9 });
+
+      await act(async () => {
+        jest.advanceTimersByTime(1);
+      });
+
+      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 1280 / 960 });
+    });
+
+    it("cancels the pending ratio update on unmount", async () => {
+      jest.useFakeTimers();
+
+      const setTimeoutSpy = jest.spyOn(globalThis, "setTimeout");
+      const clearTimeoutSpy = jest.spyOn(globalThis, "clearTimeout");
+
+      const { unmount } = await render(
+        <LibVlcPlayerView source={SOURCE} aspectRatio="auto" fallbackRatio={FALLBACK_RATIO} />
+      );
+
+      await act(async () => {
+        getNativeProps().onFirstPlay?.(firstPlayEvent(1280, 720));
+      });
+
+      const ratioCall = setTimeoutSpy.mock.calls.findIndex(([, delay]) => delay === 300);
+      const ratioTimeout = setTimeoutSpy.mock.results[ratioCall]?.value;
+
+      expect(ratioTimeout).toBeDefined();
+
+      await unmount();
+
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(ratioTimeout);
+    });
+  });
+
+  describe("native view props", () => {
+    it("stretches the native view to fill the wrapper", async () => {
+      await render(<LibVlcPlayerView source={SOURCE} style={{ width: 200 }} />);
+
+      expect(StyleSheet.flatten(getNativeProps().style)).toMatchObject({
+        width: 200,
+        height: "100%",
+      });
+    });
+
+    it.each([
+      "onPlaying",
+      "onPaused",
+      "onStopped",
+      "onDialogCanceled",
+      "onForeground",
+      "onBackground",
+      "onPictureInPictureStart",
+      "onPictureInPictureStop",
+    ] as const)("passes the %s listener through untouched", async (name) => {
+      const listener = jest.fn();
+
+      await render(<LibVlcPlayerView source={SOURCE} {...{ [name]: listener }} />);
+
+      expect(getNativeProps()[name]).toBe(listener);
     });
   });
 
@@ -241,7 +361,7 @@ describe("LibVlcPlayerView", () => {
 
       const mediaInfo = {
         media: { length: 634000, seekable: true },
-        metadata: { title: "Big Buck Bunny", artist: null, artworkURL: null },
+        metadata: { title: "Big Buck Bunny", artist: null, album: null, artworkURL: null },
         video: { width: 1920, height: 1080, frameRate: 30, bitrate: 5000 },
       };
 
@@ -255,8 +375,6 @@ describe("LibVlcPlayerView", () => {
       });
 
       expect(onFirstPlay).toHaveBeenCalledWith(mediaInfo);
-
-      jest.useRealTimers();
     });
 
     it("does not throw when native events fire without listeners", async () => {
@@ -274,15 +392,13 @@ describe("LibVlcPlayerView", () => {
             nativeEvent: {
               ...nativeProps,
               media: { length: 0, seekable: false },
-              metadata: { title: null, artist: null, artworkURL: null },
+              metadata: { title: null, artist: null, album: null, artworkURL: null },
               video: { width: 1, height: 1, frameRate: 0, bitrate: 0 },
             },
           });
           jest.runAllTimers();
         }).not.toThrow();
       });
-
-      jest.useRealTimers();
     });
   });
 });
