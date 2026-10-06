@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.58 - 2026-10-06
+
+### 💡 Others
+
+- Refactored aspect ratio logic
+
 ## 57.0.57 - 2026-10-05
 
 ### 🛠 Breaking changes
