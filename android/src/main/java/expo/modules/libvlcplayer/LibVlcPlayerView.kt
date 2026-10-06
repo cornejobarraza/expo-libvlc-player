@@ -227,57 +227,54 @@ class LibVlcPlayerView(
     }
 
   fun play() {
-    mediaPlayer?.let { player ->
+    player.withPlayer { mediaPlayer ->
       if (!autoplay) {
-        player.play()
+        mediaPlayer.play()
       }
 
-      player.play()
+      mediaPlayer.play()
     }
   }
 
   fun pause() {
-    mediaPlayer?.pause()
+    player.withPlayer { mediaPlayer ->
+      mediaPlayer.pause()
+    }
   }
 
   fun stop() {
-    player.userStop = true
-    mediaPlayer?.stop()
+    player.withPlayer { mediaPlayer ->
+      player.userStop = true
+      mediaPlayer.stop()
+    }
   }
 
   fun seek(
     value: Double,
     type: String? = "time",
   ) {
-    mediaPlayer?.let { player ->
+    player.withPlayer { mediaPlayer ->
       if (type == "position") {
-        player.setPosition(value.toFloat())
+        mediaPlayer.setPosition(value.toFloat())
       } else {
-        player.setTime(value.toLong())
+        mediaPlayer.setTime(value.toLong())
       }
     }
   }
 
   fun record(path: String?) {
-    mediaPlayer?.let { player ->
-      if (path != null) {
-        val success = player.record(path, true)
-
-        if (!success) {
-          onEncounteredError(mapOf("message" to "Media could not be recorded"))
-        }
-      } else {
-        player.record(null, false)
-      }
+    player.withPlayer(message = "Media could not be recorded") { mediaPlayer ->
+      mediaPlayer.record(path, path != null)
     }
   }
 
   fun snapshot(path: String) {
-    try {
-      val view = getTextureView(video) ?: throw Exception()
+    val message = "Snapshot could not be taken"
 
+    try {
       if (!player.hasVideoSize) throw Exception()
 
+      val view = getTextureView(video) ?: throw Exception()
       val surface = Surface(view.surfaceTexture)
       val video = player.getVideo()
       val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
@@ -301,24 +298,19 @@ class LibVlcPlayerView(
 
             onSnapshotTaken(mapOf("path" to snapshotPath))
           } catch (_: Exception) {
-            onEncounteredError(mapOf("message" to "Snapshot could not be taken"))
+            onEncounteredError(mapOf("message" to message))
           }
         },
         Handler(Looper.getMainLooper()),
       )
     } catch (_: Exception) {
-      onEncounteredError(mapOf("message" to "Snapshot could not be taken"))
+      onEncounteredError(mapOf("message" to message))
     }
   }
 
   fun postAction(action: Int) {
-    player.vlcDialog?.let { dialog ->
-      when (dialog) {
-        is VLCDialog.QuestionDialog -> {
-          dialog.postAction(action)
-          player.vlcDialog = null
-        }
-      }
+    player.withDialog<VLCDialog.QuestionDialog> { dialog ->
+      dialog.postAction(action)
     }
   }
 
@@ -327,20 +319,14 @@ class LibVlcPlayerView(
     password: String?,
     store: Boolean? = false,
   ) {
-    player.vlcDialog?.let { dialog ->
-      when (dialog) {
-        is VLCDialog.LoginDialog -> {
-          dialog.postLogin(username, password ?: "", store ?: false)
-          player.vlcDialog = null
-        }
-      }
+    player.withDialog<VLCDialog.LoginDialog> { dialog ->
+      dialog.postLogin(username, password ?: "", store ?: false)
     }
   }
 
   fun dismiss() {
-    player.vlcDialog?.let { dialog ->
+    player.withDialog<VLCDialog> { dialog ->
       dialog.dismiss()
-      player.vlcDialog = null
     }
   }
 

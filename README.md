@@ -153,7 +153,7 @@ The `LibVlcPlayerViewRef` implements the following functions:
 | `pause()`                 |                                                                                                                                                                                             | Pauses playback of the current player                                                    | `Promise<void>` |
 | `stop()`                  |                                                                                                                                                                                             | Stops playback of the current player                                                     | `Promise<void>` |
 | `seek()`                  | <div><code>value: number</code> — Must be <code>0</code> or greater</div><div><code>type: "time" \| "position"</code> — Defaults to time</div>                                              | Sets the time or position of the current player                                          | `Promise<void>` |
-| `record()`                | `path?: string` — Must be a valid directory, or `undefined` to stop recording                                                                                                               | Starts or stops recording the current media                                              | `Promise<void>` |
+| `record()`                | `path?: string` — Must be a valid directory or `undefined` to stop recording                                                                                                                | Starts or stops recording the current media                                              | `Promise<void>` |
 | `snapshot()`              | `path: string` — Must be a valid directory                                                                                                                                                  | Takes a snapshot of the current media                                                    | `Promise<void>` |
 | `postAction()`            | `action: 1 \| 2` — Which dialog action to perform                                                                                                                                           | Posts an answer to a question dialog                                                     | `Promise<void>` |
 | `postLogin()`             | <div><code>username: string</code> — Can't be empty</div><div><code>password?: string</code> — Can be empty</div><div><code>store?: boolean</code> — Whether to store the credentials</div> | Posts a username and password to a login dialog                                          | `Promise<void>` |
@@ -167,7 +167,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 
 | Prop               | Description                                                                                                                       | Default     |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `source`           | Sets the source of the media to be played, or `null` to release the player. See [`LibVlcSource`](#libvlcsource) for more          |             |
+| `source`           | Sets the source of the media to be played or `null` to release the player. See [`LibVlcSource`](#libvlcsource) for more           |             |
 | `options`          | Sets the options to initialize the media with. See the [VideoLAN Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
 | `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
 | `tracks`           | Sets the player audio, video, and subtitle track indexes. See [`Tracks`](#tracks) for more                                        | `undefined` |
@@ -194,7 +194,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `onPaused`                | Called after the `Paused` player event                       |                               |
 | `onStopped`               | Called after the `Stopped` player event                      |                               |
 | `onEncounteredError`      | Called after the `EncounteredError` player event             | [`Error`](#error)             |
-| `onDialogDisplay`         | Called after a dialog needs to be displayed                  | [`Dialog`](#dialog)           |
+| `onDialogDisplay`         | Called after a dialog is displayed                           | [`Dialog`](#dialog)           |
 | `onTimeChanged`           | Called after the `TimeChanged` player event                  | [`Time`](#time)               |
 | `onPositionChanged`       | Called after the `PositionChanged` player event              | [`Position`](#position)       |
 | `onESAdded`               | Called after the `ESAdded` player event                      | [`MediaTracks`](#mediatracks) |

@@ -32,7 +32,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Starts or stops recording the current media
    *
-   * @param path - Must be a valid directory, or `undefined` to stop recording
+   * @param path - Must be a valid directory or `undefined` to stop recording
    *
    * @returns A promise which resolves to `void`
    */
@@ -360,7 +360,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     ref?: Ref<LibVlcPlayerViewRef>;
     /**
-     * Sets the source of the media to be played, or `null` to release the player
+     * Sets the source of the media to be played or `null` to release the player
      */
     source: LibVlcSource;
     /**
@@ -519,7 +519,7 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     onEncounteredError?: (event: Error) => void;
     /**
-     * Called after a dialog needs to be displayed
+     * Called after a dialog is displayed
      */
     onDialogDisplay?: (event: Dialog) => void;
     /**

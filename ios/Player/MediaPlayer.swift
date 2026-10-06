@@ -12,8 +12,8 @@ class MediaPlayer: NSObject {
 
   private var library: VLCLibrary?
   var mediaPlayer: VLCMediaPlayer?
-  var vlcDialog: VLCDialogProvider?
-  var vlcDialogRef: NSValue?
+  var vlcDialog: VLCDialog?
+  private var vlcDialogProvider: VLCDialogProvider?
 
   var userStop: Bool = false
   private var firstPlay: Bool = true
@@ -68,8 +68,8 @@ class MediaPlayer: NSObject {
     mediaPlayer!.delegate = self
     addPlayerSlaves(view.slaves)
 
-    vlcDialog = VLCDialogProvider(library: library!, customUI: dialogCustomUI)
-    vlcDialog!.customRenderer = self
+    vlcDialogProvider = VLCDialogProvider(library: library!, customUI: dialogCustomUI)
+    vlcDialogProvider!.customRenderer = self
 
     guard let source = view.source, let url = URL(string: source) else {
       view.onEncounteredError(["message": "Invalid source, media could not be set"])
@@ -96,8 +96,29 @@ class MediaPlayer: NSObject {
     library = nil
     mediaPlayer?.stop()
     mediaPlayer = nil
-    vlcDialog?.customRenderer = nil
+    vlcDialogProvider?.customRenderer = nil
+    vlcDialogProvider = nil
     vlcDialog = nil
+  }
+
+  func withPlayer(message: String = "Player not available", _ block: (VLCMediaPlayer) -> Void) {
+    if let player = mediaPlayer {
+      block(player)
+    } else {
+      view.onEncounteredError(["message": message])
+    }
+  }
+
+  func withDialog<T: VLCDialog>(_: T.Type, _ block: (T) -> Void) {
+    switch vlcDialog {
+    case nil:
+      view.onEncounteredError(["message": "Dialog not available"])
+    case let dialog as T:
+      vlcDialog = nil
+      block(dialog)
+    default:
+      view.onEncounteredError(["message": "Dialog type not available"])
+    }
   }
 
   private func setupPlayer() {
@@ -153,29 +174,29 @@ class MediaPlayer: NSObject {
     }
   }
 
-  private func selectTrack(_ index: Int, _ type: VLCMedia.TrackType) {
-    if let player = mediaPlayer {
-      if index == -1 {
-        switch type {
-        case .audio: player.deselectAllAudioTracks()
-        case .video: player.deselectAllVideoTracks()
-        case .text: player.deselectAllTextTracks()
-        default: break
-        }
-      } else {
-        player.selectTrack(at: index, type: type)
-      }
-    }
-  }
-
   func setPlayerTracks() {
-    let audioTrack = view.tracks?.audio
-    let videoTrack = view.tracks?.video
-    let textTrack = view.tracks?.subtitle
+    if let player = mediaPlayer {
+      func selectTrack(_ index: Int, _ type: VLCMedia.TrackType) {
+        if index == -1 {
+          switch type {
+          case .audio: player.deselectAllAudioTracks()
+          case .video: player.deselectAllVideoTracks()
+          case .text: player.deselectAllTextTracks()
+          default: break
+          }
+        } else {
+          player.selectTrack(at: index, type: type)
+        }
+      }
 
-    if let audioTrack { selectTrack(audioTrack, .audio) }
-    if let videoTrack { selectTrack(videoTrack, .video) }
-    if let textTrack { selectTrack(textTrack, .text) }
+      let audioTrack = view.tracks?.audio
+      let videoTrack = view.tracks?.video
+      let textTrack = view.tracks?.subtitle
+
+      if let audioTrack { selectTrack(audioTrack, .audio) }
+      if let videoTrack { selectTrack(videoTrack, .video) }
+      if let textTrack { selectTrack(textTrack, .text) }
+    }
   }
 
   func setPlayerDelays() {
@@ -482,6 +503,8 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
     withTitle title: String,
     message: String
   ) {
+    vlcDialog = VLCDialog.ErrorMessage(vlcDialogProvider)
+
     let dialog = Dialog(
       title: title,
       text: message,
@@ -498,7 +521,7 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
     askingForStorage _: Bool,
     withReference reference: NSValue
   ) {
-    vlcDialogRef = reference
+    vlcDialog = VLCDialog.LoginDialog(vlcDialogProvider, reference)
 
     let dialog = Dialog(
       title: title,
@@ -518,7 +541,7 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
     action2String: String?,
     withReference reference: NSValue
   ) {
-    vlcDialogRef = reference
+    vlcDialog = VLCDialog.QuestionDialog(vlcDialogProvider, reference)
 
     let dialog = Dialog(
       title: title,
@@ -547,7 +570,13 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
     position _: Float
   ) {}
 
-  func cancelDialog(withReference _: NSValue) {}
+  func cancelDialog(withReference reference: NSValue) {
+    let prevReference = (vlcDialog as? VLCDialog.IdDialog)?.reference
+
+    if prevReference == reference {
+      vlcDialog = nil
+    }
+  }
 }
 
 private extension [String] {

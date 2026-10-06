@@ -183,96 +183,94 @@ class LibVlcPlayerView: ExpoView {
   }
 
   func play() {
-    if let player = mediaPlayer {
+    player.withPlayer { mediaPlayer in
       if !autoplay {
-        player.play()
+        mediaPlayer.play()
       }
 
-      player.play()
+      mediaPlayer.play()
     }
   }
 
   func pause() {
-    mediaPlayer?.pause()
+    player.withPlayer { mediaPlayer in
+      mediaPlayer.pause()
+    }
   }
 
   func stop() {
-    player.userStop = true
-    mediaPlayer?.stop()
+    player.withPlayer { mediaPlayer in
+      player.userStop = true
+      mediaPlayer.stop()
+    }
   }
 
   func seek(_ value: Double, _ type: String? = "time") {
-    if let player = mediaPlayer {
+    player.withPlayer { mediaPlayer in
       if type == "position" {
-        player.position = value
+        mediaPlayer.position = value
       } else {
-        player.time = VLCTime(int: Int32(value))
+        mediaPlayer.time = VLCTime(int: Int32(value))
       }
     }
   }
 
   func record(_ path: String?) {
-    if let player = mediaPlayer {
+    player.withPlayer(message: "Media could not be recorded") { mediaPlayer in
       if let path {
-        player.startRecording(atPath: path)
+        mediaPlayer.startRecording(atPath: path)
       } else {
-        player.stopRecording()
+        mediaPlayer.stopRecording()
       }
-    } else {
-      onEncounteredError(["message": "Media could not be recorded"])
     }
   }
 
   func snapshot(_ path: String) {
-    if player.hasVideoSize {
-      let dateFormatter = DateFormatter()
-      dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
-      let timestamp = dateFormatter.string(from: Date())
+    let message = "Snapshot could not be taken"
 
-      let snapshotPath = path + "/vlc-snapshot-\(timestamp).jpg"
-      let video = CGSize(width: 0, height: 0) // Use original window size
+    player.withPlayer(message: message) { mediaPlayer in
+      if player.hasVideoSize {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
+        let timestamp = dateFormatter.string(from: Date())
 
-      mediaPlayer?.saveVideoSnapshot(
-        at: snapshotPath,
-        withWidth: Int32(video.width),
-        andHeight: Int32(video.height)
-      )
+        let snapshotPath = path + "/vlc-snapshot-\(timestamp).jpg"
+        let video = CGSize(width: 0, height: 0) // Use original window size
 
-      let fileExists = FileManager.default.fileExists(atPath: snapshotPath)
+        mediaPlayer.saveVideoSnapshot(
+          at: snapshotPath,
+          withWidth: Int32(video.width),
+          andHeight: Int32(video.height)
+        )
 
-      if fileExists {
-        onSnapshotTaken(["path": snapshotPath])
+        let fileExists = FileManager.default.fileExists(atPath: snapshotPath)
+
+        if fileExists {
+          onSnapshotTaken(["path": snapshotPath])
+        } else {
+          onEncounteredError(["message": message])
+        }
       } else {
-        onEncounteredError(["message": "Snapshot could not be taken"])
+        onEncounteredError(["message": message])
       }
-    } else {
-      onEncounteredError(["message": "Snapshot could not be taken"])
     }
   }
 
   func postAction(_ action: Int) {
-    if let dialog = player.vlcDialog, let reference = player.vlcDialogRef {
-      dialog.postAction(Int32(action), forDialogReference: reference)
-      player.vlcDialogRef = nil
+    player.withDialog(VLCDialog.QuestionDialog.self) { dialog in
+      dialog.postAction(action)
     }
   }
 
   func postLogin(_ username: String, _ password: String?, _ store: Bool? = false) {
-    if let dialog = player.vlcDialog, let reference = player.vlcDialogRef {
-      dialog.postUsername(
-        username,
-        andPassword: password ?? "",
-        forDialogReference: reference,
-        store: store ?? false
-      )
-      player.vlcDialogRef = nil
+    player.withDialog(VLCDialog.LoginDialog.self) { dialog in
+      dialog.postLogin(username, password ?? "", store ?? false)
     }
   }
 
   func dismiss() {
-    if let dialog = player.vlcDialog, let reference = player.vlcDialogRef {
-      dialog.dismissDialog(withReference: reference)
-      player.vlcDialogRef = nil
+    player.withDialog(VLCDialog.self) { dialog in
+      dialog.dismiss()
     }
   }
 

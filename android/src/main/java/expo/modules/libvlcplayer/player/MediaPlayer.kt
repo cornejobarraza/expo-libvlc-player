@@ -242,6 +242,36 @@ class MediaPlayer(
     view.removeAllViews()
   }
 
+  fun withPlayer(
+    message: String = "Player not available",
+    block: (VLCMediaPlayer) -> Unit,
+  ) {
+    val player = mediaPlayer
+
+    if (player != null) {
+      block(player)
+    } else {
+      view.onEncounteredError(mapOf("message" to message))
+    }
+  }
+
+  inline fun <reified T : VLCDialog> withDialog(block: (T) -> Unit) {
+    when (val dialog = vlcDialog) {
+      null -> {
+        view.onEncounteredError(mapOf("message" to "Dialog not available"))
+      }
+
+      is T -> {
+        vlcDialog = null
+        block(dialog)
+      }
+
+      else -> {
+        view.onEncounteredError(mapOf("message" to "Dialog type not available"))
+      }
+    }
+  }
+
   fun setupPlayer() {
     view.post {
       mediaPlayer?.let { player ->
@@ -299,27 +329,27 @@ class MediaPlayer(
     }
   }
 
-  private fun selectTrack(
-    index: Int,
-    type: Int,
-  ) {
-    mediaPlayer?.let { player ->
-      if (index == -1) {
-        player.unselectTrackType(type)
-      } else {
-        player.selectTrack(index.toString())
-      }
-    }
-  }
-
   fun setPlayerTracks() {
-    val audioTrack = view.tracks?.audio
-    val videoTrack = view.tracks?.video
-    val spuTrack = view.tracks?.subtitle
+    mediaPlayer?.let { player ->
+      fun selectTrack(
+        index: Int,
+        type: Int,
+      ) {
+        if (index == -1) {
+          player.unselectTrackType(type)
+        } else {
+          player.selectTrack(index.toString())
+        }
+      }
 
-    audioTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Audio) }
-    videoTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Video) }
-    spuTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Text) }
+      val audioTrack = view.tracks?.audio
+      val videoTrack = view.tracks?.video
+      val spuTrack = view.tracks?.subtitle
+
+      audioTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Audio) }
+      videoTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Video) }
+      spuTrack?.let { track -> selectTrack(track, IMedia.Track.Type.Text) }
+    }
   }
 
   fun setPlayerDelays() {
@@ -691,9 +721,15 @@ private fun MediaPlayer.setDialogCallbacks() {
 
         override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
 
-        override fun onCanceled(dialog: VLCDialog) {}
-
         override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
+
+        override fun onCanceled(dialog: VLCDialog) {
+          val prevDialog = vlcDialog
+
+          if (prevDialog === dialog) {
+            vlcDialog = null
+          }
+        }
       },
     )
   }

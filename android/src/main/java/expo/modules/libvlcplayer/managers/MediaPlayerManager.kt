@@ -57,7 +57,7 @@ object MediaPlayerManager {
       if (view.pictureInPicture) {
         view.pauseDelay()
       } else {
-        view.pause()
+        view.mediaPlayer?.pause()
       }
     }
   }
