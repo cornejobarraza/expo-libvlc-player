@@ -8,8 +8,8 @@
     "build": "node scripts/build.js",
     "clean": "node scripts/clean.js",
     "lint": "eslint src/",
-    "patch": "node scripts/patch.js",
     "prepare": "husky && node scripts/prepare.js",
+    "release": "node scripts/release.js",
     "test": "jest src/"
   },
   "keywords": [

@@ -4,19 +4,21 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 
-const { run } = require("./utils");
+const { spawnSyncWithAutoShell } = require("./utils");
 
 const darwin = process.platform === "darwin";
 const repo_root = path.resolve(__dirname, "..");
+const bumps = ["patch", "minor", "major"];
 
 function parseArgs(argv) {
-  const options = { tag: null, ref: "HEAD", dryRun: false, skipTests: false };
+  const options = { bump: "patch", tag: null, ref: "HEAD", dryRun: false, skipTests: false };
 
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--tag") options.tag = argv[++i];
     else if (argv[i] === "--ref") options.ref = argv[++i];
     else if (argv[i] === "--dry-run") options.dryRun = !options.dryRun;
     else if (argv[i] === "--skip-tests") options.skipTests = !options.skipTests;
+    else if (bumps.includes(argv[i])) options.bump = argv[i];
     else {
       console.error(`Unknown argument: ${argv[i]}`);
       process.exit(1);
@@ -32,32 +34,43 @@ function trackedFiles(paths) {
   return new Set(result.split("\0").filter(Boolean));
 }
 
-function git(args, options = {}) {
-  const result = run("git", args, {
-    cwd: repo_root,
+function capture(cmd, args, options = {}) {
+  const result = spawnSyncWithAutoShell(cmd, args, {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
     ...options,
   });
+
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    const output = (result.stderr || result.stdout || "").trim();
+    throw new Error(`${cmd} ${args.join(" ")} failed with exit code ${result.status}\n${output}`);
+  }
+
   return result.stdout;
+}
+
+function git(args, options = {}) {
+  return capture("git", args, { cwd: repo_root, ...options });
 }
 
 function hasChanges(diffArgs, paths) {
   return git(["diff", ...diffArgs, "--name-only", "--", ...paths]).trim().length > 0;
 }
 
-function pack(cwd) {
-  const result = run("npm", ["pack", "--dry-run", "--json"], {
-    cwd,
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-    env: { ...process.env, HUSKY: "0" },
-  });
+function pack(cwd, spec) {
+  const args = ["pack", ...(spec ? [spec] : []), "--dry-run", "--json"];
+  const stdout = capture("npm", args, { cwd, env: { ...process.env, HUSKY: "0" } });
 
-  const jsonStart = result.stdout.indexOf("[");
-  const data = JSON.parse(result.stdout.slice(jsonStart));
+  const jsonStart = stdout.indexOf("[");
+  const data = JSON.parse(stdout.slice(jsonStart));
 
   return data[0].files.map((file) => file.path);
+}
+
+function packPublished(tag) {
+  const { name } = require(path.join(repo_root, "package.json"));
+  return pack(repo_root, `${name}@${tag.replace(/^v/, "")}`);
 }
 
 function packAtRef(ref) {
@@ -82,7 +95,10 @@ function packAtRef(ref) {
 }
 
 function test(platform) {
-  run("npm", ["run", `test:${platform}`], { cwd: path.join(repo_root, "example") });
+  capture("npm", ["run", `test:${platform}`], {
+    cwd: path.join(repo_root, "example"),
+    stdio: "inherit",
+  });
 }
 
 function tests(diffArgs) {
@@ -103,13 +119,13 @@ function tests(diffArgs) {
   }
 }
 
-function patch() {
-  run("npm", ["version", "patch"]);
+function bump(type) {
+  capture("npm", ["version", type], { stdio: "inherit" });
 }
 
 function diff(options, diffArgs) {
   if (!hasChanges(diffArgs, ["CHANGELOG.md"])) {
-    console.error("Update CHANGELOG.md before patching");
+    console.error("Update CHANGELOG.md before releasing");
     process.exit(1);
   }
 
@@ -117,9 +133,10 @@ function diff(options, diffArgs) {
   const inWorkingTree = options.ref === "HEAD";
 
   console.log(`Latest tag: ${tag}`);
+  console.log(`Release type: ${options.bump}`);
   console.log(`Comparing against: ${options.ref}${inWorkingTree ? " (working tree)" : ""}`);
 
-  const tagFiles = new Set(packAtRef(tag));
+  const tagFiles = new Set(packPublished(tag));
   const refFiles = new Set(inWorkingTree ? pack(repo_root) : packAtRef(options.ref));
 
   const added = [...refFiles].filter((file) => !tagFiles.has(file)).sort();
@@ -157,9 +174,9 @@ function diff(options, diffArgs) {
 }
 
 function version(options, diffArgs) {
-  const { dryRun, skipTests } = options;
+  const { bump: type, dryRun, skipTests } = options;
   if (!dryRun && !skipTests) tests(diffArgs);
-  if (!dryRun) patch();
+  if (!dryRun) bump(type);
 }
 
 function main() {
@@ -175,4 +192,9 @@ function main() {
   version(options, diffArgs);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(`\n${error.message}`);
+  process.exit(1);
+}
