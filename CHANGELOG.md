@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 57.0.59 - 2026-10-15
+
+### 💡 Others
+
+- Bumped Expo dependency to 57.0.30
+
 ## 57.0.58 - 2026-10-06
 
 ### 💡 Others
