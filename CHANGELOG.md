@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.0 - 2026-10-16
+
+### 🛠 Breaking changes
+
+- Upgraded to Expo SDK 58
+
 ## 57.0.59 - 2026-10-15
 
 ### 💡 Others
