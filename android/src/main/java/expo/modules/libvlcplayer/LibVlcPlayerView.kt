@@ -27,6 +27,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 import org.videolan.libvlc.Dialog as VLCDialog
 import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
 
@@ -127,7 +128,7 @@ class LibVlcPlayerView(
           field.none { existing -> existing.source == slave.source && existing.type == slave.type }
         }
 
-      field = field.apply { addAll(newSlaves) }
+      field = value
 
       if (!newSlaves.isEmpty()) {
         player.addPlayerSlaves(newSlaves)
@@ -207,7 +208,6 @@ class LibVlcPlayerView(
   var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO
     set(value) {
       field = value
-      MediaPlayerManager.audioFocusManager.currentMixingMode = value
       MediaPlayerManager.audioFocusManager.updateAudioFocus()
     }
 
@@ -287,14 +287,14 @@ class LibVlcPlayerView(
           try {
             if (copyResult != PixelCopy.SUCCESS) throw Exception()
 
-            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'")
+            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'", Locale.US)
             val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
 
-            val snapshotPath = path + "/vlc-snapshot-$timestamp.jpg"
+            val snapshotPath = path + "/vlc-snapshot-$timestamp.png"
             val file = File(snapshotPath)
 
             FileOutputStream(file).use { stream ->
-              bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+              bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             }
 
             onSnapshotTaken(mapOf("path" to snapshotPath))

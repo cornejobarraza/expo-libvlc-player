@@ -9,8 +9,6 @@ class LibVlcPlayerView: ExpoView {
     player.mediaPlayer
   }
 
-  private var oldVolume: Int = MediaPlayerConstants.maxPlayerVolume
-
   let onBuffering = EventDispatcher()
   let onPlaying = EventDispatcher()
   let onPaused = EventDispatcher()
@@ -76,17 +74,12 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  private var _slaves: [Slave] = .init()
-
-  var slaves: [Slave] {
-    get { _slaves }
-    set {
-      let newSlaves = newValue.filter { slave in
-        !_slaves
+  var slaves: [Slave] = .init() {
+    didSet {
+      let newSlaves = slaves.filter { slave in
+        !oldValue
           .contains { existing in existing.source == slave.source && existing.type == slave.type }
       }
-
-      _slaves += newSlaves
 
       if !newSlaves.isEmpty {
         player.addPlayerSlaves(newSlaves)
@@ -154,13 +147,9 @@ class LibVlcPlayerView: ExpoView {
 
   var mute: Bool = false {
     didSet {
-      if mute {
-        oldVolume = volume
-      }
-
       let newVolume = mute ?
         MediaPlayerConstants.minPlayerVolume :
-        oldVolume
+        volume
 
       mediaPlayer?.audio?.volume = Int32(newVolume)
       MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
@@ -232,10 +221,11 @@ class LibVlcPlayerView: ExpoView {
     player.withPlayer(message: message) { mediaPlayer in
       if player.hasVideoSize {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
         let timestamp = dateFormatter.string(from: Date())
 
-        let snapshotPath = path + "/vlc-snapshot-\(timestamp).jpg"
+        let snapshotPath = path + "/vlc-snapshot-\(timestamp).png"
         let video = CGSize(width: 0, height: 0) // Use original window size
 
         mediaPlayer.saveVideoSnapshot(

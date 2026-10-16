@@ -1,4 +1,3 @@
-import AVFoundation
 import ExpoModulesCore
 
 enum AudioMixingMode: String, Enumerable {
@@ -17,19 +16,6 @@ enum AudioMixingMode: String, Enumerable {
       1
     case .mixWithOthers:
       0
-    }
-  }
-
-  func toSessionCategoryOption() -> AVAudioSession.CategoryOptions? {
-    switch self {
-    case .duckOthers:
-      .duckOthers
-    case .mixWithOthers:
-      .mixWithOthers
-    case .doNotMix:
-      nil
-    case .auto:
-      nil
     }
   }
 }

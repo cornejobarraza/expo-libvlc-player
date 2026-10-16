@@ -2,11 +2,11 @@ import ExpoModulesCore
 
 struct Tracks: Record {
   @Field
-  var audio: Int = 0
+  var audio: Int? = nil
 
   @Field
-  var video: Int = 0
+  var video: Int? = nil
 
   @Field
-  var subtitle: Int = 0
+  var subtitle: Int? = nil
 }

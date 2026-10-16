@@ -207,18 +207,20 @@ class MediaPlayer(
     attachPlayerView(video)
     addPlayerSlaves(view.slaves)
 
+    val source = view.source
+
     try {
-      URI(view.source)
+      URI(source)
     } catch (_: Exception) {
       view.onEncounteredError(mapOf("message" to "Invalid source, media could not be set"))
       return
     }
 
-    var args = view.options
+    val args = view.options.toMutableList()
     args.normalizeOptions()
     args.toggleStartPausedOption(view.autoplay)
 
-    val media = createMedia(libVlc!!, view.source!!)
+    val media = createMedia(libVlc!!, source!!)
     args.forEach { arg -> media.addOption(arg) }
     mediaPlayer!!.setMedia(media)
     media.release()
@@ -309,9 +311,8 @@ class MediaPlayer(
   fun addPlayerSlaves(slaves: List<Slave>) {
     slaves.forEach { slave ->
       val source = slave.source
-      val type = slave.type
-      val slaveType =
-        if (type == "subtitle") {
+      val type =
+        if (slave.type == "subtitle") {
           IMedia.Slave.Type.Subtitle
         } else {
           IMedia.Slave.Type.Audio
@@ -321,11 +322,13 @@ class MediaPlayer(
       try {
         URI(source)
       } catch (_: Exception) {
-        view.onEncounteredError(mapOf("message" to "Invalid source, $type could not be added"))
+        view.onEncounteredError(
+          mapOf("message" to "Invalid source, ${slave.type} could not be added"),
+        )
         return@forEach
       }
 
-      mediaPlayer?.addSlave(slaveType, getSourceUri(source), selected)
+      mediaPlayer?.addSlave(type, getSourceUri(source), selected)
     }
   }
 
@@ -469,12 +472,14 @@ class MediaPlayer(
   }
 
   private fun getMetadata(): Metadata {
-    val media = mediaPlayer?.media ?: return Metadata()
+    val media = mediaPlayer?.getMedia() ?: return Metadata()
 
     val title = media.getMeta(IMedia.Meta.Title)
     val artist = media.getMeta(IMedia.Meta.Artist)
     val album = media.getMeta(IMedia.Meta.Album)
     val artworkURL = media.getMeta(IMedia.Meta.ArtworkURL)
+
+    media.release()
 
     return Metadata(
       title = title,
@@ -620,8 +625,8 @@ private fun MediaPlayer.setPlayerListener() {
             }
 
             if (type == Event.Stopped) {
-              resetPlayer()
               view.onStopped(Unit)
+              resetPlayer()
 
               if (view.repeat && !userStop) {
                 player.play()
@@ -642,6 +647,9 @@ private fun MediaPlayer.setPlayerListener() {
 
           Event.EncounteredError -> {
             view.onEncounteredError(mapOf("message" to "Player encountered an error"))
+
+            userStop = true
+
             player.stop()
           }
 

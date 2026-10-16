@@ -35,7 +35,7 @@ class AudioFocusManager(
       }
 
   private var currentFocusRequest: AudioFocusRequest? = null
-  var currentMixingMode: AudioMixingMode = AudioMixingMode.AUTO
+  private var currentMixingMode: AudioMixingMode = AudioMixingMode.AUTO
   private val preDuckVolumes: MutableMap<MediaPlayer, Int> = WeakHashMap()
 
   override fun onAudioFocusChange(focusChange: Int) {

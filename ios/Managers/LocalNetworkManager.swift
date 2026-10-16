@@ -1,6 +1,4 @@
 class LocalNetworkManager {
-  static let shared = LocalNetworkManager()
-
   /// Attempts to trigger the local network privacy alert.
   ///
   /// This builds a list of link-local IPv6 addresses and then creates a connected

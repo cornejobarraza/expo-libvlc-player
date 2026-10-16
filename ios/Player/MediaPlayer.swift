@@ -159,18 +159,17 @@ class MediaPlayer: NSObject {
   func addPlayerSlaves(_ slaves: [Slave]) {
     for slave in slaves {
       let source = slave.source
-      let type = slave.type
-      let slaveType = type == "subtitle" ?
+      let type = slave.type == "subtitle" ?
         VLCMediaPlaybackSlaveType.subtitle :
         VLCMediaPlaybackSlaveType.audio
       let selected = slave.selected ?? false
 
       guard let url = URL(string: source) else {
-        view.onEncounteredError(["message": "Invalid source, \(type) could not be added"])
+        view.onEncounteredError(["message": "Invalid source, \(slave.type) could not be added"])
         continue
       }
 
-      mediaPlayer?.addPlaybackSlave(url, type: slaveType, enforce: selected)
+      mediaPlayer?.addPlaybackSlave(url, type: type, enforce: selected)
     }
   }
 
@@ -454,6 +453,8 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
     case .error:
       view.onEncounteredError(["message": "Player encountered an error"])
 
+      userStop = true
+
       player.stop()
     default:
       break
@@ -488,9 +489,9 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
     view.onRecordChanged(recording)
   }
 
-  func mediaPlayer(recordingStoppedAt path: String) {
+  func mediaPlayer(_: VLCMediaPlayer, recordingStoppedAt url: URL?) {
     let recording = Recording(
-      path: path,
+      path: url?.path,
       isRecording: false
     )
 

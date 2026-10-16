@@ -2,8 +2,8 @@ import ExpoModulesCore
 
 struct Delays: Record {
   @Field
-  var audio: Int = 0
+  var audio: Int? = nil
 
   @Field
-  var subtitle: Int = 0
+  var subtitle: Int? = nil
 }
