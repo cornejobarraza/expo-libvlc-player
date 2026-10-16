@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a bug in the library
+about: Report an issue with the package
 labels: bug
 ---
 
@@ -20,4 +20,4 @@ If applicable, add a screenshot to help explain your problem.
 
 - Device / Simulator
 - Expo SDK version
-- Library version
+- Package version

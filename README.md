@@ -16,18 +16,13 @@
 
 ## Supported versions
 
-| Platform             | Version |
-| -------------------- | ------- |
-| Expo SDK             | 57+     |
-| React Native         | 0.86+   |
-| Android / Android TV | 7+      |
-| iOS / Apple TV       | 16.4+   |
+This package targets the latest Expo SDK release. See the [Expo SDK reference](https://docs.expo.dev/versions/latest/) for more.
 
-### Can I use this library with older Expo SDK versions?
+### Can I use an older Expo SDK version?
 
-Previous versions may be supported by changing how you compile the app.
+Previous versions may be supported by changing how the app is compiled.
 
-#### Example app.json for older SDKs
+#### Example app.json with build config plugin
 
 ```json
 {
@@ -37,9 +32,9 @@ Previous versions may be supported by changing how you compile the app.
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 36,
+            "compileSdkVersion": 37,
             "targetSdkVersion": 36,
-            "buildToolsVersion": "36.0.0"
+            "buildToolsVersion": "37.0.0"
           },
           "ios": {
             "deploymentTarget": "16.4"
@@ -79,7 +74,7 @@ EXPO_TV=1 npx expo prebuild
 
 ### Configuration in app config
 
-You can configure `expo-libvlc-player` using its built-in config plugin if you use config plugins in your project.
+You can configure `expo-libvlc-player` using its built-in config plugin.
 
 #### Example app.json with config plugin
 
@@ -400,7 +395,7 @@ LibVLC might not render properly on emulators or simulators. Please test on a re
 
 ## Disclaimer
 
-This project is not affiliated with, endorsed by, or officially supported by VideoLAN. The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with the following LibVLC bindings:
+This package is not affiliated with, endorsed by, or officially supported by VideoLAN. The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with the following LibVLC bindings:
 
 - `libvlcjni` for Android / Android TV
 - `VLCKit` for iOS / Apple TV
@@ -409,7 +404,7 @@ For official VLC products and support, please visit [videolan.org](https://www.v
 
 ## Credits
 
-This library is inspired by existing projects such as [react-native-vlc-media-player](https://github.com/razorRun/react-native-vlc-media-player) and [expo-video](https://docs.expo.dev/versions/latest/sdk/video/).
+This package is inspired by [react-native-vlc-media-player](https://github.com/razorRun/react-native-vlc-media-player) and [expo-video](https://docs.expo.dev/versions/latest/sdk/video/).
 
 ## License
 

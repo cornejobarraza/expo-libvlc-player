@@ -6,7 +6,13 @@ export function parseNativeSource(source: LibVlcSlaveSource): LibVlcSlaveSource;
 export function parseNativeSource(source: LibVlcSource): LibVlcSource;
 export function parseNativeSource(source: LibVlcSource): LibVlcSource {
   if (typeof source === "number") {
-    return Image.resolveAssetSource(source).uri;
+    const asset = Image.resolveAssetSource(source);
+
+    if (!asset) {
+      throw new Error(`Unable to resolve asset source: ${source}`);
+    }
+
+    return asset.uri;
   }
 
   return source;

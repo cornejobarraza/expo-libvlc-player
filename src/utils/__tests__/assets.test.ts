@@ -15,6 +15,14 @@ describe(parseNativeSource, () => {
     expect(resolveAssetSource).toHaveBeenCalledWith(ASSET_ID);
   });
 
+  it("throws when a number source cannot be resolved", () => {
+    jest.spyOn(Image, "resolveAssetSource").mockReturnValue(undefined);
+
+    expect(() => parseNativeSource(ASSET_ID)).toThrow(
+      `Unable to resolve asset source: ${ASSET_ID}`
+    );
+  });
+
   it("returns string sources unchanged", () => {
     const source = "https://example.com/video.mp4";
 
