@@ -1,24 +1,24 @@
-import { isDevice } from "expo-device";
 import { LibVlcPlayerView, type LibVlcPlayerViewRef, type Metadata } from "expo-libvlc-player";
 import { Fragment, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Image, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, View } from "react-native";
+import Animated, { css, cubicBezier } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Control } from "./Control";
 import { Text } from "./Text";
 import { type ControlProps, type PlayerProps } from "./types";
-
-const MIN_VOLUME = 0;
-const MAX_VOLUME = 100;
-const VOLUME_STEP = 10;
-
-const MAX_BUFFER = 1;
-const DEFAULT_TIME = 0;
-const SEEK_STEP = 10_000;
-
-const OPTIONS = !isDevice ? [":codec=avcodec"] : undefined;
-const ASPECT_RATIO = "16/9";
-const CONTENT_FIT = "contain";
+import {
+  ASPECT_RATIO,
+  CONTENT_FIT,
+  DEFAULT_TIME,
+  MAX_BUFFER,
+  MAX_VOLUME,
+  MIN_VOLUME,
+  OPTIONS,
+  SEEK_STEP,
+  VOLUME_STEP,
+} from "../constants";
+import { useControls } from "../hooks/useControls";
 
 export const Player = ({ source, fullScreen }: PlayerProps) => {
   const [buffering, setBuffering] = useState<boolean>(false);
@@ -73,31 +73,37 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
 
   const showArtist = metadata?.artist != null && metadata.artist !== "";
   const showPoster = (!playing && backgrounded) || time === DEFAULT_TIME;
-  const paddingBottom = useSafeAreaInsets().bottom;
+  const insets = useSafeAreaInsets();
+
+  const controls = useControls(fullScreen);
+  const controlsAnimation = controls.visible ? animations.enter : animations.exit;
+  const fullScreenAnimation = fullScreen && controlsAnimation;
+
+  const header = (
+    <View style={styles.header}>
+      {!parsing ? (
+        <Fragment>
+          <Text style={styles.title} numberOfLines={1}>
+            {metadata?.title || "LibVLC Player"}
+          </Text>
+          {showArtist && (
+            <Text style={styles.artist} numberOfLines={1}>
+              {metadata.artist}
+            </Text>
+          )}
+        </Fragment>
+      ) : (
+        <Fragment>
+          <Text.Loading width="50%" height={styles.title.lineHeight} />
+          <Text.Loading width="75%" height={styles.artist.lineHeight} />
+        </Fragment>
+      )}
+    </View>
+  );
 
   return (
     <View style={[styles.player, fullScreen && styles.fullScreen]}>
-      {!fullScreen && (
-        <View style={styles.header}>
-          {!parsing ? (
-            <Fragment>
-              <Text style={styles.title} numberOfLines={1}>
-                {metadata?.title || "LibVLC Player"}
-              </Text>
-              {showArtist && (
-                <Text style={styles.artist} numberOfLines={1}>
-                  {metadata.artist}
-                </Text>
-              )}
-            </Fragment>
-          ) : (
-            <Fragment>
-              <Text.Loading width="50%" height={styles.title.lineHeight} />
-              <Text.Loading width="75%" height={styles.artist.lineHeight} />
-            </Fragment>
-          )}
-        </View>
-      )}
+      {!fullScreen && header}
       <View style={styles.container}>
         {showPoster && (
           <View style={styles.poster} testID="poster">
@@ -150,25 +156,71 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
           }}
         />
       </View>
+      {fullScreen && (
+        <Pressable style={styles.surface} onPress={controls.toggle} testID="surface">
+          <Animated.View style={[styles.scrim, fullScreenAnimation]} pointerEvents="none" />
+        </Pressable>
+      )}
+      {fullScreen && (
+        <Animated.View
+          style={[
+            styles.heading,
+            { paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right },
+            fullScreenAnimation,
+            !controls.visible && animations.raised,
+          ]}
+          pointerEvents="none">
+          {header}
+        </Animated.View>
+      )}
       <View
-        style={[styles.controls, fullScreen && styles.overlay, fullScreen && { paddingBottom }]}>
+        key={fullScreen ? "overlay" : "inline"}
+        style={[styles.controls, fullScreen && styles.overlay, fullScreen && { paddingBottom: insets.bottom }]}
+        pointerEvents={controls.visible ? "box-none" : "none"}>
         {/* eslint-disable-next-line react-hooks/refs */}
         {playerControls.map(({ name, onPress }) => (
-          <Control key={name} name={name} onPress={onPress} />
+          <Animated.View
+            key={name}
+            style={[fullScreenAnimation, !controls.visible && animations.lowered]}>
+            <Control
+              name={name}
+              translucent={fullScreen}
+              onPress={() => {
+                onPress?.();
+                controls.show();
+              }}
+            />
+          </Animated.View>
         ))}
       </View>
     </View>
   );
 };
 
+const animations = css.create({
+  enter: {
+    opacity: 1,
+    transform: [{ translateY: 0 }],
+    transitionProperty: ["opacity", "transform"],
+    transitionDuration: "300ms",
+    transitionTimingFunction: cubicBezier(0.22, 1, 0.36, 1),
+  },
+  exit: {
+    opacity: 0,
+    transform: [{ translateY: 0 }],
+    transitionProperty: ["opacity", "transform"],
+    transitionDuration: "450ms",
+    transitionTimingFunction: cubicBezier(0.64, 0, 0.78, 0),
+  },
+  raised: {
+    transform: [{ translateY: -24 }],
+  },
+  lowered: {
+    transform: [{ translateY: 24 }],
+  },
+});
+
 const styles = StyleSheet.create({
-  player: {
-    gap: 24,
-  },
-  fullScreen: {
-    alignItems: "center",
-    position: "relative",
-  },
   header: {
     gap: 8,
   },
@@ -183,12 +235,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 20,
   },
-  container: {
+  player: {
+    gap: 24,
+  },
+  fullScreen: {
+    alignItems: "center",
     position: "relative",
   },
-  buffering: {
-    ...StyleSheet.absoluteFill,
-    zIndex: 9998,
+  container: {
+    position: "relative",
   },
   poster: {
     ...StyleSheet.absoluteFill,
@@ -198,14 +253,35 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  view: {
-    backgroundColor: "#000000",
-  },
   rounded: {
     borderRadius: 12,
   },
   square: {
     borderRadius: 0,
+  },
+  buffering: {
+    ...StyleSheet.absoluteFill,
+    zIndex: 9998,
+  },
+  view: {
+    backgroundColor: "#000000",
+  },
+  surface: {
+    ...StyleSheet.absoluteFill,
+    zIndex: 9998,
+  },
+  scrim: {
+    ...StyleSheet.absoluteFill,
+    backgroundImage:
+      "linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent 40%, transparent 70%, rgba(0, 0, 0, 0.6))",
+  },
+  heading: {
+    position: "absolute",
+    top: 24,
+    left: 24,
+    right: 24,
+    alignItems: "flex-start",
+    zIndex: 9999,
   },
   controls: {
     flexDirection: "row",

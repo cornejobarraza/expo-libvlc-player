@@ -1,17 +1,18 @@
-import { type MaterialIcons } from "@expo/vector-icons";
+import type MaterialIcons from "@react-native-vector-icons/material-icons";
 import { type LibVlcSource } from "expo-libvlc-player";
 import { type SFSymbol } from "expo-symbols";
 import { type JSX, type ComponentProps } from "react";
 import {
   type DimensionValue,
   type TextProps,
-  type OpaqueColorValue,
   type StyleProp,
   type TextStyle,
+  type NativeColorValue,
 } from "react-native";
 
 export interface ControlProps {
   name: SFSymbol;
+  translucent?: boolean;
   onPress?: () => void;
 }
 
@@ -25,7 +26,7 @@ export interface IconProps {
   style?: StyleProp<TextStyle>;
   name: SFSymbol;
   size?: number;
-  color: OpaqueColorValue | string;
+  color: NativeColorValue | string;
 }
 
 export interface PlayerProps {

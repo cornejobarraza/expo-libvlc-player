@@ -1,21 +1,12 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { Icon } from "./Icon";
-import { type IdMapping, type ControlProps } from "./types";
+import { type ControlProps } from "./types";
+import { CONTROL_IDS } from "../constants";
 
-const IDS = {
-  "play.fill": "play",
-  "pause.fill": "pause",
-  "stop.fill": "stop",
-  "forward.fill": "forward",
-  "backward.fill": "backward",
-  "speaker.1.fill": "speaker.1",
-  "speaker.3.fill": "speaker.3",
-} as IdMapping;
-
-export const Control = ({ name, onPress }: ControlProps) => {
+export const Control = ({ name, translucent, onPress }: ControlProps) => {
   return (
-    <TouchableOpacity style={styles.control} onPress={onPress} testID={IDS[name]}>
+    <TouchableOpacity style={[styles.control, translucent && styles.translucent]} onPress={onPress} testID={CONTROL_IDS[name]}>
       <Icon color="#f1f1f1" name={name} />
     </TouchableOpacity>
   );
@@ -28,5 +19,8 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
+  },
+  translucent: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });
