@@ -179,6 +179,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
 | `pictureInPicture` | Determines whether the player should allow Picture-in-Picture (PiP) mode                                                          | `false`     |
+| `nowPlaying`       | Shows the media in the system Now Playing controls (lock screen, notification center). See [`Metadata`](#metadata) for more       | `undefined` |
 
 #### Callback props
 

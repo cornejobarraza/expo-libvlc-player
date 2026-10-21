@@ -5,6 +5,10 @@ import VLCKit
 class LibVlcPlayerView: ExpoView {
   private var player: MediaPlayer!
 
+  var hasVideoSize: Bool {
+    player.hasVideoSize
+  }
+
   var mediaPlayer: VLCMediaPlayer? {
     player.mediaPlayer
   }
@@ -55,10 +59,12 @@ class LibVlcPlayerView: ExpoView {
   }
 
   func onStartPictureInPicture() {
+    MediaPlayerManager.shared.nowPlayingManager.update(self)
     onPictureInPictureStart()
   }
 
   func onStopPictureInPicture() {
+    MediaPlayerManager.shared.nowPlayingManager.update(self)
     onPictureInPictureStop()
   }
 
@@ -172,6 +178,12 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
+  var nowPlaying: Metadata? {
+    didSet {
+      MediaPlayerManager.shared.nowPlayingManager.update(self)
+    }
+  }
+
   func play() {
     player.withPlayer { mediaPlayer in
       if !autoplay {
@@ -198,11 +210,17 @@ class LibVlcPlayerView: ExpoView {
 
   func seek(_ value: Double, _ type: String? = "time") {
     player.withPlayer { mediaPlayer in
+      let elapsed: Double
+
       if type == "position" {
         mediaPlayer.position = value
+        elapsed = Double(mediaPlayer.media?.length.intValue ?? 0) * value / 1000
       } else {
         mediaPlayer.time = VLCTime(int: Int32(value))
+        elapsed = value / 1000
       }
+
+      MediaPlayerManager.shared.nowPlayingManager.update(self, elapsed: elapsed)
     }
   }
 
