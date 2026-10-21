@@ -19,6 +19,7 @@ import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.Media
 import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
+import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
@@ -227,6 +228,12 @@ class LibVlcPlayerView(
       player.shouldInit = true
     }
 
+  var nowPlaying: Metadata? = null
+    set(value) {
+      field = value
+      MediaPlayerManager.nowPlayingManager.update(this)
+    }
+
   fun play() {
     player.withPlayer { mediaPlayer ->
       if (!autoplay) {
@@ -260,6 +267,8 @@ class LibVlcPlayerView(
       } else {
         mediaPlayer.setTime(value.toLong())
       }
+
+      MediaPlayerManager.nowPlayingManager.update(this)
     }
   }
 

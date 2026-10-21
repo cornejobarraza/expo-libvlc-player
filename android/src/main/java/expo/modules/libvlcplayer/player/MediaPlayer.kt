@@ -233,6 +233,7 @@ class MediaPlayer(
   }
 
   fun destroyPlayer() {
+    MediaPlayerManager.nowPlayingManager.clear(view)
     cancelPauseDelay()
     sourceFd?.close()
     sourceFd = null
@@ -611,6 +612,7 @@ private fun MediaPlayer.setPlayerListener() {
                 retryUntil { isLastAttempt ->
                   if (hasMediaLength || isLastAttempt) {
                     view.onFirstPlay(getMediaInfo())
+                    MediaPlayerManager.nowPlayingManager.update(view)
                   }
 
                   return@retryUntil hasMediaLength
@@ -639,6 +641,12 @@ private fun MediaPlayer.setPlayerListener() {
             MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
             MediaPlayerManager.pictureInPictureManager.setPipActions()
+
+            if (type == Event.Stopped) {
+              MediaPlayerManager.nowPlayingManager.clear(view)
+            } else {
+              MediaPlayerManager.nowPlayingManager.update(view)
+            }
           }
 
           Event.EndReached -> {
@@ -655,6 +663,7 @@ private fun MediaPlayer.setPlayerListener() {
 
           Event.TimeChanged -> {
             view.onTimeChanged(mapOf("value" to player.getTime().toInt()))
+            MediaPlayerManager.nowPlayingManager.refresh(view)
           }
 
           Event.PositionChanged -> {

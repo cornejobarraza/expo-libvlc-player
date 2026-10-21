@@ -20,8 +20,10 @@ class AudioSessionManager {
     var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession
       .categoryOptions
 
+    // A paused player shown in Now Playing keeps the session non-mixable, or iOS drops its controls
     let anyPlayingView = expoViews.allObjects.contains { view in
-      playerRequiresCategory(view.mediaPlayer)
+      playerRequiresCategory(view.mediaPlayer) ||
+        (view.nowPlaying != nil && view.mediaPlayer != nil)
     }
 
     let shouldMixOverride = audioMixingMode == .mixWithOthers
