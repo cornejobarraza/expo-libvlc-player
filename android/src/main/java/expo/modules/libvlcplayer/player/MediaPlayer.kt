@@ -21,6 +21,7 @@ import expo.modules.libvlcplayer.records.Video
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.videolan.libvlc.LibVLC
@@ -32,6 +33,7 @@ import org.videolan.libvlc.util.VLCVideoLayout
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URI
+import java.util.concurrent.Executors
 import org.videolan.libvlc.Dialog as VLCDialog
 import org.videolan.libvlc.Media as VLCMedia
 import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
@@ -39,6 +41,9 @@ import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
 private val DISPLAY_MANAGER: DisplayManager? = null
 private val ENABLE_SUBTITLES: Boolean = true
 private val USE_TEXTURE_VIEW: Boolean = true
+
+// libVLC stop()/release() block until decoders drain; serialized off the main thread to avoid ANRs
+private val VLC_DISPATCHER = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
 class MediaPlayer(
   val view: LibVlcPlayerView,
@@ -236,12 +241,29 @@ class MediaPlayer(
     cancelPauseDelay()
     sourceFd?.close()
     sourceFd = null
-    libVlc?.release()
-    libVlc = null
-    mediaPlayer?.release()
+    detachPlayerView()
+
+    val oldMediaPlayer = mediaPlayer
+    val oldLibVlc = libVlc
     mediaPlayer = null
+    libVlc = null
     vlcDialog = null
     view.removeAllViews()
+
+    CoroutineScope(VLC_DISPATCHER).launch {
+      oldMediaPlayer?.release()
+      oldLibVlc?.release()
+    }
+  }
+
+  fun stop() {
+    withPlayer { player ->
+      userStop = true
+
+      CoroutineScope(VLC_DISPATCHER).launch {
+        player.stop()
+      }
+    }
   }
 
   fun withPlayer(

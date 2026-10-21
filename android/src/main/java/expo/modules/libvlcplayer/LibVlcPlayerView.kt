@@ -243,13 +243,7 @@ class LibVlcPlayerView(
     }
   }
 
-  fun stop() {
-    player.userStop = true
-
-    player.withPlayer { mediaPlayer ->
-      mediaPlayer.stop()
-    }
-  }
+  fun stop() = player.stop()
 
   fun seek(
     value: Double,
