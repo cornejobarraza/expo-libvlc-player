@@ -228,7 +228,7 @@ class LibVlcPlayerView(
     }
 
   fun play() {
-    player.withPlayer { mediaPlayer ->
+    player.withPlayerAsync { mediaPlayer ->
       if (!autoplay) {
         mediaPlayer.play()
       }
@@ -238,12 +238,18 @@ class LibVlcPlayerView(
   }
 
   fun pause() {
-    player.withPlayer { mediaPlayer ->
+    player.withPlayerAsync { mediaPlayer ->
       mediaPlayer.pause()
     }
   }
 
-  fun stop() = player.stop()
+  fun stop() {
+    player.userStop = true
+
+    player.withPlayerAsync { mediaPlayer ->
+      mediaPlayer.stop()
+    }
+  }
 
   fun seek(
     value: Double,

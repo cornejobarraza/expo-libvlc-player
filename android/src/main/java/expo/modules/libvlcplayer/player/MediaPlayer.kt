@@ -21,7 +21,6 @@ import expo.modules.libvlcplayer.records.Video
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.videolan.libvlc.LibVLC
@@ -33,7 +32,6 @@ import org.videolan.libvlc.util.VLCVideoLayout
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URI
-import java.util.concurrent.Executors
 import org.videolan.libvlc.Dialog as VLCDialog
 import org.videolan.libvlc.Media as VLCMedia
 import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
@@ -42,9 +40,6 @@ private val DISPLAY_MANAGER: DisplayManager? = null
 private val ENABLE_SUBTITLES: Boolean = true
 private val USE_TEXTURE_VIEW: Boolean = true
 
-// libVLC stop()/release() block until decoders drain; serialized off the main thread to avoid ANRs
-private val VLC_DISPATCHER = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-
 class MediaPlayer(
   val view: LibVlcPlayerView,
 ) {
@@ -52,6 +47,11 @@ class MediaPlayer(
 
   val video: VLCVideoLayout = VLCVideoLayout(context)
   val picture: VLCVideoLayout = VLCVideoLayout(context)
+
+  // libVLC stop()/release() block for as long as the input stalls: they run off the main thread,
+  // on one queue per native player so a stuck player never holds up the next one
+  var libVlcDispatcher = Dispatchers.IO.limitedParallelism(1)
+    private set
 
   private var sourceFd: AssetFileDescriptor? = null
   private var pauseJob: Job? = null
@@ -250,18 +250,21 @@ class MediaPlayer(
     vlcDialog = null
     view.removeAllViews()
 
-    CoroutineScope(VLC_DISPATCHER).launch {
+    CoroutineScope(libVlcDispatcher).launch {
       oldMediaPlayer?.release()
       oldLibVlc?.release()
     }
+
+    libVlcDispatcher = Dispatchers.IO.limitedParallelism(1)
   }
 
-  fun stop() {
-    withPlayer { player ->
-      userStop = true
-
-      CoroutineScope(VLC_DISPATCHER).launch {
-        player.stop()
+  fun withPlayerAsync(
+    message: String = "Player not available",
+    block: (VLCMediaPlayer) -> Unit,
+  ) {
+    withPlayer(message) { player ->
+      CoroutineScope(libVlcDispatcher).launch {
+        block(player)
       }
     }
   }
@@ -593,6 +596,17 @@ class MediaPlayer(
 
 private fun MediaPlayer.setPlayerListener() {
   mediaPlayer?.let { player ->
+    val dispatcher = libVlcDispatcher
+
+    // An event fired during teardown lands after destroyPlayer()'s release() on the same queue
+    fun stopAsync() {
+      CoroutineScope(dispatcher).launch {
+        if (!player.isReleased) {
+          player.stop()
+        }
+      }
+    }
+
     player.setEventListener(
       EventListener { event ->
         val type = event.type
@@ -664,7 +678,7 @@ private fun MediaPlayer.setPlayerListener() {
           }
 
           Event.EndReached -> {
-            player.stop()
+            stopAsync()
           }
 
           Event.EncounteredError -> {
@@ -672,7 +686,7 @@ private fun MediaPlayer.setPlayerListener() {
 
             userStop = true
 
-            player.stop()
+            stopAsync()
           }
 
           Event.TimeChanged -> {
