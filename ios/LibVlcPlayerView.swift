@@ -189,8 +189,9 @@ class LibVlcPlayerView: ExpoView {
   }
 
   func stop() {
+    player.userStop = true
+
     player.withPlayer { mediaPlayer in
-      player.userStop = true
       mediaPlayer.stop()
     }
   }

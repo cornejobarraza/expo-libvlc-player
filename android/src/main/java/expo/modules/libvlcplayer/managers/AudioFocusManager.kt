@@ -28,10 +28,12 @@ class AudioFocusManager(
 
   private val expoViews: MutableSet<LibVlcPlayerView>
     get() = MediaPlayerManager.expoViews
+  private val mediaPlayers: List<MediaPlayer>
+    get() = expoViews.mapNotNull { view -> view.mediaPlayer }
   private val anyPlayingView: Boolean
     get() =
-      expoViews.any { view ->
-        playerRequiresFocus(view.mediaPlayer)
+      mediaPlayers.any { player ->
+        playerRequiresFocus(player)
       }
 
   private var currentFocusRequest: AudioFocusRequest? = null
@@ -42,8 +44,8 @@ class AudioFocusManager(
     appContext.mainQueue.launch {
       when (focusChange) {
         AudioManager.AUDIOFOCUS_LOSS -> {
-          expoViews.forEach { view ->
-            pausePlayerIfUnmuted(view.mediaPlayer)
+          mediaPlayers.forEach { player ->
+            pausePlayerIfUnmuted(player)
           }
 
           currentFocusRequest = null
@@ -56,8 +58,8 @@ class AudioFocusManager(
             return@launch
           }
 
-          expoViews.forEach { view ->
-            pausePlayerIfUnmuted(view.mediaPlayer)
+          mediaPlayers.forEach { player ->
+            pausePlayerIfUnmuted(player)
           }
 
           currentFocusRequest = null
@@ -66,18 +68,18 @@ class AudioFocusManager(
         AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
           val audioMixingMode = findAudioMixingMode()
 
-          expoViews.forEach { view ->
+          mediaPlayers.forEach { player ->
             if (audioMixingMode == AudioMixingMode.DO_NOT_MIX) {
-              pausePlayerIfUnmuted(view.mediaPlayer)
+              pausePlayerIfUnmuted(player)
             } else {
-              duckPlayer(view.mediaPlayer)
+              duckPlayer(player)
             }
           }
         }
 
         AudioManager.AUDIOFOCUS_GAIN -> {
-          expoViews.forEach { view ->
-            unduckPlayer(view.mediaPlayer)
+          mediaPlayers.forEach { player ->
+            unduckPlayer(player)
           }
         }
       }
@@ -94,10 +96,8 @@ class AudioFocusManager(
     }
   }
 
-  private fun playerRequiresFocus(mediaPlayer: MediaPlayer?): Boolean {
-    val player = mediaPlayer ?: return false
-    return player.isPlaying() && player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME
-  }
+  private fun playerRequiresFocus(player: MediaPlayer): Boolean =
+    player.isPlaying() && player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME
 
   private fun findAudioMixingMode(): AudioMixingMode {
     val mixingModes =
@@ -177,32 +177,26 @@ class AudioFocusManager(
     currentFocusRequest = null
   }
 
-  private fun pausePlayerIfUnmuted(mediaPlayer: MediaPlayer?) {
-    mediaPlayer?.let { player ->
-      if (player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
-        player.pause()
-      }
+  private fun pausePlayerIfUnmuted(player: MediaPlayer) {
+    if (player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
+      player.pause()
     }
   }
 
-  private fun duckPlayer(mediaPlayer: MediaPlayer?) {
-    mediaPlayer?.let { player ->
-      val volume = player.getVolume()
+  private fun duckPlayer(player: MediaPlayer) {
+    val volume = player.getVolume()
 
-      if (volume > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
-        preDuckVolumes[player] = volume
-        player.setVolume(volume / 2)
-      }
+    if (volume > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
+      preDuckVolumes[player] = volume
+      player.setVolume(volume / 2)
     }
   }
 
-  private fun unduckPlayer(mediaPlayer: MediaPlayer?) {
-    mediaPlayer?.let { player ->
-      val restoredVolume = preDuckVolumes.remove(player) ?: return
+  private fun unduckPlayer(player: MediaPlayer) {
+    val restoredVolume = preDuckVolumes.remove(player) ?: return
 
-      if (player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
-        player.setVolume(restoredVolume)
-      }
+    if (player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
+      player.setVolume(restoredVolume)
     }
   }
 }

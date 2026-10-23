@@ -55,6 +55,7 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
       name: "stop.fill",
       onPress: () => {
         playerRef.current?.stop();
+        setTime(DEFAULT_TIME);
       },
     },
     {
@@ -137,7 +138,6 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
           }}
           onStopped={() => {
             setPlaying(false);
-            setTime(DEFAULT_TIME);
           }}
           onEncounteredError={({ message }) => {
             Alert.alert("Error", message);
@@ -175,7 +175,11 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
       )}
       <View
         key={fullScreen ? "overlay" : "inline"}
-        style={[styles.controls, fullScreen && styles.overlay, fullScreen && { paddingBottom: insets.bottom }]}
+        style={[
+          styles.controls,
+          fullScreen && styles.overlay,
+          fullScreen && { paddingBottom: insets.bottom },
+        ]}
         pointerEvents={controls.visible ? "box-none" : "none"}>
         {/* eslint-disable-next-line react-hooks/refs */}
         {playerControls.map(({ name, onPress }) => (

@@ -244,8 +244,9 @@ class LibVlcPlayerView(
   }
 
   fun stop() {
+    player.userStop = true
+
     player.withPlayer { mediaPlayer ->
-      player.userStop = true
       mediaPlayer.stop()
     }
   }

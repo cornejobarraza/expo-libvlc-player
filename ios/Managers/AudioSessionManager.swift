@@ -8,6 +8,10 @@ class AudioSessionManager {
 
   private lazy var expoViews = MediaPlayerManager.shared.expoViews
 
+  private var mediaPlayers: [VLCMediaPlayer] {
+    expoViews.allObjects.compactMap { view in view.mediaPlayer }
+  }
+
   func setAppropriateAudioSession() {
     Self.managerQueue.async { [weak self] in
       self?.setAudioSession()
@@ -20,8 +24,8 @@ class AudioSessionManager {
     var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession
       .categoryOptions
 
-    let anyPlayingView = expoViews.allObjects.contains { view in
-      playerRequiresCategory(view.mediaPlayer)
+    let anyPlayingView = mediaPlayers.contains { player in
+      playerRequiresCategory(player)
     }
 
     let shouldMixOverride = audioMixingMode == .mixWithOthers
@@ -64,8 +68,8 @@ class AudioSessionManager {
     }
   }
 
-  private func playerRequiresCategory(_ mediaPlayer: VLCMediaPlayer?) -> Bool {
-    guard let player = mediaPlayer, let audio = player.audio else { return false }
+  private func playerRequiresCategory(_ player: VLCMediaPlayer) -> Bool {
+    guard let audio = player.audio else { return false }
     return player.isPlaying && audio.volume > MediaPlayerConstants.minPlayerVolume
   }
 
