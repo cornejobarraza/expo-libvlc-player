@@ -9,20 +9,20 @@
     "test:ios": "maestro test -e APP_ID=expo.modules.libvlcplayer.ios .maestro"
   },
   "dependencies": {
-    "expo": "~58.0.14",
+    "@react-native-vector-icons/material-icons": "^13.1.5",
+    "expo": "~58.0.17",
     "expo-device": "^58.0.5",
-    "expo-font": "^58.0.8",
+    "expo-font": "~58.0.9",
     "expo-navigation-bar": "^58.0.4",
     "expo-screen-orientation": "^58.0.3",
-    "expo-status-bar": "^58.0.3",
+    "expo-status-bar": "~58.0.4",
     "expo-symbols": "^58.0.4",
     "expo-system-ui": "^58.0.6",
     "react": "19.3.0",
     "react-native": "0.88.0",
     "react-native-reanimated": "4.7.1",
     "react-native-safe-area-context": "^5.10.1",
-    "react-native-worklets": "0.13.0",
-    "@react-native-vector-icons/material-icons": "^13.1.5"
+    "react-native-worklets": "0.13.0"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
