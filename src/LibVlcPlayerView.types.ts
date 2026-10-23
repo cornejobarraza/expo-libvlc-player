@@ -338,6 +338,7 @@ export type LibVlcPlayerViewNativeProps = ViewProps &
     repeat?: boolean;
     autoplay?: boolean;
     pictureInPicture?: boolean;
+    nowPlaying?: Partial<Metadata>;
     onBuffering?: BufferingListener;
     onPlaying?: PlayingListener;
     onPaused?: PausedListener;
@@ -504,6 +505,15 @@ export type LibVlcPlayerViewProps = ViewProps &
      * @default false
      */
     pictureInPicture?: boolean;
+    /**
+     * Shows the media in the system Now Playing controls (lock screen, notification
+     * center, Control Center) with remote play, pause, skip and seek commands.
+     * `undefined` removes it. On iOS, keeping playback alive from the lock screen
+     * requires the `audio` background mode (see `supportsPictureInPicture`)
+     *
+     * @default undefined
+     */
+    nowPlaying?: Partial<Metadata>;
     /**
      * Called after the `Buffering` player event
      */

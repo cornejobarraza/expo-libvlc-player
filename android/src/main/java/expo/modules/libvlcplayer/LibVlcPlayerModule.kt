@@ -10,6 +10,7 @@ import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.enums.VideoContentFit
 import expo.modules.libvlcplayer.managers.MediaPlayerManager
 import expo.modules.libvlcplayer.records.Delays
+import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
 
@@ -153,6 +154,10 @@ class LibVlcPlayerModule : Module() {
           false,
         ) { view: LibVlcPlayerView, pictureInPicture: Boolean ->
           view.pictureInPicture = pictureInPicture
+        }
+
+        Prop("nowPlaying") { view: LibVlcPlayerView, nowPlaying: Metadata? ->
+          view.nowPlaying = nowPlaying
         }
 
         OnViewDidUpdateProps { view: LibVlcPlayerView ->
