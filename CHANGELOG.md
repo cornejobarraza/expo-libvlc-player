@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 58.0.1 - 2026-10-23
+
+### 🐛 Bug fixes
+
+- Fix ANR on Android when stopping or releasing the player ([#36](https://github.com/cornejobarraza/expo-libvlc-player/pull/36) by [@wendaf](https://github.com/wendaf))
+
+### 💡 Others
+
+- Bumped Expo dependency to 58.0.17
+
 ## 58.0.0 - 2026-10-16
 
 ### 🛠 Breaking changes
