@@ -18,6 +18,7 @@ import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Video
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -48,12 +49,13 @@ class MediaPlayer(
   val video: VLCVideoLayout = VLCVideoLayout(context)
   val picture: VLCVideoLayout = VLCVideoLayout(context)
 
-  private var sourceFd: AssetFileDescriptor? = null
-  private var pauseJob: Job? = null
-
   var libVlc: LibVLC? = null
   var mediaPlayer: VLCMediaPlayer? = null
   var vlcDialog: VLCDialog? = null
+
+  private var libVlcDispatcher: CoroutineDispatcher? = null
+  private var sourceFd: AssetFileDescriptor? = null
+  private var pauseJob: Job? = null
 
   var userStop: Boolean = false
   var firstPlay: Boolean = true
@@ -148,11 +150,6 @@ class MediaPlayer(
     }
   }
 
-  fun resetPlayer() {
-    detachPlayer()
-    attachPlayer()
-  }
-
   private fun attachPlayer() {
     attachPlayerView(video)
     addPlayerView(video)
@@ -161,6 +158,11 @@ class MediaPlayer(
   private fun detachPlayer() {
     detachPlayerView()
     removePlayerView()
+  }
+
+  fun resetPlayer() {
+    detachPlayer()
+    attachPlayer()
   }
 
   fun attachPlayerView(layout: VLCVideoLayout) {
@@ -204,7 +206,7 @@ class MediaPlayer(
     mediaPlayer = VLCMediaPlayer(libVlc!!)
     setPlayerListener()
 
-    attachPlayerView(video)
+    libVlcDispatcher = Dispatchers.IO.limitedParallelism(1)
     addPlayerSlaves(view.slaves)
 
     val source = view.source
@@ -229,19 +231,33 @@ class MediaPlayer(
     firstPlay = true
     shouldInit = false
 
-    addPlayerView(video)
+    attachPlayer()
+  }
+
+  fun releasePlayer() {
+    libVlcDispatcher?.let { dispatcher ->
+      val vlc = libVlc
+      val player = mediaPlayer
+      val fd = sourceFd
+
+      CoroutineScope(dispatcher).launch {
+        vlc?.release()
+        player?.release()
+        fd?.close()
+      }
+    }
   }
 
   fun destroyPlayer() {
-    cancelPauseDelay()
-    sourceFd?.close()
-    sourceFd = null
-    libVlc?.release()
+    pauseJob?.cancel()
+    detachPlayer()
+    releasePlayer()
     libVlc = null
-    mediaPlayer?.release()
     mediaPlayer = null
     vlcDialog = null
-    view.removeAllViews()
+    libVlcDispatcher = null
+    sourceFd = null
+    pauseJob = null
   }
 
   fun withPlayer(
@@ -254,6 +270,17 @@ class MediaPlayer(
       block(player)
     } else {
       view.onEncounteredError(mapOf("message" to message))
+    }
+  }
+
+  fun withPlayerAsync(
+    message: String = "Player not available",
+    block: (VLCMediaPlayer) -> Unit,
+  ) {
+    libVlcDispatcher?.let { dispatcher ->
+      CoroutineScope(dispatcher).launch {
+        withPlayer(message, block)
+      }
     }
   }
 
@@ -626,10 +653,11 @@ private fun MediaPlayer.setPlayerListener() {
 
             if (type == Event.Stopped) {
               view.onStopped(Unit)
+
               resetPlayer()
 
               if (view.repeat && !userStop) {
-                player.play()
+                view.play()
               }
 
               userStop = false
@@ -642,7 +670,7 @@ private fun MediaPlayer.setPlayerListener() {
           }
 
           Event.EndReached -> {
-            player.stop()
+            view.stopAsync()
           }
 
           Event.EncounteredError -> {
@@ -650,7 +678,7 @@ private fun MediaPlayer.setPlayerListener() {
 
             userStop = true
 
-            player.stop()
+            view.stopAsync()
           }
 
           Event.TimeChanged -> {
