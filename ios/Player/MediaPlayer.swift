@@ -49,6 +49,7 @@ class MediaPlayer: NSObject {
 
   func initPlayer() {
     if shouldInit {
+      MediaPlayerManager.shared.nowPlayingManager.clear(view)
       destroyPlayer()
 
       if view.source != nil {

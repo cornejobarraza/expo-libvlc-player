@@ -63,9 +63,10 @@ class NowPlayingManager {
     reset()
   }
 
-  /// Called from the view's deinit: its weak reference is already nil by then
+  /// Called from the view's deinit: its weak reference is already nil by then.
+  /// Registered commands mean the info is ours, so another library's Now Playing is left alone
   func clearIfReleased() {
-    guard activeView == nil else { return }
+    guard activeView == nil, !commandTargets.isEmpty else { return }
     reset()
   }
 
