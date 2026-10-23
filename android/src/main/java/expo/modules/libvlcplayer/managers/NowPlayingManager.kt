@@ -23,6 +23,7 @@ import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
 
 private const val CHANNEL_ID = "expo-libvlc-player"
 private const val NOTIFICATION_ID = 0x564C43 // "VLC"
+private const val ARTWORK_SIZE = 512
 
 class NowPlayingManager(
   private val appContext: AppContext,
@@ -186,7 +187,7 @@ class NowPlayingManager(
     CoroutineScope(Dispatchers.IO).launch {
       val bitmap =
         try {
-          URL(url).openStream().use { BitmapFactory.decodeStream(it) }
+          decodeArtwork(URL(url).readBytes())
         } catch (_: Exception) {
           null
         } ?: return@launch
@@ -198,5 +199,19 @@ class NowPlayingManager(
         activeView?.let { update(it) }
       }
     }
+  }
+
+  // Downsampled while decoding: a full-size poster would stay in memory for the whole playback
+  private fun decodeArtwork(bytes: ByteArray): Bitmap? {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+
+    var sampleSize = 1
+    while (maxOf(bounds.outWidth, bounds.outHeight) / (sampleSize * 2) >= ARTWORK_SIZE) {
+      sampleSize *= 2
+    }
+
+    val options = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
   }
 }
