@@ -243,12 +243,17 @@ class LibVlcPlayerView(
     }
   }
 
+  fun stopAsync() {
+    player.withPlayerAsync { mediaPlayer ->
+      if (!mediaPlayer.isReleased) {
+        mediaPlayer.stop()
+      }
+    }
+  }
+
   fun stop() {
     player.userStop = true
-
-    player.withPlayerAsync { mediaPlayer ->
-      mediaPlayer.stop()
-    }
+    stopAsync()
   }
 
   fun seek(
