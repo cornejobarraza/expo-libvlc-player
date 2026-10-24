@@ -1,7 +1,7 @@
 import { LibVlcPlayerView, type LibVlcPlayerViewRef, type Metadata } from "expo-libvlc-player";
 import { Fragment, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, View } from "react-native";
-import Animated, { css, cubicBezier } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, css, cubicBezier } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Control } from "./Control";
@@ -55,7 +55,6 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
       name: "stop.fill",
       onPress: () => {
         playerRef.current?.stop();
-        setTime(DEFAULT_TIME);
       },
     },
     {
@@ -107,7 +106,7 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
       {!fullScreen && header}
       <View style={styles.container}>
         {showPoster && (
-          <View style={styles.poster} testID="poster">
+          <Animated.View style={styles.poster} entering={FadeIn} exiting={FadeOut} testID="poster">
             <Image
               style={[
                 styles.image,
@@ -116,7 +115,7 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
               ]}
               source={require("../assets/bbb.png")}
             />
-          </View>
+          </Animated.View>
         )}
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
@@ -138,6 +137,7 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
           }}
           onStopped={() => {
             setPlaying(false);
+            setTime(DEFAULT_TIME);
           }}
           onEncounteredError={({ message }) => {
             Alert.alert("Error", message);
