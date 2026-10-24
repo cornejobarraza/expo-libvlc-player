@@ -10,6 +10,14 @@
 
 ### 💡 Others
 
+## 58.0.2 - 2026-10-24
+
+### 💡 Others
+
+- Fixed Gradle deprecation warnings
+- Suppressed experimental coroutine warning
+- Bumped Expo dependency to 58.0.19
+
 ## 58.0.1 - 2026-10-23
 
 ### 🐛 Bug fixes
