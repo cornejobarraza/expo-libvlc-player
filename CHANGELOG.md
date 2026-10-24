@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.3 - 2026-10-24
+
+### 🐛 Bug fixes
+
+- Fixed Gradle regression
+
 ## 58.0.2 - 2026-10-24
 
 ### 💡 Others
