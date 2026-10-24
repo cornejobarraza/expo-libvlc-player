@@ -195,6 +195,7 @@ class MediaPlayer(
     }
   }
 
+  @Suppress("OPT_IN_USAGE")
   private fun createPlayer() {
     if (view.pictureInPicture) {
       MediaPlayerManager.pictureInPictureManager.setupPipView(view)
