@@ -14,6 +14,7 @@ android {
   namespace = "expo.modules.libvlcplayer"
 
   defaultConfig {
+    versionName = pkg.version
     consumerProguardFiles("proguard-rules.pro")
   }
 
