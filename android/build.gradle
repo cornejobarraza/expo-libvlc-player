@@ -11,16 +11,14 @@ group = "expo.modules.libvlcplayer"
 version = pkg.version
 
 android {
-  namespace "expo.modules.libvlcplayer"
+  namespace = "expo.modules.libvlcplayer"
 
   defaultConfig {
-    versionCode 1
-    versionName pkg.version
     consumerProguardFiles("proguard-rules.pro")
   }
 
-  lintOptions {
-    abortOnError false
+  lint {
+    abortOnError = false
   }
 }
 
