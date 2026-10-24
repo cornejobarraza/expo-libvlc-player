@@ -38,7 +38,7 @@
     "@types/react": "^19.3.0",
     "eslint": "^9.39.5",
     "eslint-config-universe": "^16.1.2",
-    "expo": "~58.0.17",
+    "expo": "~58.0.19",
     "husky": "^9.1.7",
     "jest": "~30.5.2",
     "jest-expo": "~58.0.12",
@@ -55,10 +55,5 @@
   },
   "jest": {
     "preset": "jest-expo"
-  },
-  "overrides": {
-    "jest-expo": {
-      "jest-watch-typeahead": "^2.2.2"
-    }
   }
 }
