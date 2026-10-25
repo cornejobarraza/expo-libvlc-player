@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Control } from "./Control";
 import { Text } from "./Text";
-import { type ControlProps, type PlayerProps } from "./types";
 import {
   ASPECT_RATIO,
   CONTENT_FIT,
@@ -17,7 +16,8 @@ import {
   OPTIONS,
   SEEK_STEP,
   VOLUME_STEP,
-} from "../constants";
+} from "./constants";
+import { type ControlProps, type PlayerProps } from "./types";
 import { useControls } from "../hooks/useControls";
 
 export const Player = ({ source, fullScreen }: PlayerProps) => {

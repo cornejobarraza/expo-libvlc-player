@@ -1,6 +1,6 @@
 import { isDevice } from "expo-device";
 
-import { type IdMapping, type SymbolMapping } from "./components/types";
+import { type IdMapping, type SymbolMapping } from "./types";
 
 export const MIN_VOLUME = 0;
 export const MAX_VOLUME = 100;
@@ -13,8 +13,6 @@ export const SEEK_STEP = 10_000;
 export const OPTIONS = !isDevice ? [":codec=avcodec"] : undefined;
 export const ASPECT_RATIO = "16/9";
 export const CONTENT_FIT = "contain";
-
-export const HIDE_DELAY = 3000;
 
 export const CONTROL_IDS = {
   "play.fill": "play",

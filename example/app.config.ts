@@ -20,4 +20,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: "expo.modules.libvlcplayer.ios",
     supportsTablet: true,
   },
+  experiments: { autolinkingModuleResolution: true },
+  plugins: ["../app.plugin.js"],
 });

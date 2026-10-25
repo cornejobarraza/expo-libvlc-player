@@ -1,8 +1,8 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { Icon } from "./Icon";
+import { CONTROL_IDS } from "./constants";
 import { type ControlProps } from "./types";
-import { CONTROL_IDS } from "../constants";
 
 export const Control = ({ name, translucent, onPress }: ControlProps) => {
   return (
