@@ -370,7 +370,7 @@ class MediaPlayer(
         if (index == -1) {
           player.unselectTrackType(type)
         } else {
-          player.selectTrack(index.toString())
+          player.getTracks(type)?.getOrNull(index)?.let { track -> player.selectTrack(track.id) }
         }
       }
 
