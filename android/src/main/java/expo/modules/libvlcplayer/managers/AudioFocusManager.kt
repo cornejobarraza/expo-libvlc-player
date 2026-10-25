@@ -136,8 +136,8 @@ class AudioFocusManager(
       }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      currentFocusRequest?.let { focusRequest ->
-        if (focusRequest.focusGain == audioFocusType) {
+      currentFocusRequest?.let { request ->
+        if (request.focusGain == audioFocusType) {
           return
         }
       }
@@ -165,9 +165,9 @@ class AudioFocusManager(
   }
 
   private fun abandonAudioFocus() {
-    currentFocusRequest?.let { focusRequest ->
+    currentFocusRequest?.let { request ->
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        audioManager.abandonAudioFocusRequest(focusRequest)
+        audioManager.abandonAudioFocusRequest(request)
       } else {
         @Suppress("DEPRECATION")
         audioManager.abandonAudioFocus(this)
