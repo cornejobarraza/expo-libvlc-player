@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.4 - 2026-10-25
+
+### 🐛 Bug fixes
+
+- Fix slaves, track selection and a crash on early player release ([#38](https://github.com/cornejobarraza/expo-libvlc-player/pull/38) by [@wendaf](https://github.com/wendaf))
+
 ## 58.0.3 - 2026-10-24
 
 ### 🐛 Bug fixes
