@@ -66,7 +66,6 @@ class MediaPlayer: NSObject {
     mediaPlayer = VLCMediaPlayer(library: library!)
     mediaPlayer!.drawable = drawable
     mediaPlayer!.delegate = self
-    addPlayerSlaves(view.slaves)
 
     vlcDialogProvider = VLCDialogProvider(library: library!, customUI: dialogCustomUI)
     vlcDialogProvider!.customRenderer = self
@@ -83,6 +82,7 @@ class MediaPlayer: NSObject {
     let media = VLCMedia(url: url)
     args.forEach { arg in media!.addOption(arg) }
     mediaPlayer!.media = media
+    addPlayerSlaves(view.slaves)
     mediaPlayer!.play()
 
     firstPlay = true

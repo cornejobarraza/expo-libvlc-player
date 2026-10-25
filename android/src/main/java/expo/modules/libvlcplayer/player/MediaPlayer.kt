@@ -208,7 +208,6 @@ class MediaPlayer(
     setPlayerListener()
 
     libVlcDispatcher = Dispatchers.IO.limitedParallelism(1)
-    addPlayerSlaves(view.slaves)
 
     val source = view.source
 
@@ -227,6 +226,7 @@ class MediaPlayer(
     args.forEach { arg -> media.addOption(arg) }
     mediaPlayer!!.setMedia(media)
     media.release()
+    addPlayerSlaves(view.slaves)
     mediaPlayer!!.play()
 
     firstPlay = true
