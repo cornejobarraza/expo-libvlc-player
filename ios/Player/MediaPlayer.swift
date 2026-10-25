@@ -137,22 +137,22 @@ class MediaPlayer: NSObject {
         if view.time != MediaPlayerConstants.defaultPlayerTime {
           player.time = VLCTime(int: Int32(view.time))
         }
-
-        // Negative volume workaround
-        retryUntil { [weak self] _ in
-          guard let self else { return true }
-
-          let newVolume = view.mute ?
-            MediaPlayerConstants.minPlayerVolume :
-            view.volume
-
-          player.audio?.volume = Int32(newVolume)
-
-          return false
-        }
-
-        view.time = MediaPlayerConstants.defaultPlayerTime
       }
+
+      // Negative volume workaround
+      retryUntil { [weak self] _ in
+        guard let self else { return true }
+
+        let newVolume = view.mute ?
+          MediaPlayerConstants.minPlayerVolume :
+          view.volume
+
+        mediaPlayer?.audio?.volume = Int32(newVolume)
+
+        return false
+      }
+
+      view.time = MediaPlayerConstants.defaultPlayerTime
     }
   }
 

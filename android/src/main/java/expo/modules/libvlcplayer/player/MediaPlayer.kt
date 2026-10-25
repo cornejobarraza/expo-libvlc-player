@@ -316,24 +316,23 @@ class MediaPlayer(
         if (view.time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
           player.setTime(view.time.toLong())
         }
-
-        // Negative volume workaround
-        retryUntil {
-          val newVolume =
-            if (view.mute) {
-              MediaPlayerConstants.MIN_PLAYER_VOLUME
-            } else {
-              view.volume
-            }
-
-          val currentPlayer = mediaPlayer ?: return@retryUntil true
-          currentPlayer.setVolume(newVolume)
-
-          return@retryUntil false
-        }
-
-        view.time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
       }
+
+      // Negative volume workaround
+      retryUntil {
+        val newVolume =
+          if (view.mute) {
+            MediaPlayerConstants.MIN_PLAYER_VOLUME
+          } else {
+            view.volume
+          }
+
+        mediaPlayer?.setVolume(newVolume)
+
+        return@retryUntil false
+      }
+
+      view.time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
     }
   }
 
@@ -367,10 +366,13 @@ class MediaPlayer(
         index: Int,
         type: Int,
       ) {
+        val tracks = player.getTracks(type)
+        val track = tracks?.getOrNull(index)
+
         if (index == -1) {
           player.unselectTrackType(type)
-        } else {
-          player.getTracks(type)?.getOrNull(index)?.let { track -> player.selectTrack(track.id) }
+        } else if (track != null) {
+          player.selectTrack(track.id)
         }
       }
 
