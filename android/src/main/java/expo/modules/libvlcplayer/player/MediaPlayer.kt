@@ -326,7 +326,8 @@ class MediaPlayer(
               view.volume
             }
 
-          player.setVolume(newVolume)
+          val currentPlayer = mediaPlayer ?: return@retryUntil true
+          currentPlayer.setVolume(newVolume)
 
           return@retryUntil false
         }
