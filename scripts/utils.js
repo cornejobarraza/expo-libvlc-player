@@ -16,8 +16,6 @@ function clean(target) {
   }
 }
 
-// On Windows, executables like tsc are .cmd batch files and cannot be
-// spawned directly as they require shell: true to resolve
 function spawnSyncWithAutoShell(command, args, options) {
   return spawnSync(command, args, { ...options, shell: process.platform === "win32" });
 }

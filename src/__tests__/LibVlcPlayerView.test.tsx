@@ -13,8 +13,6 @@ jest.mock("expo", () => ({
   }),
 }));
 
-// Jest transforms asset files into { testUri } objects, but Metro resolves
-// them to numeric module ids, so mock the asset to match runtime behavior
 jest.mock("../../example/assets/bbb.mp4", () => 42);
 
 const SOURCE = require("../../example/assets/bbb.mp4");

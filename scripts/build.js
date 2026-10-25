@@ -2,17 +2,16 @@
 
 const { spawnSyncWithAutoShell } = require("./utils");
 
-const ARGS = process.argv.slice(2);
-const TSC_ARGS = [...ARGS];
+const args = process.argv.slice(2);
 
 if (
   process.stdout.isTTY &&
   !process.env.CI &&
   !process.env.EXPO_NONINTERACTIVE &&
-  !TSC_ARGS.includes("--watch")
+  !args.includes("--watch")
 ) {
-  TSC_ARGS.push("--watch");
+  args.push("--watch");
 }
 
-const result = spawnSyncWithAutoShell("tsc", TSC_ARGS, { stdio: "inherit" });
+const result = spawnSyncWithAutoShell("tsc", args, { stdio: "inherit" });
 process.exit(result.status ?? 0);

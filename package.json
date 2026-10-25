@@ -10,7 +10,7 @@
     "lint": "eslint src/",
     "prepare": "husky && node scripts/prepare.js",
     "release": "node scripts/release.js",
-    "test": "jest src/"
+    "test": "node scripts/test.js"
   },
   "keywords": [
     "react-native",
@@ -54,6 +54,10 @@
     "react-native": "*"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "roots": [
+      "<rootDir>/src",
+      "<rootDir>/plugin"
+    ]
   }
 }
