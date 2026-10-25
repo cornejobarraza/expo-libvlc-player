@@ -13,6 +13,10 @@ class LibVlcPlayerView: ExpoView {
     player.mediaPlayer
   }
 
+  var isStopped: Bool {
+    player.firstPlay
+  }
+
   let onBuffering = EventDispatcher()
   let onPlaying = EventDispatcher()
   let onPaused = EventDispatcher()

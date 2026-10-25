@@ -1,8 +1,10 @@
 import ExpoModulesCore
+import ImageIO
 import MediaPlayer
 import VLCKit
 
 private let skipInterval: TimeInterval = 10
+private let artworkSize = 512
 
 /// Mirrors the active player into the system Now Playing controls (lock screen, Control Center)
 /// the way VLC for iOS does: static metadata once, playback state on every time change
@@ -14,12 +16,15 @@ class NowPlayingManager {
   private var lastStateUpdate = Date.distantPast
 
   func update(_ view: LibVlcPlayerView, elapsed: Double? = nil) {
-    guard let metadata = view.nowPlaying, let player = view.mediaPlayer else {
+    // A seek or prop change must not bring back a stopped session
+    guard let metadata = view.nowPlaying, let player = view.mediaPlayer, !view.isStopped else {
       clear(view)
       return
     }
 
     if activeView !== view {
+      // Only a playing view takes the controls from another one
+      if activeView != nil, !player.isPlaying { return }
       activeView = view
       registerCommands()
     }
@@ -49,6 +54,14 @@ class NowPlayingManager {
   /// Called on every time change: cheap, keeps elapsed time and rate honest after buffering,
   /// rate changes or Picture-in-Picture. Throttled to once per second
   func refresh(_ view: LibVlcPlayerView) {
+    // VLC may call this from its thread with the player lock held: isPlaying would assert
+    guard Thread.isMainThread else {
+      DispatchQueue.main.async { [weak self, weak view] in
+        if let view { self?.refresh(view) }
+      }
+      return
+    }
+
     guard activeView === view, let player = view.mediaPlayer,
           Date().timeIntervalSince(lastStateUpdate) >= 1,
           var info = MPNowPlayingInfoCenter.default().nowPlayingInfo
@@ -113,7 +126,7 @@ class NowPlayingManager {
     guard let urlString, let url = URL(string: urlString) else { return }
 
     URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-      guard let data, let image = UIImage(data: data) else { return }
+      guard let data, let image = Self.decodeArtwork(data) else { return }
 
       DispatchQueue.main.async {
         guard let self, self.artworkURL == urlString else { return }
@@ -125,6 +138,19 @@ class NowPlayingManager {
         }
       }
     }.resume()
+  }
+
+  /// Downsampled while decoding: a full-size poster would stay in memory for the whole playback
+  private static func decodeArtwork(_ data: Data) -> UIImage? {
+    guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+    let options: [CFString: Any] = [
+      kCGImageSourceCreateThumbnailFromImageAlways: true,
+      kCGImageSourceCreateThumbnailWithTransform: true,
+      kCGImageSourceThumbnailMaxPixelSize: artworkSize,
+    ]
+    guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
+    else { return nil }
+    return UIImage(cgImage: image)
   }
 
   private func registerCommands() {
@@ -195,13 +221,30 @@ class NowPlayingManager {
       command.removeTarget(target)
     }
     commandTargets = []
+
+    // The command center is shared: re-enable what registerCommands disabled
+    let center = MPRemoteCommandCenter.shared()
+    for command in [center.nextTrackCommand, center.previousTrackCommand,
+                    center.seekForwardCommand, center.seekBackwardCommand,
+                    center.changePlaybackPositionCommand, center.skipForwardCommand,
+                    center.skipBackwardCommand]
+    {
+      command.isEnabled = true
+    }
   }
 
   private func skip(by seconds: TimeInterval) -> MPRemoteCommandHandlerStatus {
     guard let view = activeView,
           let player = view.mediaPlayer else { return .noActionableNowPlayingItem }
     let length = Double(player.media?.length.intValue ?? 0)
-    let target = max(0, Double(player.time.intValue) + seconds * 1000)
+    // Seeks are asynchronous: quick skips start from the shown position, not the stale player time
+    let info = MPNowPlayingInfoCenter.default().nowPlayingInfo
+    let shown = (info?[MPNowPlayingInfoPropertyElapsedPlaybackTime] as? Double).map {
+      $0 + Date().timeIntervalSince(lastStateUpdate) *
+        ((info?[MPNowPlayingInfoPropertyPlaybackRate] as? Double) ?? 0)
+    }
+    let current = shown.map { $0 * 1000 } ?? Double(player.time.intValue)
+    let target = max(0, current + seconds * 1000)
     view.seek(length > 0 ? min(target, length) : target)
     return .success
   }

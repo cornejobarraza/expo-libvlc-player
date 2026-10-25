@@ -16,7 +16,7 @@ class MediaPlayer: NSObject {
   private var vlcDialogProvider: VLCDialogProvider?
 
   var userStop: Bool = false
-  private var firstPlay: Bool = true
+  private(set) var firstPlay: Bool = true
   var shouldInit: Bool = true
 
   var hasVideoSize: Bool {

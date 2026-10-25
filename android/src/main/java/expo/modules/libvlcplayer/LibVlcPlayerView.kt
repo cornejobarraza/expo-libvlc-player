@@ -40,6 +40,8 @@ class LibVlcPlayerView(
 
   val mediaPlayer: VLCMediaPlayer?
     get() = player.mediaPlayer
+  val isStopped: Boolean
+    get() = player.firstPlay
   val video: VLCVideoLayout
     get() = player.video
   val picture: VLCVideoLayout
@@ -268,13 +270,17 @@ class LibVlcPlayerView(
     type: String? = "time",
   ) {
     player.withPlayer { mediaPlayer ->
+      val elapsed: Long
+
       if (type == "position") {
         mediaPlayer.setPosition(value.toFloat())
+        elapsed = (mediaPlayer.length * value).toLong()
       } else {
         mediaPlayer.setTime(value.toLong())
+        elapsed = value.toLong()
       }
 
-      MediaPlayerManager.nowPlayingManager.update(this)
+      MediaPlayerManager.nowPlayingManager.update(this, elapsed)
     }
   }
 
