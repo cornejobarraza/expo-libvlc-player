@@ -208,7 +208,6 @@ class MediaPlayer(
     setPlayerListener()
 
     libVlcDispatcher = Dispatchers.IO.limitedParallelism(1)
-    addPlayerSlaves(view.slaves)
 
     val source = view.source
 
@@ -227,6 +226,7 @@ class MediaPlayer(
     args.forEach { arg -> media.addOption(arg) }
     mediaPlayer!!.setMedia(media)
     media.release()
+    addPlayerSlaves(view.slaves)
     mediaPlayer!!.play()
 
     firstPlay = true
@@ -316,23 +316,23 @@ class MediaPlayer(
         if (view.time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
           player.setTime(view.time.toLong())
         }
-
-        // Negative volume workaround
-        retryUntil {
-          val newVolume =
-            if (view.mute) {
-              MediaPlayerConstants.MIN_PLAYER_VOLUME
-            } else {
-              view.volume
-            }
-
-          player.setVolume(newVolume)
-
-          return@retryUntil false
-        }
-
-        view.time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
       }
+
+      // Negative volume workaround
+      retryUntil {
+        val newVolume =
+          if (view.mute) {
+            MediaPlayerConstants.MIN_PLAYER_VOLUME
+          } else {
+            view.volume
+          }
+
+        mediaPlayer?.setVolume(newVolume)
+
+        return@retryUntil false
+      }
+
+      view.time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
     }
   }
 
@@ -366,10 +366,13 @@ class MediaPlayer(
         index: Int,
         type: Int,
       ) {
+        val tracks = player.getTracks(type)
+        val track = tracks?.getOrNull(index)
+
         if (index == -1) {
           player.unselectTrackType(type)
-        } else {
-          player.selectTrack(index.toString())
+        } else if (track != null) {
+          player.selectTrack(track.id)
         }
       }
 

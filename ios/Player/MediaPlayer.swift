@@ -66,7 +66,6 @@ class MediaPlayer: NSObject {
     mediaPlayer = VLCMediaPlayer(library: library!)
     mediaPlayer!.drawable = drawable
     mediaPlayer!.delegate = self
-    addPlayerSlaves(view.slaves)
 
     vlcDialogProvider = VLCDialogProvider(library: library!, customUI: dialogCustomUI)
     vlcDialogProvider!.customRenderer = self
@@ -83,6 +82,7 @@ class MediaPlayer: NSObject {
     let media = VLCMedia(url: url)
     args.forEach { arg in media!.addOption(arg) }
     mediaPlayer!.media = media
+    addPlayerSlaves(view.slaves)
     mediaPlayer!.play()
 
     firstPlay = true
@@ -137,22 +137,22 @@ class MediaPlayer: NSObject {
         if view.time != MediaPlayerConstants.defaultPlayerTime {
           player.time = VLCTime(int: Int32(view.time))
         }
-
-        // Negative volume workaround
-        retryUntil { [weak self] _ in
-          guard let self else { return true }
-
-          let newVolume = view.mute ?
-            MediaPlayerConstants.minPlayerVolume :
-            view.volume
-
-          player.audio?.volume = Int32(newVolume)
-
-          return false
-        }
-
-        view.time = MediaPlayerConstants.defaultPlayerTime
       }
+
+      // Negative volume workaround
+      retryUntil { [weak self] _ in
+        guard let self else { return true }
+
+        let newVolume = view.mute ?
+          MediaPlayerConstants.minPlayerVolume :
+          view.volume
+
+        mediaPlayer?.audio?.volume = Int32(newVolume)
+
+        return false
+      }
+
+      view.time = MediaPlayerConstants.defaultPlayerTime
     }
   }
 
