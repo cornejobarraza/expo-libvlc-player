@@ -21,10 +21,7 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.libvlcplayer.LibVlcPlayerView
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.net.URL
 import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
 
@@ -33,6 +30,9 @@ class NowPlayingManager(
 ) {
   private val context: Context
     get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
+  private val notificationManager by lazy {
+    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+  }
 
   private var session: MediaSession? = null
   private var activeView: LibVlcPlayerView? = null
@@ -96,9 +96,9 @@ class NowPlayingManager(
   fun refresh(view: LibVlcPlayerView) {
     val session = session ?: return
     val player = view.mediaPlayer ?: return
-    val elapsed = System.currentTimeMillis() - lastStateUpdate
+    val sinceLastUpdate = System.currentTimeMillis() - lastStateUpdate
 
-    if (activeView !== view || elapsed < MediaPlayerConstants.NOW_PLAYING_REFRESH_MS) return
+    if (activeView !== view || sinceLastUpdate < MediaPlayerConstants.NOW_PLAYING_REFRESH_MS) return
     setPlaybackState(session, player)
   }
 
@@ -170,7 +170,9 @@ class NowPlayingManager(
     val player = view.mediaPlayer ?: return
     val elapsed = if (player.isPlaying) System.currentTimeMillis() - lastStateUpdate else 0
     val target = maxOf(0, lastPosition + (elapsed * player.rate).toLong() + delta)
-    view.seek((if (player.length > 0) minOf(target, player.length) else target).toDouble())
+    val clampedTarget = if (player.length > 0) minOf(target, player.length) else target
+
+    view.seek(clampedTarget.toDouble())
   }
 
   fun clear(view: LibVlcPlayerView) {
@@ -182,17 +184,12 @@ class NowPlayingManager(
     session?.let { mediaSession ->
       mediaSession.isActive = false
       mediaSession.release()
-      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-        context.unregisterReceiver(actionReceiver)
-      }
+      unregisterActionReceiver()
     }
     session = null
     NowPlayingService.stop()
     notificationManager.cancel(MediaPlayerConstants.NOW_PLAYING_NOTIFICATION_ID)
   }
-
-  private val notificationManager: NotificationManager
-    get() = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
   private fun createSession(): MediaSession =
     MediaSession(context, MediaPlayerConstants.NOW_PLAYING_CHANNEL_ID).apply {
@@ -223,21 +220,34 @@ class NowPlayingManager(
         },
       )
       launchIntent()?.let { intent -> setSessionActivity(intent) }
-
-      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-        // Below API 33 the flag alone doesn't keep the receiver private
-        ContextCompat.registerReceiver(
-          context,
-          actionReceiver,
-          IntentFilter().apply {
-            addAction(MediaPlayerConstants.ACTION_NOW_PLAYING_PLAY_PAUSE)
-            addAction(MediaPlayerConstants.ACTION_NOW_PLAYING_REWIND)
-            addAction(MediaPlayerConstants.ACTION_NOW_PLAYING_FORWARD)
-          },
-          ContextCompat.RECEIVER_NOT_EXPORTED,
-        )
-      }
+      registerActionReceiver()
     }
+
+  private fun registerActionReceiver() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return
+
+    // Below API 33 the flag alone doesn't keep the receiver private
+    ContextCompat.registerReceiver(
+      context,
+      actionReceiver,
+      IntentFilter().apply {
+        addAction(MediaPlayerConstants.ACTION_NOW_PLAYING_PLAY_PAUSE)
+        addAction(MediaPlayerConstants.ACTION_NOW_PLAYING_REWIND)
+        addAction(MediaPlayerConstants.ACTION_NOW_PLAYING_FORWARD)
+      },
+      ContextCompat.RECEIVER_NOT_EXPORTED,
+    )
+  }
+
+  private fun unregisterActionReceiver() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return
+
+    try {
+      appContext.reactContext?.unregisterReceiver(actionReceiver)
+    } catch (_: Exception) {
+      // Receiver not registered
+    }
+  }
 
   private fun launchIntent(): PendingIntent? {
     val intent =
@@ -343,7 +353,7 @@ class NowPlayingManager(
 
     if (url == null) return
 
-    CoroutineScope(Dispatchers.IO).launch {
+    appContext.backgroundCoroutineScope.launch {
       val bitmap =
         try {
           decodeArtwork(URL(url).readBytes())
@@ -351,8 +361,8 @@ class NowPlayingManager(
           null
         } ?: return@launch
 
-      withContext(Dispatchers.Main) {
-        if (artworkUrl != url) return@withContext
+      appContext.mainQueue.launch {
+        if (artworkUrl != url) return@launch
 
         artwork = bitmap
         activeView?.let { view -> update(view) }

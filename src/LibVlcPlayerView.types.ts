@@ -506,10 +506,8 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     pictureInPicture?: boolean;
     /**
-     * Shows the media in the system Now Playing controls (lock screen, notification
-     * center, Control Center) with remote play, pause, skip and seek commands.
-     * `undefined` removes it. Keeping playback alive in the background requires
-     * the `supportsBackgroundPlayback` config plugin option
+     * Shows the media in the system Now Playing controls (lock screen, notification center).
+     * Background playback requires the `supportsBackgroundPlayback` config plugin option
      *
      * @default undefined
      */

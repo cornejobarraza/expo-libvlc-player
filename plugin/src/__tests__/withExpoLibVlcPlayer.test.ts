@@ -155,6 +155,23 @@ describe("withExpoLibVlcPlayer", () => {
       expect(infoPlist.UIBackgroundModes).toEqual([]);
     });
 
+    it("keeps the audio background mode when only background playback needs it", async () => {
+      const { infoPlist } = await applyPlugin(
+        { supportsPictureInPicture: false, supportsBackgroundPlayback: true },
+        { infoPlist: { UIBackgroundModes: [AUDIO_BACKGROUND_MODE] } }
+      );
+
+      expect(infoPlist.UIBackgroundModes).toEqual([AUDIO_BACKGROUND_MODE]);
+    });
+
+    it("leaves the service untouched when not configured", async () => {
+      const { manifest: enabled } = await applyPlugin({ supportsBackgroundPlayback: true });
+      const { manifest } = await applyPlugin({}, { manifest: enabled });
+
+      expect(getPermissions(manifest)).toEqual(PERMISSIONS);
+      expect(getServices(manifest)).toHaveLength(1);
+    });
+
     it("keeps the audio background mode when Picture-in-Picture still needs it", async () => {
       const { infoPlist } = await applyPlugin({
         supportsPictureInPicture: true,

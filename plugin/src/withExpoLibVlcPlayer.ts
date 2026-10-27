@@ -22,7 +22,7 @@ export interface WithExpoLibVlcPlayerProps {
    */
   supportsPictureInPicture?: boolean;
   /**
-   * A boolean to keep `nowPlaying` playback alive in the background
+   * A boolean to enable background playback support for `nowPlaying`
    *
    * @default undefined
    */

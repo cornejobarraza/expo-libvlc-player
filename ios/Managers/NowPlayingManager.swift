@@ -3,27 +3,22 @@ import ImageIO
 import MediaPlayer
 import VLCKit
 
-private let skipInterval: TimeInterval = 10
-private let artworkSize = 512
-
-/// Mirrors the active player into the system Now Playing controls (lock screen, Control Center)
-/// the way VLC for iOS does: static metadata once, playback state on every time change
 class NowPlayingManager {
   private weak var activeView: LibVlcPlayerView?
   private var artworkURL: String?
   private var artwork: MPMediaItemArtwork?
   private var commandTargets: [(MPRemoteCommand, Any)] = []
-  private var lastStateUpdate = Date.distantPast
+  private var lastStateUpdate: Date = .distantPast
 
   func update(_ view: LibVlcPlayerView, elapsed: Double? = nil) {
-    // A seek or prop change must not bring back a stopped session
+    // Seeks and prop changes don't bring back a stopped session
     guard let metadata = view.nowPlaying, let player = view.mediaPlayer, !view.isStopped else {
       clear(view)
       return
     }
 
     if activeView !== view {
-      // Only a playing view takes the controls from another one
+      // Only a playing view takes over the controls
       if activeView != nil, !player.isPlaying { return }
       activeView = view
       registerCommands()
@@ -38,7 +33,7 @@ class NowPlayingManager {
       : MPNowPlayingInfoMediaType.audio.rawValue
     info[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
 
-    // Fetched once per URL: a change starts a new fetch, an in-flight or failed one isn't retried
+    // Fetched once per URL, failed fetches aren't retried
     if artworkURL != metadata.artworkURL {
       loadArtwork(metadata.artworkURL)
     }
@@ -51,10 +46,8 @@ class NowPlayingManager {
     MPNowPlayingInfoCenter.default().nowPlayingInfo = info
   }
 
-  /// Called on every time change: cheap, keeps elapsed time and rate honest after buffering,
-  /// rate changes or Picture-in-Picture. Throttled to once per second
   func refresh(_ view: LibVlcPlayerView) {
-    // VLC may call this from its thread with the player lock held: isPlaying would assert
+    // VLC calls this from its thread with the player lock held, isPlaying would assert
     guard Thread.isMainThread else {
       DispatchQueue.main.async { [weak self, weak view] in
         if let view { self?.refresh(view) }
@@ -62,8 +55,10 @@ class NowPlayingManager {
       return
     }
 
+    let sinceLastUpdate = Date().timeIntervalSince(lastStateUpdate)
+
     guard activeView === view, let player = view.mediaPlayer,
-          Date().timeIntervalSince(lastStateUpdate) >= 1,
+          sinceLastUpdate >= MediaPlayerConstants.nowPlayingRefreshInterval,
           var info = MPNowPlayingInfoCenter.default().nowPlayingInfo
     else { return }
 
@@ -76,8 +71,7 @@ class NowPlayingManager {
     reset()
   }
 
-  /// Called from the view's deinit: its weak reference is already nil by then.
-  /// Registered commands mean the info is ours, so another library's Now Playing is left alone
+  /// Called from the view deinit, registered commands mean the info isn't another library's
   func clearIfReleased() {
     guard activeView == nil, !commandTargets.isEmpty else { return }
     reset()
@@ -91,7 +85,7 @@ class NowPlayingManager {
     let duration = Double(player.media?.length.intValue ?? 0) / 1000
     let isLiveStream = duration <= 0
 
-    // A seek is asynchronous: the caller passes the target time so the control doesn't jump back
+    // Seek target from the caller, the player time lags behind an async seek
     info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = elapsed ?? Double(player.time.intValue) /
       1000
     info[MPNowPlayingInfoPropertyPlaybackRate] = player.isPlaying ? Double(player.rate) : 0
@@ -140,13 +134,13 @@ class NowPlayingManager {
     }.resume()
   }
 
-  /// Downsampled while decoding: a full-size poster would stay in memory for the whole playback
+  /// Downsampled so a full-size poster doesn't stay in memory during playback
   private static func decodeArtwork(_ data: Data) -> UIImage? {
     guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
     let options: [CFString: Any] = [
       kCGImageSourceCreateThumbnailFromImageAlways: true,
       kCGImageSourceCreateThumbnailWithTransform: true,
-      kCGImageSourceThumbnailMaxPixelSize: artworkSize,
+      kCGImageSourceThumbnailMaxPixelSize: MediaPlayerConstants.nowPlayingArtworkSize,
     ]
     guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
     else { return nil }
@@ -157,10 +151,11 @@ class NowPlayingManager {
     unregisterCommands()
 
     let center = MPRemoteCommandCenter.shared()
+    let seekStep = MediaPlayerConstants.seekStep
 
-    // The lock screen shows either skip or next/previous buttons: a single media wants skip
-    center.skipForwardCommand.preferredIntervals = [NSNumber(value: skipInterval)]
-    center.skipBackwardCommand.preferredIntervals = [NSNumber(value: skipInterval)]
+    // The lock screen shows either skip or next/previous buttons, a single media wants skip
+    center.skipForwardCommand.preferredIntervals = [NSNumber(value: seekStep)]
+    center.skipBackwardCommand.preferredIntervals = [NSNumber(value: seekStep)]
     for command in [center.nextTrackCommand, center.previousTrackCommand,
                     center.seekForwardCommand, center.seekBackwardCommand]
     {
@@ -191,7 +186,13 @@ class NowPlayingManager {
 
     add(center.togglePlayPauseCommand) { [weak self] _ in
       guard let view = self?.activeView else { return .noActionableNowPlayingItem }
-      view.mediaPlayer?.isPlaying == true ? view.pause() : view.play()
+
+      if view.mediaPlayer?.isPlaying == true {
+        view.pause()
+      } else {
+        view.play()
+      }
+
       return .success
     }
 
@@ -204,15 +205,13 @@ class NowPlayingManager {
     }
 
     add(center.skipForwardCommand) { [weak self] event in
-      self?
-        .skip(by: (event as? MPSkipIntervalCommandEvent)?.interval ?? skipInterval) ??
-        .commandFailed
+      let interval = (event as? MPSkipIntervalCommandEvent)?.interval ?? seekStep
+      return self?.skip(by: interval) ?? .commandFailed
     }
 
     add(center.skipBackwardCommand) { [weak self] event in
-      self?
-        .skip(by: -((event as? MPSkipIntervalCommandEvent)?.interval ?? skipInterval)) ??
-        .commandFailed
+      let interval = (event as? MPSkipIntervalCommandEvent)?.interval ?? seekStep
+      return self?.skip(by: -interval) ?? .commandFailed
     }
   }
 
@@ -222,7 +221,7 @@ class NowPlayingManager {
     }
     commandTargets = []
 
-    // The command center is shared: re-enable what registerCommands disabled
+    // The command center is shared, re-enable what registerCommands disabled
     let center = MPRemoteCommandCenter.shared()
     for command in [center.nextTrackCommand, center.previousTrackCommand,
                     center.seekForwardCommand, center.seekBackwardCommand,
@@ -237,13 +236,13 @@ class NowPlayingManager {
     guard let view = activeView,
           let player = view.mediaPlayer else { return .noActionableNowPlayingItem }
     let length = Double(player.media?.length.intValue ?? 0)
-    // Seeks are asynchronous: quick skips start from the shown position, not the stale player time
+    // Skips from the shown position, the player time lags behind an async seek
     let info = MPNowPlayingInfoCenter.default().nowPlayingInfo
-    let shown = (info?[MPNowPlayingInfoPropertyElapsedPlaybackTime] as? Double).map {
-      $0 + Date().timeIntervalSince(lastStateUpdate) *
-        ((info?[MPNowPlayingInfoPropertyPlaybackRate] as? Double) ?? 0)
+    let rate = info?[MPNowPlayingInfoPropertyPlaybackRate] as? Double ?? 0
+    let shown = (info?[MPNowPlayingInfoPropertyElapsedPlaybackTime] as? Double).map { elapsed in
+      elapsed + Date().timeIntervalSince(lastStateUpdate) * rate
     }
-    let current = shown.map { $0 * 1000 } ?? Double(player.time.intValue)
+    let current = shown.map { elapsed in elapsed * 1000 } ?? Double(player.time.intValue)
     let target = max(0, current + seconds * 1000)
     view.seek(length > 0 ? min(target, length) : target)
     return .success
