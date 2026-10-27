@@ -338,6 +338,7 @@ export type LibVlcPlayerViewNativeProps = ViewProps &
     repeat?: boolean;
     autoplay?: boolean;
     pictureInPicture?: boolean;
+    nowPlaying?: Partial<Metadata>;
     onBuffering?: BufferingListener;
     onPlaying?: PlayingListener;
     onPaused?: PausedListener;
@@ -504,6 +505,13 @@ export type LibVlcPlayerViewProps = ViewProps &
      * @default false
      */
     pictureInPicture?: boolean;
+    /**
+     * Shows the media in the system Now Playing controls (lock screen, notification center).
+     * Background playback requires the `supportsBackgroundPlayback` config plugin option
+     *
+     * @default undefined
+     */
+    nowPlaying?: Partial<Metadata>;
     /**
      * Called after the `Buffering` player event
      */

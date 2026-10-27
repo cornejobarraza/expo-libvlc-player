@@ -19,6 +19,7 @@ import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.Media
 import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
+import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
@@ -39,6 +40,8 @@ class LibVlcPlayerView(
 
   val mediaPlayer: VLCMediaPlayer?
     get() = player.mediaPlayer
+  val isStopped: Boolean
+    get() = player.firstPlay
   val video: VLCVideoLayout
     get() = player.video
   val picture: VLCVideoLayout
@@ -227,6 +230,12 @@ class LibVlcPlayerView(
       player.shouldInit = true
     }
 
+  var nowPlaying: Metadata? = null
+    set(value) {
+      field = value
+      MediaPlayerManager.nowPlayingManager.update(this)
+    }
+
   fun play() {
     player.withPlayerAsync { mediaPlayer ->
       if (!autoplay) {
@@ -261,11 +270,17 @@ class LibVlcPlayerView(
     type: String? = "time",
   ) {
     player.withPlayer { mediaPlayer ->
+      val elapsed: Long
+
       if (type == "position") {
         mediaPlayer.setPosition(value.toFloat())
+        elapsed = (mediaPlayer.length * value).toLong()
       } else {
         mediaPlayer.setTime(value.toLong())
+        elapsed = value.toLong()
       }
+
+      MediaPlayerManager.nowPlayingManager.update(this, elapsed)
     }
   }
 

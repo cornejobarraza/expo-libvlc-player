@@ -16,7 +16,7 @@ class MediaPlayer: NSObject {
   private var vlcDialogProvider: VLCDialogProvider?
 
   var userStop: Bool = false
-  private var firstPlay: Bool = true
+  private(set) var firstPlay: Bool = true
   var shouldInit: Bool = true
 
   var hasVideoSize: Bool {
@@ -49,6 +49,7 @@ class MediaPlayer: NSObject {
 
   func initPlayer() {
     if shouldInit {
+      MediaPlayerManager.shared.nowPlayingManager.clear(view)
       destroyPlayer()
 
       if view.source != nil {
@@ -93,6 +94,7 @@ class MediaPlayer: NSObject {
   }
 
   func destroyPlayer() {
+    MediaPlayerManager.shared.nowPlayingManager.clearIfReleased()
     library = nil
     mediaPlayer?.stop()
     mediaPlayer = nil
@@ -423,6 +425,7 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
 
             if hasMediaLength || isLastAttempt {
               view.onFirstPlay(getMediaInfo())
+              MediaPlayerManager.shared.nowPlayingManager.update(view)
             }
 
             return hasMediaLength
@@ -450,6 +453,12 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
       MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
       MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
       picture.updatePipState()
+
+      if newState == .stopped {
+        MediaPlayerManager.shared.nowPlayingManager.clear(view)
+      } else {
+        MediaPlayerManager.shared.nowPlayingManager.update(view)
+      }
     case .error:
       view.onEncounteredError(["message": "Player encountered an error"])
 
@@ -474,6 +483,7 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
 
     view.onTimeChanged(["value": player.time.intValue])
     view.onPositionChanged(["value": player.position])
+    MediaPlayerManager.shared.nowPlayingManager.refresh(view)
   }
 
   func mediaPlayerTrackAdded(_: String, with _: VLCMedia.TrackType) {

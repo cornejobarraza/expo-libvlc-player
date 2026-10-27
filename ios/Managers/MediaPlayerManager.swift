@@ -6,6 +6,7 @@ class MediaPlayerManager {
   let localNetworkManager = LocalNetworkManager()
   let audioSessionManager = AudioSessionManager()
   let keepAwakeManager = KeepAwakeManager()
+  let nowPlayingManager = NowPlayingManager()
 
   let expoViews = NSHashTable<LibVlcPlayerView>.weakObjects()
 

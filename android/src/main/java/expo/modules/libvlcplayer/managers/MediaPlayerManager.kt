@@ -9,6 +9,7 @@ object MediaPlayerManager {
   lateinit var audioFocusManager: AudioFocusManager
   lateinit var keepAwakeManager: KeepAwakeManager
   lateinit var pictureInPictureManager: PictureInPictureManager
+  lateinit var nowPlayingManager: NowPlayingManager
 
   val expoViews: MutableSet<LibVlcPlayerView> = Collections.newSetFromMap(WeakHashMap())
 
@@ -31,6 +32,10 @@ object MediaPlayerManager {
 
     if (!this::pictureInPictureManager.isInitialized) {
       pictureInPictureManager = PictureInPictureManager(appContext)
+    }
+
+    if (!this::nowPlayingManager.isInitialized) {
+      nowPlayingManager = NowPlayingManager(appContext)
     }
   }
 

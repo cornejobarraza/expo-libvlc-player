@@ -123,6 +123,10 @@ public class LibVlcPlayerModule: Module {
         view.pictureInPicture = pictureInPicture
       }
 
+      Prop("nowPlaying") { (view: LibVlcPlayerView, nowPlaying: Metadata?) in
+        view.nowPlaying = nowPlaying
+      }
+
       OnViewDidUpdateProps { (view: LibVlcPlayerView) in
         view.initPlayer()
       }

@@ -86,7 +86,8 @@ You can configure `expo-libvlc-player` using its built-in config plugin.
         "expo-libvlc-player",
         {
           "localNetworkPermission": "Allow $(PRODUCT_NAME) to access your local network",
-          "supportsPictureInPicture": true
+          "supportsPictureInPicture": true,
+          "supportsBackgroundPlayback": true
         }
       ]
     ]
@@ -96,10 +97,11 @@ You can configure `expo-libvlc-player` using its built-in config plugin.
 
 #### Configurable properties
 
-| Name                       | Description                                                                                                                                                                                                                                                                                                         | Default                                                |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `localNetworkPermission`   | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                      | `"Allow $(PRODUCT_NAME) to access your local network"` |
-| `supportsPictureInPicture` | A boolean to enable Picture-in-Picture (PiP) support. If `true`, it adds the `android:supportsPictureInPicture` attribute on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the attribute on Android and the mode on iOS. If `undefined`, the configuration is not modified | `undefined`                                            |
+| Name                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                       | Default                                                |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                                                                                                                                    | `"Allow $(PRODUCT_NAME) to access your local network"` |
+| `supportsPictureInPicture`   | A boolean to enable Picture-in-Picture (PiP) support. If `true`, it adds the `android:supportsPictureInPicture` attribute on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the attribute on Android and the mode on iOS unless `supportsBackgroundPlayback` needs it. If `undefined`, the configuration is not modified                                                                  | `undefined`                                            |
+| `supportsBackgroundPlayback` | A boolean to enable background playback support for `nowPlaying`. If `true`, it adds a `mediaPlayback` foreground service and its permissions on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the service on Android, keeping the permissions other modules may need, and the mode on iOS unless `supportsPictureInPicture` needs it. If `undefined`, the configuration is not modified | `undefined`                                            |
 
 ## Usage
 
@@ -179,6 +181,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
 | `pictureInPicture` | Determines whether the player should allow Picture-in-Picture (PiP) mode                                                          | `false`     |
+| `nowPlaying`       | Shows the media in the system Now Playing controls (lock screen, notification center). See [`Metadata`](#metadata) for more       | `undefined` |
 
 #### Callback props
 
