@@ -102,6 +102,69 @@ describe("withExpoLibVlcPlayer", () => {
     });
   });
 
+  describe("background playback", () => {
+    const SERVICE_NAME = "expo.modules.libvlcplayer.managers.NowPlayingService";
+    const PERMISSIONS = [
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+    ];
+
+    const getPermissions = (manifest: AndroidManifest) =>
+      (manifest.manifest["uses-permission"] ?? []).map(
+        (permission) => permission.$["android:name"]
+      );
+    const getServices = (manifest: AndroidManifest) =>
+      AndroidConfig.Manifest.getMainApplicationOrThrow(manifest).service ?? [];
+
+    it("adds the foreground service and audio background mode when enabled", async () => {
+      const { manifest, infoPlist } = await applyPlugin({ supportsBackgroundPlayback: true });
+
+      expect(getPermissions(manifest)).toEqual(PERMISSIONS);
+      expect(getServices(manifest)).toEqual([
+        {
+          $: {
+            "android:name": SERVICE_NAME,
+            "android:exported": "false",
+            "android:foregroundServiceType": "mediaPlayback",
+          },
+        },
+      ]);
+      expect(infoPlist.UIBackgroundModes).toEqual([AUDIO_BACKGROUND_MODE]);
+    });
+
+    it("does not duplicate the service when applied twice", async () => {
+      const { manifest: first } = await applyPlugin({ supportsBackgroundPlayback: true });
+      const { manifest } = await applyPlugin(
+        { supportsBackgroundPlayback: true },
+        { manifest: first }
+      );
+
+      expect(getPermissions(manifest)).toEqual(PERMISSIONS);
+      expect(getServices(manifest)).toHaveLength(1);
+    });
+
+    it("removes the service but keeps the shared permissions when disabled", async () => {
+      const { manifest: enabled } = await applyPlugin({ supportsBackgroundPlayback: true });
+      const { manifest, infoPlist } = await applyPlugin(
+        { supportsBackgroundPlayback: false },
+        { manifest: enabled, infoPlist: { UIBackgroundModes: [AUDIO_BACKGROUND_MODE] } }
+      );
+
+      expect(getPermissions(manifest)).toEqual(PERMISSIONS);
+      expect(getServices(manifest)).toEqual([]);
+      expect(infoPlist.UIBackgroundModes).toEqual([]);
+    });
+
+    it("keeps the audio background mode when Picture-in-Picture still needs it", async () => {
+      const { infoPlist } = await applyPlugin({
+        supportsPictureInPicture: true,
+        supportsBackgroundPlayback: false,
+      });
+
+      expect(infoPlist.UIBackgroundModes).toEqual([AUDIO_BACKGROUND_MODE]);
+    });
+  });
+
   describe("local network permission", () => {
     it("sets a custom NSLocalNetworkUsageDescription message", async () => {
       const message = "Custom local network message";

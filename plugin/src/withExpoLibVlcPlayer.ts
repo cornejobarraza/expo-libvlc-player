@@ -21,15 +21,26 @@ export interface WithExpoLibVlcPlayerProps {
    * @default undefined
    */
   supportsPictureInPicture?: boolean;
+  /**
+   * A boolean to keep `nowPlaying` playback alive in the background
+   *
+   * @default undefined
+   */
+  supportsBackgroundPlayback?: boolean;
 }
 
 const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network";
 const PIP_MANIFEST_ATTRIBUTE = "android:supportsPictureInPicture";
 const AUDIO_BACKGROUND_MODE = "audio";
+const SERVICE_NAME = "expo.modules.libvlcplayer.managers.NowPlayingService";
+const SERVICE_PERMISSIONS = [
+  "android.permission.FOREGROUND_SERVICE",
+  "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+];
 
 const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
   config,
-  { localNetworkPermission, supportsPictureInPicture } = {}
+  { localNetworkPermission, supportsPictureInPicture, supportsBackgroundPlayback } = {}
 ) => {
   withAndroidManifest(config, (config) => {
     const needsConfigMod = typeof supportsPictureInPicture === "boolean";
@@ -44,6 +55,28 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
       }
     }
 
+    const needsServiceMod = typeof supportsBackgroundPlayback === "boolean";
+
+    if (needsServiceMod) {
+      const application = AndroidConfig.Manifest.getMainApplicationOrThrow(config.modResults);
+
+      application.service = (application.service ?? []).filter(
+        (service) => service.$["android:name"] !== SERVICE_NAME
+      );
+
+      // Permissions are kept when disabled, other modules may need them
+      if (supportsBackgroundPlayback) {
+        AndroidConfig.Permissions.ensurePermissions(config.modResults, SERVICE_PERMISSIONS);
+        application.service.push({
+          $: {
+            "android:name": SERVICE_NAME,
+            "android:exported": "false",
+            "android:foregroundServiceType": "mediaPlayback",
+          },
+        });
+      }
+    }
+
     return config;
   });
 
@@ -54,13 +87,15 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
   });
 
   withInfoPlist(config, (config) => {
-    const needsConfigMod = typeof supportsPictureInPicture === "boolean";
+    const needsConfigMod =
+      typeof supportsPictureInPicture === "boolean" ||
+      typeof supportsBackgroundPlayback === "boolean";
 
     if (needsConfigMod) {
       const backgroundModes = config.modResults.UIBackgroundModes ?? [];
       const filteredModes = backgroundModes.filter((mode) => mode !== AUDIO_BACKGROUND_MODE);
 
-      if (supportsPictureInPicture) {
+      if (supportsPictureInPicture || supportsBackgroundPlayback) {
         config.modResults.UIBackgroundModes = [...filteredModes, AUDIO_BACKGROUND_MODE];
       } else {
         config.modResults.UIBackgroundModes = filteredModes;

@@ -17,6 +17,14 @@ object MediaPlayerConstants {
   const val EXTRA_CONTROL_FORWARD: Int = 4
   const val SEEK_STEP_MS: Long = 10_000L
 
+  const val NOW_PLAYING_CHANNEL_ID: String = "expo-libvlc-player"
+  const val NOW_PLAYING_NOTIFICATION_ID: Int = 0x564C43
+  const val NOW_PLAYING_ARTWORK_SIZE: Int = 512
+  const val NOW_PLAYING_REFRESH_MS: Long = 1_000L
+  const val ACTION_NOW_PLAYING_PLAY_PAUSE: String = "now_playing_play_pause"
+  const val ACTION_NOW_PLAYING_REWIND: String = "now_playing_rewind"
+  const val ACTION_NOW_PLAYING_FORWARD: String = "now_playing_forward"
+
   const val ATTACH_DELAY_MS: Long = 300L
   const val PAUSE_DELAY_MS: Long = 1_000L
   const val EXP_DELAY_MULTIPLIER: Double = 2.0

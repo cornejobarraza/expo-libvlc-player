@@ -20,20 +20,13 @@ import androidx.core.content.ContextCompat
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.libvlcplayer.LibVlcPlayerView
+import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.URL
 import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
-
-private const val CHANNEL_ID = "expo-libvlc-player"
-private const val NOTIFICATION_ID = 0x564C43 // "VLC"
-private const val ARTWORK_SIZE = 512
-private const val ACTION_PLAY_PAUSE = "now_playing_play_pause"
-private const val ACTION_SKIP_BACKWARD = "now_playing_skip_backward"
-private const val ACTION_SKIP_FORWARD = "now_playing_skip_forward"
-private const val SKIP_INTERVAL_MS = 10_000L
 
 class NowPlayingManager(
   private val appContext: AppContext,
@@ -45,10 +38,10 @@ class NowPlayingManager(
   private var activeView: LibVlcPlayerView? = null
   private var artworkUrl: String? = null
   private var artwork: Bitmap? = null
-  private var lastStateUpdate = 0L
-  private var lastPosition = 0L
+  private var lastStateUpdate: Long = 0L
+  private var lastPosition: Long = 0L
 
-  // Before Android 13 the notification only shows its own actions
+  // Notification actions before Android 13
   private val actionReceiver =
     object : BroadcastReceiver() {
       override fun onReceive(
@@ -66,17 +59,17 @@ class NowPlayingManager(
     val metadata = view.nowPlaying
     val player = view.mediaPlayer
 
-    // A seek or prop change must not bring back a stopped session
+    // Seeks and prop changes don't bring back a stopped session
     if (metadata == null || player == null || view.isStopped) {
       clear(view)
       return
     }
 
-    // Only a playing view takes the controls from another one
+    // Only a playing view takes over the controls
     if (activeView != null && activeView !== view && !player.isPlaying) return
 
     activeView = view
-    val session = session ?: createSession().also { session = it }
+    val session = session ?: createSession().also { newSession -> session = newSession }
 
     val builder =
       MediaMetadata
@@ -86,12 +79,12 @@ class NowPlayingManager(
         .putString(MediaMetadata.METADATA_KEY_ALBUM, metadata.album)
         .putLong(MediaMetadata.METADATA_KEY_DURATION, player.length)
 
-    // Fetched once per URL: a change starts a new fetch, an in-flight or failed one isn't retried
+    // Fetched once per URL, failed fetches aren't retried
     if (artworkUrl != metadata.artworkURL) {
       loadArtwork(metadata.artworkURL)
     }
 
-    artwork?.let { builder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, it) }
+    artwork?.let { bitmap -> builder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, bitmap) }
 
     session.setMetadata(builder.build())
     setPlaybackState(session, player, elapsed)
@@ -100,11 +93,12 @@ class NowPlayingManager(
     notify(session, metadata.title, metadata.artist, player.isPlaying, player.length > 0)
   }
 
-  /** Called on every time change: keeps the position honest after buffering. Throttled to 1 s. */
   fun refresh(view: LibVlcPlayerView) {
     val session = session ?: return
     val player = view.mediaPlayer ?: return
-    if (activeView !== view || System.currentTimeMillis() - lastStateUpdate < 1000) return
+    val elapsed = System.currentTimeMillis() - lastStateUpdate
+
+    if (activeView !== view || elapsed < MediaPlayerConstants.NOW_PLAYING_REFRESH_MS) return
     setPlaybackState(session, player)
   }
 
@@ -114,7 +108,7 @@ class NowPlayingManager(
     elapsed: Long? = null,
   ) {
     val state = if (player.isPlaying) PlaybackState.STATE_PLAYING else PlaybackState.STATE_PAUSED
-    // A seek is asynchronous: the caller passes the target time so the control doesn't jump back
+    // Seek target from the caller, the player time lags behind an async seek
     val position = elapsed ?: player.time
     val canSeek = player.length > 0
     val actions =
@@ -131,8 +125,15 @@ class NowPlayingManager(
 
     if (canSeek) {
       builder
-        .addCustomAction(ACTION_SKIP_BACKWARD, "Rewind", android.R.drawable.ic_media_rew)
-        .addCustomAction(ACTION_SKIP_FORWARD, "Forward", android.R.drawable.ic_media_ff)
+        .addCustomAction(
+          MediaPlayerConstants.ACTION_NOW_PLAYING_REWIND,
+          "Rewind",
+          android.R.drawable.ic_media_rew,
+        ).addCustomAction(
+          MediaPlayerConstants.ACTION_NOW_PLAYING_FORWARD,
+          "Forward",
+          android.R.drawable.ic_media_ff,
+        )
     }
 
     session.setPlaybackState(builder.build())
@@ -143,13 +144,25 @@ class NowPlayingManager(
   private fun handleAction(action: String?) {
     val view = activeView ?: return
     when (action) {
-      ACTION_PLAY_PAUSE -> if (view.mediaPlayer?.isPlaying == true) view.pause() else view.play()
-      ACTION_SKIP_BACKWARD -> skip(view, -SKIP_INTERVAL_MS)
-      ACTION_SKIP_FORWARD -> skip(view, SKIP_INTERVAL_MS)
+      MediaPlayerConstants.ACTION_NOW_PLAYING_PLAY_PAUSE -> {
+        if (view.mediaPlayer?.isPlaying == true) {
+          view.pause()
+        } else {
+          view.play()
+        }
+      }
+
+      MediaPlayerConstants.ACTION_NOW_PLAYING_REWIND -> {
+        skip(view, -MediaPlayerConstants.SEEK_STEP_MS)
+      }
+
+      MediaPlayerConstants.ACTION_NOW_PLAYING_FORWARD -> {
+        skip(view, MediaPlayerConstants.SEEK_STEP_MS)
+      }
     }
   }
 
-  // Seeks are asynchronous: quick skips start from the shown position, not the stale player time
+  // Skips from the shown position, the player time lags behind an async seek
   private fun skip(
     view: LibVlcPlayerView,
     delta: Long,
@@ -166,22 +179,23 @@ class NowPlayingManager(
     activeView = null
     artwork = null
     artworkUrl = null
-    session?.let {
-      it.isActive = false
-      it.release()
+    session?.let { mediaSession ->
+      mediaSession.isActive = false
+      mediaSession.release()
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
         context.unregisterReceiver(actionReceiver)
       }
     }
     session = null
-    notificationManager.cancel(NOTIFICATION_ID)
+    NowPlayingService.stop()
+    notificationManager.cancel(MediaPlayerConstants.NOW_PLAYING_NOTIFICATION_ID)
   }
 
   private val notificationManager: NotificationManager
     get() = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
   private fun createSession(): MediaSession =
-    MediaSession(context, CHANNEL_ID).apply {
+    MediaSession(context, MediaPlayerConstants.NOW_PLAYING_CHANNEL_ID).apply {
       setCallback(
         object : MediaSession.Callback() {
           override fun onPlay() {
@@ -208,7 +222,7 @@ class NowPlayingManager(
           }
         },
       )
-      launchIntent()?.let { setSessionActivity(it) }
+      launchIntent()?.let { intent -> setSessionActivity(intent) }
 
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
         // Below API 33 the flag alone doesn't keep the receiver private
@@ -216,9 +230,9 @@ class NowPlayingManager(
           context,
           actionReceiver,
           IntentFilter().apply {
-            addAction(ACTION_PLAY_PAUSE)
-            addAction(ACTION_SKIP_BACKWARD)
-            addAction(ACTION_SKIP_FORWARD)
+            addAction(MediaPlayerConstants.ACTION_NOW_PLAYING_PLAY_PAUSE)
+            addAction(MediaPlayerConstants.ACTION_NOW_PLAYING_REWIND)
+            addAction(MediaPlayerConstants.ACTION_NOW_PLAYING_FORWARD)
           },
           ContextCompat.RECEIVER_NOT_EXPORTED,
         )
@@ -240,16 +254,32 @@ class NowPlayingManager(
   ) {
     val playPause =
       if (playing) {
-        action(ACTION_PLAY_PAUSE, android.R.drawable.ic_media_pause, "Pause")
+        action(
+          MediaPlayerConstants.ACTION_NOW_PLAYING_PLAY_PAUSE,
+          android.R.drawable.ic_media_pause,
+          "Pause",
+        )
       } else {
-        action(ACTION_PLAY_PAUSE, android.R.drawable.ic_media_play, "Play")
+        action(
+          MediaPlayerConstants.ACTION_NOW_PLAYING_PLAY_PAUSE,
+          android.R.drawable.ic_media_play,
+          "Play",
+        )
       }
     val actions =
       if (canSkip) {
         listOf(
-          action(ACTION_SKIP_BACKWARD, android.R.drawable.ic_media_rew, "Rewind"),
+          action(
+            MediaPlayerConstants.ACTION_NOW_PLAYING_REWIND,
+            android.R.drawable.ic_media_rew,
+            "Rewind",
+          ),
           playPause,
-          action(ACTION_SKIP_FORWARD, android.R.drawable.ic_media_ff, "Forward"),
+          action(
+            MediaPlayerConstants.ACTION_NOW_PLAYING_FORWARD,
+            android.R.drawable.ic_media_ff,
+            "Forward",
+          ),
         )
       } else {
         listOf(playPause)
@@ -258,9 +288,13 @@ class NowPlayingManager(
     val builder =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         notificationManager.createNotificationChannel(
-          NotificationChannel(CHANNEL_ID, "Playback", NotificationManager.IMPORTANCE_LOW),
+          NotificationChannel(
+            MediaPlayerConstants.NOW_PLAYING_CHANNEL_ID,
+            "Playback",
+            NotificationManager.IMPORTANCE_LOW,
+          ),
         )
-        Notification.Builder(context, CHANNEL_ID)
+        Notification.Builder(context, MediaPlayerConstants.NOW_PLAYING_CHANNEL_ID)
       } else {
         @Suppress("DEPRECATION")
         Notification.Builder(context)
@@ -280,11 +314,12 @@ class NowPlayingManager(
           Notification
             .MediaStyle()
             .setMediaSession(session.sessionToken)
-            .setShowActionsInCompactView(*IntArray(actions.size) { it }),
-        ).apply { actions.forEach { addAction(it) } }
+            .setShowActionsInCompactView(*IntArray(actions.size) { index -> index }),
+        ).apply { actions.forEach { action -> addAction(action) } }
         .build()
 
-    notificationManager.notify(NOTIFICATION_ID, notification)
+    notificationManager.notify(MediaPlayerConstants.NOW_PLAYING_NOTIFICATION_ID, notification)
+    NowPlayingService.update(context, notification, playing)
   }
 
   private fun action(
@@ -320,18 +355,20 @@ class NowPlayingManager(
         if (artworkUrl != url) return@withContext
 
         artwork = bitmap
-        activeView?.let { update(it) }
+        activeView?.let { view -> update(view) }
       }
     }
   }
 
-  // Downsampled while decoding: a full-size poster would stay in memory for the whole playback
+  // Downsampled so a full-size poster doesn't stay in memory during playback
   private fun decodeArtwork(bytes: ByteArray): Bitmap? {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
 
     var sampleSize = 1
-    while (maxOf(bounds.outWidth, bounds.outHeight) / (sampleSize * 2) >= ARTWORK_SIZE) {
+    val maxSize = maxOf(bounds.outWidth, bounds.outHeight)
+
+    while (maxSize / (sampleSize * 2) >= MediaPlayerConstants.NOW_PLAYING_ARTWORK_SIZE) {
       sampleSize *= 2
     }
 

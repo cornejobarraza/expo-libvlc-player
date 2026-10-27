@@ -86,7 +86,8 @@ You can configure `expo-libvlc-player` using its built-in config plugin.
         "expo-libvlc-player",
         {
           "localNetworkPermission": "Allow $(PRODUCT_NAME) to access your local network",
-          "supportsPictureInPicture": true
+          "supportsPictureInPicture": true,
+          "supportsBackgroundPlayback": true
         }
       ]
     ]
@@ -96,10 +97,11 @@ You can configure `expo-libvlc-player` using its built-in config plugin.
 
 #### Configurable properties
 
-| Name                       | Description                                                                                                                                                                                                                                                                                                         | Default                                                |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `localNetworkPermission`   | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                      | `"Allow $(PRODUCT_NAME) to access your local network"` |
-| `supportsPictureInPicture` | A boolean to enable Picture-in-Picture (PiP) support. If `true`, it adds the `android:supportsPictureInPicture` attribute on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the attribute on Android and the mode on iOS. If `undefined`, the configuration is not modified | `undefined`                                            |
+| Name                         | Description                                                                                                                                                                                                                                                                                                         | Default                                                |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                      | `"Allow $(PRODUCT_NAME) to access your local network"` |
+| `supportsPictureInPicture`   | A boolean to enable Picture-in-Picture (PiP) support. If `true`, it adds the `android:supportsPictureInPicture` attribute on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the attribute on Android and the mode on iOS. If `undefined`, the configuration is not modified | `undefined`                                            |
+| `supportsBackgroundPlayback` | A boolean to keep `nowPlaying` playback alive in the background. If `true`, it adds a `mediaPlayback` foreground service with its permissions on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the service and the mode. If `undefined`, the configuration is not modified | `undefined`                                            |
 
 ## Usage
 
