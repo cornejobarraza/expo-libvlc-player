@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.5 - 2026-10-29
+
+### 🐛 Bug fixes
+
+- Fixed missing player error on Android
+
 ## 58.0.4 - 2026-10-25
 
 ### 🐛 Bug fixes
