@@ -284,10 +284,14 @@ class MediaPlayer(
     message: String = "Player not available",
     block: (VLCMediaPlayer) -> Unit,
   ) {
-    libVlcDispatcher?.let { dispatcher ->
+    val dispatcher = libVlcDispatcher
+
+    if (dispatcher != null) {
       CoroutineScope(dispatcher).launch {
         withPlayer(message, block)
       }
+    } else {
+      view.onEncounteredError(mapOf("message" to message))
     }
   }
 
