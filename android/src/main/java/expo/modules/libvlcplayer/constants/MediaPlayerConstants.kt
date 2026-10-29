@@ -8,14 +8,12 @@ object MediaPlayerConstants {
   const val DEFAULT_PLAYER_TIME: Int = 0
   const val MIN_PLAYER_VOLUME: Int = 0
   const val MAX_PLAYER_VOLUME: Int = 100
-
-  const val ACTION_PIP_CONTROL: String = "pip_control"
-  const val EXTRA_CONTROL_TYPE: String = "control_type"
-  const val EXTRA_CONTROL_REWIND: Int = 1
-  const val EXTRA_CONTROL_PLAY: Int = 2
-  const val EXTRA_CONTROL_PAUSE: Int = 3
-  const val EXTRA_CONTROL_FORWARD: Int = 4
   const val SEEK_STEP_MS: Long = 10_000L
+
+  const val PIP_ACTION_REWIND: String = "pip_action_rewind"
+  const val PIP_ACTION_PLAY: String = "pip_action_play"
+  const val PIP_ACTION_PAUSE: String = "pip_action_pause"
+  const val PIP_ACTION_FORWARD: String = "pip_action_forward"
 
   const val ATTACH_DELAY_MS: Long = 300L
   const val PAUSE_DELAY_MS: Long = 1_000L

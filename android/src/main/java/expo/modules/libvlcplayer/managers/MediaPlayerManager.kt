@@ -21,17 +21,9 @@ object MediaPlayerManager {
   }
 
   fun onModuleCreate(appContext: AppContext) {
-    if (!this::audioFocusManager.isInitialized) {
-      audioFocusManager = AudioFocusManager(appContext)
-    }
-
-    if (!this::keepAwakeManager.isInitialized) {
-      keepAwakeManager = KeepAwakeManager(appContext)
-    }
-
-    if (!this::pictureInPictureManager.isInitialized) {
-      pictureInPictureManager = PictureInPictureManager(appContext)
-    }
+    audioFocusManager = AudioFocusManager(appContext)
+    keepAwakeManager = KeepAwakeManager(appContext)
+    pictureInPictureManager = PictureInPictureManager(appContext)
   }
 
   fun onModuleDestroy() {

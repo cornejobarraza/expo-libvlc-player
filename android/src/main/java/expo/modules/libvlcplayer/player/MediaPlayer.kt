@@ -198,7 +198,7 @@ class MediaPlayer(
   @Suppress("OPT_IN_USAGE")
   private fun createPlayer() {
     if (view.pictureInPicture) {
-      MediaPlayerManager.pictureInPictureManager.setupPipView(view)
+      MediaPlayerManager.pictureInPictureManager.addPipView(view)
     }
 
     libVlc = LibVLC(context)
@@ -259,6 +259,12 @@ class MediaPlayer(
     libVlcDispatcher = null
     sourceFd = null
     pauseJob = null
+    MediaPlayerManager.audioFocusManager.updateAudioFocus()
+    MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
+    if (view.pictureInPicture) {
+      MediaPlayerManager.pictureInPictureManager.layoutForPipExit(view)
+      MediaPlayerManager.pictureInPictureManager.removePipView(view)
+    }
   }
 
   fun withPlayer(
@@ -576,7 +582,7 @@ class MediaPlayer(
   }
 
   fun onStopPictureInPicture() {
-    MediaPlayerManager.pictureInPictureManager.layoutForPipExit()
+    MediaPlayerManager.pictureInPictureManager.layoutForPipExit(view)
     view.onPictureInPictureStop(Unit)
   }
 
@@ -766,7 +772,7 @@ private fun MediaPlayer.setDialogCallbacks() {
         override fun onCanceled(dialog: VLCDialog) {
           val prevDialog = vlcDialog
 
-          if (prevDialog === dialog) {
+          if (prevDialog == dialog) {
             vlcDialog = null
             view.onDialogCanceled(Unit)
           }

@@ -154,8 +154,10 @@ class AudioFocusManager(
           ).build()
         }
 
-      currentFocusRequest = newFocusRequest
-      audioManager.requestAudioFocus(newFocusRequest)
+      val result = audioManager.requestAudioFocus(newFocusRequest)
+
+      currentFocusRequest =
+        newFocusRequest.takeIf { result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED }
     } else {
       @Suppress("DEPRECATION")
       audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, audioFocusType)

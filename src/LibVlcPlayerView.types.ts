@@ -72,7 +72,7 @@ export interface LibVlcPlayerViewRef {
   /**
    * Enters Picture-in-Picture (PiP) mode
    *
-   * @note Config plugin has to be configured for PiP to work
+   * @note Config plugin has to be configured for this to work
    *
    * @returns A promise which resolves to `void`
    */

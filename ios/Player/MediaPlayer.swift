@@ -99,6 +99,8 @@ class MediaPlayer: NSObject {
     vlcDialogProvider?.customRenderer = nil
     vlcDialogProvider = nil
     vlcDialog = nil
+    MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+    MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
   }
 
   func withPlayer(message: String = "Player not available", _ block: (VLCMediaPlayer) -> Void) {

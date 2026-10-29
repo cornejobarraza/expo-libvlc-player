@@ -3,13 +3,12 @@ package expo.modules.libvlcplayer.managers
 import android.app.Activity
 import android.view.WindowManager
 import expo.modules.kotlin.AppContext
-import expo.modules.kotlin.exception.Exceptions
 
 class KeepAwakeManager(
   private val appContext: AppContext,
 ) {
-  private val activity: Activity
-    get() = appContext.currentActivity ?: throw Exceptions.MissingActivity()
+  private val activity: Activity?
+    get() = appContext.currentActivity
 
   private val anyPlayingView: Boolean
     get() =
@@ -18,7 +17,7 @@ class KeepAwakeManager(
       }
 
   private fun activateKeepAwake() {
-    activity.let { activity ->
+    activity?.let { activity ->
       activity.runOnUiThread {
         activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
       }
@@ -26,7 +25,7 @@ class KeepAwakeManager(
   }
 
   private fun deactivateKeepAwake() {
-    activity.let { activity ->
+    activity?.let { activity ->
       activity.runOnUiThread {
         activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
       }
