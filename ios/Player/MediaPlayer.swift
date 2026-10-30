@@ -335,14 +335,14 @@ class MediaPlayer: NSObject {
   }
 
   private func getMediaInfo() -> MediaInfo {
+    let video = getVideo()
     let media = getMedia()
     let metadata = getMetadata()
-    let video = getVideo()
 
     return MediaInfo(
-      media: media,
-      metadata: metadata,
-      video: video
+      video: video media: media,
+
+      metadata: metadata
     )
   }
 

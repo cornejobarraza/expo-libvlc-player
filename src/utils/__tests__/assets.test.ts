@@ -1,9 +1,10 @@
 import { Image } from "react-native";
 
-import { parseNativeSource } from "../assets";
+import { parseNativeSlaves, parseNativeSource } from "../assets";
 
 const ASSET_ID = 42;
 const ASSET_URI = "file:///assets/video.mp4";
+const AUDIO_URL = "https://example.com/audio.mp3";
 
 describe(parseNativeSource, () => {
   it("resolves number sources to an asset uri", () => {
@@ -31,5 +32,27 @@ describe(parseNativeSource, () => {
 
   it("returns null sources unchanged", () => {
     expect(parseNativeSource(null)).toBeNull();
+  });
+});
+
+describe(parseNativeSlaves, () => {
+  it("resolves number sources and keeps the other slave fields", () => {
+    jest
+      .spyOn(Image, "resolveAssetSource")
+      .mockReturnValue({ uri: ASSET_URI, width: 0, height: 0, scale: 1 });
+
+    expect(
+      parseNativeSlaves([
+        { source: ASSET_ID, type: "subtitle", selected: true },
+        { source: AUDIO_URL, type: "audio" },
+      ])
+    ).toEqual([
+      { source: ASSET_URI, type: "subtitle", selected: true },
+      { source: AUDIO_URL, type: "audio" },
+    ]);
+  });
+
+  it("returns undefined slaves unchanged", () => {
+    expect(parseNativeSlaves(undefined)).toBeUndefined();
   });
 });

@@ -35,7 +35,7 @@ class LibVlcPlayerView(
   context: Context,
   appContext: AppContext,
 ) : ExpoView(context, appContext) {
-  private val player = MediaPlayer(this)
+  private val player: MediaPlayer = MediaPlayer(this)
 
   val mediaPlayer: VLCMediaPlayer?
     get() = player.mediaPlayer
@@ -65,49 +65,6 @@ class LibVlcPlayerView(
   init {
     MediaPlayerManager.registerExpoView(this)
   }
-
-  fun deinit() {
-    MediaPlayerManager.unregisterExpoView(this)
-    destroyPlayer()
-  }
-
-  override fun onAttachedToWindow() {
-    super.onAttachedToWindow()
-    attachPlayerView(video)
-  }
-
-  override fun onDetachedFromWindow() {
-    super.onDetachedFromWindow()
-    detachPlayerView()
-  }
-
-  override fun onSizeChanged(
-    w: Int,
-    h: Int,
-    oldw: Int,
-    oldh: Int,
-  ) {
-    super.onSizeChanged(w, h, oldw, oldh)
-    player.applyContentFit()
-  }
-
-  fun getTextureView(layout: VLCVideoLayout) = player.getTextureView(layout)
-
-  fun attachPlayerView(layout: VLCVideoLayout) = player.attachPlayerView(layout)
-
-  fun detachPlayerView() = player.detachPlayerView()
-
-  fun initPlayer() = player.initPlayer()
-
-  fun destroyPlayer() = player.destroyPlayer()
-
-  fun pauseDelay() = player.pauseDelay()
-
-  fun cancelPauseDelay() = player.cancelPauseDelay()
-
-  fun onStartPictureInPicture() = player.onStartPictureInPicture()
-
-  fun onStopPictureInPicture() = player.onStopPictureInPicture()
 
   var source: String? = null
     set(value) {
@@ -226,6 +183,49 @@ class LibVlcPlayerView(
       field = value
       player.shouldInit = true
     }
+
+  fun deinit() {
+    MediaPlayerManager.unregisterExpoView(this)
+    destroyPlayer()
+  }
+
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    attachPlayerView(video)
+  }
+
+  override fun onDetachedFromWindow() {
+    super.onDetachedFromWindow()
+    detachPlayerView()
+  }
+
+  override fun onSizeChanged(
+    w: Int,
+    h: Int,
+    oldw: Int,
+    oldh: Int,
+  ) {
+    super.onSizeChanged(w, h, oldw, oldh)
+    player.applyContentFit()
+  }
+
+  fun getTextureView(layout: VLCVideoLayout) = player.getTextureView(layout)
+
+  fun attachPlayerView(layout: VLCVideoLayout) = player.attachPlayerView(layout)
+
+  fun detachPlayerView() = player.detachPlayerView()
+
+  fun initPlayer() = player.initPlayer()
+
+  fun destroyPlayer() = player.destroyPlayer()
+
+  fun pauseDelay() = player.pauseDelay()
+
+  fun cancelPauseDelay() = player.cancelPauseDelay()
+
+  fun onStartPictureInPicture() = player.onStartPictureInPicture()
+
+  fun onStopPictureInPicture() = player.onStopPictureInPicture()
 
   fun play() {
     player.withPlayerAsync { mediaPlayer ->
