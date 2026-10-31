@@ -1,6 +1,11 @@
 import { Image } from "react-native";
 
-import { type LibVlcSlaveSource, type LibVlcSource, type Slave } from "../LibVlcPlayerView.types";
+import {
+  type LibVlcMetadata,
+  type LibVlcSlaveSource,
+  type LibVlcSource,
+  type Slave,
+} from "../LibVlcPlayerView.types";
 
 export function parseNativeSource(source: LibVlcSlaveSource): LibVlcSlaveSource;
 export function parseNativeSource(source: LibVlcSource): LibVlcSource;
@@ -23,4 +28,21 @@ export function parseNativeSlaves(slaves?: Slave[]) {
     ...slave,
     source: parseNativeSource(slave.source),
   }));
+}
+
+function parseNativeArtwork(artworkURL?: LibVlcSource) {
+  if (artworkURL != null) {
+    return parseNativeSource(artworkURL);
+  }
+
+  return artworkURL !== null ? undefined : "";
+}
+
+export function parseNativeMetadata(metadata?: LibVlcMetadata) {
+  return (
+    metadata && {
+      ...metadata,
+      artworkURL: parseNativeArtwork(metadata.artworkURL),
+    }
+  );
 }

@@ -101,6 +101,7 @@ class MediaPlayer(
     pauseJob = null
     MediaPlayerManager.audioFocusManager.updateAudioFocus()
     MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
+    MediaPlayerManager.mediaPlaybackManager.removePlaybackView(view)
     if (view.pictureInPicture) {
       MediaPlayerManager.pictureInPictureManager.layoutForPipExit(view)
       MediaPlayerManager.pictureInPictureManager.removePipView(view)
@@ -161,7 +162,11 @@ class MediaPlayer(
         }
 
         if (view.time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
-          player.setTime(view.time.toLong())
+          val time = view.time.toLong()
+
+          player.setTime(time)
+
+          MediaPlayerManager.mediaPlaybackManager.updatePlaybackState(view, time)
         }
       }
 
@@ -632,6 +637,8 @@ private fun MediaPlayer.setPlayerListener() {
                 retryUntil { isLastAttempt ->
                   if (hasMediaLength || isLastAttempt) {
                     view.onFirstPlay(getMediaInfo())
+
+                    MediaPlayerManager.mediaPlaybackManager.updatePlaybackMetadata(view)
                   }
 
                   return@retryUntil hasMediaLength
@@ -644,6 +651,8 @@ private fun MediaPlayer.setPlayerListener() {
 
                   return@retryUntil hasMediaVolume
                 }
+
+                MediaPlayerManager.mediaPlaybackManager.addPlaybackView(view)
 
                 setupPlayer()
                 setPlayerTracks()
@@ -659,14 +668,20 @@ private fun MediaPlayer.setPlayerListener() {
 
                 firstPlay = false
               }
+
+              MediaPlayerManager.mediaPlaybackManager.updatePlaybackState(view)
             }
 
             if (type == Event.Paused) {
               view.onPaused(Unit)
+
+              MediaPlayerManager.mediaPlaybackManager.updatePlaybackState(view)
             }
 
             if (type == Event.Stopped) {
               view.onStopped(Unit)
+
+              MediaPlayerManager.mediaPlaybackManager.removePlaybackView(view)
 
               resetPlayer()
 

@@ -8,7 +8,7 @@ import {
   type VideoAspectRatio,
 } from "./LibVlcPlayerView.types";
 import { convertAspectRatio } from "./utils/aspect";
-import { parseNativeSlaves, parseNativeSource } from "./utils/assets";
+import { parseNativeMetadata, parseNativeSlaves, parseNativeSource } from "./utils/assets";
 import { convertNativeEvent } from "./utils/events";
 import { useTimeoutRef } from "./utils/timeout";
 
@@ -84,6 +84,7 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
         style={[props.style, { height: "100%" }]}
         source={parseNativeSource(props.source)}
         slaves={parseNativeSlaves(props.slaves)}
+        metadata={parseNativeMetadata(props.metadata)}
       />
     </View>
   );

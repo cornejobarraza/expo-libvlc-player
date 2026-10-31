@@ -1,10 +1,12 @@
 import { Image } from "react-native";
 
-import { parseNativeSlaves, parseNativeSource } from "../assets";
+import { parseNativeMetadata, parseNativeSlaves, parseNativeSource } from "../assets";
 
 const ASSET_ID = 42;
 const ASSET_URI = "file:///assets/video.mp4";
 const AUDIO_URL = "https://example.com/audio.mp3";
+const ARTWORK_URL = "https://example.com/artwork.png";
+const METADATA = { title: "Big Buck Bunny", artist: null, album: null };
 
 describe(parseNativeSource, () => {
   it("resolves number sources to an asset uri", () => {
@@ -54,5 +56,40 @@ describe(parseNativeSlaves, () => {
 
   it("returns undefined slaves unchanged", () => {
     expect(parseNativeSlaves(undefined)).toBeUndefined();
+  });
+});
+
+describe(parseNativeMetadata, () => {
+  it("resolves number artwork and keeps the other metadata fields", () => {
+    jest
+      .spyOn(Image, "resolveAssetSource")
+      .mockReturnValue({ uri: ASSET_URI, width: 0, height: 0, scale: 1 });
+
+    expect(parseNativeMetadata({ ...METADATA, artworkURL: ASSET_ID })).toEqual({
+      ...METADATA,
+      artworkURL: ASSET_URI,
+    });
+  });
+
+  it("returns string artwork unchanged", () => {
+    expect(parseNativeMetadata({ ...METADATA, artworkURL: ARTWORK_URL })).toEqual({
+      ...METADATA,
+      artworkURL: ARTWORK_URL,
+    });
+  });
+
+  it("leaves missing artwork undefined", () => {
+    expect(parseNativeMetadata(METADATA)).toEqual({ ...METADATA, artworkURL: undefined });
+  });
+
+  it("sets null artwork to an empty url", () => {
+    expect(parseNativeMetadata({ ...METADATA, artworkURL: null })).toEqual({
+      ...METADATA,
+      artworkURL: "",
+    });
+  });
+
+  it("returns undefined metadata unchanged", () => {
+    expect(parseNativeMetadata(undefined)).toBeUndefined();
   });
 });

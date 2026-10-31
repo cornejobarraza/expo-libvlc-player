@@ -10,6 +10,7 @@ import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.enums.VideoContentFit
 import expo.modules.libvlcplayer.managers.MediaPlayerManager
 import expo.modules.libvlcplayer.records.Delays
+import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
 
@@ -131,6 +132,10 @@ class LibVlcPlayerModule : Module() {
 
         Prop("mute", false) { view: LibVlcPlayerView, mute: Boolean ->
           view.mute = mute
+        }
+
+        Prop("metadata") { view: LibVlcPlayerView, metadata: Metadata? ->
+          view.metadata = metadata
         }
 
         Prop(

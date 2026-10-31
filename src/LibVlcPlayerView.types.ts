@@ -226,6 +226,13 @@ export interface Metadata {
   artworkURL: string | null;
 }
 
+export interface LibVlcMetadata {
+  title?: string | null;
+  artist?: string | null;
+  album?: string | null;
+  artworkURL?: LibVlcSource;
+}
+
 export interface MediaInfo {
   video: Video;
   media: Media;
@@ -334,6 +341,7 @@ export type LibVlcPlayerViewNativeProps = ViewProps &
     time?: number;
     volume?: number;
     mute?: boolean;
+    metadata?: LibVlcMetadata;
     audioMixingMode?: AudioMixingMode;
     repeat?: boolean;
     autoplay?: boolean;
@@ -480,6 +488,14 @@ export type LibVlcPlayerViewProps = ViewProps &
      * @default false
      */
     mute?: boolean;
+    /**
+     * Sets the metadata for the media notification.
+     *
+     * Unset fields default to the media metadata
+     *
+     * @default undefined
+     */
+    metadata?: LibVlcMetadata;
     /**
      * Determines how the player will interact with other audio playing in the system
      *

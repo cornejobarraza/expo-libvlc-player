@@ -10,6 +10,11 @@ object MediaPlayerConstants {
   const val MAX_PLAYER_VOLUME: Int = 100
   const val SEEK_STEP_MS: Long = 10_000L
 
+  const val MEDIA_CHANNEL_ID = "ExpoLibVlcPlayer"
+  const val MEDIA_NOTIFICATION_ID = 0x564C43 // VLC
+  const val MEDIA_NOTIFICATION_PLAY: String = "media_notification_play"
+  const val MEDIA_NOTIFICATION_PAUSE: String = "media_notification_pause"
+
   const val PIP_ACTION_REWIND: String = "pip_action_rewind"
   const val PIP_ACTION_PLAY: String = "pip_action_play"
   const val PIP_ACTION_PAUSE: String = "pip_action_pause"

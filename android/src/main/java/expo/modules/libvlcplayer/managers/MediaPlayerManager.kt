@@ -8,6 +8,7 @@ import java.util.WeakHashMap
 object MediaPlayerManager {
   lateinit var audioFocusManager: AudioFocusManager
   lateinit var keepAwakeManager: KeepAwakeManager
+  lateinit var mediaPlaybackManager: MediaPlaybackManager
   lateinit var pictureInPictureManager: PictureInPictureManager
 
   val expoViews: MutableSet<LibVlcPlayerView> = Collections.newSetFromMap(WeakHashMap())
@@ -23,6 +24,7 @@ object MediaPlayerManager {
   fun onModuleCreate(appContext: AppContext) {
     audioFocusManager = AudioFocusManager(appContext)
     keepAwakeManager = KeepAwakeManager(appContext)
+    mediaPlaybackManager = MediaPlaybackManager(appContext)
     pictureInPictureManager = PictureInPictureManager(appContext)
   }
 

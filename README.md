@@ -175,6 +175,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 | `time`             | Sets the initial player time in milliseconds. Must be `0` or greater                                                              | `0`         |
 | `volume`           | Sets the player volume. Must be between `0` and `100`                                                                             | `100`       |
 | `mute`             | Sets the player volume to `0` when `true` and restores previous volume when `false`                                               | `false`     |
+| `metadata`         | Sets the metadata for the media notification. Unset fields default to the media metadata                                          | `undefined` |
 | `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
 | `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |

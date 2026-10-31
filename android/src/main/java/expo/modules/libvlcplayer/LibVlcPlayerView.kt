@@ -19,6 +19,7 @@ import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.Media
 import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
+import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
@@ -120,6 +121,7 @@ class LibVlcPlayerView(
     set(value) {
       field = value
       mediaPlayer?.setRate(value.toFloat())
+      MediaPlayerManager.mediaPlaybackManager.updatePlaybackState(this)
     }
 
   var time: Int = MediaPlayerConstants.DEFAULT_PLAYER_TIME
@@ -160,6 +162,12 @@ class LibVlcPlayerView(
 
       mediaPlayer?.setVolume(newVolume)
       MediaPlayerManager.audioFocusManager.updateAudioFocus()
+    }
+
+  var metadata: Metadata? = null
+    set(value) {
+      field = value
+      MediaPlayerManager.mediaPlaybackManager.updatePlaybackMetadata(this)
     }
 
   var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO
@@ -219,6 +227,8 @@ class LibVlcPlayerView(
 
   fun destroyPlayer() = player.destroyPlayer()
 
+  fun getMediaMetadata() = player.getMetadata()
+
   fun pauseDelay() = player.pauseDelay()
 
   fun cancelPauseDelay() = player.cancelPauseDelay()
@@ -261,11 +271,16 @@ class LibVlcPlayerView(
     type: String? = "time",
   ) {
     player.withPlayer { mediaPlayer ->
-      if (type == "position") {
-        mediaPlayer.setPosition(value.toFloat())
-      } else {
-        mediaPlayer.setTime(value.toLong())
-      }
+      val newTime =
+        if (type == "position") {
+          mediaPlayer.setPosition(value.toFloat())
+          (value * mediaPlayer.getLength()).toLong()
+        } else {
+          mediaPlayer.setTime(value.toLong())
+          value.toLong()
+        }
+
+      MediaPlayerManager.mediaPlaybackManager.updatePlaybackState(this, newTime)
     }
   }
 

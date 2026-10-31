@@ -20,6 +20,8 @@ const SOURCE_URI = "file:///assets/bbb.mp4";
 const VIDEO_URL = "https://example.com/video.mp4";
 const AUDIO_URL = "https://example.com/audio.mp3";
 const SUBTITLE_URI = "file:///assets/subtitle.srt";
+const ARTWORK_URI = "file:///assets/bbb.png";
+const METADATA = { title: "Big Buck Bunny", artist: null, album: null };
 const FALLBACK_RATIO = "16:9";
 
 function getNativeProps(): LibVlcPlayerViewNativeProps {
@@ -325,6 +327,24 @@ describe("LibVlcPlayerView", () => {
       await render(<LibVlcPlayerView source={SOURCE} />);
 
       expect(getNativeProps().slaves).toBeUndefined();
+    });
+
+    it("resolves metadata artwork sources", async () => {
+      jest
+        .spyOn(Image, "resolveAssetSource")
+        .mockReturnValue({ uri: ARTWORK_URI, width: 0, height: 0, scale: 1 });
+
+      await render(
+        <LibVlcPlayerView source={VIDEO_URL} metadata={{ ...METADATA, artworkURL: 7 }} />
+      );
+
+      expect(getNativeProps().metadata).toEqual({ ...METADATA, artworkURL: ARTWORK_URI });
+    });
+
+    it("passes undefined metadata through to the native view", async () => {
+      await render(<LibVlcPlayerView source={SOURCE} />);
+
+      expect(getNativeProps().metadata).toBeUndefined();
     });
   });
 

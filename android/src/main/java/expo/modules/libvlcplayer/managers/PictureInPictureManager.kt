@@ -259,9 +259,13 @@ class PictureInPictureManager(
           mediaPlayer?.let { player ->
             when (intent?.action) {
               MediaPlayerConstants.PIP_ACTION_REWIND -> {
-                player.setTime(
-                  player.getTime() - MediaPlayerConstants.SEEK_STEP_MS,
-                )
+                val time = player.getTime() - MediaPlayerConstants.SEEK_STEP_MS
+
+                player.setTime(time)
+
+                pipView?.let { view ->
+                  MediaPlayerManager.mediaPlaybackManager.updatePlaybackState(view, time)
+                }
               }
 
               MediaPlayerConstants.PIP_ACTION_PLAY -> {
@@ -273,9 +277,13 @@ class PictureInPictureManager(
               }
 
               MediaPlayerConstants.PIP_ACTION_FORWARD -> {
-                player.setTime(
-                  player.getTime() + MediaPlayerConstants.SEEK_STEP_MS,
-                )
+                val time = player.getTime() + MediaPlayerConstants.SEEK_STEP_MS
+
+                player.setTime(time)
+
+                pipView?.let { view ->
+                  MediaPlayerManager.mediaPlaybackManager.updatePlaybackState(view, time)
+                }
               }
             }
           }
