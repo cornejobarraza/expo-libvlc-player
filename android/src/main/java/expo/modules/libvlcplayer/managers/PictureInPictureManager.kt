@@ -1,16 +1,13 @@
 package expo.modules.libvlcplayer.managers
 
 import android.app.Activity
-import android.app.PendingIntent
 import android.app.PictureInPictureParams
 import android.app.RemoteAction
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Rect
-import android.graphics.drawable.Icon
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Rational
 import android.view.View
 import android.view.ViewGroup
@@ -19,8 +16,9 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.libvlcplayer.LibVlcPlayerView
-import expo.modules.libvlcplayer.R
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
+import expo.modules.libvlcplayer.utils.MediaAction
+import expo.modules.libvlcplayer.utils.MediaActionReceiver
 import expo.modules.libvlcplayer.utils.PictureInPictureFragment
 import org.videolan.libvlc.MediaPlayer
 
@@ -33,11 +31,22 @@ class PictureInPictureManager(
     get() = activity as? FragmentActivity
   private val context: Context
     get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
-  private val packageName: String
-    get() = context.packageName
+  private val remoteActions: Map<MediaAction, RemoteAction> by lazy {
+    MediaAction.entries.associateWith { action ->
+      RemoteAction(
+        action.createIcon(context),
+        action.title,
+        action.description,
+        action.createPendingIntent(context, MediaPlayerConstants.PIP_ACTION_PREFIX),
+      )
+    }
+  }
+
+  private val handler = Handler(Looper.getMainLooper())
+  private val handOffRunnable = Runnable { handOff() }
 
   private var pipFragment: PictureInPictureFragment? = null
-  private var pipReceiver: BroadcastReceiver? = null
+  private var pipReceiver: MediaActionReceiver? = null
   private var pipView: LibVlcPlayerView? = null
 
   private val mediaPlayer: MediaPlayer?
@@ -49,226 +58,90 @@ class PictureInPictureManager(
 
   fun addPipView(view: LibVlcPlayerView) {
     if (isPictureInPictureSupported()) {
+      handler.removeCallbacks(handOffRunnable)
+      pipView = view
       removePipFragment()
       addPipFragment(view)
       unregisterPipReceiver()
       registerPipReceiver()
-      setPipParams(view)
-      setPipActions()
-      pipView = view
+      updatePipParams(view)
+      updatePipActions()
     }
   }
 
   fun removePipView(view: LibVlcPlayerView) {
-    removePipFragment(view)
-    unregisterPipReceiver(view)
-    pipView = null
-  }
-
-  private fun addPipFragment(view: LibVlcPlayerView) {
-    fragmentActivity?.let { activity ->
-      val fragment = PictureInPictureFragment(view)
-
-      activity.supportFragmentManager
-        .beginTransaction()
-        .add(fragment, fragment.id)
-        .commitAllowingStateLoss()
-
-      pipFragment = fragment
-    }
-  }
-
-  private fun removePipFragment() {
-    fragmentActivity?.let { activity ->
-      val fragment = pipFragment ?: return
-
-      activity.supportFragmentManager
-        .beginTransaction()
-        .remove(fragment)
-        .commitAllowingStateLoss()
-
-      pipFragment = null
-    }
-  }
-
-  fun removePipFragment(view: LibVlcPlayerView) {
     if (pipView == view) {
+      layoutForPipExit()
       removePipFragment()
-    }
-  }
-
-  private fun registerPipReceiver() {
-    pipReceiver =
-      object : BroadcastReceiver() {
-        override fun onReceive(
-          context: Context?,
-          intent: Intent?,
-        ) {
-          mediaPlayer?.let { player ->
-            when (intent?.action) {
-              MediaPlayerConstants.PIP_ACTION_REWIND -> {
-                player.setTime(
-                  player.getTime() - MediaPlayerConstants.SEEK_STEP_MS,
-                )
-              }
-
-              MediaPlayerConstants.PIP_ACTION_PLAY -> {
-                player.play()
-              }
-
-              MediaPlayerConstants.PIP_ACTION_PAUSE -> {
-                player.pause()
-              }
-
-              MediaPlayerConstants.PIP_ACTION_FORWARD -> {
-                player.setTime(
-                  player.getTime() + MediaPlayerConstants.SEEK_STEP_MS,
-                )
-              }
-            }
-          }
-        }
-      }
-
-    context?.registerReceiver(
-      pipReceiver!!,
-      IntentFilter().apply {
-        addAction(MediaPlayerConstants.PIP_ACTION_REWIND)
-        addAction(MediaPlayerConstants.PIP_ACTION_PLAY)
-        addAction(MediaPlayerConstants.PIP_ACTION_PAUSE)
-        addAction(MediaPlayerConstants.PIP_ACTION_FORWARD)
-      },
-      Context.RECEIVER_NOT_EXPORTED,
-    )
-  }
-
-  private fun unregisterPipReceiver() {
-    try {
-      if (pipReceiver != null) {
-        context?.unregisterReceiver(pipReceiver)
-        pipReceiver = null
-      }
-    } catch (_: Exception) {
-      // Receiver not registered
-    }
-  }
-
-  fun unregisterPipReceiver(view: LibVlcPlayerView) {
-    if (pipView == view) {
       unregisterPipReceiver()
+      pipView = null
+
+      handler.removeCallbacks(handOffRunnable)
+      handler.post(handOffRunnable)
     }
   }
 
-  private fun setPipParams(view: LibVlcPlayerView) {
-    val texture = view.getTextureView(view.video)
-    val canSetParams = isPictureInPictureSupported() && texture != null
-
-    if (!canSetParams) return
-
-    val ratio = Rational(texture.width, texture.height)
-    val safeRatio = ratio.takeIf { ratio -> ratio.toFloat() in 0.41841..2.39 }
-
-    val hint = Rect()
-    texture.getGlobalVisibleRect(hint)
-
-    val location = IntArray(2)
-    texture.getLocationOnScreen(location)
-
-    val height = hint.bottom - hint.top
-    hint.top = location[1]
-    hint.bottom = hint.top + height
-
-    val params =
-      PictureInPictureParams
-        .Builder()
-        .apply { safeRatio?.let { ratio -> setAspectRatio(ratio) } }
-        .setSourceRectHint(hint)
-        .setAutoEnterEnabled(pictureInPicture)
-        .build()
-
-    activity?.setPictureInPictureParams(params)
+  fun startPictureInPicture(view: LibVlcPlayerView) {
+    val activity = activity ?: throw Exceptions.MissingActivity()
+    maybeThrowPipException(view)
+    addPipView(view)
+    enterPictureInPicture(activity)
   }
 
-  fun setPipActions() {
+  fun updatePipActions() {
     val canSetActions = isPictureInPictureSupported() && pipView != null
 
     if (!canSetActions) return
 
     val isPlaying = mediaPlayer?.isPlaying() == true
-
-    val rewindControl = MediaPlayerConstants.PIP_ACTION_REWIND
-    val playbackControl =
-      if (isPlaying) {
-        MediaPlayerConstants.PIP_ACTION_PAUSE
-      } else {
-        MediaPlayerConstants.PIP_ACTION_PLAY
-      }
-    val forwardControl = MediaPlayerConstants.PIP_ACTION_FORWARD
-
-    val rewindRes = R.drawable.fast_rewind_24px
-    val rewindIcon = Icon.createWithResource(context, rewindRes)
-    val rewindTitle = "Fast rewind"
-    val rewindDescription = "Fast rewind 10s"
-
-    val playbackRes = if (isPlaying) R.drawable.pause_24px else R.drawable.play_arrow_24px
-    val playbackIcon = Icon.createWithResource(context, playbackRes)
-    val playbackTitle = if (isPlaying) "Pause" else "Play"
-    val playbackDescription = if (isPlaying) "Pause playback" else "Resume playback"
-
-    val forwardRes = R.drawable.fast_forward_24px
-    val forwardIcon = Icon.createWithResource(context, forwardRes)
-    val forwardTitle = "Fast forward"
-    val forwardDescription = "Fast forward 10s"
-
-    val rewindIntent = Intent(rewindControl).setPackage(packageName)
-    val playbackIntent = Intent(playbackControl).setPackage(packageName)
-    val forwardIntent = Intent(forwardControl).setPackage(packageName)
-
-    val rewindPendingIntent =
-      PendingIntent.getBroadcast(
-        context,
-        0,
-        rewindIntent,
-        PendingIntent.FLAG_IMMUTABLE,
-      )
-    val playbackPendingIntent =
-      PendingIntent.getBroadcast(
-        context,
-        0,
-        playbackIntent,
-        PendingIntent.FLAG_IMMUTABLE,
-      )
-    val forwardPendingIntent =
-      PendingIntent.getBroadcast(
-        context,
-        0,
-        forwardIntent,
-        PendingIntent.FLAG_IMMUTABLE,
-      )
+    val isSeekable = mediaPlayer?.isSeekable() == true
 
     val actions =
-      listOf(
-        RemoteAction(rewindIcon, rewindTitle, rewindDescription, rewindPendingIntent),
-        RemoteAction(
-          playbackIcon,
-          playbackTitle,
-          playbackDescription,
-          playbackPendingIntent,
-        ),
-        RemoteAction(forwardIcon, forwardTitle, forwardDescription, forwardPendingIntent),
-      )
+      MediaAction.controls(isPlaying, isSeekable).map { action -> remoteActions.getValue(action) }
 
     val params =
       PictureInPictureParams
         .Builder()
         .setActions(actions)
-        .setAutoEnterEnabled(pictureInPicture && isPlaying)
-        .build()
+        .apply {
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            setAutoEnterEnabled(pictureInPicture && isPlaying)
+          }
+        }.build()
 
     activity?.setPictureInPictureParams(params)
   }
 
-  fun layoutForPipEnter() {
+  private fun handOff() {
+    if (pipView == null) {
+      val nextView = findNextView { view -> view.pictureInPicture }
+
+      if (nextView != null) {
+        addPipView(nextView)
+      } else {
+        resetPipParams()
+      }
+    }
+  }
+
+  private fun findNextView(predicate: (LibVlcPlayerView) -> Boolean): LibVlcPlayerView? {
+    val views =
+      MediaPlayerManager.expoViews.filter { view ->
+        view.mediaPlayer != null &&
+          predicate(view)
+      }
+
+    return views.firstOrNull { view -> view.mediaPlayer?.isPlaying() == true }
+      ?: views.firstOrNull()
+  }
+
+  fun layoutForPipEnter(view: LibVlcPlayerView) {
+    if (pipView == view) {
+      layoutForPipEnter()
+    }
+  }
+
+  private fun layoutForPipEnter() {
     val picture = pipView?.picture ?: return
     val rootView = activity?.findViewById<ViewGroup>(android.R.id.content) ?: return
 
@@ -317,11 +190,102 @@ class PictureInPictureManager(
     }
   }
 
-  fun startPictureInPicture(view: LibVlcPlayerView) {
-    val activity = activity ?: throw Exceptions.MissingActivity()
-    maybeThrowPipException()
-    addPipView(view)
-    enterPictureInPicture(activity)
+  private fun addPipFragment(view: LibVlcPlayerView) {
+    fragmentActivity?.let { activity ->
+      val fragment = PictureInPictureFragment(view)
+
+      activity.supportFragmentManager
+        .beginTransaction()
+        .add(fragment, fragment.id)
+        .commitAllowingStateLoss()
+
+      pipFragment = fragment
+    }
+  }
+
+  private fun removePipFragment() {
+    fragmentActivity?.let { activity ->
+      pipFragment?.let { fragment ->
+        activity.supportFragmentManager
+          .beginTransaction()
+          .remove(fragment)
+          .commitAllowingStateLoss()
+
+        pipFragment = null
+      }
+    }
+  }
+
+  private fun registerPipReceiver() {
+    pipReceiver =
+      MediaActionReceiver(MediaPlayerConstants.PIP_ACTION_PREFIX) { action ->
+        pipView?.handleMediaAction(action)
+      }.also { receiver -> receiver.register(context) }
+  }
+
+  private fun unregisterPipReceiver() {
+    val receiver = pipReceiver ?: return
+
+    pipReceiver = null
+
+    appContext.reactContext?.let { context -> receiver.unregister(context) }
+  }
+
+  private fun updatePipParams(view: LibVlcPlayerView) {
+    val texture = view.getTextureView(view.video)
+    val canSetParams = isPictureInPictureSupported() && texture != null
+
+    if (!canSetParams) return
+
+    val ratio = Rational(texture.width, texture.height)
+    val safeRatio = ratio.takeIf { ratio -> ratio.toFloat() in 0.41841..2.39 }
+
+    val hint = Rect()
+    texture.getGlobalVisibleRect(hint)
+
+    val location = IntArray(2)
+    texture.getLocationOnScreen(location)
+
+    val height = hint.bottom - hint.top
+    hint.top = location[1]
+    hint.bottom = hint.top + height
+
+    val params =
+      PictureInPictureParams
+        .Builder()
+        .apply { safeRatio?.let { ratio -> setAspectRatio(ratio) } }
+        .setSourceRectHint(hint)
+        .apply {
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            setAutoEnterEnabled(pictureInPicture)
+          }
+        }.build()
+
+    activity?.setPictureInPictureParams(params)
+  }
+
+  private fun resetPipParams() {
+    if (isPictureInPictureSupported()) {
+      val params =
+        PictureInPictureParams
+          .Builder()
+          .setActions(emptyList())
+          .apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+              setAutoEnterEnabled(false)
+            }
+          }.build()
+
+      activity?.setPictureInPictureParams(params)
+    }
+  }
+
+  private fun maybeThrowPipException(view: LibVlcPlayerView) {
+    if (!isPictureInPictureSupported()) {
+      throw PictureInPictureUnsupportedException()
+    } else if (!view.pictureInPicture) {
+      throw PictureInPictureUnallowedException()
+    }
   }
 
   private fun enterPictureInPicture(activity: Activity) {
@@ -330,14 +294,6 @@ class PictureInPictureManager(
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       @Suppress("DEPRECATION")
       activity.enterPictureInPictureMode()
-    }
-  }
-
-  private fun maybeThrowPipException() {
-    if (!isPictureInPictureSupported()) {
-      throw PictureInPictureUnsupportedException()
-    } else if (!pictureInPicture) {
-      throw PictureInPictureUnallowedException()
     }
   }
 

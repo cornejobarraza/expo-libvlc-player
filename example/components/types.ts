@@ -1,5 +1,5 @@
 import type MaterialIcons from "@react-native-vector-icons/material-icons";
-import { type LibVlcSource } from "expo-libvlc-player";
+import { type LibVlcAsset, type LibVlcSource } from "expo-libvlc-player";
 import { type SFSymbol } from "expo-symbols";
 import { type JSX, type ComponentProps } from "react";
 import {
@@ -31,6 +31,7 @@ export interface IconProps {
 
 export interface PlayerProps {
   source: LibVlcSource;
+  poster?: LibVlcAsset;
   fullScreen?: boolean;
 }
 

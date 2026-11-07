@@ -17,6 +17,7 @@ jobs:
       - name: Lint all
         run: |
           npx tsc
+          npx tsc -p tsconfig.eslint.json
           npx eslint
           ktlint android/
           swiftformat --lint ios/

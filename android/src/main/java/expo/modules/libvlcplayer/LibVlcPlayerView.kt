@@ -19,9 +19,12 @@ import expo.modules.libvlcplayer.records.Dialog
 import expo.modules.libvlcplayer.records.Media
 import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
+import expo.modules.libvlcplayer.records.Metadata
+import expo.modules.libvlcplayer.records.PlayerProps
 import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
+import expo.modules.libvlcplayer.utils.MediaAction
 import org.videolan.libvlc.util.VLCVideoLayout
 import java.io.File
 import java.io.FileOutputStream
@@ -35,7 +38,7 @@ class LibVlcPlayerView(
   context: Context,
   appContext: AppContext,
 ) : ExpoView(context, appContext) {
-  private val player = MediaPlayer(this)
+  private val player: MediaPlayer = MediaPlayer(this)
 
   val mediaPlayer: VLCMediaPlayer?
     get() = player.mediaPlayer
@@ -66,66 +69,40 @@ class LibVlcPlayerView(
     MediaPlayerManager.registerExpoView(this)
   }
 
-  fun deinit() {
-    MediaPlayerManager.unregisterExpoView(this)
-    destroyPlayer()
-  }
-
-  override fun onAttachedToWindow() {
-    super.onAttachedToWindow()
-    attachPlayerView(video)
-  }
-
-  override fun onDetachedFromWindow() {
-    super.onDetachedFromWindow()
-    detachPlayerView()
-  }
-
-  override fun onSizeChanged(
-    w: Int,
-    h: Int,
-    oldw: Int,
-    oldh: Int,
-  ) {
-    super.onSizeChanged(w, h, oldw, oldh)
-    player.applyContentFit()
-  }
-
-  fun getTextureView(layout: VLCVideoLayout) = player.getTextureView(layout)
-
-  fun attachPlayerView(layout: VLCVideoLayout) = player.attachPlayerView(layout)
-
-  fun detachPlayerView() = player.detachPlayerView()
-
-  fun initPlayer() = player.initPlayer()
-
-  fun destroyPlayer() = player.destroyPlayer()
-
-  fun pauseDelay() = player.pauseDelay()
-
-  fun cancelPauseDelay() = player.cancelPauseDelay()
-
-  fun onStartPictureInPicture() = player.onStartPictureInPicture()
-
-  fun onStopPictureInPicture() = player.onStopPictureInPicture()
-
   var source: String? = null
     set(value) {
+      val oldValue = field
       field = value
-      player.shouldInit = true
+
+      if (value != oldValue) {
+        player.shouldInit = true
+      }
     }
 
-  var options: MutableList<String> = mutableListOf()
+  var metadata: Metadata? = null
     set(value) {
       field = value
-      player.shouldInit = true
+      MediaPlayerManager.mediaPlaybackManager.updatePlaybackMetadata(this)
     }
 
-  var slaves: MutableList<Slave> = mutableListOf()
+  var options: List<String> = emptyList()
     set(value) {
+      val oldValue = field
+      field = value
+
+      if (value != oldValue) {
+        player.shouldInit = true
+      }
+    }
+
+  var slaves: List<Slave> = emptyList()
+    set(value) {
+      val oldValue = field
       val newSlaves =
         value.filter { slave ->
-          field.none { existing -> existing.source == slave.source && existing.type == slave.type }
+          oldValue.none { existing ->
+            existing.source == slave.source && existing.type == slave.type
+          }
         }
 
       field = value
@@ -162,10 +139,20 @@ class LibVlcPlayerView(
   var rate: Double = MediaPlayerConstants.DEFAULT_PLAYER_RATE
     set(value) {
       field = value
-      mediaPlayer?.setRate(value.toFloat())
+      val newRate = value.toFloat()
+      mediaPlayer?.setRate(newRate)
+      MediaPlayerManager.mediaPlaybackManager.updatePlaybackPosition(this, rate = newRate)
     }
 
   var time: Int = MediaPlayerConstants.DEFAULT_PLAYER_TIME
+    set(value) {
+      val oldValue = field
+      field = value
+
+      if (value != oldValue) {
+        player.startTime = value
+      }
+    }
 
   var volume: Int = MediaPlayerConstants.MAX_PLAYER_VOLUME
     set(value) {
@@ -205,27 +192,162 @@ class LibVlcPlayerView(
       MediaPlayerManager.audioFocusManager.updateAudioFocus()
     }
 
+  var repeat: Boolean = false
+
+  var autoplay: Boolean = true
+
   var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO
     set(value) {
       field = value
       MediaPlayerManager.audioFocusManager.updateAudioFocus()
     }
 
-  var repeat: Boolean = false
-    set(value) {
-      field = value
-    }
+  val canPlayInBackground: Boolean
+    get() =
+      playInBackground && MediaPlayerManager.mediaPlaybackManager.isBackgroundPlaybackSupported
 
-  var autoplay: Boolean = true
+  val isPlaybackView: Boolean
+    get() = canPlayInBackground && MediaPlayerManager.mediaPlaybackManager.isPlaybackView(this)
+
+  var playInBackground: Boolean = false
     set(value) {
+      val oldValue = field
       field = value
+
+      if (value != oldValue) {
+        MediaPlayerManager.mediaPlaybackManager.updatePlaybackView(this)
+      }
     }
 
   var pictureInPicture: Boolean = false
     set(value) {
+      val oldValue = field
       field = value
-      player.shouldInit = true
+
+      if (value != oldValue) {
+        player.shouldInit = true
+      }
     }
+
+  fun deinit() {
+    MediaPlayerManager.unregisterExpoView(this)
+    destroyPlayer()
+  }
+
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    attachPlayerView(video)
+  }
+
+  override fun onDetachedFromWindow() {
+    super.onDetachedFromWindow()
+    detachPlayerView()
+  }
+
+  override fun onSizeChanged(
+    w: Int,
+    h: Int,
+    oldw: Int,
+    oldh: Int,
+  ) {
+    super.onSizeChanged(w, h, oldw, oldh)
+    player.applyContentFit()
+  }
+
+  fun getTextureView(layout: VLCVideoLayout) = player.getTextureView(layout)
+
+  fun attachPlayerView(layout: VLCVideoLayout) = player.attachPlayerView(layout)
+
+  fun detachPlayerView() = player.detachPlayerView()
+
+  fun initPlayer() = player.initPlayer()
+
+  fun destroyPlayer() {
+    player.destroyPlayer()
+    MediaPlayerManager.mediaPlaybackManager.removePlaybackView(this)
+  }
+
+  fun getMediaMetadata() = player.getMetadata()
+
+  fun pauseDelay() = player.pauseDelay()
+
+  fun cancelPauseDelay() = player.cancelPauseDelay()
+
+  fun onStartPictureInPicture() = player.onStartPictureInPicture()
+
+  fun onStopPictureInPicture() = player.onStopPictureInPicture()
+
+  fun update(props: PlayerProps) {
+    if (props.source != this.source) {
+      this.source = props.source
+    }
+
+    if (props.metadata != this.metadata) {
+      this.metadata = props.metadata
+    }
+
+    if (props.options != this.options) {
+      this.options = props.options
+    }
+
+    if (props.slaves != this.slaves) {
+      this.slaves = props.slaves
+    }
+
+    if (props.tracks != this.tracks) {
+      this.tracks = props.tracks
+    }
+
+    if (props.delays != this.delays) {
+      this.delays = props.delays
+    }
+
+    if (props.scale != this.scale) {
+      this.scale = props.scale
+    }
+
+    if (props.contentFit != this.contentFit) {
+      this.contentFit = props.contentFit
+    }
+
+    if (props.rate != this.rate) {
+      this.rate = props.rate
+    }
+
+    if (props.time != this.time) {
+      this.time = props.time
+    }
+
+    if (props.volume != this.volume) {
+      this.volume = props.volume
+    }
+
+    if (props.mute != this.mute) {
+      this.mute = props.mute
+    }
+
+    if (props.repeat != this.repeat) {
+      this.repeat = props.repeat
+    }
+
+    if (props.autoplay != this.autoplay) {
+      this.autoplay = props.autoplay
+    }
+
+    if (props.audioMixingMode != this.audioMixingMode) {
+      this.audioMixingMode = props.audioMixingMode
+    }
+
+    if (props.playInBackground != this.playInBackground) {
+      this.playInBackground = props.playInBackground
+    }
+
+    if (props.pictureInPicture != this.pictureInPicture) {
+      this.pictureInPicture = props.pictureInPicture
+    }
+
+    initPlayer()
+  }
 
   fun play() {
     player.withPlayerAsync { mediaPlayer ->
@@ -261,11 +383,36 @@ class LibVlcPlayerView(
     type: String? = "time",
   ) {
     player.withPlayer { mediaPlayer ->
-      if (type == "position") {
-        mediaPlayer.setPosition(value.toFloat())
-      } else {
-        mediaPlayer.setTime(value.toLong())
+      if (!mediaPlayer.isSeekable()) {
+        onEncounteredError(mapOf("message" to "Media is not seekable"))
+        return@withPlayer
       }
+
+      val newTime =
+        if (type == "position") {
+          mediaPlayer.setPosition(value.toFloat())
+          (value * mediaPlayer.getLength()).toLong()
+        } else {
+          mediaPlayer.setTime(value.toLong())
+          value.toLong()
+        }
+
+      MediaPlayerManager.mediaPlaybackManager.updatePlaybackPosition(this, time = newTime)
+    }
+  }
+
+  fun seekBy(offset: Long) {
+    mediaPlayer?.let { player ->
+      seek((player.getTime() + offset).coerceAtLeast(0L).toDouble())
+    }
+  }
+
+  fun handleMediaAction(action: MediaAction) {
+    when (action) {
+      MediaAction.REWIND -> seekBy(-MediaPlayerConstants.SEEK_STEP_MS)
+      MediaAction.PLAY -> play()
+      MediaAction.PAUSE -> pause()
+      MediaAction.FORWARD -> seekBy(MediaPlayerConstants.SEEK_STEP_MS)
     }
   }
 
