@@ -13,3 +13,10 @@ struct Metadata: Record {
   @Field
   var artworkURL: String? = nil
 }
+
+extension Metadata: Equatable {
+  static func == (lhs: Metadata, rhs: Metadata) -> Bool {
+    (lhs.title, lhs.artist, lhs.album, lhs.artworkURL) ==
+      (rhs.title, rhs.artist, rhs.album, rhs.artworkURL)
+  }
+}

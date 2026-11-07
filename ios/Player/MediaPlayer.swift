@@ -2,8 +2,6 @@ import ExpoModulesCore
 import UIKit
 import VLCKit
 
-private let dialogCustomUI: Bool = true
-
 class MediaPlayer: NSObject {
   private unowned let view: LibVlcPlayerView
 
@@ -17,7 +15,7 @@ class MediaPlayer: NSObject {
 
   var userStop: Bool = false
   private var firstPlay: Bool = true
-  var shouldInit: Bool = true
+  var shouldInit: Bool = false
 
   var hasVideoSize: Bool {
     let video = getVideo()
@@ -40,19 +38,15 @@ class MediaPlayer: NSObject {
     super.init()
   }
 
-  func applyBounds() {
-    video.transform = .identity
-    video.frame = view.bounds
-    picture.transform = .identity
-    picture.frame = view.bounds
-  }
-
   func initPlayer() {
     if shouldInit {
       destroyPlayer()
 
       if view.source != nil {
         createPlayer()
+        MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackSource(view)
+      } else {
+        MediaPlayerManager.shared.mediaPlaybackManager.removePlaybackView(ObjectIdentifier(view))
       }
     }
   }
@@ -67,7 +61,10 @@ class MediaPlayer: NSObject {
     mediaPlayer!.drawable = drawable
     mediaPlayer!.delegate = self
 
-    vlcDialogProvider = VLCDialogProvider(library: library!, customUI: dialogCustomUI)
+    vlcDialogProvider = VLCDialogProvider(
+      library: library!,
+      customUI: MediaPlayerConstants.dialogCustomUI
+    )
     vlcDialogProvider!.customRenderer = self
 
     guard let source = view.source, let url = URL(string: source) else {
@@ -92,6 +89,23 @@ class MediaPlayer: NSObject {
     view.addSubview(drawable)
   }
 
+  func addPlayerSlaves(_ slaves: [Slave]) {
+    for slave in slaves {
+      let source = slave.source
+      let type = slave.type == "subtitle" ?
+        VLCMediaPlaybackSlaveType.subtitle :
+        VLCMediaPlaybackSlaveType.audio
+      let selected = slave.selected ?? false
+
+      guard let url = URL(string: source) else {
+        view.onEncounteredError(["message": "Invalid source, \(slave.type) could not be added"])
+        continue
+      }
+
+      mediaPlayer?.addPlaybackSlave(url, type: type, enforce: selected)
+    }
+  }
+
   func destroyPlayer() {
     library = nil
     mediaPlayer?.stop()
@@ -101,26 +115,6 @@ class MediaPlayer: NSObject {
     vlcDialog = nil
     MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
     MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
-  }
-
-  func withPlayer(message: String = "Player not available", _ block: (VLCMediaPlayer) -> Void) {
-    if let player = mediaPlayer {
-      block(player)
-    } else {
-      view.onEncounteredError(["message": message])
-    }
-  }
-
-  func withDialog<T: VLCDialog>(_: T.Type, _ block: (T) -> Void) {
-    switch vlcDialog {
-    case nil:
-      view.onEncounteredError(["message": "Dialog not available"])
-    case let dialog as T:
-      vlcDialog = nil
-      block(dialog)
-    default:
-      view.onEncounteredError(["message": "Dialog type not available"])
-    }
   }
 
   private func setupPlayer() {
@@ -154,24 +148,15 @@ class MediaPlayer: NSObject {
         return false
       }
 
+      MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackPosition(
+        view,
+        time: view.time != MediaPlayerConstants.defaultPlayerTime
+          ? Int64(view.time)
+          : nil,
+        rate: Float(view.rate)
+      )
+
       view.time = MediaPlayerConstants.defaultPlayerTime
-    }
-  }
-
-  func addPlayerSlaves(_ slaves: [Slave]) {
-    for slave in slaves {
-      let source = slave.source
-      let type = slave.type == "subtitle" ?
-        VLCMediaPlaybackSlaveType.subtitle :
-        VLCMediaPlaybackSlaveType.audio
-      let selected = slave.selected ?? false
-
-      guard let url = URL(string: source) else {
-        view.onEncounteredError(["message": "Invalid source, \(slave.type) could not be added"])
-        continue
-      }
-
-      mediaPlayer?.addPlaybackSlave(url, type: type, enforce: selected)
     }
   }
 
@@ -208,6 +193,18 @@ class MediaPlayer: NSObject {
       if let audioDelay { player.currentAudioPlaybackDelay = NSInteger(audioDelay) }
       if let textDelay { player.currentVideoSubTitleDelay = NSInteger(textDelay) }
     }
+  }
+
+  func applyBounds() {
+    video.transform = .identity
+    video.frame = view.bounds
+    picture.transform = .identity
+    picture.frame = view.bounds
+  }
+
+  func applyContentFit() {
+    setContentFit(drawable: video)
+    setContentFit(drawable: picture)
   }
 
   private func setContentFit(drawable: MediaPlayerDrawable) {
@@ -250,9 +247,98 @@ class MediaPlayer: NSObject {
     }
   }
 
-  func applyContentFit() {
-    setContentFit(drawable: video)
-    setContentFit(drawable: picture)
+  func withPlayer(message: String = "Player not available", _ block: (VLCMediaPlayer) -> Void) {
+    if let player = mediaPlayer {
+      block(player)
+    } else {
+      view.onEncounteredError(["message": message])
+    }
+  }
+
+  func withDialog<T: VLCDialog>(_: T.Type, _ block: (T) -> Void) {
+    switch vlcDialog {
+    case nil:
+      view.onEncounteredError(["message": "Dialog not available"])
+    case let dialog as T:
+      vlcDialog = nil
+      block(dialog)
+    default:
+      view.onEncounteredError(["message": "Dialog type not available"])
+    }
+  }
+
+  func startPictureInPicture() throws {
+    try picture.startPictureInPicture()
+  }
+
+  func stopPictureInPicture() {
+    picture.stopPictureInPicture()
+  }
+
+  private func getMediaInfo() -> MediaInfo {
+    let video = getVideo()
+    let media = getMedia()
+    let metadata = getMetadata()
+
+    return MediaInfo(
+      video: video,
+      media: media,
+      metadata: metadata
+    )
+  }
+
+  private func getVideo() -> Video {
+    guard let track = mediaPlayer?.videoTracks.first(where: { track in track.isSelected }),
+          let video = track.video
+    else {
+      return Video()
+    }
+
+    let width = Int(video.width)
+    let height = Int(video.height)
+    let frameRate = video.frameRateDenominator != 0 ?
+      Int(video.frameRate / video.frameRateDenominator) :
+      0
+    let bitrate = Int(track.bitrate)
+
+    return Video(
+      width: width,
+      height: height,
+      frameRate: frameRate,
+      bitrate: bitrate
+    )
+  }
+
+  private func getMedia() -> Media {
+    let length = Int(mediaPlayer?.media?.length.intValue ?? 0)
+    let seekable = mediaPlayer?.isSeekable ?? false
+
+    return Media(
+      length: length,
+      seekable: seekable
+    )
+  }
+
+  func getMetadata() -> Metadata {
+    guard let metaData = mediaPlayer?.media?.metaData else {
+      return Metadata()
+    }
+
+    let title = metaData.title
+    let artist = metaData.artist
+    let album = metaData.album
+    let artworkURL = metaData.artworkURL?.absoluteString
+
+    return Metadata(
+      title: title,
+      artist: artist,
+      album: album,
+      artworkURL: artworkURL
+    )
+  }
+
+  func getLength() -> Int {
+    Int(mediaPlayer?.media?.length.intValue ?? 0)
   }
 
   private func getMediaTracks() -> MediaTracks {
@@ -282,80 +368,6 @@ class MediaPlayer: NSObject {
       video: video,
       subtitle: subtitle
     )
-  }
-
-  private func getMedia() -> Media {
-    let length = Int(mediaPlayer?.media?.length.intValue ?? 0)
-    let seekable = mediaPlayer?.isSeekable ?? false
-
-    return Media(
-      length: length,
-      seekable: seekable
-    )
-  }
-
-  private func getMetadata() -> Metadata {
-    guard let metaData = mediaPlayer?.media?.metaData else {
-      return Metadata()
-    }
-
-    let title = metaData.title
-    let artist = metaData.artist
-    let album = metaData.album
-    let artworkURL = metaData.artworkURL?.absoluteString
-
-    return Metadata(
-      title: title,
-      artist: artist,
-      album: album,
-      artworkURL: artworkURL
-    )
-  }
-
-  private func getVideo() -> Video {
-    guard let track = mediaPlayer?.videoTracks.first(where: { track in track.isSelected }),
-          let video = track.video
-    else {
-      return Video()
-    }
-
-    let width = Int(video.width)
-    let height = Int(video.height)
-    let frameRate = video.frameRateDenominator != 0 ?
-      Int(video.frameRate / video.frameRateDenominator) :
-      0
-    let bitrate = Int(track.bitrate)
-
-    return Video(
-      width: width,
-      height: height,
-      frameRate: frameRate,
-      bitrate: bitrate
-    )
-  }
-
-  private func getMediaInfo() -> MediaInfo {
-    let media = getMedia()
-    let metadata = getMetadata()
-    let video = getVideo()
-
-    return MediaInfo(
-      media: media,
-      metadata: metadata,
-      video: video
-    )
-  }
-
-  private func getLength() -> Int {
-    Int(mediaPlayer?.media?.length.intValue ?? 0)
-  }
-
-  func startPictureInPicture() throws {
-    try picture.startPictureInPicture()
-  }
-
-  func stopPictureInPicture() {
-    picture.stopPictureInPicture()
   }
 
   private func retryUntil(
@@ -391,6 +403,8 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
     case .playing,
          .paused,
          .stopped:
+      let willRepeat = newState == .stopped && view.Repeat && !userStop
+
       if newState == .playing {
         view.onPlaying()
 
@@ -399,14 +413,16 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
           setPlayerTracks()
           setPlayerDelays()
 
-          retryUntil { [weak self] _ in
+          retryUntil { [weak self] isLastAttempt in
             guard let self else { return true }
 
-            if hasVideoSize {
-              applyContentFit()
+            if hasMediaLength || isLastAttempt {
+              view.onFirstPlay(getMediaInfo())
+
+              MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackMetadata(view)
             }
 
-            return hasVideoSize
+            return hasMediaLength
           }
 
           retryUntil { [weak self] _ in
@@ -420,14 +436,14 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
             return hasMediaVolume
           }
 
-          retryUntil { [weak self] isLastAttempt in
+          retryUntil { [weak self] _ in
             guard let self else { return true }
 
-            if hasMediaLength || isLastAttempt {
-              view.onFirstPlay(getMediaInfo())
+            if hasVideoSize {
+              applyContentFit()
             }
 
-            return hasMediaLength
+            return hasVideoSize
           }
 
           firstPlay = false
@@ -441,8 +457,8 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
       if newState == .stopped {
         view.onStopped()
 
-        if view.Repeat, !userStop {
-          player.play()
+        if willRepeat {
+          view.play()
         }
 
         userStop = false
@@ -452,6 +468,10 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
       MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
       MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
       picture.updatePipState()
+
+      if !willRepeat {
+        MediaPlayerManager.shared.mediaPlaybackManager.onStateChanged(view)
+      }
     case .error:
       view.onEncounteredError(["message": "Player encountered an error"])
 

@@ -4,9 +4,16 @@
 
 ### 🛠 Breaking changes
 
+- Added error when media is not seekable
+- Removed slave source in favor of asset type
+
 ### 🎉 New features
 
+- Add background playback support ([#37](https://github.com/cornejobarraza/expo-libvlc-player/pull/37) by [@wendaf](https://github.com/wendaf))
+
 ### 🐛 Bug fixes
+
+- Fixed Picture-in-Picture (PiP) related crash
 
 ### 💡 Others
 

@@ -1,5 +1,5 @@
 import { requireNativeView } from "expo";
-import { useState, type ComponentType } from "react";
+import { type ComponentType, useState } from "react";
 import { View } from "react-native";
 
 import {
@@ -8,8 +8,9 @@ import {
   type VideoAspectRatio,
 } from "./LibVlcPlayerView.types";
 import { convertAspectRatio } from "./utils/aspect";
-import { parseNativeSource } from "./utils/assets";
+import { parseNativeMetadata, parseNativeSlaves, parseNativeSource } from "./utils/assets";
 import { convertNativeEvent } from "./utils/events";
+import { usePlayerRef } from "./utils/ref";
 import { useTimeoutRef } from "./utils/timeout";
 
 const CHILDREN_WARNING =
@@ -23,6 +24,7 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
   const [warnedChildren, setWarnedChildren] = useState<boolean>(false);
   const [mediaRatio, setMediaRatio] = useState<VideoAspectRatio>(undefined);
 
+  const nativeRef = usePlayerRef(ref, props);
   const setTimeoutRef = useTimeoutRef();
 
   if (props.children && !warnedChildren) {
@@ -37,13 +39,11 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
     <View style={[props.style, { aspectRatio: convertAspectRatio(viewRatio) }]}>
       <NativeView
         {...props}
-        ref={ref}
+        ref={nativeRef}
         style={[props.style, { height: "100%" }]}
         source={parseNativeSource(props.source)}
-        slaves={props.slaves?.map((slave) => ({
-          ...slave,
-          source: parseNativeSource(slave.source),
-        }))}
+        metadata={parseNativeMetadata(props.metadata)}
+        slaves={parseNativeSlaves(props.slaves)}
         onBuffering={(event) => {
           props.onBuffering?.(convertNativeEvent(event));
         }}
@@ -69,19 +69,18 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
           props.onSnapshotTaken?.(convertNativeEvent(event));
         }}
         onFirstPlay={(event) => {
-          const mediaInfo = convertNativeEvent(event);
+          const nativeEvent = convertNativeEvent(event);
 
-          const { width, height } = mediaInfo.video;
+          const { width, height } = nativeEvent.video;
           const videoRatio = width / height;
 
           const validRatio = videoRatio > 0 && videoRatio < Infinity;
           const nextRatio = validRatio ? videoRatio : undefined;
 
-          // View resizing workaround
-          const handler = () => setMediaRatio(nextRatio);
+          const handler = () => setMediaRatio(nextRatio); // View resizing workaround
           setTimeoutRef(handler, RATIO_TIMEOUT);
 
-          props.onFirstPlay?.(mediaInfo);
+          props.onFirstPlay?.(nativeEvent);
         }}
       />
     </View>
