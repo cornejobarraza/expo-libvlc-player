@@ -15,6 +15,9 @@ class PictureInPictureDrawable: MediaPlayerDrawable {
 
   private weak var pipController: VLCPictureInPictureWindowControlling?
 
+  private var pausedAt: Date?
+  private var skippedAt: Date?
+
   init(_ view: LibVlcPlayerView) {
     self.view = view
     super.init()
@@ -79,10 +82,19 @@ extension PictureInPictureDrawable: VLCPictureInPictureMediaControlling {
   }
 
   func pause() {
+    // AVKit pauses around a skip and sometimes never resumes
+    guard !isRecent(skippedAt) else { return }
+
+    pausedAt = Date()
     view?.pause()
   }
 
   func seek(by offset: Int64, completion: (() -> Void)!) {
+    if isRecent(pausedAt) {
+      view?.play()
+    }
+
+    skippedAt = Date()
     view?.seekBy(Double(offset))
     completion?()
   }
@@ -101,6 +113,12 @@ extension PictureInPictureDrawable: VLCPictureInPictureMediaControlling {
 
   func isMediaPlaying() -> Bool {
     mediaPlayer?.isPlaying == true
+  }
+
+  private func isRecent(_ date: Date?) -> Bool {
+    guard let date else { return false }
+
+    return Date().timeIntervalSince(date) < MediaPlayerConstants.pipSkipWindow
   }
 }
 

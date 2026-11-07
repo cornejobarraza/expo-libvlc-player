@@ -32,6 +32,7 @@ enum MediaPlayerConstants {
   static let artworkTimeout: TimeInterval = 8.0
   static let mediaArtworkSchemes: Set<String> = ["http", "https", "file"]
   static let seekStep: TimeInterval = 10.0
+  static let pipSkipWindow: TimeInterval = 0.5
 
   static let expDelayMultiplier: Double = 2.0
   static let retryDelayMs: Double = 150.0
