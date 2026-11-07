@@ -10,3 +10,10 @@ struct Tracks: Record {
   @Field
   var subtitle: Int? = nil
 }
+
+extension Tracks: Equatable {
+  static func == (lhs: Tracks, rhs: Tracks) -> Bool {
+    (lhs.audio, lhs.video, lhs.subtitle) ==
+      (rhs.audio, rhs.video, rhs.subtitle)
+  }
+}

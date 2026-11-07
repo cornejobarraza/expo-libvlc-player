@@ -1,7 +1,7 @@
 module.exports = {
   "**/*.js?(x)": "eslint --fix",
   "**/*.ts?(x)": [
-    () => "tsc --noEmit",
+    () => "tsc -p tsconfig.eslint.json",
     "eslint --fix",
     "jest --bail --findRelatedTests --passWithNoTests",
   ],

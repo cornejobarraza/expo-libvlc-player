@@ -13,28 +13,27 @@ class AudioSessionManager {
   }
 
   func setAppropriateAudioSession() {
+    let isNowPlayingEligible = MediaPlayerManager.shared.mediaPlaybackManager.isNowPlayingEligible
+
     Self.managerQueue.async { [weak self] in
-      self?.setAudioSession()
+      self?.setAudioSession(isNowPlayingEligible)
     }
   }
 
-  private func setAudioSession() {
+  private func setAudioSession(_ isNowPlayingEligible: Bool) {
     let audioSession = AVAudioSession.sharedInstance()
     let audioMixingMode = findAudioMixingMode()
     var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession
       .categoryOptions
 
-    // A paused player shown in Now Playing keeps the session non-mixable, or iOS drops its controls
     let anyPlayingView = mediaPlayers.contains { player in
       playerRequiresCategory(player)
-    } || expoViews.allObjects.contains { view in
-      view.nowPlaying != nil && view.mediaPlayer != nil
     }
 
     let shouldMixOverride = audioMixingMode == .mixWithOthers
     let doNotMixOverride = audioMixingMode == .doNotMix
     let shouldDuckOthers = audioMixingMode == .duckOthers && anyPlayingView
-    let shouldMixWithOthers = shouldMixOverride || !anyPlayingView
+    let shouldMixWithOthers = shouldMixOverride || (!anyPlayingView && !isNowPlayingEligible)
 
     if shouldMixWithOthers && !shouldDuckOthers && !doNotMixOverride {
       audioSessionCategoryOptions.insert(.mixWithOthers)

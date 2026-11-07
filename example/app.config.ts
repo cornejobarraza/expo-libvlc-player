@@ -21,5 +21,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: true,
   },
   experiments: { autolinkingModuleResolution: true },
-  plugins: [["../app.plugin.js", { supportsBackgroundPlayback: true }]],
+  plugins: ["../app.plugin.js"],
 });

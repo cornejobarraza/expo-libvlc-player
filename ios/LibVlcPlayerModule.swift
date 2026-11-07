@@ -1,26 +1,6 @@
 import AVKit
 import ExpoModulesCore
 
-private let playerEvents = [
-  "onBuffering",
-  "onPlaying",
-  "onPaused",
-  "onStopped",
-  "onEncounteredError",
-  "onDialogDisplay",
-  "onDialogCanceled",
-  "onTimeChanged",
-  "onPositionChanged",
-  "onESAdded",
-  "onRecordChanged",
-  "onSnapshotTaken",
-  "onFirstPlay",
-  "onForeground",
-  "onBackground",
-  "onPictureInPictureStart",
-  "onPictureInPictureStop",
-]
-
 public class LibVlcPlayerModule: Module {
   public func definition() -> ModuleDefinition {
     Name("ExpoLibVlcPlayer")
@@ -46,10 +26,14 @@ public class LibVlcPlayerModule: Module {
     }
 
     View(LibVlcPlayerView.self) {
-      Events(playerEvents)
+      Events(MediaPlayerConstants.playerEvents)
 
       Prop("source") { (view: LibVlcPlayerView, source: String?) in
         view.source = source
+      }
+
+      Prop("metadata") { (view: LibVlcPlayerView, metadata: Metadata?) in
+        view.metadata = metadata
       }
 
       Prop("options", .init()) { (view: LibVlcPlayerView, options: [String]) in
@@ -119,16 +103,20 @@ public class LibVlcPlayerModule: Module {
         view.autoplay = autoplay
       }
 
+      Prop("playInBackground", false) { (view: LibVlcPlayerView, playInBackground: Bool) in
+        view.playInBackground = playInBackground
+      }
+
       Prop("pictureInPicture", false) { (view: LibVlcPlayerView, pictureInPicture: Bool) in
         view.pictureInPicture = pictureInPicture
       }
 
-      Prop("nowPlaying") { (view: LibVlcPlayerView, nowPlaying: Metadata?) in
-        view.nowPlaying = nowPlaying
-      }
-
       OnViewDidUpdateProps { (view: LibVlcPlayerView) in
         view.initPlayer()
+      }
+
+      AsyncFunction("update") { (view: LibVlcPlayerView, props: PlayerProps) in
+        view.update(props)
       }
 
       AsyncFunction("play") { (view: LibVlcPlayerView) in

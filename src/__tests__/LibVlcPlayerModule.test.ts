@@ -1,7 +1,4 @@
-const mockNativeModule = {
-  triggerNetworkAlert: jest.fn(async () => {}),
-  isPictureInPictureSupported: jest.fn(() => true),
-};
+const mockNativeModule = {};
 
 jest.mock("expo", () => ({
   requireNativeModule: jest.fn(() => mockNativeModule),

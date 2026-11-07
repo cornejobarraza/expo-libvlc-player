@@ -1,98 +1,19 @@
 import { type Ref } from "react";
 import type { ViewProps } from "react-native";
 
-export interface LibVlcPlayerViewRef {
-  /**
-   * Starts playback of the current player
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly play: () => Promise<void>;
-  /**
-   * Pauses playback of the current player
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly pause: () => Promise<void>;
-  /**
-   * Stops playback of the current player
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly stop: () => Promise<void>;
-  /**
-   * Sets the time or position of the current player
-   *
-   * @param value - Must be `0` or greater
-   * @param type - Defaults to time
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly seek: (value: number, type?: "time" | "position") => Promise<void>;
-  /**
-   * Starts or stops recording the current media
-   *
-   * @param path - Must be a valid directory or `undefined` to stop recording
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly record: (path?: string) => Promise<void>;
-  /**
-   * Takes a snapshot of the current media
-   *
-   * @param path - Must be a valid directory
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly snapshot: (path: string) => Promise<void>;
-  /**
-   * Posts an answer to a question dialog
-   *
-   * @param action - Which dialog action to perform
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly postAction: (action: 1 | 2) => Promise<void>;
-  /**
-   * Posts a username and password to a login dialog
-   *
-   * @param username - Can't be empty
-   * @param password - Can be empty
-   * @param store - Whether to store the credentials
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly postLogin: (username: string, password?: string, store?: boolean) => Promise<void>;
-  /**
-   * Dismisses the current dialog
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly dismiss: () => Promise<void>;
-  /**
-   * Enters Picture-in-Picture (PiP) mode
-   *
-   * @note Config plugin has to be configured for PiP to work
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly startPictureInPicture: () => Promise<void>;
-  /**
-   * Exits Picture-in-Picture (PiP) mode
-   *
-   * @platform ios
-   *
-   * @returns A promise which resolves to `void`
-   */
-  readonly stopPictureInPicture: () => Promise<void>;
+export type LibVlcAsset = string | number;
+
+export type LibVlcSource = LibVlcAsset | null;
+
+export interface LibVlcMetadata {
+  title?: string;
+  artist?: string;
+  album?: string;
+  artworkURL?: LibVlcAsset;
 }
 
-export type LibVlcSource = string | number | null;
-
-export type LibVlcSlaveSource = string | number;
-
 export interface Slave {
-  source: LibVlcSlaveSource;
+  source: LibVlcAsset;
   type: "audio" | "subtitle";
   selected?: boolean;
 }
@@ -108,59 +29,11 @@ export interface Delays {
   subtitle?: number;
 }
 
-export type VideoAspectRatio = `${number}:${number}` | `${number}/${number}` | number | undefined;
-
-/**
- * @hidden
- */
-type NativeAspectRatioProps =
-  | {
-      aspectRatio: "auto";
-      fallbackRatio: VideoAspectRatio;
-    }
-  | {
-      aspectRatio?: VideoAspectRatio;
-      fallbackRatio?: never;
-    };
-
-type AspectRatioProps =
-  | {
-      /**
-       * Sets the container aspect ratio. When auto, a fallback ratio is required
-       */
-      aspectRatio: "auto";
-      /**
-       * Sets the fallback aspect ratio
-       */
-      fallbackRatio: VideoAspectRatio;
-    }
-  | {
-      /**
-       * Sets the container aspect ratio. When auto, a fallback ratio is required
-       *
-       * @default undefined
-       */
-      aspectRatio?: VideoAspectRatio;
-      /**
-       * Sets the fallback aspect ratio
-       *
-       * @default undefined
-       */
-      fallbackRatio?: never;
-    };
-
 export type VideoContentFit = "contain" | "cover" | "fill";
 
 export type AudioMixingMode = "mixWithOthers" | "duckOthers" | "auto" | "doNotMix";
 
-export interface NativeEventProps {
-  target: number;
-  timeStamp: number;
-}
-
-export interface NativeEvent<T> {
-  nativeEvent: T & NativeEventProps;
-}
+export type VideoAspectRatio = `${number}:${number}` | `${number}/${number}` | number | undefined;
 
 export interface Buffering {
   value: number;
@@ -231,6 +104,391 @@ export interface MediaInfo {
   media: Media;
   metadata: Metadata;
 }
+
+type AspectRatioProps =
+  | {
+      /**
+       * Sets the container aspect ratio. When auto, a fallback ratio is required
+       */
+      aspectRatio: "auto";
+      /**
+       * Sets the fallback aspect ratio
+       */
+      fallbackRatio: VideoAspectRatio;
+    }
+  | {
+      /**
+       * Sets the container aspect ratio. When auto, a fallback ratio is required
+       *
+       * @default undefined
+       */
+      aspectRatio?: VideoAspectRatio;
+      /**
+       * Sets the fallback aspect ratio
+       *
+       * @default undefined
+       */
+      fallbackRatio?: never;
+    };
+
+export type LibVlcPlayerViewRef = {
+  /**
+   * Starts playback of the current player
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly play: () => Promise<void>;
+  /**
+   * Pauses playback of the current player
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly pause: () => Promise<void>;
+  /**
+   * Stops playback of the current player
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly stop: () => Promise<void>;
+  /**
+   * Sets the time or position of the current player
+   *
+   * @param value - Must be `0` or greater
+   * @param type - Defaults to time
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly seek: (value: number, type?: "time" | "position") => Promise<void>;
+  /**
+   * Starts or stops recording the current media
+   *
+   * @param path - Must be a valid directory or `undefined` to stop recording
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly record: (path?: string) => Promise<void>;
+  /**
+   * Takes a snapshot of the current media
+   *
+   * @param path - Must be a valid directory
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly snapshot: (path: string) => Promise<void>;
+  /**
+   * Posts an answer to a question dialog
+   *
+   * @param action - Which dialog action to perform
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly postAction: (action: 1 | 2) => Promise<void>;
+  /**
+   * Posts a username and password to a login dialog
+   *
+   * @param username - Can't be empty
+   * @param password - Can be empty
+   * @param store - Whether to store the credentials
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly postLogin: (username: string, password?: string, store?: boolean) => Promise<void>;
+  /**
+   * Dismisses the current dialog
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly dismiss: () => Promise<void>;
+  /**
+   * Enters Picture-in-Picture (PiP) mode
+   *
+   * @note Config plugin has to be configured for this to work
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly startPictureInPicture: () => Promise<void>;
+  /**
+   * Exits Picture-in-Picture (PiP) mode
+   *
+   * @platform ios
+   *
+   * @returns A promise which resolves to `void`
+   */
+  readonly stopPictureInPicture: () => Promise<void>;
+};
+
+export interface PlayerProps {
+  /**
+   * Sets the source of the media to be played or `null` to release the player
+   */
+  source: LibVlcSource;
+  /**
+   * Sets the metadata shown during background playback
+   *
+   * @note Defaults to the media metadata
+   *
+   * @default undefined
+   */
+  metadata?: LibVlcMetadata;
+  /**
+   * Sets the options to initialize the media with
+   *
+   * @see {@link https://wiki.videolan.org/VLC_command-line_help/ VideoLAN Wiki}
+   *
+   * @example
+   *
+   * ```tsx
+   * <LibVlcPlayerView
+   *   {...props}
+   *   options={["--network-caching=1000"]}
+   * />
+   * ```
+   *
+   * @default []
+   */
+  options?: string[];
+  /**
+   * Sets the player audio and subtitle slaves
+   *
+   * @example
+   *
+   * ```tsx
+   * <LibVlcPlayerView
+   *   {...props}
+   *   slaves={[
+   *     {
+   *       source: "file://path/to/subtitle.srt",
+   *       type: "subtitle",
+   *       selected: true,
+   *     },
+   *   ]}
+   * />
+   * ```
+   *
+   * @default []
+   */
+  slaves?: Slave[];
+  /**
+   * Sets the player audio, video, and subtitle track indexes
+   *
+   * @example
+   *
+   * ```tsx
+   * <LibVlcPlayerView
+   *   {...props}
+   *   tracks={{
+   *     audio: -1,
+   *     video: 1,
+   *     subtitle: 1,
+   *   }}
+   * />
+   * ```
+   *
+   * @default undefined
+   */
+  tracks?: Tracks;
+  /**
+   * Sets the player audio and subtitle delay values in microseconds
+   *
+   * @example
+   *
+   * ```tsx
+   * <LibVlcPlayerView
+   *   {...props}
+   *   delays={{
+   *     audio: 500_000,
+   *     subtitle: 1_000_000,
+   *   }}
+   * />
+   * ```
+   *
+   * @default undefined
+   */
+  delays?: Delays;
+  /**
+   * Sets the player scaling factor
+   *
+   * @default 0
+   */
+  scale?: number;
+  /**
+   * Sets how the view should be scaled to fit in the container
+   *
+   * @default "contain"
+   */
+  contentFit?: VideoContentFit;
+  /**
+   * Sets the player playback rate
+   *
+   * @default 1
+   */
+  rate?: number;
+  /**
+   * Sets the initial player time in milliseconds. Must be `0` or greater
+   *
+   * @default 0
+   */
+  time?: number;
+  /**
+   * Sets the player volume. Must be between `0` and `100`
+   *
+   * @default 100
+   */
+  volume?: number;
+  /**
+   * Sets the player volume to `0` when `true` and restores previous volume when `false`
+   *
+   * @default false
+   */
+  mute?: boolean;
+  /**
+   * Determines whether the media should repeat once ended
+   *
+   * @default false
+   */
+  repeat?: boolean;
+  /**
+   * Determines whether the media should autoplay once created
+   *
+   * @default true
+   */
+  autoplay?: boolean;
+  /**
+   * Determines how the player will interact with other audio playing in the system
+   *
+   * @default "auto"
+   */
+  audioMixingMode?: AudioMixingMode;
+  /**
+   * Determines whether the media should play in the background
+   *
+   * @note Config plugin has to be configured for this to work
+   *
+   * @default false
+   */
+  playInBackground?: boolean;
+  /**
+   * Determines whether the player should allow Picture-in-Picture (PiP) mode
+   *
+   * @note Config plugin has to be configured for this to work
+   *
+   * @default false
+   */
+  pictureInPicture?: boolean;
+}
+
+export type LibVlcPlayerViewProps = ViewProps &
+  AspectRatioProps &
+  PlayerProps & {
+    /**
+     * Allows getting a ref to the component instance
+     *
+     * @see {@link https://dev/learn/referencing-values-with-refs#refs-and-the-dom React Docs}
+     */
+    ref?: Ref<LibVlcPlayerViewRef>;
+    /**
+     * Called after the `Buffering` player event
+     */
+    onBuffering?: (event: Buffering) => void;
+    /**
+     * Called after the `Playing` player event
+     */
+    onPlaying?: () => void;
+    /**
+     * Called after the `Paused` player event
+     */
+    onPaused?: () => void;
+    /**
+     * Called after the `Stopped` player event
+     */
+    onStopped?: () => void;
+    /**
+     * Called after the `EncounteredError` player event
+     */
+    onEncounteredError?: (event: Error) => void;
+    /**
+     * Called after a dialog is displayed
+     */
+    onDialogDisplay?: (event: Dialog) => void;
+    /**
+     * Called after a dialog is canceled
+     */
+    onDialogCanceled?: () => void;
+    /**
+     * Called after the `TimeChanged` player event
+     */
+    onTimeChanged?: (event: Time) => void;
+    /**
+     * Called after the `PositionChanged` player event
+     */
+    onPositionChanged?: (event: Position) => void;
+    /**
+     * Called after the `ESAdded` player event
+     */
+    onESAdded?: (event: MediaTracks) => void;
+    /**
+     * Called after the `RecordChanged` player event
+     */
+    onRecordChanged?: (event: Recording) => void;
+    /**
+     * Called after a media snapshot is taken
+     */
+    onSnapshotTaken?: (event: Snapshot) => void;
+    /**
+     * Called after the player first playing event
+     */
+    onFirstPlay?: (event: MediaInfo) => void;
+    /**
+     * Called after the player enters the foreground
+     */
+    onForeground?: () => void;
+    /**
+     * Called after the player enters the background
+     */
+    onBackground?: () => void;
+    /**
+     * Called after the player enters Picture-in-Picture (PiP) mode
+     */
+    onPictureInPictureStart?: () => void;
+    /**
+     * Called after the player exits Picture-in-Picture (PiP) mode
+     */
+    onPictureInPictureStop?: () => void;
+  };
+
+export interface NativeEventProps {
+  target: number;
+  timeStamp: number;
+}
+
+export interface NativeEvent<T> {
+  nativeEvent: T & NativeEventProps;
+}
+
+/**
+ * @hidden
+ */
+export interface LibVlcPlayerViewRefUpdate {
+  readonly update: (props: PlayerProps) => Promise<void>;
+}
+
+/**
+ * @hidden
+ */
+export type LibVlcPlayerViewNativeRef = LibVlcPlayerViewRef & LibVlcPlayerViewRefUpdate;
+
+/**
+ * @hidden
+ */
+type NativeAspectRatioProps =
+  | {
+      aspectRatio: "auto";
+      fallbackRatio: VideoAspectRatio;
+    }
+  | {
+      aspectRatio?: VideoAspectRatio;
+      fallbackRatio?: never;
+    };
 
 /**
  * @hidden
@@ -322,8 +580,9 @@ type PictureInPictureStopListener = () => void;
  */
 export type LibVlcPlayerViewNativeProps = ViewProps &
   NativeAspectRatioProps & {
-    ref?: Ref<LibVlcPlayerViewRef>;
+    ref?: Ref<LibVlcPlayerViewNativeRef>;
     source?: LibVlcSource;
+    metadata?: LibVlcMetadata;
     options?: string[];
     slaves?: Slave[];
     tracks?: Tracks;
@@ -337,8 +596,8 @@ export type LibVlcPlayerViewNativeProps = ViewProps &
     audioMixingMode?: AudioMixingMode;
     repeat?: boolean;
     autoplay?: boolean;
+    playInBackground?: boolean;
     pictureInPicture?: boolean;
-    nowPlaying?: Partial<Metadata>;
     onBuffering?: BufferingListener;
     onPlaying?: PlayingListener;
     onPaused?: PausedListener;
@@ -356,228 +615,4 @@ export type LibVlcPlayerViewNativeProps = ViewProps &
     onBackground?: BackgroundListener;
     onPictureInPictureStart?: PictureInPictureStartListener;
     onPictureInPictureStop?: PictureInPictureStopListener;
-  };
-
-export type LibVlcPlayerViewProps = ViewProps &
-  AspectRatioProps & {
-    /**
-     * Allows getting a ref to the component instance
-     *
-     * @see {@link https://dev/learn/referencing-values-with-refs#refs-and-the-dom React Docs}
-     */
-    ref?: Ref<LibVlcPlayerViewRef>;
-    /**
-     * Sets the source of the media to be played or `null` to release the player
-     */
-    source: LibVlcSource;
-    /**
-     * Sets the options to initialize the media with
-     *
-     * @see {@link https://wiki.videolan.org/VLC_command-line_help/ VideoLAN Wiki}
-     *
-     * @example
-     *
-     * ```tsx
-     * <LibVlcPlayerView
-     *   {...props}
-     *   options={["--network-caching=1000"]}
-     * />
-     * ```
-     *
-     * @default []
-     */
-    options?: string[];
-    /**
-     * Sets the player audio and subtitle slaves
-     *
-     * @example
-     *
-     * ```tsx
-     * <LibVlcPlayerView
-     *   {...props}
-     *   slaves={[
-     *     {
-     *       source: "file://path/to/subtitle.srt",
-     *       type: "subtitle",
-     *       selected: true,
-     *     },
-     *   ]}
-     * />
-     * ```
-     *
-     * @default []
-     */
-    slaves?: Slave[];
-    /**
-     * Sets the player audio, video, and subtitle track indexes
-     *
-     * @example
-     *
-     * ```tsx
-     * <LibVlcPlayerView
-     *   {...props}
-     *   tracks={{
-     *     audio: -1,
-     *     video: 1,
-     *     subtitle: 1,
-     *   }}
-     * />
-     * ```
-     *
-     * @default undefined
-     */
-    tracks?: Tracks;
-    /**
-     * Sets the player audio and subtitle delay values in microseconds
-     *
-     * @example
-     *
-     * ```tsx
-     * <LibVlcPlayerView
-     *   {...props}
-     *   delays={{
-     *     audio: 500_000,
-     *     subtitle: 1_000_000,
-     *   }}
-     * />
-     * ```
-     *
-     * @default undefined
-     */
-    delays?: Delays;
-    /**
-     * Sets the player scaling factor
-     *
-     * @default 0
-     */
-    scale?: number;
-    /**
-     * Sets how the video should be scaled to fit in the container
-     *
-     * @default "contain"
-     */
-    contentFit?: VideoContentFit;
-    /**
-     * Sets the player playback rate
-     *
-     * @default 1
-     */
-    rate?: number;
-    /**
-     * Sets the initial player time in milliseconds. Must be `0` or greater
-     *
-     * @default 0
-     */
-    time?: number;
-    /**
-     * Sets the player volume. Must be between `0` and `100`
-     *
-     * @default 100
-     */
-    volume?: number;
-    /**
-     * Sets the player volume to `0` when `true` and restores previous volume when `false`
-     *
-     * @default false
-     */
-    mute?: boolean;
-    /**
-     * Determines how the player will interact with other audio playing in the system
-     *
-     * @default "auto"
-     */
-    audioMixingMode?: AudioMixingMode;
-    /**
-     * Determines whether the media should repeat once ended
-     *
-     * @default false
-     */
-    repeat?: boolean;
-    /**
-     * Determines whether the media should autoplay once created
-     *
-     * @default true
-     */
-    autoplay?: boolean;
-    /**
-     * Determines whether the player should allow Picture-in-Picture (PiP) mode
-     *
-     * @default false
-     */
-    pictureInPicture?: boolean;
-    /**
-     * Shows the media in the system Now Playing controls (lock screen, notification center).
-     * Background playback requires the `supportsBackgroundPlayback` config plugin option
-     *
-     * @default undefined
-     */
-    nowPlaying?: Partial<Metadata>;
-    /**
-     * Called after the `Buffering` player event
-     */
-    onBuffering?: (event: Buffering) => void;
-    /**
-     * Called after the `Playing` player event
-     */
-    onPlaying?: () => void;
-    /**
-     * Called after the `Paused` player event
-     */
-    onPaused?: () => void;
-    /**
-     * Called after the `Stopped` player event
-     */
-    onStopped?: () => void;
-    /**
-     * Called after the `EncounteredError` player event
-     */
-    onEncounteredError?: (event: Error) => void;
-    /**
-     * Called after a dialog is displayed
-     */
-    onDialogDisplay?: (event: Dialog) => void;
-    /**
-     * Called after a dialog is canceled
-     */
-    onDialogCanceled?: () => void;
-    /**
-     * Called after the `TimeChanged` player event
-     */
-    onTimeChanged?: (event: Time) => void;
-    /**
-     * Called after the `PositionChanged` player event
-     */
-    onPositionChanged?: (event: Position) => void;
-    /**
-     * Called after the `ESAdded` player event
-     */
-    onESAdded?: (event: MediaTracks) => void;
-    /**
-     * Called after the `RecordChanged` player event
-     */
-    onRecordChanged?: (event: Recording) => void;
-    /**
-     * Called after a media snapshot is taken
-     */
-    onSnapshotTaken?: (event: Snapshot) => void;
-    /**
-     * Called after the player first playing event
-     */
-    onFirstPlay?: (event: MediaInfo) => void;
-    /**
-     * Called after the player enters the foreground
-     */
-    onForeground?: () => void;
-    /**
-     * Called after the player enters the background
-     */
-    onBackground?: () => void;
-    /**
-     * Called after the player enters Picture-in-Picture (PiP) mode
-     */
-    onPictureInPictureStart?: () => void;
-    /**
-     * Called after the player exits Picture-in-Picture (PiP) mode
-     */
-    onPictureInPictureStop?: () => void;
   };
