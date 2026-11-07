@@ -20,7 +20,7 @@ import {
 import { type ControlProps, type PlayerProps } from "./types";
 import { useControls } from "../hooks/useControls";
 
-export const Player = ({ source, fullScreen }: PlayerProps) => {
+export const Player = ({ source, poster, fullScreen }: PlayerProps) => {
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(false);
   const [backgrounded, setBackgrounded] = useState<boolean>(false);
@@ -72,7 +72,8 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
   ];
 
   const showArtist = metadata?.artist != null && metadata.artist !== "";
-  const showPoster = (!playing && backgrounded) || time === DEFAULT_TIME;
+  const showPoster = poster != null && ((!playing && backgrounded) || time === DEFAULT_TIME);
+  const posterSource = typeof poster === "string" ? { uri: poster } : poster;
   const insets = useSafeAreaInsets();
 
   const controls = useControls(fullScreen);
@@ -113,7 +114,7 @@ export const Player = ({ source, fullScreen }: PlayerProps) => {
                 !fullScreen ? styles.rounded : styles.square,
                 { aspectRatio: ASPECT_RATIO, objectFit: CONTENT_FIT },
               ]}
-              source={require("../assets/bbb.png")}
+              source={posterSource}
             />
           </Animated.View>
         )}

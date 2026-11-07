@@ -5,16 +5,8 @@ import VLCKit
 class LibVlcPlayerView: ExpoView {
   private var player: MediaPlayer!
 
-  var hasVideoSize: Bool {
-    player.hasVideoSize
-  }
-
   var mediaPlayer: VLCMediaPlayer? {
     player.mediaPlayer
-  }
-
-  var isStopped: Bool {
-    player.firstPlay
   }
 
   let onBuffering = EventDispatcher()
@@ -54,33 +46,25 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  func initPlayer() {
-    player.initPlayer()
-  }
-
-  func destroyPlayer() {
-    player.destroyPlayer()
-  }
-
-  func onStartPictureInPicture() {
-    MediaPlayerManager.shared.nowPlayingManager.update(self)
-    onPictureInPictureStart()
-  }
-
-  func onStopPictureInPicture() {
-    MediaPlayerManager.shared.nowPlayingManager.update(self)
-    onPictureInPictureStop()
-  }
-
   var source: String? {
     didSet {
-      player.shouldInit = true
+      if source != oldValue {
+        player.shouldInit = true
+      }
+    }
+  }
+
+  var metadata: Metadata? {
+    didSet {
+      MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackMetadata(self)
     }
   }
 
   var options: [String] = .init() {
     didSet {
-      player.shouldInit = true
+      if options != oldValue {
+        player.shouldInit = true
+      }
     }
   }
 
@@ -123,7 +107,9 @@ class LibVlcPlayerView: ExpoView {
 
   var rate: Double = MediaPlayerConstants.defaultPlayerRate {
     didSet {
-      mediaPlayer?.rate = Float(rate)
+      let newRate = Float(rate)
+      mediaPlayer?.rate = newRate
+      MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackPosition(self, rate: newRate)
     }
   }
 
@@ -166,26 +152,135 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
+  var Repeat: Bool = false
+
+  var autoplay: Bool = true
+
   var audioMixingMode: AudioMixingMode = .auto {
     didSet {
       MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
     }
   }
 
-  var Repeat: Bool = false
+  var canPlayInBackground: Bool {
+    playInBackground && MediaPlayerManager.shared.mediaPlaybackManager.isBackgroundPlaybackSupported
+  }
 
-  var autoplay: Bool = true
+  var isPlaybackView: Bool {
+    canPlayInBackground && MediaPlayerManager.shared.mediaPlaybackManager.isPlaybackView(self)
+  }
 
-  var pictureInPicture: Bool = false {
+  var playInBackground: Bool = false {
     didSet {
-      player.shouldInit = true
+      if playInBackground != oldValue {
+        MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackView(self)
+      }
     }
   }
 
-  var nowPlaying: Metadata? {
+  var pictureInPicture: Bool = false {
     didSet {
-      MediaPlayerManager.shared.nowPlayingManager.update(self)
+      if pictureInPicture != oldValue {
+        player.shouldInit = true
+      }
     }
+  }
+
+  func update(_ props: PlayerProps) {
+    if props.source != source {
+      source = props.source
+    }
+
+    if props.metadata != metadata {
+      metadata = props.metadata
+    }
+
+    if props.options != options {
+      options = props.options
+    }
+
+    if props.slaves != slaves {
+      slaves = props.slaves
+    }
+
+    if props.tracks != tracks {
+      tracks = props.tracks
+    }
+
+    if props.delays != delays {
+      delays = props.delays
+    }
+
+    if props.scale != scale {
+      scale = props.scale
+    }
+
+    if props.contentFit != contentFit {
+      contentFit = props.contentFit
+    }
+
+    if props.rate != rate {
+      rate = props.rate
+    }
+
+    if props.time != time {
+      time = props.time
+    }
+
+    if props.volume != volume {
+      volume = props.volume
+    }
+
+    if props.mute != mute {
+      mute = props.mute
+    }
+
+    if props.repeat != Repeat {
+      Repeat = props.repeat
+    }
+
+    if props.autoplay != autoplay {
+      autoplay = props.autoplay
+    }
+
+    if props.audioMixingMode != audioMixingMode {
+      audioMixingMode = props.audioMixingMode
+    }
+
+    if props.playInBackground != playInBackground {
+      playInBackground = props.playInBackground
+    }
+
+    if props.pictureInPicture != pictureInPicture {
+      pictureInPicture = props.pictureInPicture
+    }
+
+    initPlayer()
+  }
+
+  func initPlayer() {
+    player.initPlayer()
+  }
+
+  func destroyPlayer() {
+    player.destroyPlayer()
+    MediaPlayerManager.shared.mediaPlaybackManager.removePlaybackView(ObjectIdentifier(self))
+  }
+
+  func getMediaMetadata() -> Metadata {
+    player.getMetadata()
+  }
+
+  func getLength() -> Int {
+    player.getLength()
+  }
+
+  func onStartPictureInPicture() {
+    onPictureInPictureStart()
+  }
+
+  func onStopPictureInPicture() {
+    onPictureInPictureStop()
   }
 
   func play() {
@@ -214,17 +309,30 @@ class LibVlcPlayerView: ExpoView {
 
   func seek(_ value: Double, _ type: String? = "time") {
     player.withPlayer { mediaPlayer in
-      let elapsed: Double
-
-      if type == "position" {
-        mediaPlayer.position = value
-        elapsed = Double(mediaPlayer.media?.length.intValue ?? 0) * value / 1000
-      } else {
-        mediaPlayer.time = VLCTime(int: Int32(value))
-        elapsed = value / 1000
+      guard mediaPlayer.isSeekable else {
+        onEncounteredError(["message": "Media is not seekable"])
+        return
       }
 
-      MediaPlayerManager.shared.nowPlayingManager.update(self, elapsed: elapsed)
+      let newTime: Int64?
+
+      if type == "position" {
+        let length = Double(player.getLength())
+
+        mediaPlayer.position = value
+        newTime = Int64(exactly: (value * length).rounded(.towardZero))
+      } else {
+        mediaPlayer.time = VLCTime(int: Int32(value))
+        newTime = Int64(value)
+      }
+
+      MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackPosition(self, time: newTime)
+    }
+  }
+
+  func seekBy(_ offset: Double) {
+    if let player = mediaPlayer {
+      seek(max(0, Double(player.time.intValue) + offset))
     }
   }
 

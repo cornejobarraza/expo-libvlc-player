@@ -4,7 +4,7 @@ import expo.modules.kotlin.records.Field
 import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
-class Metadata(
+data class Metadata(
   @Field var title: String? = null,
   @Field var artist: String? = null,
   @Field var album: String? = null,

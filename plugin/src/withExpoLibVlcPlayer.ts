@@ -16,33 +16,60 @@ export interface WithExpoLibVlcPlayerProps {
    */
   localNetworkPermission?: string;
   /**
+   * A boolean to enable background playback support
+   *
+   * @default undefined
+   */
+  supportsBackgroundPlayback?: boolean;
+  /**
    * A boolean to enable Picture-in-Picture (PiP) support
    *
    * @default undefined
    */
   supportsPictureInPicture?: boolean;
-  /**
-   * A boolean to enable background playback support for `nowPlaying`
-   *
-   * @default undefined
-   */
-  supportsBackgroundPlayback?: boolean;
 }
 
 const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network";
-const PIP_MANIFEST_ATTRIBUTE = "android:supportsPictureInPicture";
-const AUDIO_BACKGROUND_MODE = "audio";
-const SERVICE_NAME = "expo.modules.libvlcplayer.managers.NowPlayingService";
-const SERVICE_PERMISSIONS = [
+const PLAYBACK_SERVICE_NAME = "expo.modules.libvlcplayer.services.MediaPlaybackService";
+const PLAYBACK_SERVICE_PERMISSIONS = [
   "android.permission.FOREGROUND_SERVICE",
   "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
 ];
+const AUDIO_BACKGROUND_MODE = "audio";
+const PIP_MANIFEST_ATTRIBUTE = "android:supportsPictureInPicture";
 
 const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
   config,
-  { localNetworkPermission, supportsPictureInPicture, supportsBackgroundPlayback } = {}
+  { localNetworkPermission, supportsBackgroundPlayback, supportsPictureInPicture } = {}
 ) => {
   withAndroidManifest(config, (config) => {
+    if (typeof supportsBackgroundPlayback === "boolean") {
+      const application = AndroidConfig.Manifest.getMainApplicationOrThrow(config.modResults);
+      const services = (application.service ?? []).filter(
+        (service) => service.$["android:name"] !== PLAYBACK_SERVICE_NAME
+      );
+
+      if (supportsBackgroundPlayback) {
+        AndroidConfig.Permissions.ensurePermissions(
+          config.modResults,
+          PLAYBACK_SERVICE_PERMISSIONS
+        );
+
+        application.service = [
+          ...services,
+          {
+            $: {
+              "android:name": PLAYBACK_SERVICE_NAME,
+              "android:exported": "false",
+              "android:foregroundServiceType": "mediaPlayback",
+            },
+          },
+        ];
+      } else {
+        application.service = services;
+      }
+    }
+
     const needsConfigMod = typeof supportsPictureInPicture === "boolean";
 
     if (needsConfigMod) {
@@ -52,28 +79,6 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
         activity.$[PIP_MANIFEST_ATTRIBUTE] = "true";
       } else {
         Reflect.deleteProperty(activity.$, PIP_MANIFEST_ATTRIBUTE);
-      }
-    }
-
-    const needsServiceMod = typeof supportsBackgroundPlayback === "boolean";
-
-    if (needsServiceMod) {
-      const application = AndroidConfig.Manifest.getMainApplicationOrThrow(config.modResults);
-
-      application.service = (application.service ?? []).filter(
-        (service) => service.$["android:name"] !== SERVICE_NAME
-      );
-
-      // Permissions are kept when disabled, other modules may need them
-      if (supportsBackgroundPlayback) {
-        AndroidConfig.Permissions.ensurePermissions(config.modResults, SERVICE_PERMISSIONS);
-        application.service.push({
-          $: {
-            "android:name": SERVICE_NAME,
-            "android:exported": "false",
-            "android:foregroundServiceType": "mediaPlayback",
-          },
-        });
       }
     }
 
@@ -88,14 +93,14 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
 
   withInfoPlist(config, (config) => {
     const needsConfigMod =
-      typeof supportsPictureInPicture === "boolean" ||
-      typeof supportsBackgroundPlayback === "boolean";
+      typeof supportsBackgroundPlayback === "boolean" ||
+      typeof supportsPictureInPicture === "boolean";
 
     if (needsConfigMod) {
       const backgroundModes = config.modResults.UIBackgroundModes ?? [];
       const filteredModes = backgroundModes.filter((mode) => mode !== AUDIO_BACKGROUND_MODE);
 
-      if (supportsPictureInPicture || supportsBackgroundPlayback) {
+      if (supportsBackgroundPlayback || supportsPictureInPicture) {
         config.modResults.UIBackgroundModes = [...filteredModes, AUDIO_BACKGROUND_MODE];
       } else {
         config.modResults.UIBackgroundModes = filteredModes;

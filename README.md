@@ -86,8 +86,8 @@ You can configure `expo-libvlc-player` using its built-in config plugin.
         "expo-libvlc-player",
         {
           "localNetworkPermission": "Allow $(PRODUCT_NAME) to access your local network",
-          "supportsPictureInPicture": true,
-          "supportsBackgroundPlayback": true
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true
         }
       ]
     ]
@@ -97,11 +97,11 @@ You can configure `expo-libvlc-player` using its built-in config plugin.
 
 #### Configurable properties
 
-| Name                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                       | Default                                                |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                                                                                                                                    | `"Allow $(PRODUCT_NAME) to access your local network"` |
-| `supportsPictureInPicture`   | A boolean to enable Picture-in-Picture (PiP) support. If `true`, it adds the `android:supportsPictureInPicture` attribute on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the attribute on Android and the mode on iOS unless `supportsBackgroundPlayback` needs it. If `undefined`, the configuration is not modified                                                                  | `undefined`                                            |
-| `supportsBackgroundPlayback` | A boolean to enable background playback support for `nowPlaying`. If `true`, it adds a `mediaPlayback` foreground service and its permissions on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the service on Android, keeping the permissions other modules may need, and the mode on iOS unless `supportsPictureInPicture` needs it. If `undefined`, the configuration is not modified | `undefined`                                            |
+| Name                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                              | Default                                                |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                                                                                                                                           | `"Allow $(PRODUCT_NAME) to access your local network"` |
+| `supportsBackgroundPlayback` | A boolean to enable background playback support. If `true`, it declares the media playback foreground service with the `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PLAYBACK` permissions on Android and adds the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the service on Android and the mode on iOS unless `supportsPictureInPicture` is `true`. If `undefined`, the configuration is not modified | `undefined`                                            |
+| `supportsPictureInPicture`   | A boolean to enable Picture-in-Picture (PiP) support. If `true`, it adds the `android:supportsPictureInPicture` attribute on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the attribute on Android and the mode on iOS unless `supportsBackgroundPlayback` is `true`. If `undefined`, the configuration is not modified                                                                        | `undefined`                                            |
 
 ## Usage
 
@@ -144,44 +144,45 @@ The `LibVlcPlayerModule` implements the following functions:
 
 The `LibVlcPlayerViewRef` implements the following functions:
 
-| Function                  | Parameters                                                                                                                                                                                  | Description                                                                              | Returns         |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------- |
-| `play()`                  |                                                                                                                                                                                             | Starts playback of the current player                                                    | `Promise<void>` |
-| `pause()`                 |                                                                                                                                                                                             | Pauses playback of the current player                                                    | `Promise<void>` |
-| `stop()`                  |                                                                                                                                                                                             | Stops playback of the current player                                                     | `Promise<void>` |
-| `seek()`                  | <div><code>value: number</code> — Must be <code>0</code> or greater</div><div><code>type: "time" \| "position"</code> — Defaults to time</div>                                              | Sets the time or position of the current player                                          | `Promise<void>` |
-| `record()`                | `path?: string` — Must be a valid directory or `undefined` to stop recording                                                                                                                | Starts or stops recording the current media                                              | `Promise<void>` |
-| `snapshot()`              | `path: string` — Must be a valid directory                                                                                                                                                  | Takes a snapshot of the current media                                                    | `Promise<void>` |
-| `postAction()`            | `action: 1 \| 2` — Which dialog action to perform                                                                                                                                           | Posts an answer to a question dialog                                                     | `Promise<void>` |
-| `postLogin()`             | <div><code>username: string</code> — Can't be empty</div><div><code>password?: string</code> — Can be empty</div><div><code>store?: boolean</code> — Whether to store the credentials</div> | Posts a username and password to a login dialog                                          | `Promise<void>` |
-| `dismiss()`               |                                                                                                                                                                                             | Dismisses the current dialog                                                             | `Promise<void>` |
-| `startPictureInPicture()` |                                                                                                                                                                                             | Enters Picture-in-Picture (PiP) mode. Config plugin has to be configured for PiP to work | `Promise<void>` |
-| `stopPictureInPicture()`  |                                                                                                                                                                                             | Exits Picture-in-Picture (PiP) mode on iOS                                               | `Promise<void>` |
+| Function                  | Parameters                                                                                                                                                                                  | Description                                                                               | Returns         |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | --------------- |
+| `play()`                  |                                                                                                                                                                                             | Starts playback of the current player                                                     | `Promise<void>` |
+| `pause()`                 |                                                                                                                                                                                             | Pauses playback of the current player                                                     | `Promise<void>` |
+| `stop()`                  |                                                                                                                                                                                             | Stops playback of the current player                                                      | `Promise<void>` |
+| `seek()`                  | <div><code>value: number</code> — Must be <code>0</code> or greater</div><div><code>type: "time" \| "position"</code> — Defaults to time</div>                                              | Sets the time or position of the current player                                           | `Promise<void>` |
+| `record()`                | `path?: string` — Must be a valid directory or `undefined` to stop recording                                                                                                                | Starts or stops recording the current media                                               | `Promise<void>` |
+| `snapshot()`              | `path: string` — Must be a valid directory                                                                                                                                                  | Takes a snapshot of the current media                                                     | `Promise<void>` |
+| `postAction()`            | `action: 1 \| 2` — Which dialog action to perform                                                                                                                                           | Posts an answer to a question dialog                                                      | `Promise<void>` |
+| `postLogin()`             | <div><code>username: string</code> — Can't be empty</div><div><code>password?: string</code> — Can be empty</div><div><code>store?: boolean</code> — Whether to store the credentials</div> | Posts a username and password to a login dialog                                           | `Promise<void>` |
+| `dismiss()`               |                                                                                                                                                                                             | Dismisses the current dialog                                                              | `Promise<void>` |
+| `startPictureInPicture()` |                                                                                                                                                                                             | Enters Picture-in-Picture (PiP) mode. Config plugin has to be configured for this to work | `Promise<void>` |
+| `stopPictureInPicture()`  |                                                                                                                                                                                             | Exits Picture-in-Picture (PiP) mode on iOS                                                | `Promise<void>` |
 
 ### View props
 
 The `LibVlcPlayerView` extends React Native `ViewProps` and implements the following props:
 
-| Prop               | Description                                                                                                                       | Default     |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `source`           | Sets the source of the media to be played or `null` to release the player. See [`LibVlcSource`](#libvlcsource) for more           |             |
-| `options`          | Sets the options to initialize the media with. See the [VideoLAN Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more | `[]`        |
-| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                         | `[]`        |
-| `tracks`           | Sets the player audio, video, and subtitle track indexes. See [`Tracks`](#tracks) for more                                        | `undefined` |
-| `delays`           | Sets the player audio and subtitle delay values in microseconds. See [`Delays`](#delays) for more                                 | `undefined` |
-| `scale`            | Sets the player scaling factor                                                                                                    | `0`         |
-| `aspectRatio`      | Sets the container aspect ratio. When auto, a fallback ratio is required                                                          | `undefined` |
-| `fallbackRatio`    | Sets the fallback aspect ratio                                                                                                    | `undefined` |
-| `contentFit`       | Sets how the video should be scaled to fit in the container                                                                       | `"contain"` |
-| `rate`             | Sets the player playback rate                                                                                                     | `1`         |
-| `time`             | Sets the initial player time in milliseconds. Must be `0` or greater                                                              | `0`         |
-| `volume`           | Sets the player volume. Must be between `0` and `100`                                                                             | `100`       |
-| `mute`             | Sets the player volume to `0` when `true` and restores previous volume when `false`                                               | `false`     |
-| `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
-| `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
-| `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
-| `pictureInPicture` | Determines whether the player should allow Picture-in-Picture (PiP) mode                                                          | `false`     |
-| `nowPlaying`       | Shows the media in the system Now Playing controls (lock screen, notification center). See [`Metadata`](#metadata) for more       | `undefined` |
+| Prop               | Description                                                                                                                               | Default     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `source`           | Sets the source of the media to be played or `null` to release the player. See [`LibVlcSource`](#libvlcsource) for more                   |             |
+| `metadata`         | Sets the metadata used for background playback controls. Defaults to the media metadata. See [`LibVlcMetadata`](#libvlcmetadata) for more | `undefined` |
+| `options`          | Sets the options to initialize the media with. See the [VideoLAN Wiki](https://wiki.videolan.org/VLC_command-line_help/) for more         | `[]`        |
+| `slaves`           | Sets the player audio and subtitle slaves. See [`Slave`](#slave) for more                                                                 | `[]`        |
+| `tracks`           | Sets the player audio, video, and subtitle track indexes. See [`Tracks`](#tracks) for more                                                | `undefined` |
+| `delays`           | Sets the player audio and subtitle delay values in microseconds. See [`Delays`](#delays) for more                                         | `undefined` |
+| `scale`            | Sets the player scaling factor                                                                                                            | `0`         |
+| `aspectRatio`      | Sets the container aspect ratio. When auto, a fallback ratio is required                                                                  | `undefined` |
+| `fallbackRatio`    | Sets the fallback aspect ratio                                                                                                            | `undefined` |
+| `contentFit`       | Sets how the view should be scaled to fit in the container                                                                                | `"contain"` |
+| `rate`             | Sets the player playback rate                                                                                                             | `1`         |
+| `time`             | Sets the initial player time in milliseconds. Must be `0` or greater                                                                      | `0`         |
+| `volume`           | Sets the player volume. Must be between `0` and `100`                                                                                     | `100`       |
+| `mute`             | Sets the player volume to `0` when `true` and restores previous volume when `false`                                                       | `false`     |
+| `repeat`           | Determines whether the media should repeat once ended                                                                                     | `false`     |
+| `autoplay`         | Determines whether the media should autoplay once created                                                                                 | `true`      |
+| `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                                    | `"auto"`    |
+| `playInBackground` | Determines whether the media should play in the background. Config plugin has to be configured for this to work                           | `false`     |
+| `pictureInPicture` | Determines whether the player should allow Picture-in-Picture (PiP) mode. Config plugin has to be configured for this to work             | `false`     |
 
 #### Callback props
 
@@ -213,11 +214,28 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and implements the follo
 type LibVlcSource = string | number | null;
 ```
 
+#### `LibVlcAsset`
+
+```ts
+type LibVlcAsset = NonNullable<LibVlcSource>;
+```
+
+#### `LibVlcMetadata`
+
+```ts
+interface LibVlcMetadata {
+  title?: string;
+  artist?: string;
+  album?: string;
+  artworkURL?: LibVlcAsset;
+}
+```
+
 #### `Slave`
 
 ```ts
 interface Slave {
-  source: string | number;
+  source: LibVlcAsset;
   type: "audio" | "subtitle";
   selected?: boolean;
 }

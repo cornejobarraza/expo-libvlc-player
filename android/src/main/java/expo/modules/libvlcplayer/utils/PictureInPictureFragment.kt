@@ -20,7 +20,10 @@ class PictureInPictureFragment(
         view.cancelPauseDelay()
       } else {
         view.onStopPictureInPicture()
-        view.pauseDelay()
+
+        if (!view.isPlaybackView) {
+          view.pauseDelay()
+        }
       }
     }
   }
