@@ -4,6 +4,16 @@
 
 ### 🛠 Breaking changes
 
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## 58.0.6 - 2026-11-07
+
+### 🛠 Breaking changes
+
 - Added error when media is not seekable
 - Removed slave source in favor of asset type
 
@@ -17,11 +27,17 @@
 
 ### 💡 Others
 
+- Bumped Expo dependency to 58.0.23
+
 ## 58.0.5 - 2026-10-29
 
 ### 🐛 Bug fixes
 
 - Fixed missing player error on Android
+
+### 💡 Others
+
+- Bumped Expo dependency to 58.0.21
 
 ## 58.0.4 - 2026-10-25
 
