@@ -10,29 +10,10 @@ import expo.modules.libvlcplayer.enums.AudioMixingMode
 import expo.modules.libvlcplayer.enums.VideoContentFit
 import expo.modules.libvlcplayer.managers.MediaPlayerManager
 import expo.modules.libvlcplayer.records.Delays
+import expo.modules.libvlcplayer.records.Metadata
+import expo.modules.libvlcplayer.records.PlayerProps
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
-
-private val PLAYER_EVENTS =
-  arrayOf(
-    "onBuffering",
-    "onPlaying",
-    "onPaused",
-    "onStopped",
-    "onEncounteredError",
-    "onDialogDisplay",
-    "onDialogCanceled",
-    "onTimeChanged",
-    "onPositionChanged",
-    "onESAdded",
-    "onRecordChanged",
-    "onSnapshotTaken",
-    "onFirstPlay",
-    "onForeground",
-    "onBackground",
-    "onPictureInPictureStart",
-    "onPictureInPictureStop",
-  )
 
 class LibVlcPlayerModule : Module() {
   private val activity: Activity
@@ -66,10 +47,14 @@ class LibVlcPlayerModule : Module() {
       }
 
       View(LibVlcPlayerView::class) {
-        Events(PLAYER_EVENTS)
+        Events(MediaPlayerConstants.PLAYER_EVENTS)
 
         Prop("source") { view: LibVlcPlayerView, source: String? ->
           view.source = source
+        }
+
+        Prop("metadata") { view: LibVlcPlayerView, metadata: Metadata? ->
+          view.metadata = metadata
         }
 
         Prop(
@@ -149,6 +134,13 @@ class LibVlcPlayerModule : Module() {
         }
 
         Prop(
+          "playInBackground",
+          false,
+        ) { view: LibVlcPlayerView, playInBackground: Boolean ->
+          view.playInBackground = playInBackground
+        }
+
+        Prop(
           "pictureInPicture",
           false,
         ) { view: LibVlcPlayerView, pictureInPicture: Boolean ->
@@ -161,6 +153,10 @@ class LibVlcPlayerModule : Module() {
 
         OnViewDestroys { view: LibVlcPlayerView ->
           view.deinit()
+        }
+
+        AsyncFunction("update") { view: LibVlcPlayerView, props: PlayerProps ->
+          view.update(props)
         }
 
         AsyncFunction("play") { view: LibVlcPlayerView ->

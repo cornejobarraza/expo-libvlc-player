@@ -16,6 +16,14 @@ class KeepAwakeManager(
         view.mediaPlayer?.isPlaying() == true
       }
 
+  fun toggleKeepAwake() {
+    if (anyPlayingView) {
+      activateKeepAwake()
+    } else {
+      deactivateKeepAwake()
+    }
+  }
+
   private fun activateKeepAwake() {
     activity?.let { activity ->
       activity.runOnUiThread {
@@ -29,14 +37,6 @@ class KeepAwakeManager(
       activity.runOnUiThread {
         activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
       }
-    }
-  }
-
-  fun toggleKeepAwake() {
-    if (anyPlayingView) {
-      activateKeepAwake()
-    } else {
-      deactivateKeepAwake()
     }
   }
 }

@@ -75,15 +75,16 @@ extension PictureInPictureDrawable: VLCPictureInPictureDrawable {
 
 extension PictureInPictureDrawable: VLCPictureInPictureMediaControlling {
   func play() {
-    mediaPlayer?.play()
+    view?.play()
   }
 
   func pause() {
-    mediaPlayer?.pause()
+    view?.pause()
   }
 
   func seek(by offset: Int64, completion: (() -> Void)!) {
-    mediaPlayer?.jump(withOffset: Int32(offset), completion: completion)
+    view?.seekBy(Double(offset))
+    completion?()
   }
 
   func mediaLength() -> Int64 {
