@@ -88,7 +88,7 @@ extension PictureInPictureDrawable: VLCPictureInPictureMediaControlling {
   }
 
   func mediaLength() -> Int64 {
-    mediaPlayer?.media?.length.value?.int64Value ?? 0
+    Int64(view?.getLength() ?? 0)
   }
 
   func mediaTime() -> Int64 {

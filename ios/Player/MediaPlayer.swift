@@ -15,6 +15,7 @@ class MediaPlayer: NSObject {
 
   var userStop: Bool = false
   private var firstPlay: Bool = true
+  private var playerLength: Int = 0
   var shouldInit: Bool = false
 
   var hasVideoSize: Bool {
@@ -78,6 +79,7 @@ class MediaPlayer: NSObject {
 
     let media = VLCMedia(url: url)
     args.forEach { arg in media!.addOption(arg) }
+    playerLength = 0
     mediaPlayer!.media = media
     addPlayerSlaves(view.slaves)
     mediaPlayer!.play()
@@ -310,7 +312,7 @@ class MediaPlayer: NSObject {
   }
 
   private func getMedia() -> Media {
-    let length = Int(mediaPlayer?.media?.length.intValue ?? 0)
+    let length = getLength()
     let seekable = mediaPlayer?.isSeekable ?? false
 
     return Media(
@@ -338,7 +340,9 @@ class MediaPlayer: NSObject {
   }
 
   func getLength() -> Int {
-    Int(mediaPlayer?.media?.length.intValue ?? 0)
+    let mediaLength = Int(mediaPlayer?.media?.length.intValue ?? 0)
+    // HLS keeps media.length at 0, only the player reports it
+    return mediaLength > 0 ? mediaLength : playerLength
   }
 
   private func getMediaTracks() -> MediaTracks {
@@ -487,8 +491,10 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
     view.onBuffering(["value": buffering])
   }
 
-  func mediaPlayerLengthChanged(_: Int64) {
+  func mediaPlayerLengthChanged(_ length: Int64) {
+    playerLength = Int(length)
     picture.updatePipState()
+    MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackMetadata(view)
   }
 
   func mediaPlayerTimeChanged(_: Notification) {
