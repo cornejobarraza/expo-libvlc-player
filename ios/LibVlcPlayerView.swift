@@ -330,9 +330,22 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  func seekBy(_ offset: Double) {
-    if let player = mediaPlayer {
-      seek(max(0, Double(player.time.intValue) + offset))
+  func seekBy(_ offset: Double, picture: Bool? = false) {
+    if let mediaPlayer {
+      if picture == true {
+        // AVKit skip workaround
+        player.retryUntil { [weak self] _ in
+          guard let self else { return true }
+
+          if mediaPlayer.state != .stopped {
+            play()
+          }
+
+          return false
+        }
+      }
+
+      seek(max(0, Double(mediaPlayer.time.intValue) + offset))
     }
   }
 

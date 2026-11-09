@@ -10,12 +10,12 @@ class MediaPlayer: NSObject {
 
   private var library: VLCLibrary?
   var mediaPlayer: VLCMediaPlayer?
-  var vlcDialog: VLCDialog?
   private var vlcDialogProvider: VLCDialogProvider?
+  var vlcDialog: VLCDialog?
 
+  private var pLength: Int?
   var userStop: Bool = false
   private var firstPlay: Bool = true
-  private var playerLength: Int = 0
   var shouldInit: Bool = false
 
   var hasVideoSize: Bool {
@@ -79,7 +79,6 @@ class MediaPlayer: NSObject {
 
     let media = VLCMedia(url: url)
     args.forEach { arg in media!.addOption(arg) }
-    playerLength = 0
     mediaPlayer!.media = media
     addPlayerSlaves(view.slaves)
     mediaPlayer!.play()
@@ -115,6 +114,7 @@ class MediaPlayer: NSObject {
     vlcDialogProvider?.customRenderer = nil
     vlcDialogProvider = nil
     vlcDialog = nil
+    pLength = nil
     MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
     MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
   }
@@ -312,7 +312,7 @@ class MediaPlayer: NSObject {
   }
 
   private func getMedia() -> Media {
-    let length = getLength()
+    let length = Int(pLength ?? 0)
     let seekable = mediaPlayer?.isSeekable ?? false
 
     return Media(
@@ -340,9 +340,7 @@ class MediaPlayer: NSObject {
   }
 
   func getLength() -> Int {
-    let mediaLength = Int(mediaPlayer?.media?.length.intValue ?? 0)
-    // HLS keeps media.length at 0, only the player reports it
-    return mediaLength > 0 ? mediaLength : playerLength
+    Int(pLength ?? 0)
   }
 
   private func getMediaTracks() -> MediaTracks {
@@ -374,7 +372,7 @@ class MediaPlayer: NSObject {
     )
   }
 
-  private func retryUntil(
+  func retryUntil(
     maxRetries: Int = MediaPlayerConstants.maxRetryCount,
     retry: Int = 0,
     delay: Double = MediaPlayerConstants.retryDelayMs,
@@ -492,7 +490,7 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
   }
 
   func mediaPlayerLengthChanged(_ length: Int64) {
-    playerLength = Int(length)
+    pLength = Int(length)
     picture.updatePipState()
     MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackMetadata(view)
   }
@@ -502,6 +500,8 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
 
     view.onTimeChanged(["value": player.time.intValue])
     view.onPositionChanged(["value": player.position])
+
+    picture.updatePipState()
   }
 
   func mediaPlayerTrackAdded(_: String, with _: VLCMedia.TrackType) {
