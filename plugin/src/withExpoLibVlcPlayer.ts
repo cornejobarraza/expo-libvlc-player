@@ -30,7 +30,7 @@ export interface WithExpoLibVlcPlayerProps {
 }
 
 const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network";
-const PLAYBACK_SERVICE_NAME = "expo.modules.libvlcplayer.services.MediaPlaybackService";
+const PLAYBACK_SERVICE_NAME = "expo.modules.libvlcplayer.utils.MediaPlaybackService";
 const PLAYBACK_SERVICE_PERMISSIONS = [
   "android.permission.FOREGROUND_SERVICE",
   "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",

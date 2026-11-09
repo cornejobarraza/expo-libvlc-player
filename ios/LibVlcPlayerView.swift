@@ -271,7 +271,7 @@ class LibVlcPlayerView: ExpoView {
     player.getMetadata()
   }
 
-  func getLength() -> Int {
+  func getLength() -> Int64 {
     player.getLength()
   }
 

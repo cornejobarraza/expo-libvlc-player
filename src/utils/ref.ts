@@ -34,11 +34,11 @@ export function usePlayerRef(ref: PlayerRef, props: LibVlcPlayerViewProps) {
 
   const playerProps = convertPlayerProps(props);
   const nativeProps = parseNativeProps(playerProps);
-  const nativePropsKey = JSON.stringify(nativeProps);
+  const stringProps = JSON.stringify(nativeProps);
 
   useLayoutEffect(() => {
     nativeRef.current?.update(nativeProps)?.catch(() => {});
-  }, [nativePropsKey]);
+  }, [stringProps]);
 
   return nativeRef;
 }

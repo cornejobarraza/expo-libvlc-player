@@ -64,7 +64,7 @@ class MediaPlayer(
 
   val hasMediaLength: Boolean
     get() {
-      val length = getLength()
+      val length = mediaPlayer?.getLength() ?: 0
       return length > 0
     }
 
@@ -559,8 +559,6 @@ class MediaPlayer(
     )
   }
 
-  private fun getLength(): Long = mediaPlayer?.getLength() ?: 0
-
   fun getMediaTracks(): MediaTracks {
     val player = mediaPlayer ?: return MediaTracks()
 
@@ -690,13 +688,13 @@ private fun MediaPlayer.setPlayerListener() {
               firstPlay = true
             }
 
+            if (!willRepeat) {
+              MediaPlayerManager.mediaPlaybackManager.refreshPlaybackView(view)
+            }
+
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
             MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
             MediaPlayerManager.pictureInPictureManager.updatePipActions()
-
-            if (!willRepeat) {
-              MediaPlayerManager.mediaPlaybackManager.onStateChanged(view)
-            }
           }
 
           Event.EndReached -> {

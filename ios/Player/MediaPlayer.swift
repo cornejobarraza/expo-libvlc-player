@@ -13,7 +13,7 @@ class MediaPlayer: NSObject {
   private var vlcDialogProvider: VLCDialogProvider?
   var vlcDialog: VLCDialog?
 
-  private var pLength: Int?
+  private var pLength: Int64?
   var userStop: Bool = false
   private var firstPlay: Bool = true
   var shouldInit: Bool = false
@@ -311,7 +311,7 @@ class MediaPlayer: NSObject {
   }
 
   private func getMedia() -> Media {
-    let length = Int(pLength ?? 0)
+    let length = Int(getLength())
     let seekable = mediaPlayer?.isSeekable ?? false
 
     return Media(
@@ -338,8 +338,8 @@ class MediaPlayer: NSObject {
     )
   }
 
-  func getLength() -> Int {
-    Int(pLength ?? 0)
+  func getLength() -> Int64 {
+    pLength ?? 0
   }
 
   private func getMediaTracks() -> MediaTracks {
@@ -465,13 +465,13 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
         firstPlay = true
       }
 
-      MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
-      MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-      picture.updatePipState()
-
       if !willRepeat {
-        MediaPlayerManager.shared.mediaPlaybackManager.onStateChanged(view)
+        MediaPlayerManager.shared.mediaPlaybackManager.refreshPlaybackView(view)
       }
+
+      MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+      MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
+      picture.updatePipState()
     case .error:
       view.onEncounteredError(["message": "Player encountered an error"])
 
@@ -486,7 +486,7 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
   }
 
   func mediaPlayerLengthChanged(_ length: Int64) {
-    pLength = Int(length)
+    pLength = length
     picture.updatePipState()
     MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackMetadata(view)
   }

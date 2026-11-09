@@ -51,7 +51,7 @@ class MediaPlaybackManager {
     sessionView === view
   }
 
-  func onStateChanged(_ view: LibVlcPlayerView) {
+  func refreshPlaybackView(_ view: LibVlcPlayerView) {
     DispatchQueue.main.async { [weak self, weak view] in
       guard let self, let view else { return }
 

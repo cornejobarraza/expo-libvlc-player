@@ -1,4 +1,4 @@
-package expo.modules.libvlcplayer.services
+package expo.modules.libvlcplayer.utils
 
 import android.app.Notification
 import android.app.Service

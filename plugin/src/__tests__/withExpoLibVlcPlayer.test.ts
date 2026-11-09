@@ -6,8 +6,8 @@ import withExpoLibVlcPlayer, { type WithExpoLibVlcPlayerProps } from "../withExp
 type AndroidManifest = AndroidConfig.Manifest.AndroidManifest;
 type InfoPlist = Record<string, any>;
 
-const PLAYBACK_SERVICE_NAME = "expo.modules.libvlcplayer.services.MediaPlaybackService";
-const OTHER_SERVICE_NAME = "com.example.services.OtherService";
+const PLAYBACK_SERVICE_NAME = "expo.modules.libvlcplayer.utils.MediaPlaybackService";
+const OTHER_SERVICE_NAME = "com.example.utils.OtherService";
 const PLAYBACK_SERVICE = {
   $: {
     "android:name": PLAYBACK_SERVICE_NAME,

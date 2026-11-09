@@ -77,9 +77,7 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
           const validRatio = videoRatio > 0 && videoRatio < Infinity;
           const nextRatio = validRatio ? videoRatio : undefined;
 
-          const handler = () => setMediaRatio(nextRatio); // View resizing workaround
-          setTimeoutRef(handler, RATIO_TIMEOUT);
-
+          setTimeoutRef(() => setMediaRatio(nextRatio), RATIO_TIMEOUT); // View resizing workaround
           props.onFirstPlay?.(nativeEvent);
         }}
       />

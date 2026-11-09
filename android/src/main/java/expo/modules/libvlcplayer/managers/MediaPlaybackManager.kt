@@ -28,10 +28,10 @@ import expo.modules.libvlcplayer.LibVlcPlayerView
 import expo.modules.libvlcplayer.R
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.records.Metadata
-import expo.modules.libvlcplayer.services.MediaPlaybackService
-import expo.modules.libvlcplayer.services.PlaybackServiceBinder
 import expo.modules.libvlcplayer.utils.MediaAction
 import expo.modules.libvlcplayer.utils.MediaActionReceiver
+import expo.modules.libvlcplayer.utils.MediaPlaybackService
+import expo.modules.libvlcplayer.utils.PlaybackServiceBinder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -157,7 +157,7 @@ class MediaPlaybackManager(
 
   fun isPlaybackView(view: LibVlcPlayerView): Boolean = sessionView == view
 
-  fun onStateChanged(view: LibVlcPlayerView) {
+  fun refreshPlaybackView(view: LibVlcPlayerView) {
     if (sessionView != view && canClaimSession(view)) {
       setSessionView(view)
     } else if (sessionView == view && view.mediaPlayer?.isPlaying() != true) {
@@ -182,7 +182,7 @@ class MediaPlaybackManager(
     if (sessionView == view && !isEligible(view)) {
       removePlaybackView(view)
     } else {
-      onStateChanged(view)
+      refreshPlaybackView(view)
     }
   }
 
