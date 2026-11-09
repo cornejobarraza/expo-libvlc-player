@@ -670,6 +670,8 @@ private fun MediaPlayer.setPlayerListener() {
 
                 firstPlay = false
               }
+
+              userStop = false
             }
 
             if (type == Event.Paused) {
@@ -685,7 +687,6 @@ private fun MediaPlayer.setPlayerListener() {
                 view.play()
               }
 
-              userStop = false
               firstPlay = true
             }
 
@@ -699,15 +700,13 @@ private fun MediaPlayer.setPlayerListener() {
           }
 
           Event.EndReached -> {
-            view.stopAsync()
+            view.stop(error = false)
           }
 
           Event.EncounteredError -> {
             view.onEncounteredError(mapOf("message" to "Player encountered an error"))
 
-            userStop = true
-
-            view.stopAsync()
+            view.stop(error = true)
           }
 
           Event.TimeChanged -> {

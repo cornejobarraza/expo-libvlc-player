@@ -109,7 +109,6 @@ class MediaPlayer: NSObject {
 
   func destroyPlayer() {
     library = nil
-    mediaPlayer?.stop()
     mediaPlayer = nil
     vlcDialogProvider?.customRenderer = nil
     vlcDialogProvider = nil
@@ -399,8 +398,6 @@ class MediaPlayer: NSObject {
 
 extension MediaPlayer: VLCMediaPlayerDelegate {
   func mediaPlayerStateChanged(_ newState: VLCMediaPlayerState) {
-    guard let player = mediaPlayer else { return }
-
     switch newState {
     case .playing,
          .paused,
@@ -450,6 +447,8 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
 
           firstPlay = false
         }
+
+        userStop = false
       }
 
       if newState == .paused {
@@ -463,7 +462,6 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
           view.play()
         }
 
-        userStop = false
         firstPlay = true
       }
 
@@ -477,9 +475,7 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
     case .error:
       view.onEncounteredError(["message": "Player encountered an error"])
 
-      userStop = true
-
-      player.stop()
+      view.stop(error: true)
     default:
       break
     }

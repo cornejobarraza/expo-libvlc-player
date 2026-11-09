@@ -299,8 +299,8 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  func stop() {
-    player.userStop = true
+  func stop(error: Bool? = nil) {
+    player.userStop = error ?? true
 
     player.withPlayer { mediaPlayer in
       mediaPlayer.stop()
