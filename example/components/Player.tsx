@@ -20,7 +20,7 @@ import {
 import { type ControlProps, type PlayerProps } from "./types";
 import { useControls } from "../hooks/useControls";
 
-export const Player = ({ source, poster, fullScreen }: PlayerProps) => {
+export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(false);
   const [backgrounded, setBackgrounded] = useState<boolean>(false);
@@ -76,9 +76,9 @@ export const Player = ({ source, poster, fullScreen }: PlayerProps) => {
   const posterSource = typeof poster === "string" ? { uri: poster } : poster;
   const insets = useSafeAreaInsets();
 
-  const controls = useControls(fullScreen);
+  const controls = useControls(fullscreen);
   const controlsAnimation = controls.visible ? animations.enter : animations.exit;
-  const fullScreenAnimation = fullScreen && controlsAnimation;
+  const fullscreenAnimation = fullscreen && controlsAnimation;
 
   const header = (
     <View style={styles.header}>
@@ -103,15 +103,15 @@ export const Player = ({ source, poster, fullScreen }: PlayerProps) => {
   );
 
   return (
-    <View style={[styles.player, fullScreen && styles.fullScreen]}>
-      {!fullScreen && header}
+    <View style={[styles.player, fullscreen && styles.fullscreen]}>
+      {!fullscreen && header}
       <View style={styles.container}>
         {showPoster && (
           <Animated.View style={styles.poster} entering={FadeIn} exiting={FadeOut} testID="poster">
             <Image
               style={[
                 styles.image,
-                !fullScreen ? styles.rounded : styles.square,
+                !fullscreen ? styles.rounded : styles.square,
                 { aspectRatio: ASPECT_RATIO, objectFit: CONTENT_FIT },
               ]}
               source={posterSource}
@@ -121,7 +121,7 @@ export const Player = ({ source, poster, fullScreen }: PlayerProps) => {
         {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
           ref={playerRef}
-          style={[styles.view, !fullScreen ? styles.rounded : styles.square]}
+          style={[styles.view, !fullscreen ? styles.rounded : styles.square]}
           source={source}
           options={OPTIONS}
           aspectRatio={ASPECT_RATIO}
@@ -157,17 +157,17 @@ export const Player = ({ source, poster, fullScreen }: PlayerProps) => {
           }}
         />
       </View>
-      {fullScreen && (
+      {fullscreen && (
         <Pressable style={styles.surface} onPress={controls.toggle} testID="surface">
-          <Animated.View style={[styles.scrim, fullScreenAnimation]} pointerEvents="none" />
+          <Animated.View style={[styles.scrim, fullscreenAnimation]} pointerEvents="none" />
         </Pressable>
       )}
-      {fullScreen && (
+      {fullscreen && (
         <Animated.View
           style={[
             styles.heading,
             { paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right },
-            fullScreenAnimation,
+            fullscreenAnimation,
             !controls.visible && animations.raised,
           ]}
           pointerEvents="none">
@@ -175,21 +175,21 @@ export const Player = ({ source, poster, fullScreen }: PlayerProps) => {
         </Animated.View>
       )}
       <View
-        key={fullScreen ? "overlay" : "inline"}
+        key={fullscreen ? "overlay" : "inline"}
         style={[
           styles.controls,
-          fullScreen && styles.overlay,
-          fullScreen && { paddingBottom: insets.bottom },
+          fullscreen && styles.overlay,
+          fullscreen && { paddingBottom: insets.bottom },
         ]}
         pointerEvents={controls.visible ? "box-none" : "none"}>
         {/* eslint-disable-next-line react-hooks/refs */}
         {playerControls.map(({ name, onPress }) => (
           <Animated.View
             key={name}
-            style={[fullScreenAnimation, !controls.visible && animations.lowered]}>
+            style={[fullscreenAnimation, !controls.visible && animations.lowered]}>
             <Control
               name={name}
-              translucent={fullScreen}
+              translucent={fullscreen}
               onPress={() => {
                 onPress?.();
                 controls.show();
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   player: {
     gap: 24,
   },
-  fullScreen: {
+  fullscreen: {
     alignItems: "center",
     position: "relative",
   },

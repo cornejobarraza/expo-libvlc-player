@@ -32,7 +32,7 @@ export interface IconProps {
 export interface PlayerProps {
   source: LibVlcSource;
   poster?: LibVlcAsset;
-  fullScreen?: boolean;
+  fullscreen?: boolean;
 }
 
 export type LoadingProps = {

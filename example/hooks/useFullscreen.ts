@@ -7,22 +7,22 @@ import {
 } from "expo-screen-orientation";
 import { useEffect, useState } from "react";
 
-export function useFullScreen() {
-  const [fullScreen, setFullScreen] = useState<boolean>(false);
+export function useFullscreen() {
+  const [fullscreen, setFullscreen] = useState<boolean>(false);
 
-  const updateFullScreen = (orientation: Orientation) => {
+  const updateFullscreen = (orientation: Orientation) => {
     const isLandscapeLeft = orientation === Orientation.LANDSCAPE_LEFT;
     const isLandscapeRight = orientation === Orientation.LANDSCAPE_RIGHT;
-    setFullScreen(isLandscapeLeft || isLandscapeRight);
+    setFullscreen(isLandscapeLeft || isLandscapeRight);
   };
 
   const setOrientationAsync = async () => {
     try {
       const orientation = await getOrientationAsync();
-      updateFullScreen(orientation);
+      updateFullscreen(orientation);
     } catch {
       const orientation = Orientation.UNKNOWN;
-      updateFullScreen(orientation);
+      updateFullscreen(orientation);
     } finally {
       unlockAsync();
     }
@@ -30,7 +30,7 @@ export function useFullScreen() {
 
   const orientationListener = (event: OrientationChangeEvent) => {
     const orientation = event.orientationInfo.orientation;
-    updateFullScreen(orientation);
+    updateFullscreen(orientation);
   };
 
   useEffect(() => {
@@ -44,5 +44,5 @@ export function useFullScreen() {
     };
   }, []);
 
-  return fullScreen;
+  return fullscreen;
 }

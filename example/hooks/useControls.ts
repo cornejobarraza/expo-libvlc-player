@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 const HIDE_DELAY = 3000;
 
-export function useControls(fullScreen?: boolean) {
+export function useControls(fullscreen?: boolean) {
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const timeoutRef = useRef<number>(undefined);
@@ -19,7 +19,7 @@ export function useControls(fullScreen?: boolean) {
   };
 
   const show = () => {
-    if (fullScreen) {
+    if (fullscreen) {
       clearTimeout(timeoutRef.current);
       setIsVisible(true);
       timeoutRef.current = setTimeout(hide, HIDE_DELAY);
@@ -34,7 +34,7 @@ export function useControls(fullScreen?: boolean) {
     }
   };
 
-  const visible = !fullScreen || isVisible;
+  const visible = !fullscreen || isVisible;
 
   return { visible, show, toggle };
 }

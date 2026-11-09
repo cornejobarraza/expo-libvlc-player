@@ -4,21 +4,21 @@ import { StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { Player } from "./components/Player";
-import { useFullScreen } from "./hooks/useFullScreen";
+import { useFullscreen } from "./hooks/useFullscreen";
 
 const BBB_CLIP = require("./assets/bbb.mp4");
 const BBB_POSTER = require("./assets/bbb.png");
 
 export default function App() {
-  const fullScreen = useFullScreen();
-  const padding = !fullScreen ? styles.app.padding : undefined;
+  const fullscreen = useFullscreen();
+  const padding = !fullscreen ? styles.app.padding : undefined;
 
   return (
     <SafeAreaProvider>
       <View style={{ ...styles.app, padding }}>
-        <StatusBar style="light" hidden={fullScreen} />
-        <Player source={BBB_CLIP} poster={BBB_POSTER} fullScreen={fullScreen} />
-        <NavigationBar style="light" hidden={fullScreen} />
+        <StatusBar style="light" hidden={fullscreen} />
+        <Player source={BBB_CLIP} poster={BBB_POSTER} fullscreen={fullscreen} />
+        <NavigationBar style="light" hidden={fullscreen} />
       </View>
     </SafeAreaProvider>
   );
