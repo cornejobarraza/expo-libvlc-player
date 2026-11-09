@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.7 - 2026-11-09
+
+### 🐛 Bug fixes
+
+- Fix HLS length and PiP skip on iOS ([#39](https://github.com/cornejobarraza/expo-libvlc-player/pull/39) by [@wendaf](https://github.com/wendaf))
+
 ## 58.0.6 - 2026-11-07
 
 ### 🛠 Breaking changes
