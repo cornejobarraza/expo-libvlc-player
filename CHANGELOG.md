@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.9 - 2026-11-10
+
+### 🐛 Bug fixes
+
+- Fixed stale initial time
+
 ## 58.0.8 - 2026-11-10
 
 ### 💡 Others
