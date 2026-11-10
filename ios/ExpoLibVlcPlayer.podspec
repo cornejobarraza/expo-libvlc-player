@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target = "16.4"
 
   s.dependency "ExpoModulesCore"
-  s.dependency "VLCKit", "4.0.0a25"
+  s.dependency "VLCKit", "4.0.0a26"
   s.pod_target_xcconfig = { "DEFINES_MODULE" => "YES" }
 
   s.source_files = "**/*.{h,m,mm,swift,hpp,cpp}"
