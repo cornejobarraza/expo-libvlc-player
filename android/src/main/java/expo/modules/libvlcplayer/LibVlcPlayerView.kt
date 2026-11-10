@@ -31,6 +31,7 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.reflect.KMutableProperty0
 import org.videolan.libvlc.Dialog as VLCDialog
 import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
 
@@ -270,74 +271,23 @@ class LibVlcPlayerView(
   fun onStopPictureInPicture() = player.onStopPictureInPicture()
 
   fun update(props: PlayerProps) {
-    if (props.source != this.source) {
-      this.source = props.source
-    }
-
-    if (props.metadata != this.metadata) {
-      this.metadata = props.metadata
-    }
-
-    if (props.options != this.options) {
-      this.options = props.options
-    }
-
-    if (props.slaves != this.slaves) {
-      this.slaves = props.slaves
-    }
-
-    if (props.tracks != this.tracks) {
-      this.tracks = props.tracks
-    }
-
-    if (props.delays != this.delays) {
-      this.delays = props.delays
-    }
-
-    if (props.scale != this.scale) {
-      this.scale = props.scale
-    }
-
-    if (props.contentFit != this.contentFit) {
-      this.contentFit = props.contentFit
-    }
-
-    if (props.rate != this.rate) {
-      this.rate = props.rate
-    }
-
-    if (props.time != this.time) {
-      this.time = props.time
-    }
-
-    if (props.volume != this.volume) {
-      this.volume = props.volume
-    }
-
-    if (props.mute != this.mute) {
-      this.mute = props.mute
-    }
-
-    if (props.repeat != this.repeat) {
-      this.repeat = props.repeat
-    }
-
-    if (props.autoplay != this.autoplay) {
-      this.autoplay = props.autoplay
-    }
-
-    if (props.audioMixingMode != this.audioMixingMode) {
-      this.audioMixingMode = props.audioMixingMode
-    }
-
-    if (props.playInBackground != this.playInBackground) {
-      this.playInBackground = props.playInBackground
-    }
-
-    if (props.pictureInPicture != this.pictureInPicture) {
-      this.pictureInPicture = props.pictureInPicture
-    }
-
+    setIfChanged(::source, props.source)
+    setIfChanged(::metadata, props.metadata)
+    setIfChanged(::options, props.options)
+    setIfChanged(::slaves, props.slaves)
+    setIfChanged(::tracks, props.tracks)
+    setIfChanged(::delays, props.delays)
+    setIfChanged(::scale, props.scale)
+    setIfChanged(::contentFit, props.contentFit)
+    setIfChanged(::rate, props.rate)
+    setIfChanged(::time, props.time)
+    setIfChanged(::volume, props.volume)
+    setIfChanged(::mute, props.mute)
+    setIfChanged(::repeat, props.repeat)
+    setIfChanged(::autoplay, props.autoplay)
+    setIfChanged(::audioMixingMode, props.audioMixingMode)
+    setIfChanged(::playInBackground, props.playInBackground)
+    setIfChanged(::pictureInPicture, props.pictureInPicture)
     initPlayer()
   }
 
@@ -475,5 +425,14 @@ class LibVlcPlayerView(
 
   fun startPictureInPicture() {
     MediaPlayerManager.pictureInPictureManager.startPictureInPicture(this)
+  }
+}
+
+private fun <T> setIfChanged(
+  property: KMutableProperty0<T>,
+  value: T,
+) {
+  if (property.get() != value) {
+    property.set(value)
   }
 }

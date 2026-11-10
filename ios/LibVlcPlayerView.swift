@@ -187,74 +187,23 @@ class LibVlcPlayerView: ExpoView {
   }
 
   func update(_ props: PlayerProps) {
-    if props.source != source {
-      source = props.source
-    }
-
-    if props.metadata != metadata {
-      metadata = props.metadata
-    }
-
-    if props.options != options {
-      options = props.options
-    }
-
-    if props.slaves != slaves {
-      slaves = props.slaves
-    }
-
-    if props.tracks != tracks {
-      tracks = props.tracks
-    }
-
-    if props.delays != delays {
-      delays = props.delays
-    }
-
-    if props.scale != scale {
-      scale = props.scale
-    }
-
-    if props.contentFit != contentFit {
-      contentFit = props.contentFit
-    }
-
-    if props.rate != rate {
-      rate = props.rate
-    }
-
-    if props.time != time {
-      time = props.time
-    }
-
-    if props.volume != volume {
-      volume = props.volume
-    }
-
-    if props.mute != mute {
-      mute = props.mute
-    }
-
-    if props.repeat != Repeat {
-      Repeat = props.repeat
-    }
-
-    if props.autoplay != autoplay {
-      autoplay = props.autoplay
-    }
-
-    if props.audioMixingMode != audioMixingMode {
-      audioMixingMode = props.audioMixingMode
-    }
-
-    if props.playInBackground != playInBackground {
-      playInBackground = props.playInBackground
-    }
-
-    if props.pictureInPicture != pictureInPicture {
-      pictureInPicture = props.pictureInPicture
-    }
-
+    setIfChanged(\.source, props.source)
+    setIfChanged(\.metadata, props.metadata)
+    setIfChanged(\.options, props.options)
+    setIfChanged(\.slaves, props.slaves)
+    setIfChanged(\.tracks, props.tracks)
+    setIfChanged(\.delays, props.delays)
+    setIfChanged(\.scale, props.scale)
+    setIfChanged(\.contentFit, props.contentFit)
+    setIfChanged(\.rate, props.rate)
+    setIfChanged(\.time, props.time)
+    setIfChanged(\.volume, props.volume)
+    setIfChanged(\.mute, props.mute)
+    setIfChanged(\.Repeat, props.repeat)
+    setIfChanged(\.autoplay, props.autoplay)
+    setIfChanged(\.audioMixingMode, props.audioMixingMode)
+    setIfChanged(\.playInBackground, props.playInBackground)
+    setIfChanged(\.pictureInPicture, props.pictureInPicture)
     initPlayer()
   }
 
@@ -415,5 +364,16 @@ class LibVlcPlayerView: ExpoView {
 
   func stopPictureInPicture() {
     player.stopPictureInPicture()
+  }
+}
+
+extension LibVlcPlayerView {
+  private func setIfChanged<T: Equatable>(
+    _ keyPath: ReferenceWritableKeyPath<LibVlcPlayerView, T>,
+    _ value: T
+  ) {
+    if self[keyPath: keyPath] != value {
+      self[keyPath: keyPath] = value
+    }
   }
 }
