@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.8 - 2026-11-10
+
+### 💡 Others
+
+- Bumped VLCKit to 4.0.0a26
+
 ## 58.0.7 - 2026-11-09
 
 ### 🐛 Bug fixes
