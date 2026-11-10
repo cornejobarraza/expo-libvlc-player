@@ -55,6 +55,7 @@ class MediaPlayer(
   var userStop: Boolean = false
   var firstPlay: Boolean = true
   var shouldInit: Boolean = false
+  private var shouldInitTime: Boolean = false
 
   val hasVideoSize: Boolean
     get() {
@@ -123,6 +124,7 @@ class MediaPlayer(
 
     firstPlay = true
     shouldInit = false
+    shouldInitTime = true
 
     attachPlayer()
   }
@@ -293,29 +295,25 @@ class MediaPlayer(
 
   fun setupPlayer() {
     view.post {
-      mediaPlayer?.let { player ->
-        if (view.scale != MediaPlayerConstants.DEFAULT_PLAYER_SCALE) {
-          player.setScale(view.scale.toFloat())
+      val initialTime =
+        if (shouldInitTime) {
+          view.time
+        } else {
+          0
+        }
+      val newVolume =
+        if (view.mute) {
+          MediaPlayerConstants.MIN_PLAYER_VOLUME
+        } else {
+          view.volume
         }
 
-        if (view.rate != MediaPlayerConstants.DEFAULT_PLAYER_RATE) {
-          player.setRate(view.rate.toFloat())
-        }
-
-        if (view.time != MediaPlayerConstants.DEFAULT_PLAYER_TIME) {
-          player.setTime(view.time.toLong())
-        }
-      }
+      mediaPlayer?.setScale(view.scale.toFloat())
+      mediaPlayer?.setRate(view.rate.toFloat())
+      mediaPlayer?.setTime(initialTime.toLong())
 
       // Negative volume workaround
       retryUntil {
-        val newVolume =
-          if (view.mute) {
-            MediaPlayerConstants.MIN_PLAYER_VOLUME
-          } else {
-            view.volume
-          }
-
         mediaPlayer?.setVolume(newVolume)
 
         return@retryUntil false
@@ -323,11 +321,11 @@ class MediaPlayer(
 
       MediaPlayerManager.mediaPlaybackManager.updatePlaybackPosition(
         view,
-        view.time.takeIf { time -> time != MediaPlayerConstants.DEFAULT_PLAYER_TIME }?.toLong(),
+        initialTime.toLong().takeIf { time -> time > 0 },
         view.rate.toFloat(),
       )
 
-      view.time = MediaPlayerConstants.DEFAULT_PLAYER_TIME
+      shouldInitTime = false
     }
   }
 

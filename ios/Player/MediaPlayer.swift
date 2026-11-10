@@ -17,6 +17,7 @@ class MediaPlayer: NSObject {
   var userStop: Bool = false
   private var firstPlay: Bool = true
   var shouldInit: Bool = false
+  private var shouldInitTime: Bool = false
 
   var hasVideoSize: Bool {
     let video = getVideo()
@@ -85,6 +86,7 @@ class MediaPlayer: NSObject {
 
     firstPlay = true
     shouldInit = false
+    shouldInitTime = true
 
     view.subviews.forEach { subview in subview.removeFromSuperview() }
     view.addSubview(drawable)
@@ -122,27 +124,20 @@ class MediaPlayer: NSObject {
     DispatchQueue.main.async { [weak self] in
       guard let self else { return }
 
-      if let player = mediaPlayer {
-        if view.scale != MediaPlayerConstants.defaultPlayerScale {
-          player.scaleFactor = Float(view.scale)
-        }
+      let initialTime = shouldInitTime ?
+        view.time :
+        0
+      let newVolume = view.mute ?
+        MediaPlayerConstants.minPlayerVolume :
+        view.volume
 
-        if view.rate != MediaPlayerConstants.defaultPlayerRate {
-          player.rate = Float(view.rate)
-        }
-
-        if view.time != MediaPlayerConstants.defaultPlayerTime {
-          player.time = VLCTime(int: Int32(view.time))
-        }
-      }
+      mediaPlayer?.scaleFactor = Float(view.scale)
+      mediaPlayer?.rate = Float(view.rate)
+      mediaPlayer?.time = VLCTime(int: Int32(initialTime))
 
       // Negative volume workaround
       retryUntil { [weak self] _ in
         guard let self else { return true }
-
-        let newVolume = view.mute ?
-          MediaPlayerConstants.minPlayerVolume :
-          view.volume
 
         mediaPlayer?.audio?.volume = Int32(newVolume)
 
@@ -151,13 +146,11 @@ class MediaPlayer: NSObject {
 
       MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackPosition(
         view,
-        time: view.time != MediaPlayerConstants.defaultPlayerTime
-          ? Int64(view.time)
-          : nil,
+        time: initialTime > 0 ? Int64(initialTime) : nil,
         rate: Float(view.rate)
       )
 
-      view.time = MediaPlayerConstants.defaultPlayerTime
+      shouldInitTime = false
     }
   }
 
