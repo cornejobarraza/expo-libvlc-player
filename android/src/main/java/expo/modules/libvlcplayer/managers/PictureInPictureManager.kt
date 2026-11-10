@@ -83,25 +83,25 @@ class PictureInPictureManager(
   fun updatePipActions() {
     val canSetActions = isPictureInPictureSupported() && pipView != null
 
-    if (!canSetActions) return
+    if (canSetActions) {
+      val isPlaying = mediaPlayer?.isPlaying() == true
+      val isSeekable = mediaPlayer?.isSeekable() == true
 
-    val isPlaying = mediaPlayer?.isPlaying() == true
-    val isSeekable = mediaPlayer?.isSeekable() == true
+      val actions =
+        MediaAction.controls(isPlaying, isSeekable).map { action -> remoteActions.getValue(action) }
 
-    val actions =
-      MediaAction.controls(isPlaying, isSeekable).map { action -> remoteActions.getValue(action) }
+      val params =
+        PictureInPictureParams
+          .Builder()
+          .setActions(actions)
+          .apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+              setAutoEnterEnabled(pictureInPicture && isPlaying)
+            }
+          }.build()
 
-    val params =
-      PictureInPictureParams
-        .Builder()
-        .setActions(actions)
-        .apply {
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            setAutoEnterEnabled(pictureInPicture && isPlaying)
-          }
-        }.build()
-
-    activity?.setPictureInPictureParams(params)
+      activity?.setPictureInPictureParams(params)
+    }
   }
 
   private fun reassignPipView() {
@@ -154,7 +154,7 @@ class PictureInPictureManager(
     }
   }
 
-  fun layoutForPipExit() {
+  private fun layoutForPipExit() {
     val video = pipView?.video ?: return
     val picture = pipView?.picture ?: return
     val rootView = activity?.findViewById<ViewGroup>(android.R.id.content) ?: return
@@ -227,33 +227,33 @@ class PictureInPictureManager(
     val texture = view.getTextureView(view.video)
     val canSetParams = isPictureInPictureSupported() && texture != null
 
-    if (!canSetParams) return
+    if (canSetParams) {
+      val ratio = Rational(texture.width, texture.height)
+      val safeRatio = ratio.takeIf { ratio -> ratio.toFloat() in 0.41841..2.39 }
 
-    val ratio = Rational(texture.width, texture.height)
-    val safeRatio = ratio.takeIf { ratio -> ratio.toFloat() in 0.41841..2.39 }
+      val hint = Rect()
+      texture.getGlobalVisibleRect(hint)
 
-    val hint = Rect()
-    texture.getGlobalVisibleRect(hint)
+      val location = IntArray(2)
+      texture.getLocationOnScreen(location)
 
-    val location = IntArray(2)
-    texture.getLocationOnScreen(location)
+      val height = hint.bottom - hint.top
+      hint.top = location[1]
+      hint.bottom = hint.top + height
 
-    val height = hint.bottom - hint.top
-    hint.top = location[1]
-    hint.bottom = hint.top + height
+      val params =
+        PictureInPictureParams
+          .Builder()
+          .apply { safeRatio?.let { ratio -> setAspectRatio(ratio) } }
+          .setSourceRectHint(hint)
+          .apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+              setAutoEnterEnabled(pictureInPicture)
+            }
+          }.build()
 
-    val params =
-      PictureInPictureParams
-        .Builder()
-        .apply { safeRatio?.let { ratio -> setAspectRatio(ratio) } }
-        .setSourceRectHint(hint)
-        .apply {
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            setAutoEnterEnabled(pictureInPicture)
-          }
-        }.build()
-
-    activity?.setPictureInPictureParams(params)
+      activity?.setPictureInPictureParams(params)
+    }
   }
 
   private fun resetPipParams() {
@@ -283,13 +283,10 @@ class PictureInPictureManager(
   private fun enterPictureInPicture(activity: Activity) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       activity.enterPictureInPictureMode(PictureInPictureParams.Builder().build())
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      @Suppress("DEPRECATION")
-      activity.enterPictureInPictureMode()
     }
   }
 
-  private fun isPictureInPictureSupported() =
+  fun isPictureInPictureSupported() =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
       activity?.packageManager?.hasSystemFeature(
         android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE,

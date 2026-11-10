@@ -67,24 +67,22 @@ class MediaPlaybackManager(
   private val context: Context
     get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
   private val notificationManager by lazy {
-    val manager =
-      context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: run {
-        throw CodedException("Failed to get NotificationManager service")
+    (
+      context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        ?: throw CodedException("Failed to get NotificationManager service")
+    ).apply {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        createNotificationChannel(
+          NotificationChannel(
+            MediaPlayerConstants.MEDIA_CHANNEL_ID,
+            MediaPlayerConstants.MEDIA_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_LOW,
+          ).apply {
+            setShowBadge(false)
+          },
+        )
       }
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      manager.createNotificationChannel(
-        NotificationChannel(
-          MediaPlayerConstants.MEDIA_CHANNEL_ID,
-          MediaPlayerConstants.MEDIA_CHANNEL_NAME,
-          NotificationManager.IMPORTANCE_LOW,
-        ).apply {
-          setShowBadge(false)
-        },
-      )
     }
-
-    manager
   }
   private val notificationActions: Map<MediaAction, Notification.Action> by lazy {
     MediaAction.entries.associateWith { action ->

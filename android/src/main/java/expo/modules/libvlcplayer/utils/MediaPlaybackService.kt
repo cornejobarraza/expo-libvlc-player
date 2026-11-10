@@ -14,11 +14,7 @@ class PlaybackServiceBinder(
   val service: MediaPlaybackService,
 ) : Binder()
 
-private const val TAG = "ExpoLibVlcPlayer"
-
 class MediaPlaybackService : Service() {
-  private var inForeground: Boolean = false
-
   override fun onBind(intent: Intent?): IBinder = PlaybackServiceBinder(this)
 
   override fun onStartCommand(
@@ -34,40 +30,32 @@ class MediaPlaybackService : Service() {
   }
 
   fun enterForeground(notification: Notification) {
-    if (!inForeground) {
-      try {
-        startService(Intent(this, MediaPlaybackService::class.java))
-      } catch (_: IllegalStateException) {
-        // Background start not allowed, the bound service can still enter the foreground
-      }
+    try {
+      startService(Intent(this, MediaPlaybackService::class.java))
+    } catch (_: IllegalStateException) {
+      // Background start not allowed, the bound service can still enter the foreground
+    }
 
-      try {
-        ServiceCompat.startForeground(
-          this,
-          MediaPlayerConstants.MEDIA_NOTIFICATION_ID,
-          notification,
-          ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
-        )
-
-        inForeground = true
-      } catch (_: Exception) {
-        // Android 12+ disallows most foreground service starts from background
-      }
+    try {
+      ServiceCompat.startForeground(
+        this,
+        MediaPlayerConstants.MEDIA_NOTIFICATION_ID,
+        notification,
+        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
+      )
+    } catch (_: Exception) {
+      // Android 12+ disallows most foreground service starts from background
     }
   }
 
   fun exitForeground(removeNotification: Boolean) {
-    if (inForeground) {
-      val flags =
-        if (removeNotification) {
-          ServiceCompat.STOP_FOREGROUND_REMOVE
-        } else {
-          ServiceCompat.STOP_FOREGROUND_DETACH
-        }
+    val flags =
+      if (removeNotification) {
+        ServiceCompat.STOP_FOREGROUND_REMOVE
+      } else {
+        ServiceCompat.STOP_FOREGROUND_DETACH
+      }
 
-      ServiceCompat.stopForeground(this, flags)
-
-      inForeground = false
-    }
+    ServiceCompat.stopForeground(this, flags)
   }
 }

@@ -158,15 +158,15 @@ class LibVlcPlayerView(
 
       field = newVolume
 
-      if (mute) return
+      if (!mute) {
+        mediaPlayer?.setVolume(newVolume)
 
-      mediaPlayer?.setVolume(newVolume)
+        val hadVolume = oldValue > MediaPlayerConstants.MIN_PLAYER_VOLUME
+        val hasVolume = newVolume > MediaPlayerConstants.MIN_PLAYER_VOLUME
 
-      val hadVolume = oldValue > MediaPlayerConstants.MIN_PLAYER_VOLUME
-      val hasVolume = newVolume > MediaPlayerConstants.MIN_PLAYER_VOLUME
-
-      if (hadVolume != hasVolume) {
-        MediaPlayerManager.audioFocusManager.updateAudioFocus()
+        if (hadVolume != hasVolume) {
+          MediaPlayerManager.audioFocusManager.updateAudioFocus()
+        }
       }
     }
 

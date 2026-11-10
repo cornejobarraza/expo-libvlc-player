@@ -1,8 +1,5 @@
 package expo.modules.libvlcplayer
 
-import android.app.Activity
-import android.os.Build
-import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
@@ -16,18 +13,12 @@ import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
 
 class LibVlcPlayerModule : Module() {
-  private val activity: Activity
-    get() = appContext.currentActivity ?: throw Exceptions.MissingActivity()
-
   override fun definition() =
     ModuleDefinition {
       Name("ExpoLibVlcPlayer")
 
       Function("isPictureInPictureSupported") {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
-          activity.packageManager.hasSystemFeature(
-            android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE,
-          )
+        MediaPlayerManager.pictureInPictureManager.isPictureInPictureSupported()
       }
 
       OnCreate {

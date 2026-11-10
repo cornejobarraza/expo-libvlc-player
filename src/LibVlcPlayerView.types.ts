@@ -480,19 +480,6 @@ export type LibVlcPlayerViewNativeRef = LibVlcPlayerViewRef & LibVlcPlayerViewRe
 /**
  * @hidden
  */
-type NativeAspectRatioProps =
-  | {
-      aspectRatio: "auto";
-      fallbackRatio: VideoAspectRatio;
-    }
-  | {
-      aspectRatio?: VideoAspectRatio;
-      fallbackRatio?: never;
-    };
-
-/**
- * @hidden
- */
 type BufferingListener = (event: NativeEvent<Buffering>) => void;
 
 /**
@@ -578,41 +565,40 @@ type PictureInPictureStopListener = () => void;
 /**
  * @hidden
  */
-export type LibVlcPlayerViewNativeProps = ViewProps &
-  NativeAspectRatioProps & {
-    ref?: Ref<LibVlcPlayerViewNativeRef>;
-    source?: LibVlcSource;
-    metadata?: LibVlcMetadata;
-    options?: string[];
-    slaves?: Slave[];
-    tracks?: Tracks;
-    delays?: Delays;
-    scale?: number;
-    contentFit?: VideoContentFit;
-    rate?: number;
-    time?: number;
-    volume?: number;
-    mute?: boolean;
-    audioMixingMode?: AudioMixingMode;
-    repeat?: boolean;
-    autoplay?: boolean;
-    playInBackground?: boolean;
-    pictureInPicture?: boolean;
-    onBuffering?: BufferingListener;
-    onPlaying?: PlayingListener;
-    onPaused?: PausedListener;
-    onStopped?: StoppedListener;
-    onEncounteredError?: EncounteredErrorListener;
-    onDialogDisplay?: DialogDisplayListener;
-    onDialogCanceled?: DialogCanceledListener;
-    onTimeChanged?: TimeChangedListener;
-    onPositionChanged?: PositionChangedListener;
-    onESAdded?: ESAddedListener;
-    onRecordChanged?: RecordChangedListener;
-    onSnapshotTaken?: SnapshotTakenListener;
-    onFirstPlay?: FirstPlayListener;
-    onForeground?: ForegroundListener;
-    onBackground?: BackgroundListener;
-    onPictureInPictureStart?: PictureInPictureStartListener;
-    onPictureInPictureStop?: PictureInPictureStopListener;
-  };
+export type LibVlcPlayerViewNativeProps = ViewProps & {
+  ref?: Ref<LibVlcPlayerViewNativeRef>;
+  source?: LibVlcSource;
+  metadata?: LibVlcMetadata;
+  options?: string[];
+  slaves?: Slave[];
+  tracks?: Tracks;
+  delays?: Delays;
+  scale?: number;
+  contentFit?: VideoContentFit;
+  rate?: number;
+  time?: number;
+  volume?: number;
+  mute?: boolean;
+  audioMixingMode?: AudioMixingMode;
+  repeat?: boolean;
+  autoplay?: boolean;
+  playInBackground?: boolean;
+  pictureInPicture?: boolean;
+  onBuffering?: BufferingListener;
+  onPlaying?: PlayingListener;
+  onPaused?: PausedListener;
+  onStopped?: StoppedListener;
+  onEncounteredError?: EncounteredErrorListener;
+  onDialogDisplay?: DialogDisplayListener;
+  onDialogCanceled?: DialogCanceledListener;
+  onTimeChanged?: TimeChangedListener;
+  onPositionChanged?: PositionChangedListener;
+  onESAdded?: ESAddedListener;
+  onRecordChanged?: RecordChangedListener;
+  onSnapshotTaken?: SnapshotTakenListener;
+  onFirstPlay?: FirstPlayListener;
+  onForeground?: ForegroundListener;
+  onBackground?: BackgroundListener;
+  onPictureInPictureStart?: PictureInPictureStartListener;
+  onPictureInPictureStop?: PictureInPictureStopListener;
+};

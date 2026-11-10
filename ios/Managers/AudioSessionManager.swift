@@ -1,6 +1,4 @@
 import AVFoundation
-import ExpoModulesCore
-import Foundation
 import VLCKit
 
 class AudioSessionManager {
@@ -57,7 +55,7 @@ class AudioSessionManager {
           options: audioSessionCategoryOptions
         )
       } catch {
-        log.warn("Failed to set audio session category")
+        // Failed to set audio session category
       }
     }
 
@@ -65,7 +63,7 @@ class AudioSessionManager {
       do {
         try audioSession.setActive(true)
       } catch {
-        log.warn("Failed to set the audio session")
+        // Failed to set the audio session
       }
     }
   }

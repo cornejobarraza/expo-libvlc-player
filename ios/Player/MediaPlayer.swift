@@ -46,7 +46,7 @@ class MediaPlayer: NSObject {
 
       if view.source != nil {
         createPlayer()
-        MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackSource(view)
+        MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackMetadata(view)
       } else {
         MediaPlayerManager.shared.mediaPlaybackManager.removePlaybackView(ObjectIdentifier(view))
       }
@@ -209,7 +209,7 @@ class MediaPlayer: NSObject {
 
       let video = getVideo()
 
-      if hasVideoSize == true {
+      if hasVideoSize {
         let viewAspect = drawable.frame.size.width / drawable.frame.size.height
         let videoAspect = CGFloat(video.width) / CGFloat(video.height)
 
@@ -371,20 +371,21 @@ class MediaPlayer: NSObject {
     block: @escaping (_ isLastAttempt: Bool) -> Bool
   ) {
     let isLastAttempt = retry > maxRetries
+    let isDone = block(isLastAttempt)
 
-    if block(isLastAttempt) || isLastAttempt { return }
+    if !isDone, !isLastAttempt {
+      let wait = retry > 0 ? delay : 0
+      let nextDelay = retry > 0 ? delay * MediaPlayerConstants.expDelayMultiplier : delay
+      let deadline = DispatchTime.now() + DispatchTimeInterval.milliseconds(Int(wait))
 
-    let wait = retry > 0 ? delay : 0
-    let nextDelay = retry > 0 ? delay * MediaPlayerConstants.expDelayMultiplier : delay
-    let deadline = DispatchTime.now() + DispatchTimeInterval.milliseconds(Int(wait))
-
-    DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
-      self?.retryUntil(
-        maxRetries: maxRetries,
-        retry: retry + 1,
-        delay: nextDelay,
-        block: block
-      )
+      DispatchQueue.main.asyncAfter(deadline: deadline) { [weak self] in
+        self?.retryUntil(
+          maxRetries: maxRetries,
+          retry: retry + 1,
+          delay: nextDelay,
+          block: block
+        )
+      }
     }
   }
 }

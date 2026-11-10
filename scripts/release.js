@@ -11,13 +11,13 @@ const repo_root = path.resolve(__dirname, "..");
 const bumps = ["patch", "minor", "major"];
 
 function parseArgs(argv) {
-  const options = { bump: "patch", tag: null, ref: "HEAD", dryRun: false, skipTests: false };
+  const options = { bump: "patch", tag: null, ref: "HEAD", dryRun: false, tests: false };
 
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--tag") options.tag = argv[++i];
     else if (argv[i] === "--ref") options.ref = argv[++i];
     else if (argv[i] === "--dry-run") options.dryRun = !options.dryRun;
-    else if (argv[i] === "--skip-tests") options.skipTests = !options.skipTests;
+    else if (argv[i] === "--tests") options.tests = !options.tests;
     else if (bumps.includes(argv[i])) options.bump = argv[i];
     else {
       console.error(`Unknown argument: ${argv[i]}`);
@@ -174,8 +174,8 @@ function diff(options, diffArgs) {
 }
 
 function version(options, diffArgs) {
-  const { bump: type, dryRun, skipTests } = options;
-  if (!dryRun && !skipTests) tests(diffArgs);
+  const { bump: type, dryRun, tests: runTests } = options;
+  if (!dryRun && runTests) tests(diffArgs);
   if (!dryRun) bump(type);
 }
 

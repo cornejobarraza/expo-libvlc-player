@@ -220,7 +220,7 @@ class MediaPlayer(
     MediaPlayerManager.pictureInPictureManager.removePipView(view)
   }
 
-  fun releasePlayer() {
+  private fun releasePlayer() {
     libVlcDispatcher?.let { dispatcher ->
       val vlc = libVlc
       val player = mediaPlayer
@@ -246,7 +246,7 @@ class MediaPlayer(
 
   private fun detachPlayer() {
     detachPlayerView()
-    removePlayerView()
+    removePlayerView(video)
   }
 
   fun attachPlayerView(layout: VLCVideoLayout) {
@@ -275,18 +275,18 @@ class MediaPlayer(
   }
 
   private fun addPlayerView(layout: VLCVideoLayout) {
-    val parent = video.parent as? ViewGroup
+    val parent = layout.parent as? ViewGroup
 
     if (parent == null) {
       view.addView(layout)
     }
   }
 
-  private fun removePlayerView() {
-    val parent = video.parent as? ViewGroup
+  private fun removePlayerView(layout: VLCVideoLayout) {
+    val parent = layout.parent as? ViewGroup
 
     if (parent != null) {
-      view.removeView(video)
+      view.removeView(layout)
     }
   }
 
@@ -600,16 +600,17 @@ class MediaPlayer(
     block: (isLastAttempt: Boolean) -> Boolean,
   ) {
     val isLastAttempt = retry > maxRetries
+    val isDone = block(isLastAttempt)
 
-    if (block(isLastAttempt) || isLastAttempt) return
+    if (!isDone && !isLastAttempt) {
+      val wait = if (retry > 0) delay else 0.0
+      val nextDelay = if (retry > 0) delay * MediaPlayerConstants.EXP_DELAY_MULTIPLIER else delay
+      val postDelay = wait.toLong()
 
-    val wait = if (retry > 0) delay else 0.0
-    val nextDelay = if (retry > 0) delay * MediaPlayerConstants.EXP_DELAY_MULTIPLIER else delay
-    val postDelay = wait.toLong()
-
-    view.postDelayed({
-      retryUntil(maxRetries, retry + 1, nextDelay, block)
-    }, postDelay)
+      view.postDelayed({
+        retryUntil(maxRetries, retry + 1, nextDelay, block)
+      }, postDelay)
+    }
   }
 }
 

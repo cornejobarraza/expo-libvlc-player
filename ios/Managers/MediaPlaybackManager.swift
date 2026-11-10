@@ -59,10 +59,6 @@ class MediaPlaybackManager {
     }
   }
 
-  func updatePlaybackSource(_ view: LibVlcPlayerView) {
-    onSession(view) { manager in manager.updatePlaybackMetadata() }
-  }
-
   func updatePlaybackView(_ view: LibVlcPlayerView) {
     DispatchQueue.main.async { [weak self, weak view] in
       guard let self, let view else { return }
@@ -76,11 +72,11 @@ class MediaPlaybackManager {
   }
 
   func updatePlaybackMetadata(_ view: LibVlcPlayerView) {
-    onSession(view) { manager in manager.updatePlaybackMetadata() }
+    ifSessionView(view) { manager in manager.updatePlaybackMetadata() }
   }
 
   func updatePlaybackPosition(_ view: LibVlcPlayerView, time: Int64? = nil, rate: Float? = nil) {
-    onSession(view) { manager in manager.setPlaybackState(time: time, rate: rate) }
+    ifSessionView(view) { manager in manager.setPlaybackState(time: time, rate: rate) }
   }
 
   func removePlaybackView(_ viewID: ObjectIdentifier) {
@@ -91,7 +87,7 @@ class MediaPlaybackManager {
     }
   }
 
-  private func onSession(
+  private func ifSessionView(
     _ view: LibVlcPlayerView,
     _ body: @escaping (MediaPlaybackManager) -> Void
   ) {
@@ -322,9 +318,9 @@ class MediaPlaybackManager {
       let request = URLRequest(url: uri, timeoutInterval: MediaPlayerConstants.artworkTimeout)
 
       artworkTask = URLSession.shared.dataTask(with: request) { data, _, error in
-        if (error as? URLError)?.code == .cancelled { return }
-
-        onImage(data.flatMap { data in UIImage(data: data) })
+        if (error as? URLError)?.code != .cancelled {
+          onImage(data.flatMap { data in UIImage(data: data) })
+        }
       }
 
       artworkTask?.resume()

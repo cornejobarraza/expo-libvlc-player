@@ -128,15 +128,15 @@ class LibVlcPlayerView: ExpoView {
 
       _volume = newVolume
 
-      if mute { return }
+      if !mute {
+        mediaPlayer?.audio?.volume = Int32(newVolume)
 
-      mediaPlayer?.audio?.volume = Int32(newVolume)
+        let hadVolume = oldValue > MediaPlayerConstants.minPlayerVolume
+        let hasVolume = newVolume > MediaPlayerConstants.minPlayerVolume
 
-      let hadVolume = oldValue > MediaPlayerConstants.minPlayerVolume
-      let hasVolume = newVolume > MediaPlayerConstants.minPlayerVolume
-
-      if hadVolume != hasVolume {
-        MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+        if hadVolume != hasVolume {
+          MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
+        }
       }
     }
   }
