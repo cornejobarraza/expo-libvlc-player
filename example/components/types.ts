@@ -1,13 +1,15 @@
 import type MaterialIcons from "@react-native-vector-icons/material-icons";
-import { type LibVlcAsset, type LibVlcSource } from "expo-libvlc-player";
+import { type LibVlcSource } from "expo-libvlc-player";
 import { type SFSymbol } from "expo-symbols";
 import { type JSX, type ComponentProps } from "react";
 import {
   type DimensionValue,
+  type ImageProps,
   type TextProps,
   type StyleProp,
   type TextStyle,
   type NativeColorValue,
+  type ViewStyle,
 } from "react-native";
 
 export interface ControlProps {
@@ -31,9 +33,19 @@ export interface IconProps {
 
 export interface PlayerProps {
   source: LibVlcSource;
-  poster?: LibVlcAsset;
+  poster?: LibVlcSource;
   fullscreen?: boolean;
 }
+
+export type SkeletonProps = {
+  style?: StyleProp<ViewStyle>;
+};
+
+export type PosterLoadingProps = {
+  width: DimensionValue;
+  height: DimensionValue;
+  borderRadius?: number;
+};
 
 export type LoadingProps = {
   width: DimensionValue;
@@ -41,3 +53,7 @@ export type LoadingProps = {
 };
 
 export type TextComponent = (props: TextProps) => JSX.Element;
+
+export type PosterComponent = (props: ImageProps) => JSX.Element;
+
+export type ControlComponent = (props: ControlProps) => JSX.Element;

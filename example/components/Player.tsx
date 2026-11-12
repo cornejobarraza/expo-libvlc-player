@@ -1,33 +1,43 @@
 import { LibVlcPlayerView, type LibVlcPlayerViewRef, type Metadata } from "expo-libvlc-player";
 import { Fragment, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, View } from "react-native";
-import Animated, { FadeIn, FadeOut, css, cubicBezier } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LayoutAnimationConfig,
+  css,
+  cubicBezier,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Control } from "./Control";
+import { Poster } from "./Poster";
 import { Text } from "./Text";
 import {
-  ASPECT_RATIO,
-  CONTENT_FIT,
-  DEFAULT_TIME,
-  MAX_BUFFER,
-  MAX_VOLUME,
-  MIN_VOLUME,
-  OPTIONS,
-  SEEK_STEP,
-  VOLUME_STEP,
+  PLAYER_ASPECT_RATIO,
+  PLAYER_CONTENT_FIT,
+  PLAYER_DEFAULT_TIME,
+  PLAYER_MAX_BUFFER,
+  PLAYER_MAX_VOLUME,
+  PLAYER_MIN_VOLUME,
+  PLAYER_OPTIONS,
+  PLAYER_SEEK_STEP,
+  PLAYER_VOLUME_STEP,
 } from "./constants";
 import { type ControlProps, type PlayerProps } from "./types";
 import { useControls } from "../hooks/useControls";
+import { useTimedBoolean } from "../hooks/useTimedBoolean";
+
+const VLC_ICON = require("../assets/vlc.png");
 
 export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
   const [buffering, setBuffering] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(false);
   const [backgrounded, setBackgrounded] = useState<boolean>(false);
-  const [time, setTime] = useState<number>(DEFAULT_TIME);
-  const [volume, setVolume] = useState<number>(MAX_VOLUME);
-  const [parsing, setParsing] = useState<boolean>(!!source);
+  const [time, setTime] = useState<number>(PLAYER_DEFAULT_TIME);
+  const [volume, setVolume] = useState<number>(PLAYER_MAX_VOLUME);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
+  const [parsing, setParsing] = useTimedBoolean(true);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
 
@@ -35,13 +45,13 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
     {
       name: "backward.fill",
       onPress: () => {
-        playerRef.current?.seek(time - SEEK_STEP);
+        playerRef.current?.seek(time - PLAYER_SEEK_STEP);
       },
     },
     {
       name: "speaker.1.fill",
       onPress: () => {
-        setVolume((prev) => Math.max(prev - VOLUME_STEP, MIN_VOLUME));
+        setVolume((prev) => Math.max(prev - PLAYER_VOLUME_STEP, PLAYER_MIN_VOLUME));
       },
     },
     {
@@ -60,38 +70,36 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
     {
       name: "speaker.3.fill",
       onPress: () => {
-        setVolume((prev) => Math.min(prev + VOLUME_STEP, MAX_VOLUME));
+        setVolume((prev) => Math.min(prev + PLAYER_VOLUME_STEP, PLAYER_MAX_VOLUME));
       },
     },
     {
       name: "forward.fill",
       onPress: () => {
-        playerRef.current?.seek(time + SEEK_STEP);
+        playerRef.current?.seek(time + PLAYER_SEEK_STEP);
       },
     },
   ];
 
-  const showArtist = metadata?.artist != null && metadata.artist !== "";
-  const showPoster = poster != null && ((!playing && backgrounded) || time === DEFAULT_TIME);
+  const showPoster = (!playing && backgrounded) || time === PLAYER_DEFAULT_TIME;
+  const showBuffering = !parsing && buffering;
   const posterSource = typeof poster === "string" ? { uri: poster } : poster;
   const insets = useSafeAreaInsets();
 
   const controls = useControls(fullscreen);
-  const controlsAnimation = controls.visible ? animations.enter : animations.exit;
-  const fullscreenAnimation = fullscreen && controlsAnimation;
+  const slideAnimation = controls.visible ? animations.enter : animations.exit;
+  const controlsAnimation = fullscreen && slideAnimation;
 
   const header = (
     <View style={styles.header}>
       {!parsing ? (
         <Fragment>
           <Text style={styles.title} numberOfLines={1}>
-            {metadata?.title || "LibVLC Player"}
+            {metadata?.title || "Media Player"}
           </Text>
-          {showArtist && (
-            <Text style={styles.artist} numberOfLines={1}>
-              {metadata.artist}
-            </Text>
-          )}
+          <Text style={styles.artist} numberOfLines={1}>
+            {metadata?.artist || "Powered by LibVLC"}
+          </Text>
         </Fragment>
       ) : (
         <Fragment>
@@ -106,29 +114,58 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
     <View style={[styles.player, fullscreen && styles.fullscreen]}>
       {!fullscreen && header}
       <View style={styles.container}>
-        {showPoster && (
-          <Animated.View style={styles.poster} entering={FadeIn} exiting={FadeOut} testID="poster">
-            <Image
-              style={[
-                styles.image,
-                !fullscreen ? styles.rounded : styles.square,
-                { aspectRatio: ASPECT_RATIO, objectFit: CONTENT_FIT },
-              ]}
-              source={posterSource}
-            />
-          </Animated.View>
+        <LayoutAnimationConfig skipEntering>
+          {showPoster && (
+            <Animated.View
+              style={styles.poster}
+              entering={FadeIn}
+              exiting={FadeOut}
+              testID="poster">
+              {!parsing ? (
+                posterSource != null ? (
+                  <Poster
+                    style={[
+                      styles.image,
+                      !fullscreen ? styles.rounded : styles.square,
+                      { aspectRatio: PLAYER_ASPECT_RATIO, objectFit: PLAYER_CONTENT_FIT },
+                    ]}
+                    source={posterSource}
+                  />
+                ) : (
+                  <View
+                    style={[
+                      styles.image,
+                      styles.placeholder,
+                      !fullscreen ? styles.rounded : styles.square,
+                    ]}>
+                    <Image source={VLC_ICON} />
+                  </View>
+                )
+              ) : (
+                <Poster.Loading
+                  width="100%"
+                  height="100%"
+                  borderRadius={
+                    !fullscreen ? styles.rounded.borderRadius : styles.square.borderRadius
+                  }
+                />
+              )}
+            </Animated.View>
+          )}
+        </LayoutAnimationConfig>
+        {showBuffering && (
+          <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />
         )}
-        {buffering && <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />}
         <LibVlcPlayerView
           ref={playerRef}
           style={[styles.view, !fullscreen ? styles.rounded : styles.square]}
           source={source}
-          options={OPTIONS}
-          aspectRatio={ASPECT_RATIO}
-          contentFit={CONTENT_FIT}
+          options={PLAYER_OPTIONS}
+          aspectRatio={PLAYER_ASPECT_RATIO}
+          contentFit={PLAYER_CONTENT_FIT}
           volume={volume}
           onBuffering={({ value }) => {
-            setBuffering(value < MAX_BUFFER);
+            setBuffering(value < PLAYER_MAX_BUFFER);
           }}
           onPlaying={() => {
             setPlaying(true);
@@ -138,7 +175,7 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
           }}
           onStopped={() => {
             setPlaying(false);
-            setTime(DEFAULT_TIME);
+            setTime(PLAYER_DEFAULT_TIME);
           }}
           onEncounteredError={({ message }) => {
             Alert.alert("Error", message);
@@ -159,7 +196,7 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
       </View>
       {fullscreen && (
         <Pressable style={styles.surface} onPress={controls.toggle} testID="surface">
-          <Animated.View style={[styles.scrim, fullscreenAnimation]} pointerEvents="none" />
+          <Animated.View style={[styles.scrim, controlsAnimation]} pointerEvents="none" />
         </Pressable>
       )}
       {fullscreen && (
@@ -167,7 +204,7 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
           style={[
             styles.heading,
             { paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right },
-            fullscreenAnimation,
+            controlsAnimation,
             !controls.visible && animations.raised,
           ]}
           pointerEvents="none">
@@ -186,15 +223,19 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
         {playerControls.map(({ name, onPress }) => (
           <Animated.View
             key={name}
-            style={[fullscreenAnimation, !controls.visible && animations.lowered]}>
-            <Control
-              name={name}
-              translucent={fullscreen}
-              onPress={() => {
-                onPress?.();
-                controls.show();
-              }}
-            />
+            style={[controlsAnimation, !controls.visible && animations.lowered]}>
+            {!parsing ? (
+              <Control
+                name={name}
+                translucent={fullscreen}
+                onPress={() => {
+                  onPress?.();
+                  controls.show();
+                }}
+              />
+            ) : (
+              <Control.Loading />
+            )}
           </Animated.View>
         ))}
       </View>
@@ -257,6 +298,11 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
+  },
+  placeholder: {
+    backgroundColor: "#ffffff",
+    justifyContent: "center",
+    alignItems: "center",
   },
   rounded: {
     borderRadius: 12,
