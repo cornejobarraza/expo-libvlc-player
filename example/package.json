@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@react-native-vector-icons/material-icons": "^13.1.5",
-    "expo": "~58.0.24",
+    "expo": "~58.0.25",
     "expo-device": "^58.0.5",
     "expo-font": "~58.0.12",
     "expo-navigation-bar": "^58.0.4",
