@@ -10,6 +10,17 @@
 
 ### 💡 Others
 
+## 58.0.10 - 2026-11-11
+
+### 🐛 Bug fixes
+
+- Fixed audio mixing mode on Android
+- Fixed audio focus release on Android
+
+### 💡 Others
+
+- Bumped Expo dependency to 58.0.24
+
 ## 58.0.9 - 2026-11-10
 
 ### 🐛 Bug fixes
