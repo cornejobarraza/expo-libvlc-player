@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 58.0.11 - 2026-11-12
+
+### 🐛 Bug fixes
+
+- Fixed native buffering value
+
+### 💡 Others
+
+- Bumped Expo dependency to 58.0.25
+
 ## 58.0.10 - 2026-11-11
 
 ### 🐛 Bug fixes
