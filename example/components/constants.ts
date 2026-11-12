@@ -6,7 +6,7 @@ export const PLAYER_MIN_VOLUME = 0;
 export const PLAYER_MAX_VOLUME = 100;
 export const PLAYER_VOLUME_STEP = 10;
 
-export const PLAYER_MAX_BUFFER = 1;
+export const PLAYER_MAX_BUFFER = 100;
 export const PLAYER_DEFAULT_TIME = 0;
 export const PLAYER_SEEK_STEP = 10_000;
 

@@ -476,7 +476,7 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
   }
 
   func mediaPlayerBufferingChanged(_ buffering: Float) {
-    view.onBuffering(["value": buffering])
+    view.onBuffering(["value": buffering * 100])
   }
 
   func mediaPlayerLengthChanged(_ length: Int64) {
