@@ -4,6 +4,7 @@ import android.content.res.AssetFileDescriptor
 import android.graphics.Matrix
 import android.net.Uri
 import android.view.TextureView
+import android.view.View
 import android.view.ViewGroup
 import expo.modules.libvlcplayer.LibVlcPlayerView
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
@@ -678,7 +679,9 @@ private fun MediaPlayer.setPlayerListener() {
             if (type == Event.Stopped) {
               view.onStopped(Unit)
 
-              resetPlayer()
+              if (view.windowVisibility == View.VISIBLE) {
+                resetPlayer()
+              }
 
               if (willRepeat) {
                 view.play()
