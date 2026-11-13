@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.12 - 2026-11-13
+
+### 🐛 Bug fixes
+
+- Fixed background repeat on Android
+
 ## 58.0.11 - 2026-11-12
 
 ### 🐛 Bug fixes
