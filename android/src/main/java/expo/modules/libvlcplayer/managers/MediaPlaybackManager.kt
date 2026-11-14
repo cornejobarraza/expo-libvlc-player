@@ -470,49 +470,47 @@ class MediaPlaybackManager(
       if (url != null) {
         artworkJob =
           CoroutineScope(Dispatchers.Main).launch {
-            artwork = withContext(Dispatchers.IO) { loadArtwork(url) }
+            artwork = withContext(Dispatchers.IO) { loadArtwork(Uri.parse(url)) }
             updatePlaybackMetadata()
           }
       }
     }
   }
 
-  private fun loadArtwork(url: String): Bitmap? =
+  private fun loadArtwork(uri: Uri): Bitmap? =
     try {
-      openArtworkStream(url)?.use { input -> decodeArtwork(input.readBytes()) }
+      openArtworkStream(uri)?.use { input -> decodeArtwork(input.readBytes()) }
     } catch (_: Exception) {
       null
     } catch (_: OutOfMemoryError) {
       null
     }
 
+  private fun getArtworkId(uri: Uri): Int? =
+    context.resources
+      .getIdentifier(uri.toString(), "drawable", context.packageName)
+      .takeIf { id -> id != 0 }
+
   private fun decodeArtwork(bytes: ByteArray): Bitmap? =
     BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 
-  private fun openArtworkStream(url: String): InputStream? {
-    val uri = Uri.parse(url)
-
-    return when (uri.scheme) {
-      "http", "https" -> {
-        URL(url)
-          .openConnection()
-          .apply {
-            connectTimeout = MediaPlayerConstants.ARTWORK_TIMEOUT_MS
-            readTimeout = MediaPlayerConstants.ARTWORK_TIMEOUT_MS
-          }.getInputStream()
-      }
-
-      null -> {
-        val identifier = context.resources.getIdentifier(url, "drawable", context.packageName)
-
-        if (identifier != 0) context.resources.openRawResource(identifier) else null
-      }
-
-      else -> {
-        context.contentResolver.openInputStream(uri)
-      }
+  private fun openArtworkStream(uri: Uri): InputStream? =
+    when (uri.scheme) {
+      "http", "https" -> openArtworkConnection(uri)
+      null -> openArtworkResource(uri)
+      else -> context.contentResolver.openInputStream(uri)
     }
-  }
+
+  private fun openArtworkResource(uri: Uri): InputStream? =
+    getArtworkId(uri)?.let { id -> context.resources.openRawResource(id) }
+
+  private fun openArtworkConnection(uri: Uri): InputStream =
+    URL(uri.toString())
+      .openConnection()
+      .apply {
+        connectTimeout = MediaPlayerConstants.ARTWORK_TIMEOUT_MS
+        readTimeout = MediaPlayerConstants.ARTWORK_TIMEOUT_MS
+      }.getInputStream()
 
   private fun MediaPlayer.isStopped(): Boolean =
     getPlayerState().let { state -> state == IMedia.State.Stopped || state == IMedia.State.Ended }
@@ -565,6 +563,7 @@ class MediaPlaybackManager(
   }
 
   private fun updateNotification() {
+    val session = session ?: return
     val player = mediaPlayer ?: return
     val metadata = metadata ?: return
 
@@ -578,7 +577,7 @@ class MediaPlaybackManager(
       )
 
     if (state != notificationState) {
-      val notification = buildMediaNotification(state) ?: return
+      val notification = buildMediaNotification(session, state)
 
       notificationState = state
       this.notification = notification
@@ -610,8 +609,10 @@ class MediaPlaybackManager(
     }
   }
 
-  private fun buildMediaNotification(state: NotificationState): Notification? {
-    val session = session ?: return null
+  private fun buildMediaNotification(
+    session: MediaSession,
+    state: NotificationState,
+  ): Notification {
     val actions = MediaAction.controls(state.isPlaying, state.isSeekable)
 
     val builder =
