@@ -298,38 +298,45 @@ class MediaPlaybackManager {
   }
 
   private func updateArtwork(_ url: String?) {
-    guard url != artworkURL else { return }
+    if url != artworkURL {
+      resetArtwork(url)
 
-    resetArtwork(url)
-
-    guard let url, let uri = URL(string: url), let scheme = uri.scheme?.lowercased() else { return }
-
-    let onImage: (UIImage?) -> Void = { [weak self] image in
-      DispatchQueue.main.async { [weak self] in
-        guard let self, artworkURL == url else { return }
-
-        artwork = image.map { image in MPMediaItemArtwork(boundsSize: image.size) { _ in image } }
-        artworkTask = nil
-        updatePlaybackMetadata()
+      if let url, let uri = URL(string: url) {
+        loadArtwork(uri)
       }
     }
+  }
+
+  private func loadArtwork(_ uri: URL) {
+    let scheme = uri.scheme?.lowercased()
 
     if scheme == "http" || scheme == "https" {
       let request = URLRequest(url: uri, timeoutInterval: MediaPlayerConstants.artworkTimeout)
 
-      artworkTask = URLSession.shared.dataTask(with: request) { data, _, error in
+      artworkTask = URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
         if (error as? URLError)?.code != .cancelled {
-          onImage(data.flatMap { data in UIImage(data: data) })
+          self?.applyArtwork(data, for: uri)
         }
       }
 
       artworkTask?.resume()
     } else {
-      DispatchQueue.global(qos: .utility).async {
-        let data = try? Data(contentsOf: uri)
-
-        onImage(data.flatMap { data in UIImage(data: data) })
+      DispatchQueue.global(qos: .utility).async { [weak self] in
+        self?.applyArtwork(try? Data(contentsOf: uri), for: uri)
       }
+    }
+  }
+
+  private func applyArtwork(_ data: Data?, for uri: URL) {
+    let image = data.flatMap { data in UIImage(data: data) }
+
+    DispatchQueue.main.async { [weak self] in
+      guard let self, artworkURL.flatMap({ url in URL(string: url) }) == uri else { return }
+
+      artwork = image.map { image in MPMediaItemArtwork(boundsSize: image.size) { _ in image } }
+      artworkTask = nil
+
+      updatePlaybackMetadata()
     }
   }
 }
