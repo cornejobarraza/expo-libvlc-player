@@ -134,21 +134,22 @@ class MediaPlayer(
     libVlc: LibVLC,
     source: String,
   ): VLCMedia {
-    val file = openSourceFd(source)
+    val uri = Uri.parse(source)
 
-    return if (file != null) {
-      VLCMedia(libVlc, file)
-    } else {
-      VLCMedia(libVlc, Uri.parse(source))
-    }
+    val afd =
+      when (uri.scheme) {
+        "content" -> openContentFd(uri)
+        null -> openRawFd(source)
+        else -> null
+      }
+
+    return afd?.let { fd -> VLCMedia(libVlc, fd) } ?: VLCMedia(libVlc, uri)
   }
 
-  private fun openSourceFd(source: String): AssetFileDescriptor? {
-    val sourceId = getSourceId(source) ?: return null
-
+  private fun openContentFd(uri: Uri): AssetFileDescriptor? {
     sourceFd =
       try {
-        context.resources.openRawResourceFd(sourceId)
+        context.contentResolver.openAssetFileDescriptor(uri, "r")
       } catch (_: Exception) {
         null
       }
@@ -156,13 +157,23 @@ class MediaPlayer(
     return sourceFd
   }
 
-  private fun getSourceId(source: String): Int? {
-    if (Uri.parse(source).scheme != null) return null
+  private fun openRawFd(source: String): AssetFileDescriptor? {
+    val id = getSourceId(source) ?: return null
 
-    val identifier = context.resources.getIdentifier(source, "raw", context.packageName)
+    sourceFd =
+      try {
+        context.resources.openRawResourceFd(id)
+      } catch (_: Exception) {
+        null
+      }
 
-    return identifier.takeIf { id -> id != 0 }
+    return sourceFd
   }
+
+  private fun getSourceId(source: String): Int? =
+    context.resources
+      .getIdentifier(source, "raw", context.packageName)
+      .takeIf { id -> id != 0 }
 
   fun addPlayerSlaves(slaves: List<Slave>) {
     slaves.forEach { slave ->
@@ -189,18 +200,18 @@ class MediaPlayer(
   }
 
   private fun getSourceUri(source: String): Uri {
-    val sourceUri = Uri.parse(source)
-    val sourceId = getSourceId(source) ?: return sourceUri
+    val uri = Uri.parse(source)
+    val id = getSourceId(source) ?: return uri
     val cacheDir = File(context.cacheDir, MediaPlayerConstants.SOURCE_CACHE_DIR)
     val file = File(cacheDir, source)
 
     try {
       cacheDir.mkdirs()
-      context.resources.openRawResource(sourceId).use { input ->
+      context.resources.openRawResource(id).use { input ->
         FileOutputStream(file).use { output -> input.copyTo(output) }
       }
     } catch (_: Exception) {
-      return sourceUri
+      return uri
     }
 
     return Uri.fromFile(file)
