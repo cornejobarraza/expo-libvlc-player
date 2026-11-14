@@ -8,6 +8,8 @@
 
 ### 🐛 Bug fixes
 
+- Fixed `content://` sources on Android
+
 ### 💡 Others
 
 ## 58.0.12 - 2026-11-13

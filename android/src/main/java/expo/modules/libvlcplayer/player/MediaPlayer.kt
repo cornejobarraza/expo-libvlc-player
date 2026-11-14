@@ -1,5 +1,6 @@
 package expo.modules.libvlcplayer.player
 
+import android.content.ContentResolver
 import android.content.res.AssetFileDescriptor
 import android.graphics.Matrix
 import android.net.Uri
@@ -117,6 +118,12 @@ class MediaPlayer(
     args.toggleStartPausedOption(view.autoplay)
 
     val media = createMedia(libVlc!!, source!!)
+
+    if (media == null) {
+      view.onEncounteredError(mapOf("message" to "Invalid source, media could not be set"))
+      return
+    }
+
     args.forEach { arg -> media.addOption(arg) }
     mediaPlayer!!.setMedia(media)
     media.release()
@@ -133,22 +140,29 @@ class MediaPlayer(
   private fun createMedia(
     libVlc: LibVLC,
     source: String,
-  ): VLCMedia {
+  ): VLCMedia? {
     val file = openSourceFd(source)
 
     return if (file != null) {
       VLCMedia(libVlc, file)
+    } else if (Uri.parse(source).scheme == ContentResolver.SCHEME_CONTENT) {
+      null
     } else {
       VLCMedia(libVlc, Uri.parse(source))
     }
   }
 
   private fun openSourceFd(source: String): AssetFileDescriptor? {
-    val sourceId = getSourceId(source) ?: return null
+    val sourceUri = Uri.parse(source)
 
     sourceFd =
       try {
-        context.resources.openRawResourceFd(sourceId)
+        if (sourceUri.scheme == ContentResolver.SCHEME_CONTENT) {
+          context.contentResolver.openAssetFileDescriptor(sourceUri, "r")
+        } else {
+          val sourceId = getSourceId(source) ?: return null
+          context.resources.openRawResourceFd(sourceId)
+        }
       } catch (_: Exception) {
         null
       }
