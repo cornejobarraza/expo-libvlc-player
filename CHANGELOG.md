@@ -8,7 +8,7 @@
 
 ### 🐛 Bug fixes
 
-- Fixed `content://` sources on Android
+- Fix content:// sources on Android ([#40](https://github.com/cornejobarraza/expo-libvlc-player/pull/40) by [@CharlesCoeder](https://github.com/CharlesCoeder))
 
 ### 💡 Others
 
