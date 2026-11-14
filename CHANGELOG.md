@@ -8,9 +8,13 @@
 
 ### 🐛 Bug fixes
 
-- Fix content:// sources on Android ([#40](https://github.com/cornejobarraza/expo-libvlc-player/pull/40) by [@CharlesCoeder](https://github.com/CharlesCoeder))
-
 ### 💡 Others
+
+## 58.0.13 - 2026-11-14
+
+### 🐛 Bug fixes
+
+- Fix content:// sources on Android ([#40](https://github.com/cornejobarraza/expo-libvlc-player/pull/40) by [@CharlesCoeder](https://github.com/CharlesCoeder))
 
 ## 58.0.12 - 2026-11-13
 
