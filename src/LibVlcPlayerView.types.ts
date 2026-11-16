@@ -12,9 +12,11 @@ export interface Metadata {
   artworkURL?: Asset | null;
 }
 
+export type SlaveType = "audio" | "subtitle";
+
 export interface Slave {
   source: Asset;
-  type: "audio" | "subtitle";
+  type: SlaveType;
   selected?: boolean;
 }
 
@@ -43,10 +45,12 @@ export interface Error {
   message: string;
 }
 
+export type DialogType = "error" | "login" | "question";
+
 export interface Dialog {
   title: string;
   text: string;
-  type: "error" | "login" | "question";
+  type: DialogType;
   cancelText: string | null;
   action1Text: string | null;
   action2Text: string | null;
@@ -124,6 +128,8 @@ type AspectRatioProps =
       fallbackRatio?: never;
     };
 
+export type SeekType = "time" | "position";
+
 export type LibVlcPlayerViewRef = {
   /**
    * Starts playback of the current player
@@ -151,7 +157,7 @@ export type LibVlcPlayerViewRef = {
    *
    * @returns A promise which resolves to `void`
    */
-  readonly seek: (value: number, type?: "time" | "position") => Promise<void>;
+  readonly seek: (value: number, type?: SeekType) => Promise<void>;
   /**
    * Starts or stops recording the current media
    *
