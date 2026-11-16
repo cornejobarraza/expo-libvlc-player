@@ -1,16 +1,16 @@
 import { Image } from "react-native";
 
 import {
-  type LibVlcMetadata,
-  type LibVlcAsset,
-  type LibVlcSource,
+  type Asset,
+  type Metadata,
+  type Source,
   type PlayerProps,
   type Slave,
 } from "../LibVlcPlayerView.types";
 
-export function parseNativeSource(source: LibVlcAsset): LibVlcAsset;
-export function parseNativeSource(source: LibVlcSource): LibVlcSource;
-export function parseNativeSource(source: LibVlcSource): LibVlcSource {
+export function parseNativeSource(source: Asset): Asset;
+export function parseNativeSource(source: Source): Source;
+export function parseNativeSource(source: Source): Source {
   if (typeof source === "number") {
     const asset = Image.resolveAssetSource(source);
 
@@ -31,7 +31,7 @@ export function parseNativeSlaves(slaves?: Slave[]) {
   }));
 }
 
-export function parseNativeMetadata(metadata?: LibVlcMetadata) {
+export function parseNativeMetadata(metadata?: Metadata) {
   return (
     metadata && {
       ...metadata,

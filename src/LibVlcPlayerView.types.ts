@@ -1,19 +1,19 @@
 import { type Ref } from "react";
 import type { ViewProps } from "react-native";
 
-export type LibVlcSource = string | number | null;
+export type Source = string | number | null;
 
-export type LibVlcAsset = NonNullable<LibVlcSource>;
+export type Asset = NonNullable<Source>;
 
-export interface LibVlcMetadata {
-  title?: string;
-  artist?: string;
-  album?: string;
-  artworkURL?: LibVlcAsset;
+export interface Metadata {
+  title?: string | null;
+  artist?: string | null;
+  album?: string | null;
+  artworkURL?: Asset | null;
 }
 
 export interface Slave {
-  source: LibVlcAsset;
+  source: Asset;
   type: "audio" | "subtitle";
   selected?: boolean;
 }
@@ -90,13 +90,6 @@ export interface Video {
 export interface Media {
   length: number;
   seekable: boolean;
-}
-
-export interface Metadata {
-  title: string | null;
-  artist: string | null;
-  album: string | null;
-  artworkURL: string | null;
 }
 
 export interface MediaInfo {
@@ -221,7 +214,7 @@ export interface PlayerProps {
   /**
    * Sets the source of the media to be played or `null` to release the player
    */
-  source: LibVlcSource;
+  source: Source;
   /**
    * Sets the metadata used for background playback controls
    *
@@ -229,7 +222,7 @@ export interface PlayerProps {
    *
    * @default undefined
    */
-  metadata?: LibVlcMetadata;
+  metadata?: Metadata;
   /**
    * Sets the options to initialize the media with
    *
@@ -567,8 +560,8 @@ type PictureInPictureStopListener = () => void;
  */
 export type LibVlcPlayerViewNativeProps = ViewProps & {
   ref?: Ref<LibVlcPlayerViewNativeRef>;
-  source?: LibVlcSource;
-  metadata?: LibVlcMetadata;
+  source?: Source;
+  metadata?: Metadata;
   options?: string[];
   slaves?: Slave[];
   tracks?: Tracks;
