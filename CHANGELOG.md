@@ -10,6 +10,20 @@
 
 ### 💡 Others
 
+## 58.0.14 - 2026-11-16
+
+### 🛠 Breaking changes
+
+- Renamed LibVlc prefixed types
+
+### 🎉 New features
+
+- Added more player types
+
+### 💡 Others
+
+- Updated README documentation
+
 ## 58.0.13 - 2026-11-14
 
 ### 🐛 Bug fixes
@@ -231,7 +245,7 @@
 
 ### 💡 Others
 
-- Replaced README \<br\> with \<div\>
+- Updated README documentation
 
 ## 57.0.44 - 2026-09-11
 
@@ -320,7 +334,7 @@
 
 ### 💡 Others
 
-- Updated README to improve documentation
+- Updated README documentation
 
 ## 57.0.31 - 2026-09-03
 
@@ -415,7 +429,7 @@
 
 ### 💡 Others
 
-- Updated README to improve documentation
+- Updated README documentation
 
 ## 57.0.17 - 2026-08-25
 
@@ -478,13 +492,13 @@
 
 ### 💡 Others
 
-- Updated README to improve documentation
+- Updated README documentation
 
 ## 57.0.8 - 2026-08-22
 
 ### 💡 Others
 
-- Updated README to improve documentation
+- Updated README documentation
 
 ## 57.0.7 - 2026-08-21
 
@@ -524,7 +538,7 @@
 
 ### 💡 Others
 
-- Updated README to improve documentation
+- Updated README documentation
 
 ## 57.0.1 - 2026-08-11
 
