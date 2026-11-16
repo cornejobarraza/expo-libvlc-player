@@ -3,7 +3,6 @@ import { type LibVlcSource } from "expo-libvlc-player";
 import { type SFSymbol } from "expo-symbols";
 import { type JSX, type ComponentProps } from "react";
 import {
-  type DimensionValue,
   type ImageProps,
   type TextProps,
   type StyleProp,
@@ -11,14 +10,6 @@ import {
   type NativeColorValue,
   type ViewStyle,
 } from "react-native";
-
-export interface ControlProps {
-  name: SFSymbol;
-  translucent?: boolean;
-  onPress?: () => void;
-}
-
-export type IdMapping = Record<SFSymbol, string>;
 
 export type MaterialIcon = ComponentProps<typeof MaterialIcons>["name"];
 
@@ -31,29 +22,30 @@ export interface IconProps {
   color: NativeColorValue | string;
 }
 
-export interface PlayerProps {
-  source: LibVlcSource;
-  poster?: LibVlcSource;
-  fullscreen?: boolean;
+export interface SkeletonProps {
+  style?: StyleProp<ViewStyle>;
 }
 
-export type SkeletonProps = {
+export interface LoadingProps {
   style?: StyleProp<ViewStyle>;
-};
-
-export type PosterLoadingProps = {
-  width: DimensionValue;
-  height: DimensionValue;
-  borderRadius?: number;
-};
-
-export type LoadingProps = {
-  width: DimensionValue;
-  height: number;
-};
+}
 
 export type TextComponent = (props: TextProps) => JSX.Element;
 
 export type PosterComponent = (props: ImageProps) => JSX.Element;
 
+export type IdMapping = Record<SFSymbol, string>;
+
+export interface ControlProps {
+  name: SFSymbol;
+  translucent?: boolean;
+  onPress?: () => void;
+}
+
 export type ControlComponent = (props: ControlProps) => JSX.Element;
+
+export interface PlayerProps {
+  source: LibVlcSource;
+  poster?: LibVlcSource;
+  fullscreen?: boolean;
+}

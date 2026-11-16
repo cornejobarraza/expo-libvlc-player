@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 const DEFAULT_TIMEOUT = 5_000;
 
-export function useTimedBoolean(value: boolean) {
+export function useBoolean(value: boolean) {
   const [bool, setBool] = useState<boolean>(value);
   const timeoutRef = useRef<number>(null);
 

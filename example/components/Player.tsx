@@ -25,8 +25,8 @@ import {
   PLAYER_VOLUME_STEP,
 } from "./constants";
 import { type ControlProps, type PlayerProps } from "./types";
+import { useBoolean } from "../hooks/useBoolean";
 import { useControls } from "../hooks/useControls";
-import { useTimedBoolean } from "../hooks/useTimedBoolean";
 
 const VLC_ICON = require("../assets/vlc.png");
 
@@ -37,7 +37,7 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
   const [time, setTime] = useState<number>(PLAYER_DEFAULT_TIME);
   const [volume, setVolume] = useState<number>(PLAYER_MAX_VOLUME);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
-  const [parsing, setParsing] = useTimedBoolean(true);
+  const [parsing, setParsing] = useBoolean(true);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
 
@@ -103,8 +103,8 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
         </Fragment>
       ) : (
         <Fragment>
-          <Text.Loading width="50%" height={styles.title.lineHeight} />
-          <Text.Loading width="75%" height={styles.artist.lineHeight} />
+          <Text.Loading style={{ width: "50%", height: styles.title.lineHeight }} />
+          <Text.Loading style={{ width: "75%", height: styles.artist.lineHeight }} />
         </Fragment>
       )}
     </View>
@@ -143,11 +143,7 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
                 )
               ) : (
                 <Poster.Loading
-                  width="100%"
-                  height="100%"
-                  borderRadius={
-                    !fullscreen ? styles.rounded.borderRadius : styles.square.borderRadius
-                  }
+                  style={[styles.image, !fullscreen ? styles.rounded : styles.square]}
                 />
               )}
             </Animated.View>

@@ -1,11 +1,9 @@
 import { Image, type ImageProps } from "react-native";
 
 import { Skeleton } from "./Skeleton";
-import { type PosterComponent, type PosterLoadingProps } from "./types";
+import { type LoadingProps, type PosterComponent } from "./types";
 
-const Loading = ({ width, height, borderRadius }: PosterLoadingProps) => (
-  <Skeleton style={{ width, height, borderRadius }} />
-);
+const Loading = ({ style }: LoadingProps) => <Skeleton style={style} />;
 
 export const Poster: PosterComponent & { Loading: typeof Loading } = Object.assign(
   (props: ImageProps) => <Image {...props} />,

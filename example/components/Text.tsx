@@ -1,11 +1,15 @@
-import { Text as RNText, type TextProps } from "react-native";
+import { Text as RNText, StyleSheet, type TextProps } from "react-native";
 
 import { Skeleton } from "./Skeleton";
 import { type LoadingProps, type TextComponent } from "./types";
 
-const Loading = ({ width, height }: LoadingProps) => (
-  <Skeleton style={{ width, height, borderRadius: height / 4 }} />
-);
+const Loading = ({ style }: LoadingProps) => {
+  const { height } = StyleSheet.flatten(style) ?? {};
+
+  return (
+    <Skeleton style={[{ borderRadius: typeof height === "number" ? height / 4 : 0 }, style]} />
+  );
+};
 
 export const Text: TextComponent & { Loading: typeof Loading } = Object.assign(
   (props: TextProps) => <RNText {...props} />,

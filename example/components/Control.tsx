@@ -9,9 +9,9 @@ import {
   CONTROL_PADDING_VERTICAL,
   CONTROL_ICON_SIZE,
 } from "./constants";
-import { type ControlComponent, type ControlProps } from "./types";
+import { type ControlComponent, type ControlProps, type LoadingProps } from "./types";
 
-const Loading = () => <Skeleton style={styles.loading} />;
+const Loading = ({ style }: LoadingProps) => <Skeleton style={[styles.loading, style]} />;
 
 export const Control: ControlComponent & { Loading: typeof Loading } = Object.assign(
   ({ name, translucent, onPress }: ControlProps) => (
