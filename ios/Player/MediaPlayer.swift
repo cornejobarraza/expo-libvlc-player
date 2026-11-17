@@ -30,8 +30,8 @@ class MediaPlayer: NSObject {
   }
 
   private var hasMediaVolume: Bool {
-    let volume = mediaPlayer?.audio?.volume ?? Int32(MediaPlayerConstants.minPlayerVolume)
-    return volume > MediaPlayerConstants.minPlayerVolume
+    let volume = mediaPlayer?.audio?.volume ?? 0
+    return volume > 0
   }
 
   init(_ view: LibVlcPlayerView) {
@@ -133,7 +133,7 @@ class MediaPlayer: NSObject {
 
       mediaPlayer?.scaleFactor = Float(view.scale)
       mediaPlayer?.rate = Float(view.rate)
-      mediaPlayer?.time = VLCTime(int: Int32(initialTime))
+      if initialTime > 0 { mediaPlayer?.time = VLCTime(int: Int32(initialTime)) }
 
       // Negative volume workaround
       retryUntil { [weak self] _ in
@@ -525,9 +525,9 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
     vlcDialog = VLCDialog.ErrorMessage(vlcDialogProvider)
 
     let dialog = Dialog(
+      type: "error",
       title: title,
-      text: message,
-      type: "error"
+      text: message
     )
 
     view.onDialogDisplay(dialog)
@@ -543,9 +543,9 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
     vlcDialog = VLCDialog.LoginDialog(vlcDialogProvider, reference)
 
     let dialog = Dialog(
+      type: "login",
       title: title,
-      text: message,
-      type: "login"
+      text: message
     )
 
     view.onDialogDisplay(dialog)
@@ -563,9 +563,9 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
     vlcDialog = VLCDialog.QuestionDialog(vlcDialogProvider, reference)
 
     let dialog = Dialog(
+      type: "question",
       title: title,
       text: message,
-      type: "question",
       cancelText: cancel,
       action1Text: action1String,
       action2Text: action2String
@@ -575,22 +575,35 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
   }
 
   func showProgress(
-    withTitle _: String,
-    message _: String,
+    withTitle title: String,
+    message: String,
     isIndeterminate _: Bool,
     position _: Float,
-    cancel _: String?,
-    withReference _: NSValue
-  ) {}
+    cancel: String?,
+    withReference reference: NSValue
+  ) {
+    vlcDialog = VLCDialog.ProgressDialog(vlcDialogProvider, reference)
+
+    let dialog = Dialog(
+      type: "progress",
+      title: title,
+      text: message,
+      cancelText: cancel
+    )
+
+    view.onDialogDisplay(dialog)
+  }
 
   func updateProgress(
     withReference _: NSValue,
     message _: String?,
-    position _: Float
-  ) {}
+    position: Float
+  ) {
+    view.onDialogProgress(["value": position])
+  }
 
   func cancelDialog(withReference reference: NSValue) {
-    let prevReference = (vlcDialog as? VLCDialog.IdDialog)?.reference
+    let prevReference = (vlcDialog as? VLCDialog.Dialog)?.reference
 
     if prevReference == reference {
       vlcDialog = nil

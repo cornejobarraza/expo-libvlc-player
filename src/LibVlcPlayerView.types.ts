@@ -45,22 +45,22 @@ export interface Error {
   message: string;
 }
 
-export type DialogType = "error" | "login" | "question";
+export type DialogType = "error" | "login" | "question" | "progress";
 
 export interface Dialog {
+  type: DialogType;
   title: string;
   text: string;
-  type: DialogType;
   cancelText: string | null;
   action1Text: string | null;
   action2Text: string | null;
 }
 
-export interface Time {
+export interface Position {
   value: number;
 }
 
-export interface Position {
+export interface Time {
   value: number;
 }
 
@@ -410,6 +410,10 @@ export type LibVlcPlayerViewProps = ViewProps &
      */
     onDialogDisplay?: (event: Dialog) => void;
     /**
+     * Called after a progress dialog is updated
+     */
+    onDialogProgress?: (event: Position) => void;
+    /**
      * Called after a dialog is canceled
      */
     onDialogCanceled?: () => void;
@@ -509,6 +513,11 @@ type DialogDisplayListener = (event: NativeEvent<Dialog>) => void;
 /**
  * @hidden
  */
+type DialogProgressListener = (event: NativeEvent<Position>) => void;
+
+/**
+ * @hidden
+ */
 type DialogCanceledListener = () => void;
 
 /**
@@ -589,6 +598,7 @@ export type LibVlcPlayerViewNativeProps = ViewProps & {
   onStopped?: StoppedListener;
   onEncounteredError?: EncounteredErrorListener;
   onDialogDisplay?: DialogDisplayListener;
+  onDialogProgress?: DialogProgressListener;
   onDialogCanceled?: DialogCanceledListener;
   onTimeChanged?: TimeChangedListener;
   onPositionChanged?: PositionChangedListener;

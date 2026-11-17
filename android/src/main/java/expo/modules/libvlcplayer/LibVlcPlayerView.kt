@@ -54,6 +54,7 @@ class LibVlcPlayerView(
   val onStopped by EventDispatcher<Unit>()
   val onEncounteredError by EventDispatcher()
   val onDialogDisplay by EventDispatcher<Dialog>()
+  val onDialogProgress by EventDispatcher()
   val onDialogCanceled by EventDispatcher<Unit>()
   val onTimeChanged by EventDispatcher()
   val onPositionChanged by EventDispatcher()
@@ -161,8 +162,8 @@ class LibVlcPlayerView(
       if (!mute) {
         mediaPlayer?.setVolume(newVolume)
 
-        val hadVolume = oldValue > MediaPlayerConstants.MIN_PLAYER_VOLUME
-        val hasVolume = newVolume > MediaPlayerConstants.MIN_PLAYER_VOLUME
+        val hadVolume = oldValue > 0
+        val hasVolume = newVolume > 0
 
         if (hadVolume != hasVolume) {
           MediaPlayerManager.audioFocusManager.updateAudioFocus()

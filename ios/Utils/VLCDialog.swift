@@ -9,7 +9,7 @@ class VLCDialog {
 
   func dismiss() {}
 
-  class IdDialog: VLCDialog {
+  class Dialog: VLCDialog {
     let reference: NSValue
 
     init(_ provider: VLCDialogProvider?, _ reference: NSValue) {
@@ -24,7 +24,7 @@ class VLCDialog {
 
   final class ErrorMessage: VLCDialog {}
 
-  final class LoginDialog: IdDialog {
+  final class LoginDialog: Dialog {
     func postLogin(_ username: String, _ password: String, _ store: Bool) {
       provider?.postUsername(
         username,
@@ -35,9 +35,11 @@ class VLCDialog {
     }
   }
 
-  final class QuestionDialog: IdDialog {
+  final class QuestionDialog: Dialog {
     func postAction(_ action: Int) {
       provider?.postAction(Int32(action), forDialogReference: reference)
     }
   }
+
+  final class ProgressDialog: Dialog {}
 }

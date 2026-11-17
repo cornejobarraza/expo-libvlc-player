@@ -53,6 +53,9 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
         onDialogDisplay={(event) => {
           props.onDialogDisplay?.(convertNativeEvent(event));
         }}
+        onDialogProgress={(event) => {
+          props.onDialogProgress?.(convertNativeEvent(event));
+        }}
         onTimeChanged={(event) => {
           props.onTimeChanged?.(convertNativeEvent(event));
         }}

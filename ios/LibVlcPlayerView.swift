@@ -15,6 +15,7 @@ class LibVlcPlayerView: ExpoView {
   let onStopped = EventDispatcher()
   let onEncounteredError = EventDispatcher()
   let onDialogDisplay = EventDispatcher()
+  let onDialogProgress = EventDispatcher()
   let onDialogCanceled = EventDispatcher()
   let onTimeChanged = EventDispatcher()
   let onPositionChanged = EventDispatcher()
@@ -131,8 +132,8 @@ class LibVlcPlayerView: ExpoView {
       if !mute {
         mediaPlayer?.audio?.volume = Int32(newVolume)
 
-        let hadVolume = oldValue > MediaPlayerConstants.minPlayerVolume
-        let hasVolume = newVolume > MediaPlayerConstants.minPlayerVolume
+        let hadVolume = oldValue > 0
+        let hasVolume = newVolume > 0
 
         if hadVolume != hasVolume {
           MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()

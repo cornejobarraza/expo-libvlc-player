@@ -5,9 +5,9 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 class Dialog(
+  @Field var type: String = "",
   @Field var title: String = "",
   @Field var text: String = "",
-  @Field var type: String = "",
   @Field var cancelText: String? = null,
   @Field var action1Text: String? = null,
   @Field var action2Text: String? = null,

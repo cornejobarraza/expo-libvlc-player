@@ -162,10 +162,10 @@ class AudioFocusManager(
   }
 
   private fun playerRequiresFocus(player: MediaPlayer): Boolean =
-    player.isPlaying() && player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME
+    player.isPlaying() && player.getVolume() > 0
 
   private fun pausePlayerIfUnmuted(player: MediaPlayer) {
-    if (player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
+    if (player.getVolume() > 0) {
       player.pause()
     }
   }
@@ -173,7 +173,7 @@ class AudioFocusManager(
   private fun duckPlayer(player: MediaPlayer) {
     val volume = player.getVolume()
 
-    if (volume > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
+    if (volume > 0) {
       preDuckVolumes[player] = volume
       player.setVolume(volume / 2)
     }
@@ -181,7 +181,7 @@ class AudioFocusManager(
 
   private fun unduckPlayer(player: MediaPlayer) {
     preDuckVolumes.remove(player)?.let { restoredVolume ->
-      if (player.getVolume() > MediaPlayerConstants.MIN_PLAYER_VOLUME) {
+      if (player.getVolume() > 0) {
         player.setVolume(restoredVolume)
       }
     }

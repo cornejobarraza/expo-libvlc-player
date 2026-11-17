@@ -12,6 +12,7 @@ object MediaPlayerConstants {
       "onStopped",
       "onEncounteredError",
       "onDialogDisplay",
+      "onDialogProgress",
       "onDialogCanceled",
       "onTimeChanged",
       "onPositionChanged",

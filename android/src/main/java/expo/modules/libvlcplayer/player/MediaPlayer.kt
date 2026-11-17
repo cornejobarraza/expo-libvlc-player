@@ -72,8 +72,8 @@ class MediaPlayer(
 
   val hasMediaVolume: Boolean
     get() {
-      val volume = mediaPlayer?.getVolume() ?: MediaPlayerConstants.MIN_PLAYER_VOLUME
-      return volume > MediaPlayerConstants.MIN_PLAYER_VOLUME
+      val volume = mediaPlayer?.getVolume() ?: 0
+      return volume > 0
     }
 
   fun initPlayer() {
@@ -322,7 +322,7 @@ class MediaPlayer(
 
       mediaPlayer?.setScale(view.scale.toFloat())
       mediaPlayer?.setRate(view.rate.toFloat())
-      mediaPlayer?.setTime(initialTime.toLong())
+      if (initialTime > 0) mediaPlayer?.setTime(initialTime.toLong())
 
       // Negative volume workaround
       retryUntil {
@@ -757,9 +757,9 @@ private fun MediaPlayer.setDialogCallbacks() {
 
           val dialog =
             Dialog(
+              type = "error",
               title = dialog.getTitle(),
               text = dialog.getText(),
-              type = "error",
             )
 
           view.onDialogDisplay(dialog)
@@ -770,9 +770,9 @@ private fun MediaPlayer.setDialogCallbacks() {
 
           val dialog =
             Dialog(
+              type = "login",
               title = dialog.getTitle(),
               text = dialog.getText(),
-              type = "login",
             )
 
           view.onDialogDisplay(dialog)
@@ -783,9 +783,9 @@ private fun MediaPlayer.setDialogCallbacks() {
 
           val dialog =
             Dialog(
+              type = "question",
               title = dialog.getTitle(),
               text = dialog.getText(),
-              type = "question",
               cancelText = dialog.getCancelText(),
               action1Text = dialog.getAction1Text(),
               action2Text = dialog.getAction2Text(),
@@ -794,9 +794,23 @@ private fun MediaPlayer.setDialogCallbacks() {
           view.onDialogDisplay(dialog)
         }
 
-        override fun onDisplay(dialog: VLCDialog.ProgressDialog) {}
+        override fun onDisplay(dialog: VLCDialog.ProgressDialog) {
+          vlcDialog = dialog
 
-        override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {}
+          val dialog =
+            Dialog(
+              type = "progress",
+              title = dialog.getTitle(),
+              text = dialog.getText(),
+              cancelText = dialog.getCancelText(),
+            )
+
+          view.onDialogDisplay(dialog)
+        }
+
+        override fun onProgressUpdate(dialog: VLCDialog.ProgressDialog) {
+          view.onDialogProgress(mapOf("value" to dialog.getPosition()))
+        }
 
         override fun onCanceled(dialog: VLCDialog) {
           val prevDialog = vlcDialog

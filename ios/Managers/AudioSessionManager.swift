@@ -71,7 +71,7 @@ class AudioSessionManager {
   private func playerRequiresCategory(_ player: VLCMediaPlayer) -> Bool {
     guard let audio = player.audio else { return false }
 
-    return player.isPlaying && audio.volume > MediaPlayerConstants.minPlayerVolume
+    return player.isPlaying && audio.volume > 0
   }
 
   private func findAudioMixingMode() -> AudioMixingMode? {

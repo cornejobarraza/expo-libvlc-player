@@ -98,7 +98,18 @@ const REF_CALLS: { [K in keyof LibVlcPlayerViewRef]: Parameters<LibVlcPlayerView
 const EVENT_PAYLOADS = [
   ["onBuffering", { value: 42 }],
   ["onEncounteredError", { message: "Failed to open media" }],
-  ["onDialogDisplay", { title: "Insecure site", text: "Continue?", type: "question" }],
+  [
+    "onDialogDisplay",
+    {
+      type: "question",
+      title: "Insecure site",
+      text: "Continue?",
+      cancelText: "Cancel",
+      action1Text: "Accept",
+      action2Text: null,
+    },
+  ],
+  ["onDialogProgress", { value: 0.5 }],
   ["onTimeChanged", { value: 1000 }],
   ["onPositionChanged", { value: 0.5 }],
   ["onESAdded", { audio: [{ id: 1, name: "Track 1" }], video: [], subtitle: [] }],

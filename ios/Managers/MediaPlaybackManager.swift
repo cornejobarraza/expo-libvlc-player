@@ -41,7 +41,7 @@ class MediaPlaybackManager {
   var isNowPlayingEligible: Bool {
     guard let view = sessionView else { return false }
 
-    let isAudible = !view.mute && view.volume > MediaPlayerConstants.minPlayerVolume
+    let isAudible = !view.mute && view.volume > 0
     let isMixable = view.audioMixingMode == .mixWithOthers || view.audioMixingMode == .duckOthers
 
     return isAudible && !isMixable

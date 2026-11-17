@@ -14,15 +14,11 @@
   <img alt="Example App" src="example/assets/player.png">
 </p>
 
-## Supported versions
+## Support for Expo SDK versions
 
 This package targets the latest Expo SDK version. See the [Expo SDK reference](https://docs.expo.dev/versions/latest/) for more.
 
-### Can I use older Expo SDK versions?
-
-Previous versions may be supported by configuring native build properties.
-
-#### Example app.json with build config plugin
+Previous versions may work by installing [`expo-build-properties`](https://docs.expo.dev/versions/latest/sdk/build-properties/) and configuring the following:
 
 ```json
 {
@@ -54,7 +50,7 @@ npm install expo-libvlc-player
 
 ### Bare React Native projects
 
-You must ensure that you have [installed and configured](https://docs.expo.dev/bare/installing-expo-modules/) the `expo` package.
+Make sure to [install and configure](https://docs.expo.dev/bare/installing-expo-modules/) the `expo` package.
 
 ### Configure for Android
 
@@ -167,6 +163,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and accepts the followin
 | `onStopped`               | Called after the `Stopped` player event                      |                               |
 | `onEncounteredError`      | Called after the `EncounteredError` player event             | [`Error`](#error)             |
 | `onDialogDisplay`         | Called after a dialog is displayed                           | [`Dialog`](#dialog)           |
+| `onDialogProgress`        | Called after a progress dialog is updated                    | [`Position`](#position)       |
 | `onDialogCanceled`        | Called after a dialog is canceled                            |                               |
 | `onTimeChanged`           | Called after the `TimeChanged` player event                  | [`Time`](#time)               |
 | `onPositionChanged`       | Called after the `PositionChanged` player event              | [`Position`](#position)       |
@@ -214,12 +211,6 @@ The `LibVlcPlayerModule` exposes the following functions:
 type Source = string | number | null;
 ```
 
-#### `Asset`
-
-```ts
-type Asset = NonNullable<Source>;
-```
-
 #### `Metadata`
 
 ```ts
@@ -227,7 +218,7 @@ interface Metadata {
   title?: string | null;
   artist?: string | null;
   album?: string | null;
-  artworkURL?: Asset | null;
+  artworkURL?: string | number | null;
 }
 ```
 
@@ -235,7 +226,7 @@ interface Metadata {
 
 ```ts
 interface Slave {
-  source: Asset;
+  source: string | number;
   type: "audio" | "subtitle";
   selected?: boolean;
 }
@@ -280,20 +271,12 @@ interface Error {
 
 ```ts
 interface Dialog {
+  type: "error" | "login" | "question" | "progress";
   title: string;
   text: string;
-  type: "error" | "login" | "question";
   cancelText: string | null;
   action1Text: string | null;
   action2Text: string | null;
-}
-```
-
-#### `Time`
-
-```ts
-interface Time {
-  value: number;
 }
 ```
 
@@ -301,6 +284,14 @@ interface Time {
 
 ```ts
 interface Position {
+  value: number;
+}
+```
+
+#### `Time`
+
+```ts
+interface Time {
   value: number;
 }
 ```
