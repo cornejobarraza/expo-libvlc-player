@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 58.0.15 - 2026-11-17
+
+### 🎉 New features
+
+- Added progress dialog
+
+### 💡 Others
+
+- Bumped Expo dependency to 58.0.26
+
 ## 58.0.14 - 2026-11-16
 
 ### 🛠 Breaking changes
