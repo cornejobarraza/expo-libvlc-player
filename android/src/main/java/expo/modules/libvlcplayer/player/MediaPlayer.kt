@@ -134,6 +134,7 @@ class MediaPlayer(
     libVlc: LibVLC,
     source: String,
   ): VLCMedia {
+    @Suppress("UseKtx")
     val uri = Uri.parse(source)
 
     val afd =
@@ -170,6 +171,7 @@ class MediaPlayer(
     return sourceFd
   }
 
+  @Suppress("DiscouragedApi")
   private fun getSourceId(source: String): Int? =
     context.resources
       .getIdentifier(source, "raw", context.packageName)
@@ -200,6 +202,7 @@ class MediaPlayer(
   }
 
   private fun getSourceUri(source: String): Uri {
+    @Suppress("UseKtx")
     val uri = Uri.parse(source)
     val id = getSourceId(source) ?: return uri
     val cacheDir = File(context.cacheDir, MediaPlayerConstants.SOURCE_CACHE_DIR)

@@ -9,6 +9,7 @@ import android.os.Build
 import android.util.Rational
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.exception.CodedException
@@ -29,16 +30,7 @@ class PictureInPictureManager(
     get() = activity as? FragmentActivity
   private val context: Context
     get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
-  private val remoteActions: Map<MediaAction, RemoteAction> by lazy {
-    MediaAction.entries.associateWith { action ->
-      RemoteAction(
-        action.createIcon(context),
-        action.title,
-        action.description,
-        action.createPendingIntent(context, MediaPlayerConstants.PIP_ACTION_PREFIX),
-      )
-    }
-  }
+  private var remoteActions: Map<MediaAction, RemoteAction>? = null
 
   private var pipFragment: PictureInPictureFragment? = null
   private var pipReceiver: MediaActionReceiver? = null
@@ -88,7 +80,9 @@ class PictureInPictureManager(
       val isSeekable = mediaPlayer?.isSeekable() == true
 
       val actions =
-        MediaAction.controls(isPlaying, isSeekable).map { action -> remoteActions.getValue(action) }
+        MediaAction.controls(isPlaying, isSeekable).map { action ->
+          getRemoteActions().getValue(action)
+        }
 
       val params =
         PictureInPictureParams
@@ -103,6 +97,18 @@ class PictureInPictureManager(
       activity?.setPictureInPictureParams(params)
     }
   }
+
+  @RequiresApi(Build.VERSION_CODES.O)
+  private fun getRemoteActions(): Map<MediaAction, RemoteAction> =
+    remoteActions ?: MediaAction.entries
+      .associateWith { action ->
+        RemoteAction(
+          action.createIcon(context),
+          action.title,
+          action.description,
+          action.createPendingIntent(context, MediaPlayerConstants.PIP_ACTION_PREFIX),
+        )
+      }.also { actions -> remoteActions = actions }
 
   private fun reassignPipView() {
     if (pipView == null) {

@@ -35,6 +35,7 @@ import kotlin.reflect.KMutableProperty0
 import org.videolan.libvlc.Dialog as VLCDialog
 import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
 
+@Suppress("ViewConstructor")
 class LibVlcPlayerView(
   context: Context,
   appContext: AppContext,
@@ -371,6 +372,8 @@ class LibVlcPlayerView(
       val view = getTextureView(video) ?: throw Exception()
       val surface = Surface(view.surfaceTexture)
       val video = player.getVideo()
+
+      @Suppress("UseKtx")
       val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
 
       PixelCopy.request(

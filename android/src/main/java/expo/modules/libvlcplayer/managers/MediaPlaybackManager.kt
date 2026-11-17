@@ -20,7 +20,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import androidx.core.content.ContextCompat
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.exception.Exceptions
@@ -32,6 +31,7 @@ import expo.modules.libvlcplayer.utils.MediaAction
 import expo.modules.libvlcplayer.utils.MediaActionReceiver
 import expo.modules.libvlcplayer.utils.MediaPlaybackService
 import expo.modules.libvlcplayer.utils.PlaybackServiceBinder
+import expo.modules.libvlcplayer.utils.registerNotExportedReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -353,11 +353,9 @@ class MediaPlaybackManager(
           onNotificationDismissed()
         }
       }.also { receiver ->
-        ContextCompat.registerReceiver(
-          context,
+        context.registerNotExportedReceiver(
           receiver,
           IntentFilter(MediaPlayerConstants.MEDIA_NOTIFICATION_DISMISS_ACTION),
-          ContextCompat.RECEIVER_NOT_EXPORTED,
         )
       }
 
@@ -415,6 +413,8 @@ class MediaPlaybackManager(
 
     val viewMetadata = view.metadata
     val mediaMetadata = view.getMediaMetadata()
+
+    @Suppress("UseKtx")
     val metadata =
       Metadata(
         title = viewMetadata?.title ?: mediaMetadata.title,
@@ -463,6 +463,7 @@ class MediaPlaybackManager(
     artwork = null
   }
 
+  @Suppress("UseKtx")
   private fun updateArtwork(url: String?) {
     if (url != artworkURL) {
       resetArtwork(url)
@@ -486,6 +487,7 @@ class MediaPlaybackManager(
       null
     }
 
+  @Suppress("DiscouragedApi")
   private fun getArtworkId(uri: Uri): Int? =
     context.resources
       .getIdentifier(uri.toString(), "drawable", context.packageName)

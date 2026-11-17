@@ -35,7 +35,8 @@ object MediaPlayerConstants {
   const val MAX_PLAYER_VOLUME: Int = 100
   const val SEEK_STEP_MS: Long = 10_000L
 
-  val DISPLAY_MANAGER: DisplayManager? = null
+  val DISPLAY_MANAGER: DisplayManager?
+    get() = null
   const val ENABLE_SUBTITLES: Boolean = true
   const val USE_TEXTURE_VIEW: Boolean = true
 

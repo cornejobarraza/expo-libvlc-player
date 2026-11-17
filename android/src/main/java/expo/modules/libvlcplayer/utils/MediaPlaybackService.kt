@@ -3,10 +3,8 @@ package expo.modules.libvlcplayer.utils
 import android.app.Notification
 import android.app.Service
 import android.content.Intent
-import android.content.pm.ServiceInfo
 import android.os.Binder
 import android.os.IBinder
-import androidx.core.app.ServiceCompat
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.managers.MediaPlayerManager
 
@@ -37,12 +35,7 @@ class MediaPlaybackService : Service() {
     }
 
     try {
-      ServiceCompat.startForeground(
-        this,
-        MediaPlayerConstants.MEDIA_NOTIFICATION_ID,
-        notification,
-        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
-      )
+      startForeground(MediaPlayerConstants.MEDIA_NOTIFICATION_ID, notification)
     } catch (_: Exception) {
       // Android 12+ disallows most foreground service starts from background
     }
@@ -51,11 +44,11 @@ class MediaPlaybackService : Service() {
   fun exitForeground(removeNotification: Boolean) {
     val flags =
       if (removeNotification) {
-        ServiceCompat.STOP_FOREGROUND_REMOVE
+        STOP_FOREGROUND_REMOVE
       } else {
-        ServiceCompat.STOP_FOREGROUND_DETACH
+        STOP_FOREGROUND_DETACH
       }
 
-    ServiceCompat.stopForeground(this, flags)
+    stopForeground(flags)
   }
 }

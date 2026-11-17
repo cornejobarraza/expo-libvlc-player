@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.Icon
-import androidx.core.content.ContextCompat
 import expo.modules.libvlcplayer.R
 
 enum class MediaAction(
@@ -68,7 +67,7 @@ class MediaActionReceiver(
         MediaAction.entries.forEach { action -> addAction(action.intentAction(prefix)) }
       }
 
-    ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+    context.registerNotExportedReceiver(this, filter)
   }
 
   fun unregister(context: Context) {
