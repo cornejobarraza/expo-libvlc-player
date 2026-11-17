@@ -5,7 +5,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: "LibVLC Player",
   slug: "expo-libvlc-player-example",
   version: "1.0.0",
-  orientation: "portrait",
   icon: "./assets/icon.png",
   android: {
     package: "expo.modules.libvlcplayer.android",

@@ -2,7 +2,6 @@ import {
   addOrientationChangeListener,
   getOrientationAsync,
   Orientation,
-  unlockAsync,
   type OrientationChangeEvent,
 } from "expo-screen-orientation";
 import { useEffect, useState } from "react";
@@ -10,34 +9,32 @@ import { useEffect, useState } from "react";
 export function useFullscreen() {
   const [fullscreen, setFullscreen] = useState<boolean>(false);
 
-  const updateFullscreen = (orientation: Orientation) => {
+  const update = (orientation: Orientation) => {
     const isLandscapeLeft = orientation === Orientation.LANDSCAPE_LEFT;
     const isLandscapeRight = orientation === Orientation.LANDSCAPE_RIGHT;
     setFullscreen(isLandscapeLeft || isLandscapeRight);
   };
 
-  const setOrientationAsync = async () => {
+  const sync = async () => {
     try {
       const orientation = await getOrientationAsync();
-      updateFullscreen(orientation);
+      update(orientation);
     } catch {
       const orientation = Orientation.UNKNOWN;
-      updateFullscreen(orientation);
-    } finally {
-      unlockAsync();
+      update(orientation);
     }
   };
 
-  const orientationListener = (event: OrientationChangeEvent) => {
+  const listener = (event: OrientationChangeEvent) => {
     const orientation = event.orientationInfo.orientation;
-    updateFullscreen(orientation);
+    update(orientation);
   };
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setOrientationAsync();
+    sync();
 
-    const subscription = addOrientationChangeListener(orientationListener);
+    const subscription = addOrientationChangeListener(listener);
 
     return () => {
       subscription.remove();
