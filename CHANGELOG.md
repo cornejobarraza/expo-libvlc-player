@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.16 - 2026-11-17
+
+### 🐛 Bug fixes
+
+- Fixed compatibility issues on Android
+
 ## 58.0.15 - 2026-11-17
 
 ### 🎉 New features
