@@ -6,8 +6,8 @@ describe(convertNativeEvent, () => {
   it("strips target and timeStamp and keeps the rest of the event", () => {
     const mediaInfo = {
       media: { length: 634000, seekable: true },
-      metadata: { title: "Big Buck Bunny", artist: null, artworkURL: null },
       video: { width: 1920, height: 1080, frameRate: 30, bitrate: 5000 },
+      metadata: { title: "Big Buck Bunny", artist: null, artworkURL: null },
     };
 
     const event = {

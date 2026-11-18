@@ -16,7 +16,6 @@ import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTrack
 import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Metadata
-import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Video
 import kotlinx.coroutines.CoroutineDispatcher
@@ -511,14 +510,24 @@ class MediaPlayer(
   }
 
   fun getMediaInfo(): MediaInfo {
-    val video = getVideo()
     val media = getMedia()
+    val video = getVideo()
     val metadata = getMetadata()
 
     return MediaInfo(
-      video = video,
       media = media,
+      video = video,
       metadata = metadata,
+    )
+  }
+
+  private fun getMedia(): Media {
+    val length = (mediaPlayer?.getLength() ?: 0).toInt()
+    val seekable = mediaPlayer?.isSeekable() ?: false
+
+    return Media(
+      length = length,
+      seekable = seekable,
     )
   }
 
@@ -541,16 +550,6 @@ class MediaPlayer(
       height = height,
       frameRate = frameRate,
       bitrate = bitrate,
-    )
-  }
-
-  private fun getMedia(): Media {
-    val length = (mediaPlayer?.getLength() ?: 0).toInt()
-    val seekable = mediaPlayer?.isSeekable() ?: false
-
-    return Media(
-      length = length,
-      seekable = seekable,
     )
   }
 
@@ -736,13 +735,7 @@ private fun MediaPlayer.setPlayerListener() {
           }
 
           Event.RecordChanged -> {
-            val recording =
-              Recording(
-                path = event.getRecordPath(),
-                isRecording = event.getRecording(),
-              )
-
-            view.onRecordChanged(recording)
+            view.onRecordChanged(mapOf("path" to event.getRecordPath()))
           }
         }
       },

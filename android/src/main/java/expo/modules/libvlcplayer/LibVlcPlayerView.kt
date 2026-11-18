@@ -21,7 +21,6 @@ import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.PlayerProps
-import expo.modules.libvlcplayer.records.Recording
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
 import expo.modules.libvlcplayer.utils.MediaAction
@@ -34,6 +33,8 @@ import java.util.Locale
 import kotlin.reflect.KMutableProperty0
 import org.videolan.libvlc.Dialog as VLCDialog
 import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
+
+typealias NullableMap = Map<String, Any?>
 
 @Suppress("ViewConstructor")
 class LibVlcPlayerView(
@@ -60,7 +61,7 @@ class LibVlcPlayerView(
   val onTimeChanged by EventDispatcher()
   val onPositionChanged by EventDispatcher()
   val onESAdded by EventDispatcher<MediaTracks>()
-  val onRecordChanged by EventDispatcher<Recording>()
+  val onRecordChanged by EventDispatcher<NullableMap>()
   val onSnapshotTaken by EventDispatcher()
   val onFirstPlay by EventDispatcher<MediaInfo>()
   val onForeground by EventDispatcher<Unit>()

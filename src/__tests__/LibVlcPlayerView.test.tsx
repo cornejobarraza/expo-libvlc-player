@@ -113,7 +113,7 @@ const EVENT_PAYLOADS = [
   ["onTimeChanged", { value: 1000 }],
   ["onPositionChanged", { value: 0.5 }],
   ["onESAdded", { audio: [{ id: 1, name: "Track 1" }], video: [], subtitle: [] }],
-  ["onRecordChanged", { path: "/records", isRecording: true }],
+  ["onRecordChanged", { path: "/records" }],
   ["onSnapshotTaken", { path: "/snapshots/1.png" }],
 ] as const;
 
@@ -122,8 +122,8 @@ const NATIVE_EVENT_PROPS = { target: 1, timeStamp: 1234 };
 function createMediaInfo(width: number, height: number) {
   return {
     media: { length: 634_000, seekable: true },
-    metadata: { title: "Big Buck Bunny", artist: null, album: null, artworkURL: null },
     video: { width, height, frameRate: 30, bitrate: 5000 },
+    metadata: { title: "Big Buck Bunny", artist: null, album: null, artworkURL: null },
   };
 }
 
@@ -442,15 +442,15 @@ describe("LibVlcPlayerView", () => {
         <LibVlcPlayerView
           source={VIDEO_URL}
           slaves={[
-            { source: 7, type: "subtitle", selected: true },
             { source: AUDIO_URL, type: "audio" },
+            { source: 7, type: "subtitle", selected: true },
           ]}
         />
       );
 
       expect(getNativeProps().slaves).toEqual([
-        { source: SUBTITLE_URI, type: "subtitle", selected: true },
         { source: AUDIO_URL, type: "audio" },
+        { source: SUBTITLE_URI, type: "subtitle", selected: true },
       ]);
     });
 

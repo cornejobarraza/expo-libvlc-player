@@ -54,12 +54,12 @@ describe(parseNativeSlaves, () => {
 
     expect(
       parseNativeSlaves([
-        { source: ASSET_ID, type: "subtitle", selected: true },
         { source: AUDIO_URL, type: "audio" },
+        { source: ASSET_ID, type: "subtitle", selected: true },
       ])
     ).toEqual([
-      { source: ASSET_URI, type: "subtitle", selected: true },
       { source: AUDIO_URL, type: "audio" },
+      { source: ASSET_URI, type: "subtitle", selected: true },
     ]);
   });
 

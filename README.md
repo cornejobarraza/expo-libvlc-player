@@ -62,7 +62,7 @@ Run `npx pod-install` after installing the npm package.
 
 ### Configure for TV
 
-Set the `EXPO_TV` environment variable, and run prebuild to make the TV modifications to the project.
+Set the `EXPO_TV` environment variable and run prebuild to apply TV modifications.
 
 ```sh
 EXPO_TV=1 npx expo prebuild
@@ -109,20 +109,20 @@ import { LibVlcPlayerView } from "expo-libvlc-player";
 return <LibVlcPlayerView source={require("./assets/bbb.mp4")} />;
 ```
 
-Trigger the local network privacy alert on iOS:
-
-```tsx
-import LibVlcPlayerModule from "expo-libvlc-player";
-
-await LibVlcPlayerModule.triggerNetworkAlert();
-```
-
 Check for Picture-in-Picture (PiP) support:
 
 ```tsx
 import LibVlcPlayerModule from "expo-libvlc-player";
 
 LibVlcPlayerModule.isPictureInPictureSupported();
+```
+
+Trigger the local network privacy alert on iOS:
+
+```tsx
+import LibVlcPlayerModule from "expo-libvlc-player";
+
+await LibVlcPlayerModule.triggerNetworkAlert();
 ```
 
 See the [Example App](example) for additional usage.
@@ -200,8 +200,8 @@ The `LibVlcPlayerModule` exposes the following functions:
 
 | Function                        | Description                                                 | Returns         |
 | ------------------------------- | ----------------------------------------------------------- | --------------- |
-| `triggerNetworkAlert()`         | Attempts to trigger the local network privacy alert on iOS  | `Promise<void>` |
 | `isPictureInPictureSupported()` | Checks whether the device supports Picture-in-Picture (PiP) | `boolean`       |
+| `triggerNetworkAlert()`         | Attempts to trigger the local network privacy alert on iOS  | `Promise<void>` |
 
 ### Module types
 
@@ -320,7 +320,6 @@ interface MediaTracks {
 ```ts
 interface Recording {
   path: string | null;
-  isRecording: boolean;
 }
 ```
 
@@ -329,6 +328,15 @@ interface Recording {
 ```ts
 interface Snapshot {
   path: string;
+}
+```
+
+#### `Media`
+
+```ts
+interface Media {
+  length: number;
+  seekable: boolean;
 }
 ```
 
@@ -343,21 +351,12 @@ interface Video {
 }
 ```
 
-#### `Media`
-
-```ts
-interface Media {
-  length: number;
-  seekable: boolean;
-}
-```
-
 #### `MediaInfo`
 
 ```ts
 interface MediaInfo {
-  video: Video;
   media: Media;
+  video: Video;
   metadata: Metadata;
 }
 ```
@@ -366,9 +365,9 @@ interface MediaInfo {
 
 #### Black screen
 
-On Android, the `libvlcjni` player detaches from the View after switching screens.
+On Android, the `libvlcjni` player detaches from the View when switching screens.
 
-The current workaround attaches the View back to the player but causes a brief black screen.
+The current workaround attaches the View back to the player causing a brief black screen.
 
 https://code.videolan.org/videolan/vlc-android/-/issues/1495
 

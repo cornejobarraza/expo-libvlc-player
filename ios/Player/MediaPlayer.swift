@@ -270,14 +270,24 @@ class MediaPlayer: NSObject {
   }
 
   private func getMediaInfo() -> MediaInfo {
-    let video = getVideo()
     let media = getMedia()
+    let video = getVideo()
     let metadata = getMetadata()
 
     return MediaInfo(
-      video: video,
       media: media,
+      video: video,
       metadata: metadata
+    )
+  }
+
+  private func getMedia() -> Media {
+    let length = Int(getLength())
+    let seekable = mediaPlayer?.isSeekable ?? false
+
+    return Media(
+      length: length,
+      seekable: seekable
     )
   }
 
@@ -300,16 +310,6 @@ class MediaPlayer: NSObject {
       height: height,
       frameRate: frameRate,
       bitrate: bitrate
-    )
-  }
-
-  private func getMedia() -> Media {
-    let length = Int(getLength())
-    let seekable = mediaPlayer?.isSeekable ?? false
-
-    return Media(
-      length: length,
-      seekable: seekable
     )
   }
 
@@ -499,21 +499,11 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
   }
 
   func mediaPlayerStartedRecording(_: VLCMediaPlayer) {
-    let recording = Recording(
-      path: nil,
-      isRecording: true
-    )
-
-    view.onRecordChanged(recording)
+    view.onRecordChanged(["path": nil])
   }
 
   func mediaPlayer(_: VLCMediaPlayer, recordingStoppedAt url: URL?) {
-    let recording = Recording(
-      path: url?.path,
-      isRecording: false
-    )
-
-    view.onRecordChanged(recording)
+    view.onRecordChanged(["path": url?.path])
   }
 }
 

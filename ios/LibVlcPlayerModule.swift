@@ -5,12 +5,12 @@ public class LibVlcPlayerModule: Module {
   public func definition() -> ModuleDefinition {
     Name("ExpoLibVlcPlayer")
 
-    AsyncFunction("triggerNetworkAlert") {
-      MediaPlayerManager.shared.localNetworkManager.triggerNetworkAlert()
-    }
-
     Function("isPictureInPictureSupported") {
       AVPictureInPictureController.isPictureInPictureSupported()
+    }
+
+    AsyncFunction("triggerNetworkAlert") {
+      MediaPlayerManager.shared.localNetworkManager.triggerNetworkAlert()
     }
 
     OnDestroy {

@@ -38,6 +38,9 @@ export type AudioMixingMode = "mixWithOthers" | "duckOthers" | "auto" | "doNotMi
 export type VideoAspectRatio = `${number}:${number}` | `${number}/${number}` | number | undefined;
 
 export interface Buffering {
+  /**
+   * Value between `0` and `100`
+   */
   value: number;
 }
 
@@ -57,10 +60,16 @@ export interface Dialog {
 }
 
 export interface Position {
+  /**
+   * Value between `0` and `1`
+   */
   value: number;
 }
 
 export interface Time {
+  /**
+   * Value in milliseconds
+   */
   value: number;
 }
 
@@ -76,12 +85,22 @@ export interface MediaTracks {
 }
 
 export interface Recording {
+  /**
+   * Path of the file or `null` when recording
+   */
   path: string | null;
-  isRecording: boolean;
 }
 
 export interface Snapshot {
+  /**
+   * Path of the file
+   */
   path: string;
+}
+
+export interface Media {
+  length: number;
+  seekable: boolean;
 }
 
 export interface Video {
@@ -91,14 +110,9 @@ export interface Video {
   bitrate: number;
 }
 
-export interface Media {
-  length: number;
-  seekable: boolean;
-}
-
 export interface MediaInfo {
-  video: Video;
   media: Media;
+  video: Video;
   metadata: Metadata;
 }
 
