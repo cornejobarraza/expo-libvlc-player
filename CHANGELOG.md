@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.17 - 2026-11-18
+
+### 🛠 Breaking changes
+
+- Removed isRecording payload prop
+
 ## 58.0.16 - 2026-11-17
 
 ### 🐛 Bug fixes
