@@ -103,8 +103,8 @@ public class LibVlcPlayerModule: Module {
         view.autoplay = autoplay
       }
 
-      Prop("keepAwake", true) { (view: LibVlcPlayerView, keepAwake: Bool) in
-        view.keepAwake = keepAwake
+      Prop("keepScreenAwake", true) { (view: LibVlcPlayerView, keepScreenAwake: Bool) in
+        view.keepScreenAwake = keepScreenAwake
       }
 
       Prop("playInBackground", false) { (view: LibVlcPlayerView, playInBackground: Bool) in

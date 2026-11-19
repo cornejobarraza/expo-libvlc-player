@@ -22,7 +22,7 @@ class PlayerProps(
   @Field var repeat: Boolean = false,
   @Field var autoplay: Boolean = true,
   @Field var audioMixingMode: AudioMixingMode = AudioMixingMode.AUTO,
-  @Field var keepAwake: Boolean = true,
+  @Field var keepScreenAwake: Boolean = true,
   @Field var playInBackground: Boolean = false,
   @Field var pictureInPicture: Boolean = false,
 ) : Record

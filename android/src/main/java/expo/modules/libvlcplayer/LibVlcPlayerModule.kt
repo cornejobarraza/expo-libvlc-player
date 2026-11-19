@@ -124,8 +124,8 @@ class LibVlcPlayerModule : Module() {
           view.autoplay = autoplay
         }
 
-        Prop("keepAwake", true) { view: LibVlcPlayerView, keepAwake: Boolean ->
-          view.keepAwake = keepAwake
+        Prop("keepScreenAwake", true) { view: LibVlcPlayerView, keepScreenAwake: Boolean ->
+          view.keepScreenAwake = keepScreenAwake
         }
 
         Prop(

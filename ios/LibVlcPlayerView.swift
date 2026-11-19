@@ -163,14 +163,14 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  var keepAwake: Bool = true {
+  var keepScreenAwake: Bool = true {
     didSet {
       MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake(self)
     }
   }
 
   var shouldKeepAwake: Bool {
-    keepAwake && mediaPlayer?.isPlaying == true && player.hasVideoTrack
+    keepScreenAwake && mediaPlayer?.isPlaying == true && player.hasVideoTrack
   }
 
   var canPlayInBackground: Bool {
@@ -213,7 +213,7 @@ class LibVlcPlayerView: ExpoView {
     setIfChanged(\.Repeat, props.repeat)
     setIfChanged(\.autoplay, props.autoplay)
     setIfChanged(\.audioMixingMode, props.audioMixingMode)
-    setIfChanged(\.keepAwake, props.keepAwake)
+    setIfChanged(\.keepScreenAwake, props.keepScreenAwake)
     setIfChanged(\.playInBackground, props.playInBackground)
     setIfChanged(\.pictureInPicture, props.pictureInPicture)
     initPlayer()
@@ -331,7 +331,7 @@ class LibVlcPlayerView: ExpoView {
         dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
         let timestamp = dateFormatter.string(from: Date())
 
-        let snapshotPath = path + "/vlc-snapshot-\(timestamp).png"
+        let snapshotPath = path + "/libvlc-snapshot-\(timestamp).png"
         let video = CGSize(width: 0, height: 0) // Use original window size
 
         mediaPlayer.saveVideoSnapshot(

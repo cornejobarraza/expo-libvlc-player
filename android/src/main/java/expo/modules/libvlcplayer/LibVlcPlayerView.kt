@@ -198,14 +198,14 @@ class LibVlcPlayerView(
       MediaPlayerManager.audioFocusManager.updateAudioFocus()
     }
 
-  var keepAwake: Boolean = true
+  var keepScreenAwake: Boolean = true
     set(value) {
       field = value
       MediaPlayerManager.keepAwakeManager.toggleKeepAwake(this)
     }
 
   val shouldKeepAwake: Boolean
-    get() = keepAwake && mediaPlayer?.isPlaying() == true && player.hasVideoTrack
+    get() = keepScreenAwake && mediaPlayer?.isPlaying() == true && player.hasVideoTrack
 
   val canPlayInBackground: Boolean
     get() =
@@ -286,7 +286,7 @@ class LibVlcPlayerView(
     setIfChanged(::repeat, props.repeat)
     setIfChanged(::autoplay, props.autoplay)
     setIfChanged(::audioMixingMode, props.audioMixingMode)
-    setIfChanged(::keepAwake, props.keepAwake)
+    setIfChanged(::keepScreenAwake, props.keepScreenAwake)
     setIfChanged(::playInBackground, props.playInBackground)
     setIfChanged(::pictureInPicture, props.pictureInPicture)
     initPlayer()
@@ -385,7 +385,7 @@ class LibVlcPlayerView(
             val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'", Locale.US)
             val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
 
-            val snapshotPath = path + "/vlc-snapshot-$timestamp.png"
+            val snapshotPath = path + "/libvlc-snapshot-$timestamp.png"
             val file = File(snapshotPath)
 
             FileOutputStream(file).use { stream ->

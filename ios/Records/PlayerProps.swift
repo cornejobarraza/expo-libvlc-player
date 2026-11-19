@@ -47,7 +47,7 @@ struct PlayerProps: Record {
   var audioMixingMode: AudioMixingMode = .auto
 
   @Field
-  var keepAwake: Bool = true
+  var keepScreenAwake: Bool = true
 
   @Field
   var playInBackground: Bool = false

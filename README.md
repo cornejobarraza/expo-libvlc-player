@@ -11,14 +11,14 @@
 </p>
 
 <p align="center">
-  <img alt="Example App" src="example/assets/player.png">
+  <img alt="Example App" src="example/assets/app.png">
 </p>
 
 ## Support for Expo SDK versions
 
-This package targets the latest Expo SDK version. See the [Expo SDK reference](https://docs.expo.dev/versions/latest/) for more.
+This package targets the latest Expo SDK release. See the [Expo SDK reference](https://docs.expo.dev/versions/latest/) for more.
 
-Previous versions may work by installing [`expo-build-properties`](https://docs.expo.dev/versions/latest/sdk/build-properties/) and configuring the following:
+Previous versions may work by configuring the following props:
 
 ```json
 {
@@ -150,8 +150,8 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and accepts the followin
 | `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
 | `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
-| `keepAwake`        | Determines whether the screen should stay awake during video playback                                                             | `true`      |
-| `playInBackground` | Determines whether the media should play in the background. Config plugin has to be configured for this to work                   | `false`     |
+| `keepScreenAwake`  | Determines whether the player should keep the screen awake during video playback                                                  | `true`      |
+| `playInBackground` | Determines whether the player should allow background playback. Config plugin has to be configured for this to work               | `false`     |
 | `pictureInPicture` | Determines whether the player should allow Picture-in-Picture (PiP) mode. Config plugin has to be configured for this to work     | `false`     |
 
 #### Callback props
@@ -164,7 +164,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and accepts the followin
 | `onStopped`               | Called after the `Stopped` player event                      |                               |
 | `onEncounteredError`      | Called after the `EncounteredError` player event             | [`Error`](#error)             |
 | `onDialogDisplay`         | Called after a dialog is displayed                           | [`Dialog`](#dialog)           |
-| `onDialogProgress`        | Called after a progress dialog is updated                    | [`Position`](#position)       |
+| `onDialogProgress`        | Called after a progress dialog is updated                    | [`Progress`](#progress)       |
 | `onDialogCanceled`        | Called after a dialog is canceled                            |                               |
 | `onTimeChanged`           | Called after the `TimeChanged` player event                  | [`Time`](#time)               |
 | `onPositionChanged`       | Called after the `PositionChanged` player event              | [`Position`](#position)       |
@@ -281,6 +281,14 @@ interface Dialog {
 }
 ```
 
+#### `Progress`
+
+```ts
+interface Progress {
+  value: number;
+}
+```
+
 #### `Position`
 
 ```ts
@@ -378,7 +386,7 @@ LibVLC might not render properly on emulators or simulators. Please test on a re
 
 ## Disclaimer
 
-This package is not affiliated with, endorsed by, or officially supported by VideoLAN. The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with the following LibVLC bindings:
+This package is not affiliated with, endorsed by, or officially supported by VideoLAN. The VLC icon is trademark of VideoLAN and is used here solely to indicate compatibility with these bindings:
 
 - `libvlcjni` for Android / Android TV
 - `VLCKit` for iOS / Apple TV

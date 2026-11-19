@@ -59,6 +59,13 @@ export interface Dialog {
   action2Text: string | null;
 }
 
+export interface Progress {
+  /**
+   * Value between `0` and `1`
+   */
+  value: number;
+}
+
 export interface Position {
   /**
    * Value between `0` and `1`
@@ -373,13 +380,13 @@ export interface PlayerProps {
    */
   audioMixingMode?: AudioMixingMode;
   /**
-   * Determines whether the screen should stay awake during video playback
+   * Determines whether the player should keep the screen awake during video playback
    *
    * @default true
    */
-  keepAwake?: boolean;
+  keepScreenAwake?: boolean;
   /**
-   * Determines whether the media should play in the background
+   * Determines whether the player should allow background playback
    *
    * @note Config plugin has to be configured for this to work
    *
@@ -432,7 +439,7 @@ export type LibVlcPlayerViewProps = ViewProps &
     /**
      * Called after a progress dialog is updated
      */
-    onDialogProgress?: (event: Position) => void;
+    onDialogProgress?: (event: Progress) => void;
     /**
      * Called after a dialog is canceled
      */
@@ -533,7 +540,7 @@ type DialogDisplayListener = (event: NativeEvent<Dialog>) => void;
 /**
  * @hidden
  */
-type DialogProgressListener = (event: NativeEvent<Position>) => void;
+type DialogProgressListener = (event: NativeEvent<Progress>) => void;
 
 /**
  * @hidden
@@ -610,7 +617,7 @@ export type LibVlcPlayerViewNativeProps = ViewProps & {
   audioMixingMode?: AudioMixingMode;
   repeat?: boolean;
   autoplay?: boolean;
-  keepAwake?: boolean;
+  keepScreenAwake?: boolean;
   playInBackground?: boolean;
   pictureInPicture?: boolean;
   onBuffering?: BufferingListener;

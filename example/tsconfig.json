@@ -3,8 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "expo-libvlc-player": ["../src/index"],
-      "expo-libvlc-player/*": ["../src/*"]
+      "expo-libvlc-player": ["../src/index"]
     }
   }
 }
