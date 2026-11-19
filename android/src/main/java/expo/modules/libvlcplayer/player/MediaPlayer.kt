@@ -18,6 +18,7 @@ import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Video
+import expo.modules.libvlcplayer.utils.SurfaceTextureKeeper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,6 +50,11 @@ class MediaPlayer(
   private var libVlcDispatcher: CoroutineDispatcher? = null
   private var sourceFd: AssetFileDescriptor? = null
   private var videoTrack: IMedia.Track? = null
+  private var surfaceKeeper: SurfaceTextureKeeper? = null
+    set(value) {
+      field?.release()
+      field = value
+    }
 
   var userStop: Boolean = false
   var firstPlay: Boolean = true
@@ -272,7 +278,7 @@ class MediaPlayer(
     removePlayerView(video)
   }
 
-  fun attachPlayerView(layout: VLCVideoLayout) {
+  private fun attachPlayerView(layout: VLCVideoLayout) {
     mediaPlayer?.let { player ->
       val attached = player.getVLCVout().areViewsAttached()
 
@@ -283,11 +289,13 @@ class MediaPlayer(
           MediaPlayerConstants.ENABLE_SUBTITLES,
           MediaPlayerConstants.USE_TEXTURE_VIEW,
         )
+
+        surfaceKeeper = getTextureView(layout)?.let { texture -> SurfaceTextureKeeper(texture) }
       }
     }
   }
 
-  fun detachPlayerView() {
+  private fun detachPlayerView() {
     mediaPlayer?.let { player ->
       val attached = player.getVLCVout().areViewsAttached()
 
@@ -295,6 +303,8 @@ class MediaPlayer(
         player.detachViews()
       }
     }
+
+    surfaceKeeper = null
   }
 
   fun switchPlayerView(layout: VLCVideoLayout) {

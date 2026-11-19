@@ -242,16 +242,6 @@ class LibVlcPlayerView(
     destroyPlayer()
   }
 
-  override fun onAttachedToWindow() {
-    super.onAttachedToWindow()
-    attachPlayerView(video)
-  }
-
-  override fun onDetachedFromWindow() {
-    super.onDetachedFromWindow()
-    detachPlayerView()
-  }
-
   override fun onSizeChanged(
     w: Int,
     h: Int,
@@ -263,10 +253,6 @@ class LibVlcPlayerView(
   }
 
   fun getTextureView(layout: VLCVideoLayout) = player.getTextureView(layout)
-
-  fun attachPlayerView(layout: VLCVideoLayout) = player.attachPlayerView(layout)
-
-  fun detachPlayerView() = player.detachPlayerView()
 
   fun switchPlayerView(layout: VLCVideoLayout) = player.switchPlayerView(layout)
 

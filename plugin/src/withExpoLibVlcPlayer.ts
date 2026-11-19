@@ -22,6 +22,8 @@ export interface WithExpoLibVlcPlayerProps {
   /**
    * A string to set the `NSLocalNetworkUsageDescription` permission message
    *
+   * @note For sources requiring local network access only
+   *
    * @default "Allow $(PRODUCT_NAME) to access your local network"
    *
    * @platform ios

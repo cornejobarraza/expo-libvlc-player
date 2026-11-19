@@ -97,7 +97,7 @@ You can configure `expo-libvlc-player` using its built-in config plugin.
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
 | `supportsBackgroundPlayback` | A boolean to enable background playback support. If `true`, it declares the media playback foreground service with the `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PLAYBACK` permissions on Android and adds the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the service on Android and the mode on iOS unless `supportsPictureInPicture` is `true`. If `undefined`, the configuration is not modified | `undefined`                                            |
 | `supportsPictureInPicture`   | A boolean to enable Picture-in-Picture (PiP) support. If `true`, it adds the `android:supportsPictureInPicture` attribute on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the attribute on Android and the mode on iOS unless `supportsBackgroundPlayback` is `true`. If `undefined`, the configuration is not modified                                                                        | `undefined`                                            |
-| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                                                                                                                                           | `"Allow $(PRODUCT_NAME) to access your local network"` |
+| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS. For sources requiring local network access only                                                                                                                                                                                                                                                                                                          | `"Allow $(PRODUCT_NAME) to access your local network"` |
 
 ## Usage
 
@@ -361,24 +361,6 @@ interface MediaInfo {
   metadata: Metadata;
 }
 ```
-
-## Known issues
-
-#### Black screen
-
-On Android, the `libvlcjni` player detaches from the View when switching screens.
-
-The current workaround attaches the View back to the player causing a brief black screen.
-
-https://code.videolan.org/videolan/vlc-android/-/issues/1495
-
-#### Local network
-
-On iOS, the `VLCKit` player interacts with the local network to discover media servers by default.
-
-A custom message can be provided for the `NSLocalNetworkUsageDescription` key in the Info.plist file.
-
-https://code.videolan.org/videolan/vlc-ios/-/issues/893
 
 ## Contributing
 
