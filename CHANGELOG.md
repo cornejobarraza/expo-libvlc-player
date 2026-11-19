@@ -10,6 +10,20 @@
 
 ### 💡 Others
 
+## 58.0.19 - 2026-11-19
+
+### 🛠 Breaking changes
+
+- Renamed keepAwake to keepScreenAwake prop
+
+### 🎉 New features
+
+- Added Progress module type
+
+### 💡 Others
+
+- Updated README documentation
+
 ## 58.0.18 - 2026-11-19
 
 ### 🎉 New features
@@ -459,7 +473,7 @@
 
 ### 🛠 Breaking changes
 
-- Renamed type Track to MediaTrack
+- Renamed Track to MediaTrack type
 
 ### 💡 Others
 
