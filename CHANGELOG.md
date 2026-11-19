@@ -10,6 +10,18 @@
 
 ### 💡 Others
 
+## 58.0.18 - 2026-11-19
+
+### 🎉 New features
+
+- Added keepAwake player prop
+
+### 🐛 Bug fixes
+
+- Fixed black screen issue on Android
+- Fixed awake screen during audio playback
+- Removed Picture-in-Picture delay on Android
+
 ## 58.0.17 - 2026-11-18
 
 ### 🛠 Breaking changes
@@ -68,7 +80,7 @@
 
 - Bumped Expo dependency to 58.0.25
 
-## 58.0.10 - 2026-11-11
+## 58.0.10 - 2026-11-12
 
 ### 🐛 Bug fixes
 
@@ -162,7 +174,7 @@
 
 - Upgraded to Expo SDK 58
 
-## 57.0.59 - 2026-10-15
+## 57.0.59 - 2026-10-16
 
 ### 💡 Others
 
@@ -174,7 +186,7 @@
 
 - Refactored aspect ratio logic
 
-## 57.0.57 - 2026-10-05
+## 57.0.57 - 2026-10-06
 
 ### 🛠 Breaking changes
 
@@ -237,13 +249,13 @@
 
 - Refactored LibVlcPlayer out of View
 
-## 57.0.48 - 2026-09-13
+## 57.0.48 - 2026-09-14
 
 ### 🐛 Bug fixes
 
 - Restored Metadata album type
 
-## 57.0.47 - 2026-09-13
+## 57.0.47 - 2026-09-14
 
 ### 🛠 Breaking changes
 
@@ -253,7 +265,7 @@
 
 - Added missing video bitrate on Android
 
-## 57.0.46 - 2026-09-12
+## 57.0.46 - 2026-09-13
 
 ### 🛠 Breaking changes
 
@@ -263,13 +275,13 @@
 
 - Reordered some module types
 
-## 57.0.45 - 2026-09-11
+## 57.0.45 - 2026-09-12
 
 ### 💡 Others
 
 - Updated README documentation
 
-## 57.0.44 - 2026-09-11
+## 57.0.44 - 2026-09-12
 
 ### 💡 Others
 
@@ -322,7 +334,7 @@
 
 - Fixed Double constant regression
 
-## 57.0.36 - 2026-09-08
+## 57.0.36 - 2026-09-09
 
 ### 🐛 Bug fixes
 
@@ -352,13 +364,13 @@
 
 - Bumped Expo dependency to 57.0.20
 
-## 57.0.32 - 2026-09-03
+## 57.0.32 - 2026-09-04
 
 ### 💡 Others
 
 - Updated README documentation
 
-## 57.0.31 - 2026-09-03
+## 57.0.31 - 2026-09-04
 
 ### 🐛 Bug fixes
 
@@ -406,7 +418,7 @@
 - Added LibVlcSource type documentation
 - Removed redundant JSDoc comments
 
-## 57.0.24 - 2026-08-29
+## 57.0.24 - 2026-08-30
 
 ### 💡 Others
 
@@ -568,7 +580,7 @@
 
 - Bumped Expo dependency to 57.0.12
 
-## 57.0.0 - 2026-08-08
+## 57.0.0 - 2026-08-09
 
 ### 🛠 Breaking changes
 
