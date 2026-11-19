@@ -24,6 +24,7 @@ export const PLAYER_PROP_KEYS = keysOf<PlayerProps>({
   repeat: true,
   autoplay: true,
   audioMixingMode: true,
+  keepAwake: true,
   playInBackground: true,
   pictureInPicture: true,
 });

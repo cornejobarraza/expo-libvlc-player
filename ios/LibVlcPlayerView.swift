@@ -163,6 +163,16 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
+  var keepAwake: Bool = true {
+    didSet {
+      MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake(self)
+    }
+  }
+
+  var shouldKeepAwake: Bool {
+    keepAwake && mediaPlayer?.isPlaying == true && player.hasVideoTrack
+  }
+
   var canPlayInBackground: Bool {
     playInBackground && MediaPlayerManager.shared.mediaPlaybackManager.isBackgroundPlaybackSupported
   }
@@ -203,6 +213,7 @@ class LibVlcPlayerView: ExpoView {
     setIfChanged(\.Repeat, props.repeat)
     setIfChanged(\.autoplay, props.autoplay)
     setIfChanged(\.audioMixingMode, props.audioMixingMode)
+    setIfChanged(\.keepAwake, props.keepAwake)
     setIfChanged(\.playInBackground, props.playInBackground)
     setIfChanged(\.pictureInPicture, props.pictureInPicture)
     initPlayer()

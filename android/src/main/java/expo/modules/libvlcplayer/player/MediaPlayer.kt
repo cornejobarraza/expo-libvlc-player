@@ -61,6 +61,9 @@ class MediaPlayer(
       return video.width > 0 && video.height > 0
     }
 
+  val hasVideoTrack: Boolean
+    get() = mediaPlayer?.getSelectedTrack(IMedia.Track.Type.Video) != null
+
   val hasMediaLength: Boolean
     get() {
       val length = mediaPlayer?.getLength() ?: 0
@@ -230,7 +233,7 @@ class MediaPlayer(
     sourceFd = null
     videoTrack = null
     MediaPlayerManager.audioFocusManager.updateAudioFocus()
-    MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
+    MediaPlayerManager.keepAwakeManager.deactivate(view)
   }
 
   private fun releasePlayer() {
@@ -727,7 +730,7 @@ private fun MediaPlayer.setPlayerListener() {
             }
 
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
-            MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
+            MediaPlayerManager.keepAwakeManager.toggleKeepAwake(view)
             MediaPlayerManager.pictureInPictureManager.refreshPipView(view)
           }
 
@@ -756,6 +759,7 @@ private fun MediaPlayer.setPlayerListener() {
           Event.ESSelected -> {
             if (event.getEsChangedType() == IMedia.Track.Type.Video) {
               resetVideoTrack()
+              MediaPlayerManager.keepAwakeManager.toggleKeepAwake(view)
             }
           }
 

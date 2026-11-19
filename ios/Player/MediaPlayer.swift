@@ -25,6 +25,10 @@ class MediaPlayer: NSObject {
     return video.width > 0 && video.height > 0
   }
 
+  var hasVideoTrack: Bool {
+    mediaPlayer?.videoTracks.contains { track in track.isSelected } == true
+  }
+
   private var hasMediaLength: Bool {
     let length = getLength()
     return length > 0
@@ -120,7 +124,7 @@ class MediaPlayer: NSObject {
     vlcDialog = nil
     pLength = nil
     MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-    MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
+    MediaPlayerManager.shared.keepAwakeManager.deactivate(viewID)
   }
 
   private func setupPlayer() {
@@ -467,7 +471,7 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
       }
 
       MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-      MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake()
+      MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake(view)
       picture.updatePipState()
     case .error:
       view.onEncounteredError(["message": "Player encountered an error"])
@@ -499,6 +503,16 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
 
   func mediaPlayerTrackAdded(_: String, with _: VLCMedia.TrackType) {
     view.onESAdded(getMediaTracks())
+  }
+
+  func mediaPlayerTrackSelected(
+    _ trackType: VLCMedia.TrackType,
+    selectedId _: String,
+    unselectedId _: String
+  ) {
+    if trackType == .video {
+      MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake(view)
+    }
   }
 
   func mediaPlayerStartedRecording(_: VLCMediaPlayer) {

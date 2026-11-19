@@ -1,27 +1,35 @@
 class KeepAwakeManager {
-  private lazy var expoViews = MediaPlayerManager.shared.expoViews
+  private var activeTags = Set<ObjectIdentifier>()
 
-  private func activateKeepAwake() {
-    DispatchQueue.main.async {
-      UIApplication.shared.isIdleTimerDisabled = true
-    }
+  private var isActivated: Bool {
+    !activeTags.isEmpty
   }
 
-  private func deactivateKeepAwake() {
-    DispatchQueue.main.async {
-      UIApplication.shared.isIdleTimerDisabled = false
-    }
+  func toggleKeepAwake(_ view: LibVlcPlayerView) {
+    updateTag(ObjectIdentifier(view), view.shouldKeepAwake)
   }
 
-  func toggleKeepAwake() {
-    let anyPlayingView = expoViews.allObjects.contains { view in
-      view.mediaPlayer?.isPlaying == true
-    }
+  func deactivate(_ viewID: ObjectIdentifier) {
+    updateTag(viewID, false)
+  }
 
-    if anyPlayingView {
-      activateKeepAwake()
+  private func updateTag(_ viewID: ObjectIdentifier, _ active: Bool) {
+    let wasActivated = isActivated
+
+    if active {
+      activeTags.insert(viewID)
     } else {
-      deactivateKeepAwake()
+      activeTags.remove(viewID)
+    }
+
+    if isActivated != wasActivated {
+      setActivated(isActivated)
+    }
+  }
+
+  private func setActivated(_ activated: Bool) {
+    DispatchQueue.main.async {
+      UIApplication.shared.isIdleTimerDisabled = activated
     }
   }
 }

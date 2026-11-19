@@ -8,14 +8,6 @@ import {
 
 export interface WithExpoLibVlcPlayerProps {
   /**
-   * A string to set the `NSLocalNetworkUsageDescription` permission message
-   *
-   * @default "Allow $(PRODUCT_NAME) to access your local network"
-   *
-   * @platform ios
-   */
-  localNetworkPermission?: string;
-  /**
    * A boolean to enable background playback support
    *
    * @default undefined
@@ -27,9 +19,16 @@ export interface WithExpoLibVlcPlayerProps {
    * @default undefined
    */
   supportsPictureInPicture?: boolean;
+  /**
+   * A string to set the `NSLocalNetworkUsageDescription` permission message
+   *
+   * @default "Allow $(PRODUCT_NAME) to access your local network"
+   *
+   * @platform ios
+   */
+  localNetworkPermission?: string;
 }
 
-const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network";
 const PLAYBACK_SERVICE_NAME = "expo.modules.libvlcplayer.utils.MediaPlaybackService";
 const PLAYBACK_SERVICE_PERMISSIONS = [
   "android.permission.FOREGROUND_SERVICE",
@@ -37,6 +36,7 @@ const PLAYBACK_SERVICE_PERMISSIONS = [
 ];
 const AUDIO_BACKGROUND_MODE = "audio";
 const PIP_MANIFEST_ATTRIBUTE = "android:supportsPictureInPicture";
+const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network";
 
 const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
   config,
@@ -85,12 +85,6 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
     return config;
   });
 
-  IOSConfig.Permissions.createPermissionsPlugin({
-    NSLocalNetworkUsageDescription: LOCAL_NETWORK_USAGE,
-  })(config, {
-    NSLocalNetworkUsageDescription: localNetworkPermission,
-  });
-
   withInfoPlist(config, (config) => {
     const needsConfigMod =
       typeof supportsBackgroundPlayback === "boolean" ||
@@ -108,6 +102,12 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
     }
 
     return config;
+  });
+
+  IOSConfig.Permissions.createPermissionsPlugin({
+    NSLocalNetworkUsageDescription: LOCAL_NETWORK_USAGE,
+  })(config, {
+    NSLocalNetworkUsageDescription: localNetworkPermission,
   });
 
   return config;

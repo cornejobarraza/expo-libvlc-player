@@ -198,6 +198,15 @@ class LibVlcPlayerView(
       MediaPlayerManager.audioFocusManager.updateAudioFocus()
     }
 
+  var keepAwake: Boolean = true
+    set(value) {
+      field = value
+      MediaPlayerManager.keepAwakeManager.toggleKeepAwake(this)
+    }
+
+  val shouldKeepAwake: Boolean
+    get() = keepAwake && mediaPlayer?.isPlaying() == true && player.hasVideoTrack
+
   val canPlayInBackground: Boolean
     get() =
       playInBackground && MediaPlayerManager.mediaPlaybackManager.isBackgroundPlaybackSupported
@@ -291,6 +300,7 @@ class LibVlcPlayerView(
     setIfChanged(::repeat, props.repeat)
     setIfChanged(::autoplay, props.autoplay)
     setIfChanged(::audioMixingMode, props.audioMixingMode)
+    setIfChanged(::keepAwake, props.keepAwake)
     setIfChanged(::playInBackground, props.playInBackground)
     setIfChanged(::pictureInPicture, props.pictureInPicture)
     initPlayer()

@@ -373,6 +373,12 @@ export interface PlayerProps {
    */
   audioMixingMode?: AudioMixingMode;
   /**
+   * Determines whether the screen should stay awake during video playback
+   *
+   * @default true
+   */
+  keepAwake?: boolean;
+  /**
    * Determines whether the media should play in the background
    *
    * @note Config plugin has to be configured for this to work
@@ -604,6 +610,7 @@ export type LibVlcPlayerViewNativeProps = ViewProps & {
   audioMixingMode?: AudioMixingMode;
   repeat?: boolean;
   autoplay?: boolean;
+  keepAwake?: boolean;
   playInBackground?: boolean;
   pictureInPicture?: boolean;
   onBuffering?: BufferingListener;

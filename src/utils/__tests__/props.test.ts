@@ -17,6 +17,7 @@ const PLAYER_PROPS = {
   repeat: true,
   autoplay: false,
   audioMixingMode: "duckOthers",
+  keepAwake: false,
   playInBackground: true,
   pictureInPicture: true,
 } satisfies Required<PlayerProps>;

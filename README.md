@@ -81,9 +81,9 @@ You can configure `expo-libvlc-player` using its built-in config plugin.
       [
         "expo-libvlc-player",
         {
-          "localNetworkPermission": "Allow $(PRODUCT_NAME) to access your local network",
           "supportsBackgroundPlayback": true,
-          "supportsPictureInPicture": true
+          "supportsPictureInPicture": true,
+          "localNetworkPermission": "Allow $(PRODUCT_NAME) to access your local network"
         }
       ]
     ]
@@ -95,9 +95,9 @@ You can configure `expo-libvlc-player` using its built-in config plugin.
 
 | Name                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                              | Default                                                |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                                                                                                                                           | `"Allow $(PRODUCT_NAME) to access your local network"` |
 | `supportsBackgroundPlayback` | A boolean to enable background playback support. If `true`, it declares the media playback foreground service with the `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PLAYBACK` permissions on Android and adds the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the service on Android and the mode on iOS unless `supportsPictureInPicture` is `true`. If `undefined`, the configuration is not modified | `undefined`                                            |
 | `supportsPictureInPicture`   | A boolean to enable Picture-in-Picture (PiP) support. If `true`, it adds the `android:supportsPictureInPicture` attribute on Android and the `audio` mode to the `UIBackgroundModes` on iOS. If `false`, it removes the attribute on Android and the mode on iOS unless `supportsBackgroundPlayback` is `true`. If `undefined`, the configuration is not modified                                                                        | `undefined`                                            |
+| `localNetworkPermission`     | A string to set the `NSLocalNetworkUsageDescription` permission message on iOS                                                                                                                                                                                                                                                                                                                                                           | `"Allow $(PRODUCT_NAME) to access your local network"` |
 
 ## Usage
 
@@ -150,6 +150,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and accepts the followin
 | `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
 | `autoplay`         | Determines whether the media should autoplay once created                                                                         | `true`      |
 | `audioMixingMode`  | Determines how the player will interact with other audio in the system                                                            | `"auto"`    |
+| `keepAwake`        | Determines whether the screen should stay awake during video playback                                                             | `true`      |
 | `playInBackground` | Determines whether the media should play in the background. Config plugin has to be configured for this to work                   | `false`     |
 | `pictureInPicture` | Determines whether the player should allow Picture-in-Picture (PiP) mode. Config plugin has to be configured for this to work     | `false`     |
 
