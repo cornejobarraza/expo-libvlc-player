@@ -213,6 +213,7 @@ class LibVlcPlayerView: ExpoView {
   }
 
   func destroyPlayer() {
+    player.stopPictureInPicture()
     player.destroyPlayer()
     MediaPlayerManager.shared.mediaPlaybackManager.removePlaybackView(ObjectIdentifier(self))
   }

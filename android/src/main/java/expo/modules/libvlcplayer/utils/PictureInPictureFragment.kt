@@ -17,13 +17,18 @@ class PictureInPictureFragment(
     view.get()?.let { view ->
       if (isInPictureInPictureMode) {
         view.onStartPictureInPicture()
-        view.cancelPauseDelay()
       } else {
         view.onStopPictureInPicture()
+      }
+    }
+  }
 
-        if (!view.isPlaybackView) {
-          view.pauseDelay()
-        }
+  override fun onStop() {
+    super.onStop()
+
+    view.get()?.let { view ->
+      if (!isRemoving && !view.isPlaybackView) {
+        view.pause()
       }
     }
   }

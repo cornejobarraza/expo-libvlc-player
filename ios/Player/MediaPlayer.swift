@@ -4,6 +4,7 @@ import VLCKit
 
 class MediaPlayer: NSObject {
   private unowned let view: LibVlcPlayerView
+  private let viewID: ObjectIdentifier
 
   private let video: MediaPlayerDrawable = .init()
   private var picture: PictureInPictureDrawable!
@@ -36,20 +37,22 @@ class MediaPlayer: NSObject {
 
   init(_ view: LibVlcPlayerView) {
     self.view = view
+    viewID = ObjectIdentifier(view)
     picture = PictureInPictureDrawable(view)
     super.init()
   }
 
   func initPlayer() {
-    if shouldInit {
-      destroyPlayer()
+    if !shouldInit { return }
 
-      if view.source != nil {
-        createPlayer()
-        MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackMetadata(view)
-      } else {
-        MediaPlayerManager.shared.mediaPlaybackManager.removePlaybackView(ObjectIdentifier(view))
-      }
+    if view.source != nil {
+      destroyPlayer()
+      createPlayer()
+      MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackMetadata(view)
+    } else {
+      stopPictureInPicture()
+      destroyPlayer()
+      MediaPlayerManager.shared.mediaPlaybackManager.removePlaybackView(viewID)
     }
   }
 

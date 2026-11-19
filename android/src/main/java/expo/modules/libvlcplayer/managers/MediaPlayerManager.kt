@@ -37,10 +37,6 @@ object MediaPlayerManager {
   fun onModuleForeground() {
     expoViews.forEach { view ->
       view.onForeground(Unit)
-
-      if (view.pictureInPicture) {
-        view.cancelPauseDelay()
-      }
     }
   }
 
@@ -48,11 +44,7 @@ object MediaPlayerManager {
     expoViews.forEach { view ->
       view.onBackground(Unit)
 
-      if (view.isPlaybackView) return@forEach
-
-      if (view.pictureInPicture) {
-        view.pauseDelay()
-      } else {
+      if (!view.isPlaybackView && !view.isPipView) {
         view.pause()
       }
     }

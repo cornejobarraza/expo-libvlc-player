@@ -21,8 +21,6 @@ import expo.modules.libvlcplayer.records.Video
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.MediaPlayer.Event
@@ -50,7 +48,7 @@ class MediaPlayer(
 
   private var libVlcDispatcher: CoroutineDispatcher? = null
   private var sourceFd: AssetFileDescriptor? = null
-  private var pauseJob: Job? = null
+  private var videoTrack: IMedia.Track? = null
 
   var userStop: Boolean = false
   var firstPlay: Boolean = true
@@ -76,15 +74,16 @@ class MediaPlayer(
     }
 
   fun initPlayer() {
-    if (shouldInit) {
-      destroyPlayer()
+    if (!shouldInit) return
 
-      if (view.source != null) {
-        createPlayer()
-        MediaPlayerManager.mediaPlaybackManager.updatePlaybackSource(view)
-      } else {
-        MediaPlayerManager.mediaPlaybackManager.removePlaybackView(view)
-      }
+    if (view.source != null) {
+      destroyPlayer()
+      createPlayer()
+      MediaPlayerManager.mediaPlaybackManager.updatePlaybackSource(view)
+    } else {
+      destroyPlayer()
+      MediaPlayerManager.mediaPlaybackManager.removePlaybackView(view)
+      MediaPlayerManager.pictureInPictureManager.removePipView(view)
     }
   }
 
@@ -92,6 +91,8 @@ class MediaPlayer(
   private fun createPlayer() {
     if (view.pictureInPicture) {
       MediaPlayerManager.pictureInPictureManager.addPipView(view)
+    } else {
+      MediaPlayerManager.pictureInPictureManager.removePipView(view)
     }
 
     libVlc = LibVLC(context)
@@ -220,7 +221,6 @@ class MediaPlayer(
   }
 
   fun destroyPlayer() {
-    pauseJob?.cancel()
     detachPlayer()
     releasePlayer()
     libVlc = null
@@ -228,10 +228,9 @@ class MediaPlayer(
     vlcDialog = null
     libVlcDispatcher = null
     sourceFd = null
-    pauseJob = null
+    videoTrack = null
     MediaPlayerManager.audioFocusManager.updateAudioFocus()
     MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
-    MediaPlayerManager.pictureInPictureManager.removePipView(view)
   }
 
   private fun releasePlayer() {
@@ -254,7 +253,14 @@ class MediaPlayer(
   }
 
   private fun attachPlayer() {
-    attachPlayerView(video)
+    val layout =
+      if (MediaPlayerManager.pictureInPictureManager.isInPipLayout(view)) {
+        picture
+      } else {
+        video
+      }
+
+    attachPlayerView(layout)
     addPlayerView(video)
   }
 
@@ -285,6 +291,33 @@ class MediaPlayer(
       if (attached) {
         player.detachViews()
       }
+    }
+  }
+
+  fun switchPlayerView(layout: VLCVideoLayout) {
+    saveVideoTrack()
+    detachPlayerView()
+    attachPlayerView(layout)
+  }
+
+  private fun saveVideoTrack() {
+    mediaPlayer?.let { player ->
+      val track = player.getSelectedTrack(IMedia.Track.Type.Video)
+
+      videoTrack = track
+    }
+  }
+
+  fun resetVideoTrack() {
+    mediaPlayer?.let { player ->
+      val track = player.getSelectedTrack(IMedia.Track.Type.Video)
+      val trackId = videoTrack?.id
+
+      if (trackId != null && track?.id != trackId) {
+        player.selectTrack(trackId)
+      }
+
+      videoTrack = null
     }
   }
 
@@ -485,28 +518,14 @@ class MediaPlayer(
     }
   }
 
-  fun pauseDelay() {
-    pauseJob?.cancel()
-
-    pauseJob =
-      CoroutineScope(Dispatchers.Main).launch {
-        delay(MediaPlayerConstants.PAUSE_DELAY_MS)
-        mediaPlayer?.pause()
-      }
-  }
-
-  fun cancelPauseDelay() {
-    pauseJob?.cancel()
-  }
-
   fun onStartPictureInPicture() {
-    MediaPlayerManager.pictureInPictureManager.layoutForPipEnter(view)
     view.onPictureInPictureStart(Unit)
+    MediaPlayerManager.pictureInPictureManager.layoutForPipEnter(view)
   }
 
   fun onStopPictureInPicture() {
-    MediaPlayerManager.pictureInPictureManager.layoutForPipExit(view)
     view.onPictureInPictureStop(Unit)
+    MediaPlayerManager.pictureInPictureManager.layoutForPipExit(view)
   }
 
   fun getMediaInfo(): MediaInfo {
@@ -709,7 +728,7 @@ private fun MediaPlayer.setPlayerListener() {
 
             MediaPlayerManager.audioFocusManager.updateAudioFocus()
             MediaPlayerManager.keepAwakeManager.toggleKeepAwake()
-            MediaPlayerManager.pictureInPictureManager.updatePipActions()
+            MediaPlayerManager.pictureInPictureManager.refreshPipView(view)
           }
 
           Event.EndReached -> {
@@ -732,6 +751,12 @@ private fun MediaPlayer.setPlayerListener() {
 
           Event.ESAdded -> {
             view.onESAdded(getMediaTracks())
+          }
+
+          Event.ESSelected -> {
+            if (event.getEsChangedType() == IMedia.Track.Type.Video) {
+              resetVideoTrack()
+            }
           }
 
           Event.RecordChanged -> {

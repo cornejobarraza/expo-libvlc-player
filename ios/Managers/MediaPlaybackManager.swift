@@ -64,7 +64,7 @@ class MediaPlaybackManager {
       guard let self, let view else { return }
 
       if sessionView === view, !isEligible(view) {
-        reassignSessionView()
+        release()
       } else {
         refreshSession(view)
       }
@@ -83,7 +83,7 @@ class MediaPlaybackManager {
     DispatchQueue.main.async { [weak self] in
       guard let self, sessionViewID == viewID else { return }
 
-      reassignSessionView()
+      release()
     }
   }
 
@@ -132,38 +132,20 @@ class MediaPlaybackManager {
     MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
   }
 
-  private func reassignSessionView() {
+  private func release() {
     sessionView = nil
     sessionViewID = nil
 
-    if let nextView = findNextPlaybackView() {
-      setSessionView(nextView)
-    } else {
-      clearNowPlaying()
-      MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
-    }
+    removeCommandTargets()
+    resetArtwork()
+    MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+    MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
   }
 
   private func findPlayingView(excluding excludedView: LibVlcPlayerView) -> LibVlcPlayerView? {
     MediaPlayerManager.shared.expoViews.allObjects.first { view in
       view !== excludedView && isEligible(view) && view.mediaPlayer?.isPlaying == true
     }
-  }
-
-  private func findNextPlaybackView() -> LibVlcPlayerView? {
-    let views = MediaPlayerManager.shared.expoViews.allObjects.filter { view in
-      let player = view.mediaPlayer
-
-      return isEligible(view) && (player?.isPlaying == true || player?.state == .paused)
-    }
-
-    return views.first { view in view.mediaPlayer?.isPlaying == true } ?? views.first
-  }
-
-  private func clearNowPlaying() {
-    removeCommandTargets()
-    resetArtwork()
-    MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
   }
 
   private func updatePlaybackMetadata() {

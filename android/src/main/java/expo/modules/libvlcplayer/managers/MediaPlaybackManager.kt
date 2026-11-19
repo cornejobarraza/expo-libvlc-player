@@ -202,8 +202,7 @@ class MediaPlaybackManager(
 
   fun removePlaybackView(view: LibVlcPlayerView) {
     if (sessionView == view) {
-      sessionView = null
-      reassignSessionView()
+      release()
     }
   }
 
@@ -244,35 +243,10 @@ class MediaPlaybackManager(
   private fun canClaimSession(view: LibVlcPlayerView): Boolean =
     isEligible(view) && view.mediaPlayer?.isPlaying() == true && mediaPlayer?.isPlaying() != true
 
-  private fun reassignSessionView() {
-    if (sessionView == null) {
-      findNextPlaybackView()?.let { view -> setSessionView(view) } ?: release()
-    }
-  }
-
   private fun findPlayingView(excludedView: LibVlcPlayerView): LibVlcPlayerView? =
-    findNextView { view ->
+    MediaPlayerManager.expoViews.firstOrNull { view ->
       view != excludedView && isEligible(view) && view.mediaPlayer?.isPlaying() == true
     }
-
-  private fun findNextPlaybackView(): LibVlcPlayerView? =
-    findNextView { view ->
-      val player = view.mediaPlayer
-
-      isEligible(view) &&
-        (player?.isPlaying() == true || player?.getPlayerState() == IMedia.State.Paused)
-    }
-
-  private fun findNextView(predicate: (LibVlcPlayerView) -> Boolean): LibVlcPlayerView? {
-    val views =
-      MediaPlayerManager.expoViews.filter { view ->
-        view.mediaPlayer != null &&
-          predicate(view)
-      }
-
-    return views.firstOrNull { view -> view.mediaPlayer?.isPlaying() == true }
-      ?: views.firstOrNull()
-  }
 
   private fun setSessionView(view: LibVlcPlayerView) {
     sessionView = view

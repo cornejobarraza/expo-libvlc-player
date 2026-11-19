@@ -205,6 +205,9 @@ class LibVlcPlayerView(
   val isPlaybackView: Boolean
     get() = canPlayInBackground && MediaPlayerManager.mediaPlaybackManager.isPlaybackView(this)
 
+  val isPipView: Boolean
+    get() = MediaPlayerManager.pictureInPictureManager.isPipView(this)
+
   var playInBackground: Boolean = false
     set(value) {
       val oldValue = field
@@ -256,18 +259,17 @@ class LibVlcPlayerView(
 
   fun detachPlayerView() = player.detachPlayerView()
 
+  fun switchPlayerView(layout: VLCVideoLayout) = player.switchPlayerView(layout)
+
   fun initPlayer() = player.initPlayer()
 
   fun destroyPlayer() {
     player.destroyPlayer()
     MediaPlayerManager.mediaPlaybackManager.removePlaybackView(this)
+    MediaPlayerManager.pictureInPictureManager.removePipView(this)
   }
 
   fun getMediaMetadata() = player.getMetadata()
-
-  fun pauseDelay() = player.pauseDelay()
-
-  fun cancelPauseDelay() = player.cancelPauseDelay()
 
   fun onStartPictureInPicture() = player.onStartPictureInPicture()
 

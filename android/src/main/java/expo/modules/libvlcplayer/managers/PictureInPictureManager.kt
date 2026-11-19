@@ -35,33 +35,45 @@ class PictureInPictureManager(
   private var pipFragment: PictureInPictureFragment? = null
   private var pipReceiver: MediaActionReceiver? = null
   private var pipView: LibVlcPlayerView? = null
+  private var isPipLayout: Boolean = false
 
   private val mediaPlayer: MediaPlayer?
     get() = pipView?.mediaPlayer
   private val pictureInPicture: Boolean
     get() = pipView?.pictureInPicture == true
+  private val isInPictureInPictureMode: Boolean
+    get() = activity?.isInPictureInPictureMode == true
 
   private val rootChildrenVisibility: MutableMap<View, Int> = mutableMapOf()
 
   fun addPipView(view: LibVlcPlayerView) {
     if (isPictureInPictureSupported()) {
-      pipView = view
+      switchPipView(view)
       removePipFragment()
-      addPipFragment(view)
+      addPipFragment()
       unregisterPipReceiver()
       registerPipReceiver()
-      updatePipParams(view)
+      updatePipParams()
       updatePipActions()
+    }
+  }
+
+  private fun switchPipView(view: LibVlcPlayerView) {
+    if (pipView != view) {
+      layoutForPipExit()
+      pipView = view
+      if (isInPictureInPictureMode) layoutForPipEnter()
     }
   }
 
   fun removePipView(view: LibVlcPlayerView) {
     if (pipView == view) {
+      exitPictureInPicture()
       layoutForPipExit()
       removePipFragment()
       unregisterPipReceiver()
       pipView = null
-      reassignPipView()
+      resetPipParams()
     }
   }
 
@@ -70,6 +82,14 @@ class PictureInPictureManager(
     maybeThrowPipException(view)
     addPipView(view)
     enterPictureInPicture(activity)
+  }
+
+  fun refreshPipView(view: LibVlcPlayerView) {
+    if (pipView == null && view.pictureInPicture && view.mediaPlayer?.isPlaying() == true) {
+      addPipView(view)
+    } else {
+      updatePipActions()
+    }
   }
 
   fun updatePipActions() {
@@ -110,28 +130,9 @@ class PictureInPictureManager(
         )
       }.also { actions -> remoteActions = actions }
 
-  private fun reassignPipView() {
-    if (pipView == null) {
-      val nextView = findNextView { view -> view.pictureInPicture }
+  fun isPipView(view: LibVlcPlayerView): Boolean = pipView == view
 
-      if (nextView != null) {
-        addPipView(nextView)
-      } else {
-        resetPipParams()
-      }
-    }
-  }
-
-  private fun findNextView(predicate: (LibVlcPlayerView) -> Boolean): LibVlcPlayerView? {
-    val views =
-      MediaPlayerManager.expoViews.filter { view ->
-        view.mediaPlayer != null &&
-          predicate(view)
-      }
-
-    return views.firstOrNull { view -> view.mediaPlayer?.isPlaying() == true }
-      ?: views.firstOrNull()
-  }
+  fun isInPipLayout(view: LibVlcPlayerView): Boolean = pipView == view && isPipLayout
 
   fun layoutForPipEnter(view: LibVlcPlayerView) {
     if (pipView == view) {
@@ -140,46 +141,41 @@ class PictureInPictureManager(
   }
 
   private fun layoutForPipEnter() {
-    val picture = pipView?.picture ?: return
-    val rootView = activity?.findViewById<ViewGroup>(android.R.id.content) ?: return
+    if (!isPipLayout) {
+      val rootView = activity?.findViewById<ViewGroup>(android.R.id.content) ?: return
 
-    for (i in 0 until rootView.childCount) {
-      val child = rootView.getChildAt(i)
-      rootChildrenVisibility[child] = child.visibility
-      child.visibility = View.GONE
-    }
+      pipView?.let { view ->
+        for (i in 0 until rootView.childCount) {
+          val child = rootView.getChildAt(i)
+          rootChildrenVisibility[child] = child.visibility
+          child.visibility = View.GONE
+        }
 
-    rootView.addView(picture)
+        rootView.addView(view.picture)
 
-    pipView?.let { view ->
-      view.detachPlayerView()
-      view.postDelayed(
-        { view.attachPlayerView(picture) },
-        MediaPlayerConstants.ATTACH_DELAY_MS,
-      )
+        view.switchPlayerView(view.picture)
+
+        isPipLayout = true
+      }
     }
   }
 
   private fun layoutForPipExit() {
-    val video = pipView?.video ?: return
-    val picture = pipView?.picture ?: return
-    val rootView = activity?.findViewById<ViewGroup>(android.R.id.content) ?: return
+    if (isPipLayout) {
+      pipView?.let { view ->
+        view.switchPlayerView(view.video)
 
-    pipView?.let { view ->
-      view.detachPlayerView()
-      view.postDelayed(
-        { view.attachPlayerView(video) },
-        MediaPlayerConstants.ATTACH_DELAY_MS,
-      )
+        (view.picture.parent as? ViewGroup)?.removeView(view.picture)
+      }
+
+      rootChildrenVisibility.forEach { (child, visibility) ->
+        child.visibility = visibility
+      }
+
+      rootChildrenVisibility.clear()
+
+      isPipLayout = false
     }
-
-    rootView.removeView(picture)
-
-    rootChildrenVisibility.forEach { (child, visibility) ->
-      child.visibility = visibility
-    }
-
-    rootChildrenVisibility.clear()
   }
 
   fun layoutForPipExit(view: LibVlcPlayerView) {
@@ -188,16 +184,18 @@ class PictureInPictureManager(
     }
   }
 
-  private fun addPipFragment(view: LibVlcPlayerView) {
+  private fun addPipFragment() {
     fragmentActivity?.let { activity ->
-      val fragment = PictureInPictureFragment(view)
+      pipView?.let { view ->
+        val fragment = PictureInPictureFragment(view)
 
-      activity.supportFragmentManager
-        .beginTransaction()
-        .add(fragment, fragment.id)
-        .commitAllowingStateLoss()
+        activity.supportFragmentManager
+          .beginTransaction()
+          .add(fragment, fragment.id)
+          .commitAllowingStateLoss()
 
-      pipFragment = fragment
+        pipFragment = fragment
+      }
     }
   }
 
@@ -229,8 +227,8 @@ class PictureInPictureManager(
     appContext.reactContext?.let { context -> receiver.unregister(context) }
   }
 
-  private fun updatePipParams(view: LibVlcPlayerView) {
-    val texture = view.getTextureView(view.video)
+  private fun updatePipParams() {
+    val texture = pipView?.let { view -> view.getTextureView(view.video) }
     val canSetParams = isPictureInPictureSupported() && texture != null
 
     if (canSetParams) {
@@ -289,6 +287,12 @@ class PictureInPictureManager(
   private fun enterPictureInPicture(activity: Activity) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       activity.enterPictureInPictureMode(PictureInPictureParams.Builder().build())
+    }
+  }
+
+  private fun exitPictureInPicture() {
+    if (isInPictureInPictureMode) {
+      activity?.moveTaskToBack(true)
     }
   }
 
