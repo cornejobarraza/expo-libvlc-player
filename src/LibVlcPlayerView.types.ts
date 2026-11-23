@@ -27,7 +27,13 @@ export interface Tracks {
 }
 
 export interface Delays {
+  /**
+   * Value in microseconds
+   */
   audio?: number;
+  /**
+   * Value in microseconds
+   */
   subtitle?: number;
 }
 
@@ -106,6 +112,9 @@ export interface Snapshot {
 }
 
 export interface Media {
+  /**
+   * Value in milliseconds
+   */
   length: number;
   seekable: boolean;
 }
@@ -149,7 +158,21 @@ type AspectRatioProps =
       fallbackRatio?: never;
     };
 
-export type SeekType = "time" | "position";
+export type Target =
+  | {
+      /**
+       * Value in milliseconds
+       */
+      time: number;
+      position?: never;
+    }
+  | {
+      /**
+       * Value between `0` and `1`
+       */
+      position: number;
+      time?: never;
+    };
 
 export type LibVlcPlayerViewRef = {
   /**
@@ -173,12 +196,11 @@ export type LibVlcPlayerViewRef = {
   /**
    * Sets the time or position of the current player
    *
-   * @param value - Must be `0` or greater
-   * @param type - Defaults to time
+   * @param target - Either a time in milliseconds or a position between `0` and `1`
    *
    * @returns A promise which resolves to `void`
    */
-  readonly seek: (value: number, type?: SeekType) => Promise<void>;
+  readonly seek: (target: Target) => Promise<void>;
   /**
    * Starts or stops recording the current media
    *
@@ -344,7 +366,7 @@ export interface PlayerProps {
    */
   rate?: number;
   /**
-   * Sets the initial player time in milliseconds. Must be `0` or greater
+   * Sets the initial player time in milliseconds
    *
    * @default 0
    */

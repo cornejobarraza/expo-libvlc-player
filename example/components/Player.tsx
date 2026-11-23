@@ -45,7 +45,7 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
     {
       name: "backward.fill",
       onPress: () => {
-        playerRef.current?.seek(time - PLAYER_SEEK_STEP);
+        playerRef.current?.seek({ time: time - PLAYER_SEEK_STEP });
       },
     },
     {
@@ -76,7 +76,7 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
     {
       name: "forward.fill",
       onPress: () => {
-        playerRef.current?.seek(time + PLAYER_SEEK_STEP);
+        playerRef.current?.seek({ time: time + PLAYER_SEEK_STEP });
       },
     },
   ];

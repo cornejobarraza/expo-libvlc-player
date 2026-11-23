@@ -144,7 +144,7 @@ The `LibVlcPlayerView` extends React Native `ViewProps` and accepts the followin
 | `fallbackRatio`    | Sets the fallback aspect ratio                                                                                                    | `undefined` |
 | `contentFit`       | Sets how the view should be scaled to fit in the container                                                                        | `"contain"` |
 | `rate`             | Sets the player playback rate                                                                                                     | `1`         |
-| `time`             | Sets the initial player time in milliseconds. Must be `0` or greater                                                              | `0`         |
+| `time`             | Sets the initial player time in milliseconds                                                                                      | `0`         |
 | `volume`           | Sets the player volume. Must be between `0` and `100`                                                                             | `100`       |
 | `mute`             | Sets the player volume to `0` when `true` and restores previous volume when `false`                                               | `false`     |
 | `repeat`           | Determines whether the media should repeat once ended                                                                             | `false`     |
@@ -186,7 +186,7 @@ The `LibVlcPlayerViewRef` exposes the following functions:
 | `play()`                  |                                                                                                                                                                                             | Starts playback of the current player                                                     | `Promise<void>` |
 | `pause()`                 |                                                                                                                                                                                             | Pauses playback of the current player                                                     | `Promise<void>` |
 | `stop()`                  |                                                                                                                                                                                             | Stops playback of the current player                                                      | `Promise<void>` |
-| `seek()`                  | <div><code>value: number</code> — Must be <code>0</code> or greater</div><div><code>type: "time" \| "position"</code> — Defaults to time</div>                                              | Sets the time or position of the current player                                           | `Promise<void>` |
+| `seek()`                  | `target: Target` — Either a time in milliseconds or a position between `0` and `1`. See [`Target`](#target) for more                                                                        | Sets the time or position of the current player                                           | `Promise<void>` |
 | `record()`                | `path?: string` — Must be a valid directory or `undefined` to stop recording                                                                                                                | Starts or stops recording the current media                                               | `Promise<void>` |
 | `snapshot()`              | `path: string` — Must be a valid directory                                                                                                                                                  | Takes a snapshot of the current media                                                     | `Promise<void>` |
 | `postAction()`            | `action: 1 \| 2` — Which dialog action to perform                                                                                                                                           | Posts an answer to a question dialog                                                      | `Promise<void>` |
@@ -250,6 +250,12 @@ interface Delays {
   audio?: number;
   subtitle?: number;
 }
+```
+
+#### `Target`
+
+```ts
+type Target = { time: number } | { position: number };
 ```
 
 #### `Buffering`

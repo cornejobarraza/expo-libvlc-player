@@ -116,24 +116,13 @@ class LibVlcPlayerView: ExpoView {
 
   var time: Int = MediaPlayerConstants.defaultPlayerTime
 
-  private var _volume: Int = MediaPlayerConstants.maxPlayerVolume
-
-  var volume: Int {
-    get { _volume }
-    set {
-      let oldValue = _volume
-      let newVolume = max(
-        MediaPlayerConstants.minPlayerVolume,
-        min(MediaPlayerConstants.maxPlayerVolume, newValue)
-      )
-
-      _volume = newVolume
-
+  var volume: Int = MediaPlayerConstants.maxPlayerVolume {
+    didSet {
       if !mute {
-        mediaPlayer?.audio?.volume = Int32(newVolume)
+        mediaPlayer?.audio?.volume = Int32(volume)
 
         let hadVolume = oldValue > 0
-        let hasVolume = newVolume > 0
+        let hasVolume = volume > 0
 
         if hadVolume != hasVolume {
           MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
@@ -269,23 +258,27 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  func seek(_ value: Double, _ type: String? = "time") {
+  func seek(_ target: Target) {
     player.withPlayer { mediaPlayer in
-      guard mediaPlayer.isSeekable else {
-        onEncounteredError(["message": "Media is not seekable"])
+      if !mediaPlayer.isSeekable {
+        onEncounteredError(["message": "Media not seekable"])
         return
       }
 
+      let time = target.time
+      let position = target.position
+
       let newTime: Int64?
 
-      if type == "position" {
-        let length = Double(player.getLength())
-
-        mediaPlayer.position = value
-        newTime = Int64(exactly: (value * length).rounded(.towardZero))
+      if let position {
+        mediaPlayer.position = position
+        newTime = Int64(position * Double(player.getLength()))
+      } else if let time {
+        mediaPlayer.time = VLCTime(int: Int32(time))
+        newTime = Int64(time)
       } else {
-        mediaPlayer.time = VLCTime(int: Int32(value))
-        newTime = Int64(value)
+        onEncounteredError(["message": "Time or position required"])
+        return
       }
 
       MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackPosition(self, time: newTime)
@@ -307,7 +300,7 @@ class LibVlcPlayerView: ExpoView {
         }
       }
 
-      seek(max(0, Double(mediaPlayer.time.intValue) + offset))
+      seek(Target(time: Double(mediaPlayer.time.intValue) + offset))
     }
   }
 

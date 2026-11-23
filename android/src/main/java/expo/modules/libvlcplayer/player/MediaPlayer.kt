@@ -183,26 +183,28 @@ class MediaPlayer(
       .takeIf { id -> id != 0 }
 
   fun addPlayerSlaves(slaves: List<Slave>) {
-    slaves.forEach { slave ->
-      val source = slave.source
-      val type =
-        if (slave.type == "subtitle") {
-          IMedia.Slave.Type.Subtitle
-        } else {
-          IMedia.Slave.Type.Audio
+    mediaPlayer?.let { player ->
+      slaves.forEach { slave ->
+        val source = slave.source
+        val type =
+          if (slave.type == "subtitle") {
+            IMedia.Slave.Type.Subtitle
+          } else {
+            IMedia.Slave.Type.Audio
+          }
+        val selected = slave.selected ?: false
+
+        try {
+          URI(source)
+        } catch (_: Exception) {
+          view.onEncounteredError(
+            mapOf("message" to "Invalid source, ${slave.type} could not be added"),
+          )
+          return@forEach
         }
-      val selected = slave.selected ?: false
 
-      try {
-        URI(source)
-      } catch (_: Exception) {
-        view.onEncounteredError(
-          mapOf("message" to "Invalid source, ${slave.type} could not be added"),
-        )
-        return@forEach
+        player.addSlave(type, getSourceUri(source), selected)
       }
-
-      mediaPlayer?.addSlave(type, getSourceUri(source), selected)
     }
   }
 
@@ -351,37 +353,39 @@ class MediaPlayer(
 
   fun setupPlayer() {
     view.post {
-      val initialTime =
-        if (shouldInitTime) {
-          view.time
-        } else {
-          0
+      mediaPlayer?.let { player ->
+        val initialTime =
+          if (shouldInitTime) {
+            view.time
+          } else {
+            0
+          }
+        val newVolume =
+          if (view.mute) {
+            MediaPlayerConstants.MIN_PLAYER_VOLUME
+          } else {
+            view.volume
+          }
+
+        player.setScale(view.scale.toFloat())
+        player.setRate(view.rate.toFloat())
+        if (initialTime > 0) player.setTime(initialTime.toLong())
+
+        // Negative volume workaround
+        retryUntil {
+          player.setVolume(newVolume)
+
+          return@retryUntil false
         }
-      val newVolume =
-        if (view.mute) {
-          MediaPlayerConstants.MIN_PLAYER_VOLUME
-        } else {
-          view.volume
-        }
 
-      mediaPlayer?.setScale(view.scale.toFloat())
-      mediaPlayer?.setRate(view.rate.toFloat())
-      if (initialTime > 0) mediaPlayer?.setTime(initialTime.toLong())
+        MediaPlayerManager.mediaPlaybackManager.updatePlaybackPosition(
+          view,
+          initialTime.toLong().takeIf { time -> time > 0 },
+          view.rate.toFloat(),
+        )
 
-      // Negative volume workaround
-      retryUntil {
-        mediaPlayer?.setVolume(newVolume)
-
-        return@retryUntil false
+        shouldInitTime = false
       }
-
-      MediaPlayerManager.mediaPlaybackManager.updatePlaybackPosition(
-        view,
-        initialTime.toLong().takeIf { time -> time > 0 },
-        view.rate.toFloat(),
-      )
-
-      shouldInitTime = false
     }
   }
 

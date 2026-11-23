@@ -22,6 +22,7 @@ import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.PlayerProps
 import expo.modules.libvlcplayer.records.Slave
+import expo.modules.libvlcplayer.records.Target
 import expo.modules.libvlcplayer.records.Tracks
 import expo.modules.libvlcplayer.utils.MediaAction
 import org.videolan.libvlc.util.VLCVideoLayout
@@ -153,19 +154,13 @@ class LibVlcPlayerView(
   var volume: Int = MediaPlayerConstants.MAX_PLAYER_VOLUME
     set(value) {
       val oldValue = field
-      val newVolume =
-        value.coerceIn(
-          MediaPlayerConstants.MIN_PLAYER_VOLUME,
-          MediaPlayerConstants.MAX_PLAYER_VOLUME,
-        )
-
-      field = newVolume
+      field = value
 
       if (!mute) {
-        mediaPlayer?.setVolume(newVolume)
+        mediaPlayer?.setVolume(value)
 
         val hadVolume = oldValue > 0
-        val hasVolume = newVolume > 0
+        val hasVolume = value > 0
 
         if (hadVolume != hasVolume) {
           MediaPlayerManager.audioFocusManager.updateAudioFocus()
@@ -318,23 +313,26 @@ class LibVlcPlayerView(
     }
   }
 
-  fun seek(
-    value: Double,
-    type: String? = "time",
-  ) {
+  fun seek(target: Target) {
     player.withPlayer { mediaPlayer ->
       if (!mediaPlayer.isSeekable()) {
-        onEncounteredError(mapOf("message" to "Media is not seekable"))
+        onEncounteredError(mapOf("message" to "Media not seekable"))
         return@withPlayer
       }
 
+      val time = target.time
+      val position = target.position
+
       val newTime =
-        if (type == "position") {
-          mediaPlayer.setPosition(value.toFloat())
-          (value * mediaPlayer.getLength()).toLong()
+        if (position != null) {
+          mediaPlayer.setPosition(position.toFloat())
+          (position * mediaPlayer.getLength()).toLong()
+        } else if (time != null) {
+          mediaPlayer.setTime(time.toLong())
+          time.toLong()
         } else {
-          mediaPlayer.setTime(value.toLong())
-          value.toLong()
+          onEncounteredError(mapOf("message" to "Time or position required"))
+          return@withPlayer
         }
 
       MediaPlayerManager.mediaPlaybackManager.updatePlaybackPosition(this, time = newTime)
@@ -343,7 +341,7 @@ class LibVlcPlayerView(
 
   fun seekBy(offset: Long) {
     mediaPlayer?.let { player ->
-      seek((player.getTime() + offset).coerceAtLeast(0L).toDouble())
+      seek(Target(time = (player.getTime() + offset).toDouble()))
     }
   }
 

@@ -65,7 +65,7 @@ class MediaPlayer: NSObject {
       ? picture!
       : video
 
-    library = VLCLibrary(view.options)
+    library = VLCLibrary(options: view.options)
     mediaPlayer = VLCMediaPlayer(library: library!)
     mediaPlayer!.drawable = drawable
     mediaPlayer!.delegate = self
@@ -96,19 +96,21 @@ class MediaPlayer: NSObject {
   }
 
   func addPlayerSlaves(_ slaves: [Slave]) {
-    for slave in slaves {
-      let source = slave.source
-      let type = slave.type == "subtitle" ?
-        VLCMediaPlaybackSlaveType.subtitle :
-        VLCMediaPlaybackSlaveType.audio
-      let selected = slave.selected ?? false
+    if let player = mediaPlayer {
+      for slave in slaves {
+        let source = slave.source
+        let type = slave.type == "subtitle" ?
+          VLCMediaPlaybackSlaveType.subtitle :
+          VLCMediaPlaybackSlaveType.audio
+        let selected = slave.selected ?? false
 
-      guard let url = URL(string: source) else {
-        view.onEncounteredError(["message": "Invalid source, \(slave.type) could not be added"])
-        continue
+        guard let url = URL(string: source) else {
+          view.onEncounteredError(["message": "Invalid source, \(slave.type) could not be added"])
+          continue
+        }
+
+        player.addPlaybackSlave(url, type: type, enforce: selected)
       }
-
-      mediaPlayer?.addPlaybackSlave(url, type: type, enforce: selected)
     }
   }
 
@@ -127,33 +129,33 @@ class MediaPlayer: NSObject {
     DispatchQueue.main.async { [weak self] in
       guard let self else { return }
 
-      let initialTime = shouldInitTime ?
-        view.time :
-        0
-      let newVolume = view.mute ?
-        MediaPlayerConstants.minPlayerVolume :
-        view.volume
+      if let player = mediaPlayer {
+        let initialTime = shouldInitTime ?
+          view.time :
+          0
+        let newVolume = view.mute ?
+          MediaPlayerConstants.minPlayerVolume :
+          view.volume
 
-      mediaPlayer?.scaleFactor = Float(view.scale)
-      mediaPlayer?.rate = Float(view.rate)
-      if initialTime > 0 { mediaPlayer?.time = VLCTime(int: Int32(initialTime)) }
+        player.scaleFactor = Float(view.scale)
+        player.rate = Float(view.rate)
+        if initialTime > 0 { player.time = VLCTime(int: Int32(initialTime)) }
 
-      // Negative volume workaround
-      retryUntil { [weak self] _ in
-        guard let self else { return true }
+        // Negative volume workaround
+        retryUntil { _ in
+          player.audio?.volume = Int32(newVolume)
 
-        mediaPlayer?.audio?.volume = Int32(newVolume)
+          return false
+        }
 
-        return false
+        MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackPosition(
+          view,
+          time: initialTime > 0 ? Int64(initialTime) : nil,
+          rate: Float(view.rate)
+        )
+
+        shouldInitTime = false
       }
-
-      MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackPosition(
-        view,
-        time: initialTime > 0 ? Int64(initialTime) : nil,
-        rate: Float(view.rate)
-      )
-
-      shouldInitTime = false
     }
   }
 
@@ -512,11 +514,11 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
   }
 
   func mediaPlayerStartedRecording(_: VLCMediaPlayer) {
-    view.onRecordChanged(["path": nil])
+    view.onRecordChanged(["path": NSNull()])
   }
 
   func mediaPlayer(_: VLCMediaPlayer, recordingStoppedAt url: URL?) {
-    view.onRecordChanged(["path": url?.path])
+    view.onRecordChanged(["path": url?.path ?? NSNull()])
   }
 }
 
