@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.20 - 2026-11-23
+
+### 🛠 Breaking changes
+
+- Updated seek to a time or position object
+
 ## 58.0.19 - 2026-11-19
 
 ### 🛠 Breaking changes
