@@ -104,7 +104,7 @@ class MediaPlayer(
       MediaPlayerManager.pictureInPictureManager.removePipView(view)
     }
 
-    libVlc = LibVLC(context)
+    libVlc = LibVLC(context, view.options)
     setDialogCallbacks()
 
     mediaPlayer = VLCMediaPlayer(libVlc!!)
@@ -121,12 +121,8 @@ class MediaPlayer(
       return
     }
 
-    val args = view.options.toMutableList()
-    args.normalizeOptions()
-    args.toggleStartPausedOption(view.autoplay)
-
     val media = createMedia(libVlc!!, source!!)
-    args.forEach { arg -> media.addOption(arg) }
+    if (!view.autoplay) media.addOption(":start-paused")
     mediaPlayer!!.setMedia(media)
     media.release()
     addPlayerSlaves(view.slaves)
@@ -857,28 +853,5 @@ private fun MediaPlayer.setDialogCallbacks() {
         }
       },
     )
-  }
-}
-
-private fun MutableList<String>.normalizeOptions() {
-  val normalized =
-    map { option ->
-      if (!option.startsWith(":")) {
-        ":" + option.dropWhile { character -> character == '-' }
-      } else {
-        option
-      }
-    }
-
-  for (i in indices) {
-    this[i] = normalized[i]
-  }
-}
-
-private fun MutableList<String>.toggleStartPausedOption(autoplay: Boolean) {
-  val hasOption = contains(":start-paused")
-
-  if (!autoplay && !hasOption) {
-    add(":start-paused")
   }
 }

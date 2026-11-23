@@ -35,6 +35,6 @@ export const PLAYER_MAX_BUFFER = 100;
 export const PLAYER_DEFAULT_TIME = 0;
 export const PLAYER_SEEK_STEP = 10_000;
 
-export const PLAYER_OPTIONS = !isDevice ? [":codec=avcodec"] : undefined;
+export const PLAYER_OPTIONS = !isDevice ? ["--codec=avcodec"] : undefined;
 export const PLAYER_ASPECT_RATIO = "16/9";
 export const PLAYER_CONTENT_FIT = "contain";

@@ -65,7 +65,7 @@ class MediaPlayer: NSObject {
       ? picture!
       : video
 
-    library = VLCLibrary()
+    library = VLCLibrary(view.options)
     mediaPlayer = VLCMediaPlayer(library: library!)
     mediaPlayer!.drawable = drawable
     mediaPlayer!.delegate = self
@@ -81,12 +81,8 @@ class MediaPlayer: NSObject {
       return
     }
 
-    var args = view.options
-    args.normalizeOptions()
-    args.toggleStartPausedOption(view.autoplay)
-
     let media = VLCMedia(url: url)
-    args.forEach { arg in media!.addOption(arg) }
+    if !view.autoplay { media!.addOption(":start-paused") }
     mediaPlayer!.media = media
     addPlayerSlaves(view.slaves)
     mediaPlayer!.play()
@@ -615,28 +611,6 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
     if prevReference == reference {
       vlcDialog = nil
       view.onDialogCanceled()
-    }
-  }
-}
-
-private extension [String] {
-  mutating func normalizeOptions() {
-    self = map { option in
-      if !option.hasPrefix(":") {
-        ":" + option.drop { character in character == "-" }
-      } else {
-        option
-      }
-    }
-  }
-}
-
-private extension [String] {
-  mutating func toggleStartPausedOption(_ autoplay: Bool) {
-    let hasOption = self.contains(":start-paused")
-
-    if !autoplay, !hasOption {
-      append(":start-paused")
     }
   }
 }
