@@ -159,21 +159,7 @@ type AspectRatioProps =
       fallbackRatio?: never;
     };
 
-export type SeekTarget =
-  | {
-      /**
-       * Value in milliseconds
-       */
-      time: number;
-      position?: never;
-    }
-  | {
-      /**
-       * Value between `0` and `1`
-       */
-      position: number;
-      time?: never;
-    };
+export type SeekType = "time" | "position";
 
 export type LibVlcPlayerViewRef = {
   /**
@@ -197,11 +183,12 @@ export type LibVlcPlayerViewRef = {
   /**
    * Sets the time or position of the current player
    *
-   * @param target - Either a time in milliseconds or a position between `0` and `1`
+   * @param value - Either a time in milliseconds or a position between `0` and `1`
+   * @param type - Defaults to time
    *
    * @returns A promise which resolves to `void`
    */
-  readonly seek: (target: SeekTarget) => Promise<void>;
+  readonly seek: (value: number, type?: SeekType) => Promise<void>;
   /**
    * Starts or stops recording the current media
    *
@@ -274,7 +261,7 @@ export interface PlayerProps {
    */
   metadata?: Metadata;
   /**
-   * Sets the options to initialize the media with
+   * Sets the options to initialize the player with
    *
    * @see {@link https://wiki.videolan.org/VLC_command-line_help/ VideoLAN Wiki}
    *
@@ -312,7 +299,7 @@ export interface PlayerProps {
    */
   slaves?: Slave[];
   /**
-   * Sets the player audio, video, and subtitle track indexes
+   * Sets the player audio, video, and subtitle tracks
    *
    * @example
    *
@@ -331,7 +318,7 @@ export interface PlayerProps {
    */
   tracks?: Tracks;
   /**
-   * Sets the player audio and subtitle delay values in microseconds
+   * Sets the player audio and subtitle delays in microseconds
    *
    * @example
    *
@@ -373,7 +360,7 @@ export interface PlayerProps {
    */
   time?: number;
   /**
-   * Sets the player volume. Must be between `0` and `100`
+   * Sets the player volume
    *
    * @default 100
    */

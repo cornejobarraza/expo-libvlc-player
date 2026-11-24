@@ -9,7 +9,6 @@ import expo.modules.libvlcplayer.managers.MediaPlayerManager
 import expo.modules.libvlcplayer.records.Delays
 import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.PlayerProps
-import expo.modules.libvlcplayer.records.SeekTarget
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
 
@@ -167,8 +166,8 @@ class LibVlcPlayerModule : Module() {
           view.stop()
         }
 
-        AsyncFunction("seek") { view: LibVlcPlayerView, target: SeekTarget ->
-          view.seek(target)
+        AsyncFunction("seek") { view: LibVlcPlayerView, value: Double, type: String? ->
+          view.seek(value, type)
         }
 
         AsyncFunction("record") { view: LibVlcPlayerView, path: String? ->

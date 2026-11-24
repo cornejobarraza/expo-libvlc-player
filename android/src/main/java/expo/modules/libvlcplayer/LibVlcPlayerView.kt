@@ -21,7 +21,6 @@ import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.PlayerProps
-import expo.modules.libvlcplayer.records.SeekTarget
 import expo.modules.libvlcplayer.records.Slave
 import expo.modules.libvlcplayer.records.Tracks
 import expo.modules.libvlcplayer.utils.MediaAction
@@ -313,26 +312,23 @@ class LibVlcPlayerView(
     }
   }
 
-  fun seek(target: SeekTarget) {
+  fun seek(
+    value: Double,
+    type: String? = "time",
+  ) {
     player.withPlayer { mediaPlayer ->
       if (!mediaPlayer.isSeekable()) {
         onEncounteredError(mapOf("message" to "Media not seekable"))
         return@withPlayer
       }
 
-      val time = target.time
-      val position = target.position
-
       val newTime =
-        if (position != null) {
-          mediaPlayer.setPosition(position.toFloat())
-          (position * mediaPlayer.getLength()).toLong()
-        } else if (time != null) {
-          mediaPlayer.setTime(time.toLong())
-          time.toLong()
+        if (type == "position") {
+          mediaPlayer.setPosition(value.toFloat())
+          (value * mediaPlayer.getLength()).toLong()
         } else {
-          onEncounteredError(mapOf("message" to "Time or position required"))
-          return@withPlayer
+          mediaPlayer.setTime(value.toLong())
+          value.toLong()
         }
 
       MediaPlayerManager.mediaPlaybackManager.updatePlaybackPosition(this, time = newTime)
@@ -341,7 +337,7 @@ class LibVlcPlayerView(
 
   fun seekBy(offset: Long) {
     mediaPlayer?.let { player ->
-      seek(SeekTarget(time = (player.getTime() + offset).toDouble()))
+      seek((player.getTime() + offset).toDouble())
     }
   }
 

@@ -19,7 +19,7 @@ export function usePlayerRef(ref: PlayerRef, props: LibVlcPlayerViewProps) {
       play: async () => nativeRef.current?.play(),
       pause: async () => nativeRef.current?.pause(),
       stop: async () => nativeRef.current?.stop(),
-      seek: async (target) => nativeRef.current?.seek(target),
+      seek: async (value, type) => nativeRef.current?.seek(value, type),
       record: async (path) => nativeRef.current?.record(path),
       snapshot: async (path) => nativeRef.current?.snapshot(path),
       postAction: async (action) => nativeRef.current?.postAction(action),

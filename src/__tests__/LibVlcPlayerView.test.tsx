@@ -86,7 +86,7 @@ const REF_CALLS: { [K in keyof LibVlcPlayerViewRef]: Parameters<LibVlcPlayerView
   play: [],
   pause: [],
   stop: [],
-  seek: [{ time: 1_000 }],
+  seek: [1_000, "time"],
   record: ["/records"],
   snapshot: ["/snapshots"],
   postAction: [1],

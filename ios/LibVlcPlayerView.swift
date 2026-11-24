@@ -258,27 +258,21 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  func seek(_ target: SeekTarget) {
+  func seek(_ value: Double, _ type: String? = "time") {
     player.withPlayer { mediaPlayer in
       if !mediaPlayer.isSeekable {
         onEncounteredError(["message": "Media not seekable"])
         return
       }
 
-      let time = target.time
-      let position = target.position
-
       let newTime: Int64?
 
-      if let position {
-        mediaPlayer.position = position
-        newTime = Int64(position * Double(player.getLength()))
-      } else if let time {
-        mediaPlayer.time = VLCTime(int: Int32(time))
-        newTime = Int64(time)
+      if type == "position" {
+        mediaPlayer.position = value
+        newTime = Int64(value * Double(player.getLength()))
       } else {
-        onEncounteredError(["message": "Time or position required"])
-        return
+        mediaPlayer.time = VLCTime(int: Int32(value))
+        newTime = Int64(value)
       }
 
       MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackPosition(self, time: newTime)
@@ -300,7 +294,7 @@ class LibVlcPlayerView: ExpoView {
         }
       }
 
-      seek(SeekTarget(time: Double(mediaPlayer.time.intValue) + offset))
+      seek(Double(mediaPlayer.time.intValue) + offset)
     }
   }
 

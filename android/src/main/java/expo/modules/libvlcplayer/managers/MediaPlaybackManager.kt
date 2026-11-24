@@ -27,7 +27,6 @@ import expo.modules.libvlcplayer.LibVlcPlayerView
 import expo.modules.libvlcplayer.R
 import expo.modules.libvlcplayer.constants.MediaPlayerConstants
 import expo.modules.libvlcplayer.records.Metadata
-import expo.modules.libvlcplayer.records.SeekTarget
 import expo.modules.libvlcplayer.utils.MediaAction
 import expo.modules.libvlcplayer.utils.MediaActionReceiver
 import expo.modules.libvlcplayer.utils.MediaPlaybackService
@@ -282,7 +281,7 @@ class MediaPlaybackManager(
         }
 
         override fun onSeekTo(time: Long) {
-          sessionView?.seek(SeekTarget(time = time.toDouble()))
+          sessionView?.seek(time.toDouble())
         }
 
         override fun onRewind() {
