@@ -45,7 +45,7 @@ export type VideoAspectRatio = `${number}:${number}` | `${number}/${number}` | n
 
 export interface Buffering {
   /**
-   * Value between `0` and `100`
+   * Value from `0` to `1`
    */
   value: number;
 }
@@ -67,14 +67,14 @@ export interface Dialog {
 
 export interface Progress {
   /**
-   * Value between `0` and `1`
+   * Value from `0` to `1`
    */
   value: number;
 }
 
 export interface Position {
   /**
-   * Value between `0` and `1`
+   * Value from `0` to `1`
    */
   value: number;
 }
@@ -136,7 +136,9 @@ export interface MediaInfo {
 type AspectRatioProps =
   | {
       /**
-       * Sets the container aspect ratio. When auto, a fallback ratio is required
+       * Sets the container aspect ratio
+       *
+       * @note Fallback ratio is required when auto
        */
       aspectRatio: "auto";
       /**
@@ -146,7 +148,9 @@ type AspectRatioProps =
     }
   | {
       /**
-       * Sets the container aspect ratio. When auto, a fallback ratio is required
+       * Sets the container aspect ratio
+       *
+       * @note Fallback ratio is required when auto
        *
        * @default undefined
        */
@@ -183,7 +187,7 @@ export type LibVlcPlayerViewRef = {
   /**
    * Sets the time or position of the current player
    *
-   * @param value - Either a time in milliseconds or a position between `0` and `1`
+   * @param value - Either a time in milliseconds or a position as a fraction
    * @param type - Defaults to time
    *
    * @returns A promise which resolves to `void`
@@ -366,7 +370,7 @@ export interface PlayerProps {
    */
   volume?: number;
   /**
-   * Sets the player volume to `0` when `true` and restores previous volume when `false`
+   * Sets the player volume to zero when `true`
    *
    * @default false
    */

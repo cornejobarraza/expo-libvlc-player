@@ -676,7 +676,7 @@ private fun MediaPlayer.setPlayerListener() {
 
         when (type) {
           Event.Buffering -> {
-            view.onBuffering(mapOf("value" to event.getBuffering()))
+            view.onBuffering(mapOf("value" to event.getBuffering() / 100))
           }
 
           Event.Playing,
