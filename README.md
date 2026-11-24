@@ -186,7 +186,7 @@ The `LibVlcPlayerViewRef` exposes the following functions:
 | `play()`                  |                                                                                                                                                                                             | Starts playback of the current player                                                     | `Promise<void>` |
 | `pause()`                 |                                                                                                                                                                                             | Pauses playback of the current player                                                     | `Promise<void>` |
 | `stop()`                  |                                                                                                                                                                                             | Stops playback of the current player                                                      | `Promise<void>` |
-| `seek()`                  | `target: Target` — Either a time in milliseconds or a position between `0` and `1`. See [`Target`](#target) for more                                                                        | Sets the time or position of the current player                                           | `Promise<void>` |
+| `seek()`                  | `target: SeekTarget` — Either a time in milliseconds or a position between `0` and `1`. See [`SeekTarget`](#seektarget) for more                                                            | Sets the time or position of the current player                                           | `Promise<void>` |
 | `record()`                | `path?: string` — Must be a valid directory or `undefined` to stop recording                                                                                                                | Starts or stops recording the current media                                               | `Promise<void>` |
 | `snapshot()`              | `path: string` — Must be a valid directory                                                                                                                                                  | Takes a snapshot of the current media                                                     | `Promise<void>` |
 | `postAction()`            | `action: 1 \| 2` — Which dialog action to perform                                                                                                                                           | Posts an answer to a question dialog                                                      | `Promise<void>` |
@@ -252,10 +252,10 @@ interface Delays {
 }
 ```
 
-#### `Target`
+#### `SeekTarget`
 
 ```ts
-type Target = { time: number } | { position: number };
+type SeekTarget = { time: number } | { position: number };
 ```
 
 #### `Buffering`

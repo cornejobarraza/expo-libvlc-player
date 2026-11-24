@@ -243,7 +243,7 @@ class MediaPlaybackManager {
     addTarget(commandCenter.changePlaybackPositionCommand) { view, _, event in
       guard let event = event as? MPChangePlaybackPositionCommandEvent else { return }
 
-      view.seek(Target(time: event.positionTime * 1000))
+      view.seek(SeekTarget(time: event.positionTime * 1000))
     }
 
     let seekStep = MediaPlayerConstants.seekStep

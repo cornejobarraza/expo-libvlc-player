@@ -135,7 +135,7 @@ public class LibVlcPlayerModule: Module {
         view.stop()
       }
 
-      AsyncFunction("seek") { (view: LibVlcPlayerView, target: Target) in
+      AsyncFunction("seek") { (view: LibVlcPlayerView, target: SeekTarget) in
         view.seek(target)
       }
 

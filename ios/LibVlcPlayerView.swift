@@ -258,7 +258,7 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  func seek(_ target: Target) {
+  func seek(_ target: SeekTarget) {
     player.withPlayer { mediaPlayer in
       if !mediaPlayer.isSeekable {
         onEncounteredError(["message": "Media not seekable"])
@@ -300,7 +300,7 @@ class LibVlcPlayerView: ExpoView {
         }
       }
 
-      seek(Target(time: Double(mediaPlayer.time.intValue) + offset))
+      seek(SeekTarget(time: Double(mediaPlayer.time.intValue) + offset))
     }
   }
 

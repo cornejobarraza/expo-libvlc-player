@@ -21,8 +21,8 @@ import expo.modules.libvlcplayer.records.MediaInfo
 import expo.modules.libvlcplayer.records.MediaTracks
 import expo.modules.libvlcplayer.records.Metadata
 import expo.modules.libvlcplayer.records.PlayerProps
+import expo.modules.libvlcplayer.records.SeekTarget
 import expo.modules.libvlcplayer.records.Slave
-import expo.modules.libvlcplayer.records.Target
 import expo.modules.libvlcplayer.records.Tracks
 import expo.modules.libvlcplayer.utils.MediaAction
 import org.videolan.libvlc.util.VLCVideoLayout
@@ -313,7 +313,7 @@ class LibVlcPlayerView(
     }
   }
 
-  fun seek(target: Target) {
+  fun seek(target: SeekTarget) {
     player.withPlayer { mediaPlayer ->
       if (!mediaPlayer.isSeekable()) {
         onEncounteredError(mapOf("message" to "Media not seekable"))
@@ -341,7 +341,7 @@ class LibVlcPlayerView(
 
   fun seekBy(offset: Long) {
     mediaPlayer?.let { player ->
-      seek(Target(time = (player.getTime() + offset).toDouble()))
+      seek(SeekTarget(time = (player.getTime() + offset).toDouble()))
     }
   }
 

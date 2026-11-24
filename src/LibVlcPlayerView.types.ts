@@ -158,7 +158,7 @@ type AspectRatioProps =
       fallbackRatio?: never;
     };
 
-export type Target =
+export type SeekTarget =
   | {
       /**
        * Value in milliseconds
@@ -200,7 +200,7 @@ export type LibVlcPlayerViewRef = {
    *
    * @returns A promise which resolves to `void`
    */
-  readonly seek: (target: Target) => Promise<void>;
+  readonly seek: (target: SeekTarget) => Promise<void>;
   /**
    * Starts or stops recording the current media
    *

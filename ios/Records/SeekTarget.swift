@@ -1,6 +1,6 @@
 import ExpoModulesCore
 
-struct Target: Record {
+struct SeekTarget: Record {
   @Field
   var time: Double? = nil
 
