@@ -6,4 +6,7 @@ struct Media: Record {
 
   @Field
   var seekable: Bool = false
+
+  @Field
+  var pausable: Bool = false
 }

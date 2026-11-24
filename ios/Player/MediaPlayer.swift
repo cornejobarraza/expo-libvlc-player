@@ -16,7 +16,7 @@ class MediaPlayer: NSObject {
 
   private var pLength: Int64?
   var userStop: Bool = false
-  private var firstPlay: Bool = true
+  private var firstPlay: Bool = false
   var shouldInit: Bool = false
   private var shouldInitTime: Bool = false
 
@@ -121,6 +121,10 @@ class MediaPlayer: NSObject {
     vlcDialogProvider = nil
     vlcDialog = nil
     pLength = nil
+    userStop = false
+    firstPlay = false
+    shouldInit = false
+    shouldInitTime = false
     MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
     MediaPlayerManager.shared.keepAwakeManager.deactivate(viewID)
   }
@@ -289,10 +293,12 @@ class MediaPlayer: NSObject {
   private func getMedia() -> Media {
     let length = Int(getLength())
     let seekable = mediaPlayer?.isSeekable ?? false
+    let pausable = mediaPlayer?.canPause ?? false
 
     return Media(
       length: length,
-      seekable: seekable
+      seekable: seekable,
+      pausable: pausable
     )
   }
 

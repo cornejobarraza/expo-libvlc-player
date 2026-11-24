@@ -56,8 +56,9 @@ class MediaPlayer(
       field = value
     }
 
+  var canPause: Boolean = false
   var userStop: Boolean = false
-  var firstPlay: Boolean = true
+  var firstPlay: Boolean = false
   var shouldInit: Boolean = false
   private var shouldInitTime: Boolean = false
 
@@ -236,6 +237,11 @@ class MediaPlayer(
     libVlcDispatcher = null
     sourceFd = null
     videoTrack = null
+    canPause = false
+    userStop = false
+    firstPlay = false
+    shouldInit = false
+    shouldInitTime = false
     MediaPlayerManager.audioFocusManager.updateAudioFocus()
     MediaPlayerManager.keepAwakeManager.deactivate(view)
   }
@@ -556,10 +562,12 @@ class MediaPlayer(
   private fun getMedia(): Media {
     val length = (mediaPlayer?.getLength() ?: 0).toInt()
     val seekable = mediaPlayer?.isSeekable() ?: false
+    val pausable = canPause
 
     return Media(
       length = length,
       seekable = seekable,
+      pausable = pausable,
     )
   }
 
@@ -771,6 +779,10 @@ private fun MediaPlayer.setPlayerListener() {
               resetVideoTrack()
               MediaPlayerManager.keepAwakeManager.toggleKeepAwake(view)
             }
+          }
+
+          Event.PausableChanged -> {
+            canPause = event.getPausable()
           }
 
           Event.RecordChanged -> {

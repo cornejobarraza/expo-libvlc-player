@@ -117,6 +117,7 @@ export interface Media {
    */
   length: number;
   seekable: boolean;
+  pausable: boolean;
 }
 
 export interface Video {

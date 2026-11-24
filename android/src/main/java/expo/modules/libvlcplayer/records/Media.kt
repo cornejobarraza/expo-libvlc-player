@@ -7,5 +7,6 @@ import java.io.Serializable
 class Media(
   @Field var length: Int = 0,
   @Field var seekable: Boolean = false,
+  @Field var pausable: Boolean = false,
 ) : Record,
   Serializable

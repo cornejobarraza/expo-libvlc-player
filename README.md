@@ -352,6 +352,7 @@ interface Snapshot {
 interface Media {
   length: number;
   seekable: boolean;
+  pausable: boolean;
 }
 ```
 
