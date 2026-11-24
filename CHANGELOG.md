@@ -10,6 +10,13 @@
 
 ### 💡 Others
 
+## 58.0.22 - 2026-11-24
+
+### 🛠 Breaking changes
+
+- Updated buffering from percentage to fraction
+- Dropped seek target for value and type
+
 ## 58.0.21 - 2026-11-24
 
 ### 🛠 Breaking changes
