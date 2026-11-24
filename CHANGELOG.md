@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.23 - 2026-11-24
+
+### 💡 Others
+
+- Refactored media ratio logic
+
 ## 58.0.22 - 2026-11-24
 
 ### 🛠 Breaking changes
