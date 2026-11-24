@@ -137,8 +137,6 @@ type AspectRatioProps =
   | {
       /**
        * Sets the container aspect ratio
-       *
-       * @note Fallback ratio is required when auto
        */
       aspectRatio: "auto";
       /**

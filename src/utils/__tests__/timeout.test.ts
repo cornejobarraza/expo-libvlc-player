@@ -15,9 +15,24 @@ describe(useTimeoutRef, () => {
     const { result } = await renderHook(() => useTimeoutRef());
     const handler = jest.fn();
 
-    result.current(handler, 1000);
+    result.current(handler, 1_000);
 
     jest.advanceTimersByTime(999);
+
+    expect(handler).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(1);
+
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  it("defaults to a 300ms timeout", async () => {
+    const { result } = await renderHook(() => useTimeoutRef());
+    const handler = jest.fn();
+
+    result.current(handler);
+
+    jest.advanceTimersByTime(299);
 
     expect(handler).not.toHaveBeenCalled();
 
@@ -31,8 +46,8 @@ describe(useTimeoutRef, () => {
     const firstHandler = jest.fn();
     const secondHandler = jest.fn();
 
-    result.current(firstHandler, 1000);
-    result.current(secondHandler, 1000);
+    result.current(firstHandler, 1_000);
+    result.current(secondHandler, 1_000);
 
     jest.runAllTimers();
 
@@ -45,11 +60,11 @@ describe(useTimeoutRef, () => {
     const firstHandler = jest.fn();
     const secondHandler = jest.fn();
 
-    result.current(firstHandler, 1000);
+    result.current(firstHandler, 1_000);
 
     await rerender(undefined);
 
-    result.current(secondHandler, 1000);
+    result.current(secondHandler, 1_000);
 
     jest.runAllTimers();
 
@@ -63,7 +78,7 @@ describe(useTimeoutRef, () => {
 
     await rerender(undefined);
 
-    result.current(handler, 1000);
+    result.current(handler, 1_000);
 
     await unmount();
     jest.runAllTimers();

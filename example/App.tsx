@@ -1,6 +1,6 @@
 import { NavigationBar } from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { Player } from "./components/Player";
@@ -14,12 +14,10 @@ export default function App() {
   const padding = !fullscreen ? styles.app.padding : undefined;
 
   return (
-    <SafeAreaProvider>
-      <View style={{ ...styles.app, padding }}>
-        <StatusBar style="light" hidden={fullscreen} />
-        <Player source={BBB_CLIP} poster={BBB_POSTER} fullscreen={fullscreen} />
-        <NavigationBar style="light" hidden={fullscreen} />
-      </View>
+    <SafeAreaProvider style={{ ...styles.app, padding }}>
+      <StatusBar style="light" hidden={fullscreen} />
+      <Player source={BBB_CLIP} poster={BBB_POSTER} fullscreen={fullscreen} />
+      <NavigationBar style="light" hidden={fullscreen} />
     </SafeAreaProvider>
   );
 }

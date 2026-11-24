@@ -1,4 +1,4 @@
-import { type VideoAspectRatio } from "../LibVlcPlayerView.types";
+import { type Video, type VideoAspectRatio } from "../LibVlcPlayerView.types";
 
 export function convertAspectRatio(ratio?: VideoAspectRatio) {
   if (typeof ratio === "string") {
@@ -15,4 +15,10 @@ export function convertAspectRatio(ratio?: VideoAspectRatio) {
   }
 
   return ratio;
+}
+
+export function getMediaRatio(video: Video) {
+  const videoRatio = video.width / video.height;
+  const validRatio = videoRatio > 0 && videoRatio < Infinity;
+  return validRatio ? videoRatio : undefined;
 }

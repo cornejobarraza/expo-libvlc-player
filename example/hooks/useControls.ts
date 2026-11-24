@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const HIDE_DELAY = 3000;
+const HIDE_DELAY = 3_000;
 
 export function useControls(fullscreen?: boolean) {
   const [isVisible, setIsVisible] = useState<boolean>(false);

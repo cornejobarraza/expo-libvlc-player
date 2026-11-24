@@ -97,7 +97,7 @@ const REF_CALLS: { [K in keyof LibVlcPlayerViewRef]: Parameters<LibVlcPlayerView
 };
 
 const EVENT_PAYLOADS = [
-  ["onBuffering", { value: 42 }],
+  ["onBuffering", { value: 0.42 }],
   ["onEncounteredError", { message: "Failed to open media" }],
   [
     "onDialogDisplay",
@@ -123,7 +123,7 @@ const NATIVE_EVENT_PROPS = { target: 1, timeStamp: 1234 };
 function createMediaInfo(width: number, height: number) {
   return {
     media: { length: 634_000, seekable: true, pausable: true },
-    video: { width, height, frameRate: 30, bitrate: 5000 },
+    video: { width, height, frameRate: 30, bitrate: 5_000 },
     metadata: { title: "Big Buck Bunny", artist: null, album: null, artworkURL: null },
   };
 }

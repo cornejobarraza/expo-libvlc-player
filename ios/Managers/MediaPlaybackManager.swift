@@ -162,7 +162,7 @@ class MediaPlaybackManager {
     info[MPMediaItemPropertyArtist] = metadata.artist
     info[MPMediaItemPropertyAlbumTitle] = metadata.album
     info[MPMediaItemPropertyArtwork] = artwork
-    info[MPMediaItemPropertyPlaybackDuration] = hasLength ? Double(length) / 1000 : nil
+    info[MPMediaItemPropertyPlaybackDuration] = hasLength ? Double(length) / 1_000 : nil
     info[MPNowPlayingInfoPropertyIsLiveStream] = !hasLength
     info[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaType.video.rawValue
 
@@ -192,7 +192,7 @@ class MediaPlaybackManager {
     let position = !isStopped ? time ?? Int64(player.time.intValue) : 0
     let speed = Double(rate ?? player.rate)
 
-    info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = Double(max(position, 0)) / 1000
+    info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = Double(max(position, 0)) / 1_000
     info[MPNowPlayingInfoPropertyPlaybackRate] = player.isPlaying ? speed : 0
     info[MPNowPlayingInfoPropertyDefaultPlaybackRate] = speed
 
@@ -243,7 +243,7 @@ class MediaPlaybackManager {
     addTarget(commandCenter.changePlaybackPositionCommand) { view, _, event in
       guard let event = event as? MPChangePlaybackPositionCommandEvent else { return }
 
-      view.seek(event.positionTime * 1000)
+      view.seek(event.positionTime * 1_000)
     }
 
     let seekStep = MediaPlayerConstants.seekStep
@@ -258,7 +258,7 @@ class MediaPlaybackManager {
       addTarget(command) { view, _, event in
         let interval = (event as? MPSkipIntervalCommandEvent)?.interval ?? seekStep
 
-        view.seekBy(direction * interval * 1000)
+        view.seekBy(direction * interval * 1_000)
       }
     }
   }

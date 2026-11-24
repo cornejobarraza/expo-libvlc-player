@@ -81,15 +81,6 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
     },
   ];
 
-  const showPoster = (!playing && backgrounded) || time === PLAYER_DEFAULT_TIME;
-  const showBuffering = !parsing && buffering;
-  const posterSource = typeof poster === "string" ? { uri: poster } : poster;
-  const insets = useSafeAreaInsets();
-
-  const controls = useControls(fullscreen);
-  const slideAnimation = controls.visible ? animations.enter : animations.exit;
-  const controlsAnimation = fullscreen && slideAnimation;
-
   const header = (
     <View style={styles.header}>
       {!parsing ? (
@@ -110,12 +101,22 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
     </View>
   );
 
+  const hasPoster = (!playing && backgrounded) || time === PLAYER_DEFAULT_TIME;
+  const hasBuffering = !parsing && buffering;
+
+  const controls = useControls(fullscreen);
+  const animation = controls.visible ? animations.enter : animations.exit;
+  const controlsAnimation = fullscreen && animation;
+
+  const posterSource = typeof poster === "string" ? { uri: poster } : poster;
+  const insets = useSafeAreaInsets();
+
   return (
     <View style={[styles.player, fullscreen && styles.fullscreen]}>
       {!fullscreen && header}
       <View style={styles.container}>
         <LayoutAnimationConfig skipEntering>
-          {showPoster && (
+          {hasPoster && (
             <Animated.View
               style={styles.poster}
               entering={FadeIn}
@@ -149,7 +150,7 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
             </Animated.View>
           )}
         </LayoutAnimationConfig>
-        {showBuffering && (
+        {hasBuffering && (
           <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />
         )}
         <LibVlcPlayerView
@@ -181,8 +182,8 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
           onTimeChanged={({ value }) => {
             setTime(value);
           }}
-          onFirstPlay={(info) => {
-            setMetadata(info.metadata);
+          onFirstPlay={({ metadata }) => {
+            setMetadata(metadata);
             setParsing(false);
           }}
           onBackground={() => {

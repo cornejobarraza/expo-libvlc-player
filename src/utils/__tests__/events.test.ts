@@ -5,9 +5,9 @@ const NATIVE_PROPS = { target: 1, timeStamp: 2 };
 describe(convertNativeEvent, () => {
   it("strips target and timeStamp and keeps the rest of the event", () => {
     const mediaInfo = {
-      media: { length: 634000, seekable: true },
-      video: { width: 1920, height: 1080, frameRate: 30, bitrate: 5000 },
-      metadata: { title: "Big Buck Bunny", artist: null, artworkURL: null },
+      media: { length: 634_000, seekable: true, pausable: true },
+      video: { width: 1920, height: 1080, frameRate: 30, bitrate: 5_000 },
+      metadata: { title: "Big Buck Bunny", artist: null, album: null, artworkURL: null },
     };
 
     const event = {
