@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 58.0.21 - 2026-11-24
+
+### 🛠 Breaking changes
+
+- Renamed Target to SeekTarget type
+
+### 🎉 New features
+
+- Added pausable Media prop
+
 ## 58.0.20 - 2026-11-23
 
 ### 🛠 Breaking changes
