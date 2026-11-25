@@ -219,16 +219,28 @@ interface Metadata {
   title?: string | null;
   artist?: string | null;
   album?: string | null;
-  artworkURL?: string | number | null;
+  artworkURL?: Source;
 }
+```
+
+#### `Asset`
+
+```ts
+type Asset = NonNullable<Source>;
+```
+
+#### `SlaveType`
+
+```ts
+type SlaveType = "audio" | "subtitle";
 ```
 
 #### `Slave`
 
 ```ts
 interface Slave {
-  source: string | number;
-  type: "audio" | "subtitle";
+  source: Asset;
+  type: SlaveType;
   selected?: boolean;
 }
 ```
@@ -268,11 +280,17 @@ interface Error {
 }
 ```
 
+#### `DialogType`
+
+```ts
+type DialogType = "error" | "login" | "question" | "progress";
+```
+
 #### `Dialog`
 
 ```ts
 interface Dialog {
-  type: "error" | "login" | "question" | "progress";
+  type: DialogType;
   title: string;
   text: string;
   cancelText: string | null;
