@@ -250,9 +250,7 @@ class MediaPlaybackManager(
 
   private fun setSessionView(view: LibVlcPlayerView) {
     sessionView = view
-
     val session = session ?: createMediaSession()
-
     session.isActive = true
     bindPlaybackService()
     setPlaybackState()

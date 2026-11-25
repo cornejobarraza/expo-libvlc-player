@@ -44,7 +44,7 @@ class PictureInPictureManager(
   private val isInPictureInPictureMode: Boolean
     get() = activity?.isInPictureInPictureMode == true
 
-  private val rootChildrenVisibility: MutableMap<View, Int> = mutableMapOf()
+  private val childrenVisibility: MutableMap<View, Int> = mutableMapOf()
 
   fun addPipView(view: LibVlcPlayerView) {
     if (isPictureInPictureSupported()) {
@@ -142,45 +142,42 @@ class PictureInPictureManager(
 
   private fun layoutForPipEnter() {
     if (!isPipLayout) {
-      val rootView = activity?.findViewById<ViewGroup>(android.R.id.content) ?: return
-
       pipView?.let { view ->
-        for (i in 0 until rootView.childCount) {
-          val child = rootView.getChildAt(i)
-          rootChildrenVisibility[child] = child.visibility
+        val parent = activity?.findViewById<ViewGroup>(android.R.id.content) ?: return
+
+        for (i in 0 until parent.childCount) {
+          val child = parent.getChildAt(i)
+          childrenVisibility[child] = child.visibility
           child.visibility = View.GONE
         }
 
-        rootView.addView(view.picture)
-
         view.switchPlayerView(view.picture)
+        parent.addView(view.picture)
 
         isPipLayout = true
       }
     }
   }
 
-  private fun layoutForPipExit() {
-    if (isPipLayout) {
-      pipView?.let { view ->
-        view.switchPlayerView(view.video)
-
-        (view.picture.parent as? ViewGroup)?.removeView(view.picture)
-      }
-
-      rootChildrenVisibility.forEach { (child, visibility) ->
-        child.visibility = visibility
-      }
-
-      rootChildrenVisibility.clear()
-
-      isPipLayout = false
-    }
-  }
-
   fun layoutForPipExit(view: LibVlcPlayerView) {
     if (pipView == view) {
       layoutForPipExit()
+    }
+  }
+
+  private fun layoutForPipExit() {
+    if (isPipLayout) {
+      pipView?.let { view ->
+        val parent = view.picture.parent as? ViewGroup ?: return
+
+        childrenVisibility.forEach { (child, visibility) -> child.visibility = visibility }
+        childrenVisibility.clear()
+
+        view.switchPlayerView(view.video)
+        parent.removeView(view.picture)
+
+        isPipLayout = false
+      }
     }
   }
 
@@ -220,11 +217,8 @@ class PictureInPictureManager(
   }
 
   private fun unregisterPipReceiver() {
-    val receiver = pipReceiver ?: return
-
+    pipReceiver?.unregister(context)
     pipReceiver = null
-
-    appContext.reactContext?.let { context -> receiver.unregister(context) }
   }
 
   private fun updatePipParams() {

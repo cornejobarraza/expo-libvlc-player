@@ -214,6 +214,7 @@ class MediaPlayer(
     @Suppress("UseKtx")
     val uri = Uri.parse(source)
     val id = getSourceId(source) ?: return uri
+
     val cacheDir = File(context.cacheDir, MediaPlayerConstants.SOURCE_CACHE_DIR)
     val file = File(cacheDir, source)
 

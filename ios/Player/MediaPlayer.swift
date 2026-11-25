@@ -199,10 +199,13 @@ class MediaPlayer: NSObject {
   }
 
   func applyBounds() {
-    video.transform = .identity
-    video.frame = view.bounds
-    picture.transform = .identity
-    picture.frame = view.bounds
+    setBounds(drawable: video)
+    setBounds(drawable: picture)
+  }
+
+  func setBounds(drawable: MediaPlayerDrawable) {
+    drawable.transform = .identity
+    drawable.frame = view.bounds
   }
 
   func applyContentFit() {
