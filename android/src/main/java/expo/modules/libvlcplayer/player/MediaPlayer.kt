@@ -31,6 +31,7 @@ import org.videolan.libvlc.util.VLCVideoLayout
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URI
+import kotlin.math.round
 import org.videolan.libvlc.Dialog as VLCDialog
 import org.videolan.libvlc.Media as VLCMedia
 import org.videolan.libvlc.MediaPlayer as VLCMediaPlayer
@@ -579,11 +580,11 @@ class MediaPlayer(
     val height = video.height
     val frameRate =
       if (video.frameRateDen != 0) {
-        video.frameRateNum / video.frameRateDen
+        (video.frameRateNum.toDouble() / video.frameRateDen.toDouble()).frameRound()
       } else {
-        0
+        0.0
       }
-    val bitrate = video.bitrate
+    val bitrate = video.bitrate / MediaPlayerConstants.BITS_PER_KILOBIT
 
     return Video(
       width = width,
@@ -871,3 +872,7 @@ private fun MediaPlayer.setDialogCallbacks() {
     )
   }
 }
+
+private fun Double.frameRound(
+  precision: Double = MediaPlayerConstants.FRAME_RATE_PRECISION,
+): Double = round(this * precision) / precision

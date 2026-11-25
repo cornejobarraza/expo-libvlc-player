@@ -124,6 +124,9 @@ export interface Video {
   width: number;
   height: number;
   frameRate: number;
+  /**
+   * Value in kilobits per second
+   */
   bitrate: number;
 }
 

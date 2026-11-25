@@ -34,6 +34,8 @@ object MediaPlayerConstants {
   const val MIN_PLAYER_VOLUME: Int = 0
   const val MAX_PLAYER_VOLUME: Int = 100
   const val SEEK_STEP_MS: Long = 10_000L
+  const val FRAME_RATE_PRECISION: Double = 1_000_000.0
+  const val BITS_PER_KILOBIT: Int = 1_000
 
   val DISPLAY_MANAGER: DisplayManager?
     get() = null

@@ -25,6 +25,8 @@ enum MediaPlayerConstants {
   static let defaultPlayerTime: Int = 0
   static let minPlayerVolume: Int = 0
   static let maxPlayerVolume: Int = 100
+  static let frameRatePrecision: Double = 1_000_000.0
+  static let bitsPerKilobit: Int = 1_000
 
   static let dialogCustomUI: Bool = true
 

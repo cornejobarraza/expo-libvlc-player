@@ -8,7 +8,7 @@ struct Video: Record {
   var height: Int = 0
 
   @Field
-  var frameRate: Int = 0
+  var frameRate: Double = 0.0
 
   @Field
   var bitrate: Int = 0

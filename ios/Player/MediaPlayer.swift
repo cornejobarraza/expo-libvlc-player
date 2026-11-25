@@ -312,9 +312,9 @@ class MediaPlayer: NSObject {
     let width = Int(video.width)
     let height = Int(video.height)
     let frameRate = video.frameRateDenominator != 0 ?
-      Int(video.frameRate / video.frameRateDenominator) :
-      0
-    let bitrate = Int(track.bitrate)
+      (Double(video.frameRate) / Double(video.frameRateDenominator)).frameRound() :
+      0.0
+    let bitrate = Int(track.bitrate) / MediaPlayerConstants.bitsPerKilobit
 
     return Video(
       width: width,
@@ -620,5 +620,11 @@ extension MediaPlayer: VLCCustomDialogRendererProtocol {
       vlcDialog = nil
       view.onDialogCanceled()
     }
+  }
+}
+
+private extension Double {
+  func frameRound(_ precision: Double = MediaPlayerConstants.frameRatePrecision) -> Double {
+    (self * precision).rounded() / precision
   }
 }
