@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## 58.0.24 - 2026-11-25
+
+### 🛠 Breaking changes
+
+- Updated video bitrate to kilobits per second
+
+### 🐛 Bug fixes
+
+- Fixed video frame rate truncation
+
 ## 58.0.23 - 2026-11-24
 
 ### 💡 Others
