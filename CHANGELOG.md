@@ -10,6 +10,21 @@
 
 ### 💡 Others
 
+## 58.0.26 - 2026-11-27
+
+### 🐛 Bug fixes
+
+- Fixed Picture-in-Picture (PiP) aspect ratio on Android
+- Fixed content fit stretching the video on iOS
+- Fixed audio mixing mode options on iOS
+- Fixed player error for views without a source
+- Fixed volume changes after playback starts
+
+### 💡 Others
+
+- Removed auto aspect ratio delay
+- Upgraded Expo dependency to 58.1.0
+
 ## 58.0.25 - 2026-11-25
 
 ### 💡 Others
