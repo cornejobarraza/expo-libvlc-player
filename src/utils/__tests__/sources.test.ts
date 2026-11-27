@@ -5,7 +5,7 @@ import {
   parseNativeProps,
   parseNativeSlaves,
   parseNativeSource,
-} from "../assets";
+} from "../sources";
 
 const ASSET_ID = 42;
 const ASSET_URI = "file:///assets/video.mp4";

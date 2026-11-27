@@ -7,8 +7,9 @@ import {
   type LibVlcPlayerViewProps,
   type LibVlcPlayerViewRef,
 } from "../../LibVlcPlayerView.types";
-import { PLAYER_PROP_KEYS } from "../props";
+import { convertPlayerProps, PLAYER_PROP_KEYS } from "../props";
 import { usePlayerRef } from "../ref";
+import { parseNativeProps } from "../sources";
 
 const ASSET_ID = 42;
 const ASSET_URI = "file:///assets/video.mp4";
@@ -39,7 +40,7 @@ async function renderPlayerRef(initialProps: LibVlcPlayerViewProps) {
 
   const { rerender } = await renderHook(
     (props: LibVlcPlayerViewProps) => {
-      const playerRef = usePlayerRef(ref, props);
+      const playerRef = usePlayerRef(ref, parseNativeProps(convertPlayerProps(props)));
       playerRef.current = nativeRef;
       return playerRef;
     },
@@ -132,7 +133,7 @@ describe(usePlayerRef, () => {
     jest.mocked(nativeRef.update).mockReturnValue(rejection);
 
     await renderHook(() => {
-      const playerRef = usePlayerRef(ref, { source: VIDEO_URL });
+      const playerRef = usePlayerRef(ref, convertPlayerProps({ source: VIDEO_URL }));
       playerRef.current = nativeRef;
       return playerRef;
     });

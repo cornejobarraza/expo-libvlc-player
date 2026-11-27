@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.os.Build
 import android.util.Rational
+import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
@@ -54,7 +55,6 @@ class PictureInPictureManager(
       unregisterPipReceiver()
       registerPipReceiver()
       updatePipParams()
-      updatePipActions()
     }
   }
 
@@ -88,33 +88,7 @@ class PictureInPictureManager(
     if (pipView == null && view.pictureInPicture && view.mediaPlayer?.isPlaying() == true) {
       addPipView(view)
     } else {
-      updatePipActions()
-    }
-  }
-
-  fun updatePipActions() {
-    val canSetActions = isPictureInPictureSupported() && pipView != null
-
-    if (canSetActions) {
-      val isPlaying = mediaPlayer?.isPlaying() == true
-      val isSeekable = mediaPlayer?.isSeekable() == true
-
-      val actions =
-        MediaAction.controls(isPlaying, isSeekable).map { action ->
-          getRemoteActions().getValue(action)
-        }
-
-      val params =
-        PictureInPictureParams
-          .Builder()
-          .setActions(actions)
-          .apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-              setAutoEnterEnabled(pictureInPicture && isPlaying)
-            }
-          }.build()
-
-      activity?.setPictureInPictureParams(params)
+      updatePipParams()
     }
   }
 
@@ -221,37 +195,60 @@ class PictureInPictureManager(
     pipReceiver = null
   }
 
+  fun updatePipParams(view: LibVlcPlayerView) {
+    if (pipView == view) {
+      updatePipParams()
+    }
+  }
+
   private fun updatePipParams() {
-    val texture = pipView?.let { view -> view.getTextureView(view.video) }
-    val canSetParams = isPictureInPictureSupported() && texture != null
+    val canSetParams = isPictureInPictureSupported() && pipView != null
 
     if (canSetParams) {
-      val ratio = Rational(texture.width, texture.height)
-      val safeRatio = ratio.takeIf { ratio -> ratio.toFloat() in 0.41841..2.39 }
+      val isPlaying = mediaPlayer?.isPlaying() == true
+      val isSeekable = mediaPlayer?.isSeekable() == true
 
-      val hint = Rect()
-      texture.getGlobalVisibleRect(hint)
-
-      val location = IntArray(2)
-      texture.getLocationOnScreen(location)
-
-      val height = hint.bottom - hint.top
-      hint.top = location[1]
-      hint.bottom = hint.top + height
+      val actions =
+        MediaAction.controls(isPlaying, isSeekable).map { action ->
+          getRemoteActions().getValue(action)
+        }
+      val texture =
+        pipView
+          ?.takeIf { !isPipLayout && !isInPictureInPictureMode }
+          ?.let { view -> view.getTextureView(view.video) }
 
       val params =
         PictureInPictureParams
           .Builder()
-          .apply { safeRatio?.let { ratio -> setAspectRatio(ratio) } }
-          .setSourceRectHint(hint)
+          .setActions(actions)
           .apply {
+            texture?.let { texture -> setSourceBounds(texture) }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-              setAutoEnterEnabled(pictureInPicture)
+              setAutoEnterEnabled(pictureInPicture && isPlaying)
             }
           }.build()
 
       activity?.setPictureInPictureParams(params)
     }
+  }
+
+  @RequiresApi(Build.VERSION_CODES.O)
+  private fun PictureInPictureParams.Builder.setSourceBounds(texture: TextureView) {
+    val ratio = Rational(texture.width, texture.height)
+    if (ratio.toFloat() in 0.41841..2.39) setAspectRatio(ratio)
+
+    val hint = Rect()
+    texture.getGlobalVisibleRect(hint)
+
+    val location = IntArray(2)
+    texture.getLocationOnScreen(location)
+
+    val height = hint.bottom - hint.top
+    hint.top = location[1]
+    hint.bottom = hint.top + height
+
+    setSourceRectHint(hint)
   }
 
   private fun resetPipParams() {

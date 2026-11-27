@@ -6,27 +6,27 @@ class AudioSessionManager {
 
   private lazy var expoViews = MediaPlayerManager.shared.expoViews
 
-  private var mediaPlayers: [VLCMediaPlayer] {
-    expoViews.allObjects.compactMap { view in view.mediaPlayer }
-  }
-
   func setAppropriateAudioSession() {
+    let playingViews = expoViews.allObjects.filter { view in view.mediaPlayer?.isPlaying == true }
+    let audioMixingMode = playingViews.map(\.audioMixingMode)
+      .max { lhs, rhs in lhs.priority() < rhs.priority() }
+    let anyPlayingView = playingViews
+      .contains { view in (view.mediaPlayer?.audio?.volume ?? 0) > 0 }
     let isNowPlayingEligible = MediaPlayerManager.shared.mediaPlaybackManager.isNowPlayingEligible
 
-    Self.managerQueue.async { [weak self] in
-      self?.setAudioSession(isNowPlayingEligible)
+    Self.managerQueue.async {
+      Self.setAudioSession(audioMixingMode, anyPlayingView, isNowPlayingEligible)
     }
   }
 
-  private func setAudioSession(_ isNowPlayingEligible: Bool) {
+  private static func setAudioSession(
+    _ audioMixingMode: AudioMixingMode?,
+    _ anyPlayingView: Bool,
+    _ isNowPlayingEligible: Bool
+  ) {
     let audioSession = AVAudioSession.sharedInstance()
-    let audioMixingMode = findAudioMixingMode()
     var audioSessionCategoryOptions: AVAudioSession.CategoryOptions = audioSession
       .categoryOptions
-
-    let anyPlayingView = mediaPlayers.contains { player in
-      playerRequiresCategory(player)
-    }
 
     let shouldMixOverride = audioMixingMode == .mixWithOthers
     let doNotMixOverride = audioMixingMode == .doNotMix
@@ -66,31 +66,5 @@ class AudioSessionManager {
         // Failed to set the audio session
       }
     }
-  }
-
-  private func playerRequiresCategory(_ player: VLCMediaPlayer) -> Bool {
-    guard let audio = player.audio else { return false }
-
-    return player.isPlaying && audio.volume > 0
-  }
-
-  private func findAudioMixingMode() -> AudioMixingMode? {
-    let playingViews = expoViews.allObjects.filter { view in
-      view.mediaPlayer?.isPlaying == true
-    }
-
-    var audioMixingMode: AudioMixingMode = .auto
-
-    if playingViews.isEmpty {
-      return nil
-    }
-
-    for view in playingViews
-      where (audioMixingMode.priority()) < view.audioMixingMode.priority()
-    {
-      audioMixingMode = view.audioMixingMode
-    }
-
-    return audioMixingMode
   }
 }

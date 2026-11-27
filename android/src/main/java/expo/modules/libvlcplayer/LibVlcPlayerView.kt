@@ -170,17 +170,12 @@ class LibVlcPlayerView(
   var mute: Boolean = false
     set(value) {
       field = value
-
-      val newVolume =
-        if (value) {
-          MediaPlayerConstants.MIN_PLAYER_VOLUME
-        } else {
-          volume
-        }
-
-      mediaPlayer?.setVolume(newVolume)
+      mediaPlayer?.setVolume(playerVolume)
       MediaPlayerManager.audioFocusManager.updateAudioFocus()
     }
+
+  val playerVolume: Int
+    get() = if (mute) MediaPlayerConstants.MIN_PLAYER_VOLUME else volume
 
   var repeat: Boolean = false
 
@@ -302,8 +297,8 @@ class LibVlcPlayerView(
     }
   }
 
-  fun stop(error: Boolean? = null) {
-    player.userStop = error ?: true
+  fun stop(userStop: Boolean = true) {
+    player.userStop = userStop
 
     player.withPlayerAsync { mediaPlayer ->
       if (!mediaPlayer.isReleased) {
@@ -362,33 +357,25 @@ class LibVlcPlayerView(
     try {
       if (!player.hasVideoSize) throw Exception()
 
-      val view = getTextureView(video) ?: throw Exception()
-      val surface = Surface(view.surfaceTexture)
-      val video = player.getVideo()
+      val texture = getTextureView(video)
+      val track = player.getVideo()
 
-      @Suppress("UseKtx")
-      val bitmap = Bitmap.createBitmap(video.width, video.height, Bitmap.Config.ARGB_8888)
+      val surface = Surface(texture?.surfaceTexture)
+      val bitmap = Bitmap.createBitmap(track.width, track.height, Bitmap.Config.ARGB_8888)
 
       PixelCopy.request(
         surface,
         bitmap,
-        { copyResult ->
+        { result ->
           try {
-            if (copyResult != PixelCopy.SUCCESS) throw Exception()
-
-            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'", Locale.US)
-            val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
-
-            val snapshotPath = path + "/libvlc-snapshot-$timestamp.png"
-            val file = File(snapshotPath)
-
-            FileOutputStream(file).use { stream ->
-              bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            }
-
-            onSnapshotTaken(mapOf("path" to snapshotPath))
+            if (result != PixelCopy.SUCCESS) throw Exception()
+            onSnapshotTaken(mapOf("path" to saveSnapshot(path, bitmap)))
+          } catch (_: OutOfMemoryError) {
+            onEncounteredError(mapOf("message" to message))
           } catch (_: Exception) {
             onEncounteredError(mapOf("message" to message))
+          } finally {
+            surface.release()
           }
         },
         Handler(Looper.getMainLooper()),
@@ -396,6 +383,21 @@ class LibVlcPlayerView(
     } catch (_: Exception) {
       onEncounteredError(mapOf("message" to message))
     }
+  }
+
+  private fun saveSnapshot(
+    path: String,
+    bitmap: Bitmap,
+  ): String {
+    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH'h'mm'm'ss's'", Locale.US)
+    val timestamp = simpleDateFormat.format(Calendar.getInstance().time)
+    val snapshotPath = path + "/libvlc-snapshot-$timestamp.png"
+
+    FileOutputStream(File(snapshotPath)).use { stream ->
+      bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    }
+
+    return snapshotPath
   }
 
   fun postAction(action: Int) {

@@ -32,6 +32,7 @@ import expo.modules.libvlcplayer.utils.MediaActionReceiver
 import expo.modules.libvlcplayer.utils.MediaPlaybackService
 import expo.modules.libvlcplayer.utils.PlaybackServiceBinder
 import expo.modules.libvlcplayer.utils.registerNotExportedReceiver
+import expo.modules.libvlcplayer.utils.unregisterReceiverSafely
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -223,7 +224,7 @@ class MediaPlaybackManager(
 
       context?.let { context ->
         notificationReceiver?.unregister(context)
-        dismissReceiver?.let { receiver -> unregisterReceiver(context, receiver) }
+        dismissReceiver?.let { receiver -> context.unregisterReceiverSafely(receiver) }
       }
 
       notificationReceiver = null
@@ -336,17 +337,6 @@ class MediaPlaybackManager(
     return session
   }
 
-  private fun unregisterReceiver(
-    context: Context,
-    receiver: BroadcastReceiver,
-  ) {
-    try {
-      context.unregisterReceiver(receiver)
-    } catch (_: IllegalArgumentException) {
-      // Receiver not registered
-    }
-  }
-
   private fun onNotificationDismissed() {
     if (mediaPlayer?.isPlaying() == true) {
       notificationState = null
@@ -453,9 +443,9 @@ class MediaPlaybackManager(
   private fun loadArtwork(uri: Uri): Bitmap? =
     try {
       openArtworkStream(uri)?.use { input -> decodeArtwork(input.readBytes()) }
-    } catch (_: Exception) {
-      null
     } catch (_: OutOfMemoryError) {
+      null
+    } catch (_: Exception) {
       null
     }
 
@@ -486,9 +476,6 @@ class MediaPlaybackManager(
         readTimeout = MediaPlayerConstants.ARTWORK_TIMEOUT_MS
       }.getInputStream()
 
-  private fun MediaPlayer.isStopped(): Boolean =
-    getPlayerState().let { state -> state == IMedia.State.Stopped || state == IMedia.State.Ended }
-
   private fun setPlaybackState(
     time: Long? = null,
     rate: Float? = null,
@@ -496,7 +483,6 @@ class MediaPlaybackManager(
     val session = session ?: return
     val player = mediaPlayer ?: return
 
-    val isStopped = player.isStopped()
     val isSeekable = player.isSeekable()
     val actions =
       if (isSeekable) {
@@ -513,6 +499,7 @@ class MediaPlaybackManager(
         IMedia.State.Error -> PlaybackState.STATE_ERROR
         else -> PlaybackState.STATE_NONE
       }
+    val isStopped = state == PlaybackState.STATE_STOPPED
     val position = if (!isStopped) (time ?: player.getTime()).coerceAtLeast(0L) else 0L
     val speed = rate ?: player.getRate()
 

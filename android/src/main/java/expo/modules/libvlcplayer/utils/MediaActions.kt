@@ -71,10 +71,6 @@ class MediaActionReceiver(
   }
 
   fun unregister(context: Context) {
-    try {
-      context.unregisterReceiver(this)
-    } catch (_: IllegalArgumentException) {
-      // Receiver not registered
-    }
+    context.unregisterReceiverSafely(this)
   }
 }

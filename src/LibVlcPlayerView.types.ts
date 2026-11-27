@@ -424,7 +424,7 @@ export type LibVlcPlayerViewProps = ViewProps &
     /**
      * Allows getting a ref to the component instance
      *
-     * @see {@link https://dev/learn/referencing-values-with-refs#refs-and-the-dom React Docs}
+     * @see {@link https://react.dev/learn/referencing-values-with-refs#refs-and-the-dom React Docs}
      */
     ref?: Ref<LibVlcPlayerViewRef>;
     /**
@@ -525,132 +525,25 @@ export type LibVlcPlayerViewNativeRef = LibVlcPlayerViewRef & LibVlcPlayerViewRe
 /**
  * @hidden
  */
-type BufferingListener = (event: NativeEvent<Buffering>) => void;
-
-/**
- * @hidden
- */
-type PlayingListener = () => void;
-
-/**
- * @hidden
- */
-type PausedListener = () => void;
-
-/**
- * @hidden
- */
-type StoppedListener = () => void;
-
-/**
- * @hidden
- */
-type EncounteredErrorListener = (event: NativeEvent<Error>) => void;
-
-/**
- * @hidden
- */
-type DialogDisplayListener = (event: NativeEvent<Dialog>) => void;
-
-/**
- * @hidden
- */
-type DialogProgressListener = (event: NativeEvent<Progress>) => void;
-
-/**
- * @hidden
- */
-type DialogCanceledListener = () => void;
-
-/**
- * @hidden
- */
-type TimeChangedListener = (event: NativeEvent<Time>) => void;
-
-/**
- * @hidden
- */
-type PositionChangedListener = (event: NativeEvent<Position>) => void;
-
-/**
- * @hidden
- */
-type ESAddedListener = (event: NativeEvent<MediaTracks>) => void;
-
-/**
- * @hidden
- */
-type RecordChangedListener = (event: NativeEvent<Recording>) => void;
-
-/**
- * @hidden
- */
-type SnapshotTakenListener = (event: NativeEvent<Snapshot>) => void;
-
-/**
- * @hidden
- */
-type FirstPlayListener = (event: NativeEvent<MediaInfo>) => void;
-
-/**
- * @hidden
- */
-type ForegroundListener = () => void;
-
-/**
- * @hidden
- */
-type BackgroundListener = () => void;
-
-/**
- * @hidden
- */
-type PictureInPictureStartListener = () => void;
-
-/**
- * @hidden
- */
-type PictureInPictureStopListener = () => void;
-
-/**
- * @hidden
- */
-export type LibVlcPlayerViewNativeProps = ViewProps & {
-  ref?: Ref<LibVlcPlayerViewNativeRef>;
-  source?: Source;
-  metadata?: Metadata;
-  options?: string[];
-  slaves?: Slave[];
-  tracks?: Tracks;
-  delays?: Delays;
-  scale?: number;
-  contentFit?: VideoContentFit;
-  rate?: number;
-  time?: number;
-  volume?: number;
-  mute?: boolean;
-  audioMixingMode?: AudioMixingMode;
-  repeat?: boolean;
-  autoplay?: boolean;
-  keepScreenAwake?: boolean;
-  playInBackground?: boolean;
-  pictureInPicture?: boolean;
-  onBuffering?: BufferingListener;
-  onPlaying?: PlayingListener;
-  onPaused?: PausedListener;
-  onStopped?: StoppedListener;
-  onEncounteredError?: EncounteredErrorListener;
-  onDialogDisplay?: DialogDisplayListener;
-  onDialogProgress?: DialogProgressListener;
-  onDialogCanceled?: DialogCanceledListener;
-  onTimeChanged?: TimeChangedListener;
-  onPositionChanged?: PositionChangedListener;
-  onESAdded?: ESAddedListener;
-  onRecordChanged?: RecordChangedListener;
-  onSnapshotTaken?: SnapshotTakenListener;
-  onFirstPlay?: FirstPlayListener;
-  onForeground?: ForegroundListener;
-  onBackground?: BackgroundListener;
-  onPictureInPictureStart?: PictureInPictureStartListener;
-  onPictureInPictureStop?: PictureInPictureStopListener;
-};
+export type LibVlcPlayerViewNativeProps = ViewProps &
+  Partial<PlayerProps> & {
+    ref?: Ref<LibVlcPlayerViewNativeRef>;
+    onBuffering?: (event: NativeEvent<Buffering>) => void;
+    onPlaying?: () => void;
+    onPaused?: () => void;
+    onStopped?: () => void;
+    onEncounteredError?: (event: NativeEvent<Error>) => void;
+    onDialogDisplay?: (event: NativeEvent<Dialog>) => void;
+    onDialogProgress?: (event: NativeEvent<Progress>) => void;
+    onDialogCanceled?: () => void;
+    onTimeChanged?: (event: NativeEvent<Time>) => void;
+    onPositionChanged?: (event: NativeEvent<Position>) => void;
+    onESAdded?: (event: NativeEvent<MediaTracks>) => void;
+    onRecordChanged?: (event: NativeEvent<Recording>) => void;
+    onSnapshotTaken?: (event: NativeEvent<Snapshot>) => void;
+    onFirstPlay?: (event: NativeEvent<MediaInfo>) => void;
+    onForeground?: () => void;
+    onBackground?: () => void;
+    onPictureInPictureStart?: () => void;
+    onPictureInPictureStop?: () => void;
+  };

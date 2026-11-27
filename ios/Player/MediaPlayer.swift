@@ -12,7 +12,7 @@ class MediaPlayer: NSObject {
   private var library: VLCLibrary?
   var mediaPlayer: VLCMediaPlayer?
   private var vlcDialogProvider: VLCDialogProvider?
-  var vlcDialog: VLCDialog?
+  private var vlcDialog: VLCDialog?
 
   private var pLength: Int64?
   var userStop: Bool = false
@@ -54,9 +54,7 @@ class MediaPlayer: NSObject {
       createPlayer()
       MediaPlayerManager.shared.mediaPlaybackManager.updatePlaybackMetadata(view)
     } else {
-      stopPictureInPicture()
-      destroyPlayer()
-      MediaPlayerManager.shared.mediaPlaybackManager.removePlaybackView(viewID)
+      view.destroyPlayer()
     }
   }
 
@@ -117,7 +115,6 @@ class MediaPlayer: NSObject {
   func destroyPlayer() {
     library = nil
     mediaPlayer = nil
-    vlcDialogProvider?.customRenderer = nil
     vlcDialogProvider = nil
     vlcDialog = nil
     pLength = nil
@@ -137,17 +134,15 @@ class MediaPlayer: NSObject {
         let initialTime = shouldInitTime ?
           view.time :
           0
-        let newVolume = view.mute ?
-          MediaPlayerConstants.minPlayerVolume :
-          view.volume
-
         player.scaleFactor = Float(view.scale)
         player.rate = Float(view.rate)
         if initialTime > 0 { player.time = VLCTime(int: Int32(initialTime)) }
 
         // Negative volume workaround
-        retryUntil { _ in
-          player.audio?.volume = Int32(newVolume)
+        retryUntil { [weak self] _ in
+          guard let self else { return true }
+
+          mediaPlayer?.audio?.volume = Int32(view.playerVolume)
 
           return false
         }
@@ -203,7 +198,7 @@ class MediaPlayer: NSObject {
     setBounds(drawable: picture)
   }
 
-  func setBounds(drawable: MediaPlayerDrawable) {
+  private func setBounds(drawable: MediaPlayerDrawable) {
     drawable.transform = .identity
     drawable.frame = view.bounds
   }
@@ -222,7 +217,7 @@ class MediaPlayer: NSObject {
       let video = getVideo()
 
       if hasVideoSize {
-        let viewAspect = drawable.frame.size.width / drawable.frame.size.height
+        let viewAspect = drawable.bounds.size.width / drawable.bounds.size.height
         let videoAspect = CGFloat(video.width) / CGFloat(video.height)
 
         switch view.contentFit {
@@ -483,7 +478,7 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
     case .error:
       view.onEncounteredError(["message": "Player encountered an error"])
 
-      view.stop(error: true)
+      view.stop()
     default:
       break
     }

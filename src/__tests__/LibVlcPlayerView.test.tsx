@@ -157,7 +157,6 @@ describe("LibVlcPlayerView", () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
@@ -223,108 +222,58 @@ describe("LibVlcPlayerView", () => {
       expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 16 / 9 });
     });
 
-    it.each([
-      [0, 0],
-      [1280, 0],
-      [0, 720],
-    ])("returns to the fallback ratio when the media reports %ix%i", async (width, height) => {
-      jest.useFakeTimers();
-
+    it("adopts the media ratio when aspectRatio is auto", async () => {
       const { toJSON } = await render(
         <LibVlcPlayerView source={SOURCE} aspectRatio="auto" fallbackRatio={FALLBACK_RATIO} />
       );
 
       await act(async () => {
         getNativeProps().onFirstPlay?.(createFirstPlayEvent(1280, 960));
-        jest.runAllTimers();
-        getNativeProps().onFirstPlay?.(createFirstPlayEvent(width, height));
-        jest.runAllTimers();
-      });
-
-      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 16 / 9 });
-    });
-  });
-
-  describe("auto ratio timing", () => {
-    it("waits for the resize delay before adopting the media ratio", async () => {
-      jest.useFakeTimers();
-
-      const { toJSON } = await render(
-        <LibVlcPlayerView source={SOURCE} aspectRatio="auto" fallbackRatio={FALLBACK_RATIO} />
-      );
-
-      await act(async () => {
-        getNativeProps().onFirstPlay?.(createFirstPlayEvent(1280, 960));
-        jest.advanceTimersByTime(299);
-      });
-
-      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 16 / 9 });
-
-      await act(async () => {
-        jest.advanceTimersByTime(1);
       });
 
       expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 1280 / 960 });
     });
 
-    it("ignores the media ratio when aspectRatio is not auto", async () => {
-      jest.useFakeTimers();
-
-      const { toJSON } = await render(<LibVlcPlayerView source={SOURCE} aspectRatio="4:3" />);
-
-      await act(async () => {
-        getNativeProps().onFirstPlay?.(createFirstPlayEvent(1920, 1080));
-        jest.runAllTimers();
-      });
-
-      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 4 / 3 });
-    });
-
-    it("applies only the latest ratio when onFirstPlay fires again", async () => {
-      jest.useFakeTimers();
-
+    it("applies the latest ratio when onFirstPlay fires again", async () => {
       const { toJSON } = await render(
         <LibVlcPlayerView source={SOURCE} aspectRatio="auto" fallbackRatio={FALLBACK_RATIO} />
       );
 
       await act(async () => {
         getNativeProps().onFirstPlay?.(createFirstPlayEvent(400, 400));
-        jest.advanceTimersByTime(200);
         getNativeProps().onFirstPlay?.(createFirstPlayEvent(1280, 960));
-        jest.advanceTimersByTime(299);
-      });
-
-      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 16 / 9 });
-
-      await act(async () => {
-        jest.advanceTimersByTime(1);
       });
 
       expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 1280 / 960 });
     });
 
-    it("cancels the pending ratio update on unmount", async () => {
-      jest.useFakeTimers();
-
-      const setTimeoutSpy = jest.spyOn(globalThis, "setTimeout");
-      const clearTimeoutSpy = jest.spyOn(globalThis, "clearTimeout");
-
-      const { unmount } = await render(
+    it.each([
+      [0, 0],
+      [1280, 0],
+      [0, 720],
+      [-1280, 720],
+      [1280, -720],
+    ])("returns to the fallback ratio when the media reports %ix%i", async (width, height) => {
+      const { toJSON } = await render(
         <LibVlcPlayerView source={SOURCE} aspectRatio="auto" fallbackRatio={FALLBACK_RATIO} />
       );
 
       await act(async () => {
-        getNativeProps().onFirstPlay?.(createFirstPlayEvent(1280, 720));
+        getNativeProps().onFirstPlay?.(createFirstPlayEvent(1280, 960));
+        getNativeProps().onFirstPlay?.(createFirstPlayEvent(width, height));
       });
 
-      const ratioCall = setTimeoutSpy.mock.calls.findIndex(([, delay]) => delay === 300);
-      const ratioTimeout = setTimeoutSpy.mock.results[ratioCall]?.value;
+      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 16 / 9 });
+    });
 
-      expect(ratioTimeout).toBeDefined();
+    it("ignores the media ratio when aspectRatio is not auto", async () => {
+      const { toJSON } = await render(<LibVlcPlayerView source={SOURCE} aspectRatio="4:3" />);
 
-      await unmount();
+      await act(async () => {
+        getNativeProps().onFirstPlay?.(createFirstPlayEvent(1920, 1080));
+      });
 
-      expect(clearTimeoutSpy).toHaveBeenCalledWith(ratioTimeout);
+      expect(getWrapperStyle(toJSON())).toMatchObject({ aspectRatio: 4 / 3 });
     });
   });
 
@@ -484,23 +433,18 @@ describe("LibVlcPlayerView", () => {
     });
 
     it("converts the native event for onFirstPlay", async () => {
-      jest.useFakeTimers();
-
       const onFirstPlay = jest.fn();
 
       await render(<LibVlcPlayerView source={SOURCE} onFirstPlay={onFirstPlay} />);
 
       await act(async () => {
         getNativeProps().onFirstPlay?.(createFirstPlayEvent(1920, 1080));
-        jest.runAllTimers();
       });
 
       expect(onFirstPlay).toHaveBeenCalledWith(createMediaInfo(1920, 1080));
     });
 
     it("does not throw when native events fire without listeners", async () => {
-      jest.useFakeTimers();
-
       await render(<LibVlcPlayerView source={SOURCE} />);
       const props = getNativeProps();
 
@@ -512,8 +456,7 @@ describe("LibVlcPlayerView", () => {
             });
           }
           props.onFirstPlay?.(createFirstPlayEvent(1, 1));
-          jest.runAllTimers();
-        }).not.toThrow();
+          }).not.toThrow();
       });
     });
   });

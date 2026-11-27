@@ -2,15 +2,13 @@ import { useLayoutEffect, useImperativeHandle, useRef, type Ref } from "react";
 
 import {
   type LibVlcPlayerViewNativeRef,
-  type LibVlcPlayerViewProps,
   type LibVlcPlayerViewRef,
+  type PlayerProps,
 } from "../LibVlcPlayerView.types";
-import { parseNativeProps } from "./assets";
-import { convertPlayerProps } from "./props";
 
 type PlayerRef = Ref<LibVlcPlayerViewRef> | undefined;
 
-export function usePlayerRef(ref: PlayerRef, props: LibVlcPlayerViewProps) {
+export function usePlayerRef(ref: PlayerRef, props: PlayerProps) {
   const nativeRef = useRef<LibVlcPlayerViewNativeRef>(null);
 
   useImperativeHandle(
@@ -32,13 +30,9 @@ export function usePlayerRef(ref: PlayerRef, props: LibVlcPlayerViewProps) {
     []
   );
 
-  const playerProps = convertPlayerProps(props);
-  const nativeProps = parseNativeProps(playerProps);
-  const stringProps = JSON.stringify(nativeProps);
-
   useLayoutEffect(() => {
-    nativeRef.current?.update(nativeProps)?.catch(() => {});
-  }, [stringProps]);
+    nativeRef.current?.update(props)?.catch(() => {});
+  }, [JSON.stringify(props)]);
 
   return nativeRef;
 }

@@ -1,34 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const DEFAULT_TIMEOUT = 5_000;
 
 export function useBoolean(value: boolean) {
   const [bool, setBool] = useState<boolean>(value);
-  const timeoutRef = useRef<number>(null);
-
-  const set = (bool: boolean) => {
-    setBool(bool);
-  };
-
-  const clear = () => {
-    clearTimeout(timeoutRef.current);
-  };
-
-  const schedule = () => {
-    const timeout = setTimeout(() => set(false), DEFAULT_TIMEOUT);
-    timeoutRef.current = timeout;
-  };
-
-  const update = (next: boolean) => {
-    clear();
-    set(next);
-    schedule();
-  };
 
   useEffect(() => {
-    schedule();
-    return clear;
+    if (!bool) return;
+    const timeout = setTimeout(() => setBool(false), DEFAULT_TIMEOUT);
+    return () => clearTimeout(timeout);
   }, [bool]);
 
-  return [bool, update] as const;
+  return [bool, setBool] as const;
 }

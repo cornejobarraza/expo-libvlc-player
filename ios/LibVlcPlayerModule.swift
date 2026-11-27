@@ -13,6 +13,10 @@ public class LibVlcPlayerModule: Module {
       MediaPlayerManager.shared.localNetworkManager.triggerNetworkAlert()
     }
 
+    OnCreate {
+      MediaPlayerManager.shared.onModuleCreate()
+    }
+
     OnDestroy {
       MediaPlayerManager.shared.onModuleDestroy()
     }

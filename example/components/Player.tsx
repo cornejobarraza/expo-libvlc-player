@@ -40,6 +40,27 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
   const [parsing, setParsing] = useBoolean(true);
 
   const playerRef = useRef<LibVlcPlayerViewRef>(null);
+  const insets = useSafeAreaInsets();
+
+  const header = (
+    <View style={styles.header}>
+      {!parsing ? (
+        <Fragment>
+          <Text style={styles.title} numberOfLines={1}>
+            {metadata?.title || "Media Player"}
+          </Text>
+          <Text style={styles.artist} numberOfLines={1}>
+            {metadata?.artist || "Powered by LibVLC"}
+          </Text>
+        </Fragment>
+      ) : (
+        <Fragment>
+          <Text.Loading style={{ width: "50%", height: styles.title.lineHeight }} />
+          <Text.Loading style={{ width: "75%", height: styles.artist.lineHeight }} />
+        </Fragment>
+      )}
+    </View>
+  );
 
   const playerControls: ControlProps[] = [
     {
@@ -81,42 +102,19 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
     },
   ];
 
-  const header = (
-    <View style={styles.header}>
-      {!parsing ? (
-        <Fragment>
-          <Text style={styles.title} numberOfLines={1}>
-            {metadata?.title || "Media Player"}
-          </Text>
-          <Text style={styles.artist} numberOfLines={1}>
-            {metadata?.artist || "Powered by LibVLC"}
-          </Text>
-        </Fragment>
-      ) : (
-        <Fragment>
-          <Text.Loading style={{ width: "50%", height: styles.title.lineHeight }} />
-          <Text.Loading style={{ width: "75%", height: styles.artist.lineHeight }} />
-        </Fragment>
-      )}
-    </View>
-  );
-
-  const hasPoster = (!playing && backgrounded) || time === PLAYER_DEFAULT_TIME;
-  const hasBuffering = !parsing && buffering;
-
   const controls = useControls(fullscreen);
   const animation = controls.visible ? animations.enter : animations.exit;
   const controlsAnimation = fullscreen && animation;
 
+  const showPoster = (!playing && backgrounded) || time === PLAYER_DEFAULT_TIME;
   const posterSource = typeof poster === "string" ? { uri: poster } : poster;
-  const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.player, fullscreen && styles.fullscreen]}>
       {!fullscreen && header}
       <View style={styles.container}>
         <LayoutAnimationConfig skipEntering>
-          {hasPoster && (
+          {showPoster && (
             <Animated.View
               style={styles.poster}
               entering={FadeIn}
@@ -150,7 +148,7 @@ export const Player = ({ source, poster, fullscreen }: PlayerProps) => {
             </Animated.View>
           )}
         </LayoutAnimationConfig>
-        {hasBuffering && (
+        {!parsing && buffering && (
           <ActivityIndicator style={styles.buffering} color="#f1f1f1" size="large" />
         )}
         <LibVlcPlayerView

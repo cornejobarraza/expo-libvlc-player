@@ -92,9 +92,7 @@ class MediaPlayer(
       createPlayer()
       MediaPlayerManager.mediaPlaybackManager.updatePlaybackSource(view)
     } else {
-      destroyPlayer()
-      MediaPlayerManager.mediaPlaybackManager.removePlaybackView(view)
-      MediaPlayerManager.pictureInPictureManager.removePipView(view)
+      view.destroyPlayer()
     }
   }
 
@@ -295,7 +293,6 @@ class MediaPlayer(
           MediaPlayerConstants.ENABLE_SUBTITLES,
           MediaPlayerConstants.USE_TEXTURE_VIEW,
         )
-
         surfaceKeeper = getTextureView(layout)?.let { texture -> SurfaceTextureKeeper(texture) }
       }
     }
@@ -307,10 +304,9 @@ class MediaPlayer(
 
       if (attached) {
         player.detachViews()
+        surfaceKeeper = null
       }
     }
-
-    surfaceKeeper = null
   }
 
   fun switchPlayerView(layout: VLCVideoLayout) {
@@ -368,20 +364,13 @@ class MediaPlayer(
           } else {
             0
           }
-        val newVolume =
-          if (view.mute) {
-            MediaPlayerConstants.MIN_PLAYER_VOLUME
-          } else {
-            view.volume
-          }
-
         player.setScale(view.scale.toFloat())
         player.setRate(view.rate.toFloat())
         if (initialTime > 0) player.setTime(initialTime.toLong())
 
         // Negative volume workaround
         retryUntil {
-          player.setVolume(newVolume)
+          mediaPlayer?.setVolume(view.playerVolume)
 
           return@retryUntil false
         }
@@ -436,6 +425,7 @@ class MediaPlayer(
   fun applyContentFit() {
     setContentFit(layout = video)
     setContentFit(layout = picture)
+    MediaPlayerManager.pictureInPictureManager.updatePipParams(view)
   }
 
   private fun setContentFit(layout: VLCVideoLayout) {
@@ -755,13 +745,13 @@ private fun MediaPlayer.setPlayerListener() {
           }
 
           Event.EndReached -> {
-            view.stop(error = false)
+            view.stop(userStop = false)
           }
 
           Event.EncounteredError -> {
             view.onEncounteredError(mapOf("message" to "Player encountered an error"))
 
-            view.stop(error = true)
+            view.stop()
           }
 
           Event.TimeChanged -> {

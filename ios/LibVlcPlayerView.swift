@@ -133,13 +133,13 @@ class LibVlcPlayerView: ExpoView {
 
   var mute: Bool = false {
     didSet {
-      let newVolume = mute ?
-        MediaPlayerConstants.minPlayerVolume :
-        volume
-
-      mediaPlayer?.audio?.volume = Int32(newVolume)
+      mediaPlayer?.audio?.volume = Int32(playerVolume)
       MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
     }
+  }
+
+  var playerVolume: Int {
+    mute ? MediaPlayerConstants.minPlayerVolume : volume
   }
 
   var Repeat: Bool = false
@@ -250,8 +250,8 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  func stop(error: Bool? = nil) {
-    player.userStop = error ?? true
+  func stop(userStop: Bool = true) {
+    player.userStop = userStop
 
     player.withPlayer { mediaPlayer in
       mediaPlayer.stop()
@@ -279,14 +279,14 @@ class LibVlcPlayerView: ExpoView {
     }
   }
 
-  func seekBy(_ offset: Double, picture: Bool? = false) {
+  func seekBy(_ offset: Double, picture: Bool = false) {
     if let mediaPlayer {
-      if picture == true {
+      if picture {
         // AVKit skip workaround
         player.retryUntil { [weak self] _ in
           guard let self else { return true }
 
-          if mediaPlayer.state != .stopped {
+          if self.mediaPlayer?.state != .stopped {
             play()
           }
 
@@ -312,32 +312,25 @@ class LibVlcPlayerView: ExpoView {
     let message = "Snapshot could not be taken"
 
     player.withPlayer(message: message) { mediaPlayer in
-      if player.hasVideoSize {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
-        let timestamp = dateFormatter.string(from: Date())
-
-        let snapshotPath = path + "/libvlc-snapshot-\(timestamp).png"
-        let video = CGSize(width: 0, height: 0) // Use original window size
-
-        mediaPlayer.saveVideoSnapshot(
-          at: snapshotPath,
-          withWidth: Int32(video.width),
-          andHeight: Int32(video.height)
-        )
-
-        let fileExists = FileManager.default.fileExists(atPath: snapshotPath)
-
-        if fileExists {
-          onSnapshotTaken(["path": snapshotPath])
-        } else {
-          onEncounteredError(["message": message])
-        }
+      if player.hasVideoSize, let snapshotPath = saveSnapshot(path, mediaPlayer) {
+        onSnapshotTaken(["path": snapshotPath])
       } else {
         onEncounteredError(["message": message])
       }
     }
+  }
+
+  private func saveSnapshot(_ path: String, _ player: VLCMediaPlayer) -> String? {
+    let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+    dateFormatter.dateFormat = "yyyy-MM-dd-HH'h'mm'm'ss's'"
+    let timestamp = dateFormatter.string(from: Date())
+
+    let snapshotPath = path + "/libvlc-snapshot-\(timestamp).png"
+    // Zero width and height keep the original video size
+    player.saveVideoSnapshot(at: snapshotPath, withWidth: 0, andHeight: 0)
+
+    return FileManager.default.fileExists(atPath: snapshotPath) ? snapshotPath : nil
   }
 
   func postAction(_ action: Int) {

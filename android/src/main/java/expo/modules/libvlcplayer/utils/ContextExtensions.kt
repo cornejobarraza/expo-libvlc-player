@@ -16,3 +16,11 @@ internal fun Context.registerNotExportedReceiver(
     registerReceiver(receiver, filter)
   }
 }
+
+internal fun Context.unregisterReceiverSafely(receiver: BroadcastReceiver) {
+  try {
+    unregisterReceiver(receiver)
+  } catch (_: IllegalArgumentException) {
+    // Receiver not registered
+  }
+}

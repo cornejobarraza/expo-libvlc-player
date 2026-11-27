@@ -1,4 +1,5 @@
 import Foundation
+import VLCKit
 
 class MediaPlayerManager {
   static let shared = MediaPlayerManager()
@@ -16,6 +17,10 @@ class MediaPlayerManager {
 
   func unregisterExpoView(_ view: LibVlcPlayerView) {
     expoViews.remove(view)
+  }
+
+  func onModuleCreate() {
+    VLCLibrary.sharedEventsConfiguration = VLCEventsLegacyConfiguration()
   }
 
   func onModuleDestroy() {

@@ -5,13 +5,14 @@ import { View } from "react-native";
 import {
   type LibVlcPlayerViewNativeProps,
   type LibVlcPlayerViewProps,
+  type MediaInfo,
   type VideoAspectRatio,
 } from "./LibVlcPlayerView.types";
-import { convertAspectRatio, getMediaRatio } from "./utils/aspect";
-import { parseNativeMetadata, parseNativeSlaves, parseNativeSource } from "./utils/assets";
-import { convertNativeEvent } from "./utils/events";
+import { convertAspectRatio } from "./utils/aspect";
+import { forwardNativeEvent } from "./utils/events";
+import { convertPlayerProps } from "./utils/props";
 import { usePlayerRef } from "./utils/ref";
-import { useTimeoutRef } from "./utils/timeout";
+import { parseNativeProps } from "./utils/sources";
 
 const CHILDREN_WARNING =
   "<LibVlcPlayerView> does not support children. Render content using absolute positioning";
@@ -23,8 +24,15 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
   const [warnedChildren, setWarnedChildren] = useState<boolean>(false);
   const [mediaRatio, setMediaRatio] = useState<VideoAspectRatio>(undefined);
 
-  const nativeRef = usePlayerRef(ref, props);
-  const timeoutRef = useTimeoutRef();
+  const nativeProps = parseNativeProps(convertPlayerProps(props));
+  const nativeRef = usePlayerRef(ref, nativeProps);
+
+  const handleFirstPlay = (mediaInfo: MediaInfo) => {
+    const videoRatio = mediaInfo.video.width / mediaInfo.video.height;
+    const validRatio = videoRatio > 0 && videoRatio < Infinity;
+    setMediaRatio(validRatio ? videoRatio : undefined);
+    props.onFirstPlay?.(mediaInfo);
+  };
 
   const viewRatio =
     props.aspectRatio === "auto" ? (mediaRatio ?? props.fallbackRatio) : props.aspectRatio;
@@ -38,44 +46,19 @@ const LibVlcPlayerView = ({ ref, ...props }: LibVlcPlayerViewProps) => {
     <View style={[props.style, { aspectRatio: convertAspectRatio(viewRatio) }]}>
       <NativeView
         {...props}
+        {...nativeProps}
         ref={nativeRef}
         style={[props.style, { height: "100%" }]}
-        source={parseNativeSource(props.source)}
-        metadata={parseNativeMetadata(props.metadata)}
-        slaves={parseNativeSlaves(props.slaves)}
-        onBuffering={(event) => {
-          props.onBuffering?.(convertNativeEvent(event));
-        }}
-        onEncounteredError={(event) => {
-          props.onEncounteredError?.(convertNativeEvent(event));
-        }}
-        onDialogDisplay={(event) => {
-          props.onDialogDisplay?.(convertNativeEvent(event));
-        }}
-        onDialogProgress={(event) => {
-          props.onDialogProgress?.(convertNativeEvent(event));
-        }}
-        onTimeChanged={(event) => {
-          props.onTimeChanged?.(convertNativeEvent(event));
-        }}
-        onPositionChanged={(event) => {
-          props.onPositionChanged?.(convertNativeEvent(event));
-        }}
-        onESAdded={(event) => {
-          props.onESAdded?.(convertNativeEvent(event));
-        }}
-        onRecordChanged={(event) => {
-          props.onRecordChanged?.(convertNativeEvent(event));
-        }}
-        onSnapshotTaken={(event) => {
-          props.onSnapshotTaken?.(convertNativeEvent(event));
-        }}
-        onFirstPlay={(event) => {
-          const mediaInfo = convertNativeEvent(event);
-          const mediaRatio = getMediaRatio(mediaInfo.video);
-          timeoutRef(() => setMediaRatio(mediaRatio)); // View resize workaround
-          props.onFirstPlay?.(mediaInfo);
-        }}
+        onBuffering={forwardNativeEvent(props.onBuffering)}
+        onEncounteredError={forwardNativeEvent(props.onEncounteredError)}
+        onDialogDisplay={forwardNativeEvent(props.onDialogDisplay)}
+        onDialogProgress={forwardNativeEvent(props.onDialogProgress)}
+        onTimeChanged={forwardNativeEvent(props.onTimeChanged)}
+        onPositionChanged={forwardNativeEvent(props.onPositionChanged)}
+        onESAdded={forwardNativeEvent(props.onESAdded)}
+        onRecordChanged={forwardNativeEvent(props.onRecordChanged)}
+        onSnapshotTaken={forwardNativeEvent(props.onSnapshotTaken)}
+        onFirstPlay={forwardNativeEvent(handleFirstPlay)}
       />
     </View>
   );

@@ -7,14 +7,12 @@
   "scripts": {
     "build": "node scripts/build.js",
     "clean": "node scripts/clean.js",
-    "lint": "eslint src/",
     "prepare": "husky && node scripts/prepare.js",
     "release": "node scripts/release.js",
     "test": "node scripts/test.js"
   },
   "keywords": [
     "react-native",
-    "vlc",
     "expo",
     "libvlc",
     "player",
