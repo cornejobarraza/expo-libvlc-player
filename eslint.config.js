@@ -21,12 +21,13 @@ module.exports = defineConfig([
     },
     rules: {
       "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
+      "import/consistent-type-specifier-style": ["error", "prefer-inline"],
       "@typescript-eslint/no-unused-vars": [
         "error",
         { enableAutofixRemoval: { imports: true }, ignoreRestSiblings: true },
       ],
-      "react/jsx-fragments": ["warn", "element"],
       "no-unused-vars": "off",
+      "react/jsx-fragments": ["error", "element"],
     },
   },
 ]);

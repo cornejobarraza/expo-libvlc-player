@@ -1,5 +1,5 @@
 import { type Ref } from "react";
-import type { ViewProps } from "react-native";
+import { type ViewProps } from "react-native";
 
 export type Source = string | number | null;
 
