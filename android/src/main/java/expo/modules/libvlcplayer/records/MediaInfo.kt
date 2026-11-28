@@ -5,8 +5,8 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 class MediaInfo(
-  @Field var media: Media = Media(),
-  @Field var video: Video = Video(),
-  @Field var metadata: Metadata = Metadata(),
+  @Field val media: Media = Media(),
+  @Field val video: Video = Video(),
+  @Field val metadata: Metadata = Metadata(),
 ) : Record,
   Serializable

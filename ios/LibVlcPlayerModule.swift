@@ -1,4 +1,3 @@
-import AVKit
 import ExpoModulesCore
 
 public class LibVlcPlayerModule: Module {
@@ -6,7 +5,7 @@ public class LibVlcPlayerModule: Module {
     Name("ExpoLibVlcPlayer")
 
     Function("isPictureInPictureSupported") {
-      AVPictureInPictureController.isPictureInPictureSupported()
+      MediaPlayerManager.shared.pictureInPictureManager.isPictureInPictureSupported()
     }
 
     AsyncFunction("triggerNetworkAlert") {
@@ -92,19 +91,19 @@ public class LibVlcPlayerModule: Module {
         view.mute = mute
       }
 
+      Prop("repeat", false) { (view: LibVlcPlayerView, repeat: Bool) in
+        view.repeat = `repeat`
+      }
+
+      Prop("autoplay", true) { (view: LibVlcPlayerView, autoplay: Bool) in
+        view.autoplay = autoplay
+      }
+
       Prop("audioMixingMode", .auto) { (
         view: LibVlcPlayerView,
         audioMixingMode: AudioMixingMode
       ) in
         view.audioMixingMode = audioMixingMode
-      }
-
-      Prop("repeat", false) { (view: LibVlcPlayerView, Repeat: Bool) in
-        view.Repeat = Repeat
-      }
-
-      Prop("autoplay", true) { (view: LibVlcPlayerView, autoplay: Bool) in
-        view.autoplay = autoplay
       }
 
       Prop("keepScreenAwake", true) { (view: LibVlcPlayerView, keepScreenAwake: Bool) in

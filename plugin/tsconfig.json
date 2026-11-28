@@ -2,15 +2,12 @@
   "extends": "../tsconfig.base",
   "compilerOptions": {
     "composite": true,
-    "declarationMap": false,
-    "inlineSources": false,
     "lib": ["es2023"],
     "module": "nodenext",
     "moduleResolution": "node16",
     "outDir": "./build",
     "resolveJsonModule": true,
     "rootDir": "./src",
-    "sourceMap": false,
     "target": "es2022",
     "types": ["jest"],
     "verbatimModuleSyntax": false

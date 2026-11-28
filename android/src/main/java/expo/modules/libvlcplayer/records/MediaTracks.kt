@@ -5,8 +5,8 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 class MediaTracks(
-  @Field var audio: List<MediaTrack> = emptyList(),
-  @Field var video: List<MediaTrack> = emptyList(),
-  @Field var subtitle: List<MediaTrack> = emptyList(),
+  @Field val audio: List<MediaTrack> = emptyList(),
+  @Field val video: List<MediaTrack> = emptyList(),
+  @Field val subtitle: List<MediaTrack> = emptyList(),
 ) : Record,
   Serializable

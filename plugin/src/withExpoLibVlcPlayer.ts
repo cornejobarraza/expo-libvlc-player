@@ -42,7 +42,7 @@ const LOCAL_NETWORK_USAGE = "Allow $(PRODUCT_NAME) to access your local network"
 
 const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
   config,
-  { localNetworkPermission, supportsBackgroundPlayback, supportsPictureInPicture } = {}
+  { supportsBackgroundPlayback, supportsPictureInPicture, localNetworkPermission } = {}
 ) => {
   withAndroidManifest(config, (config) => {
     if (typeof supportsBackgroundPlayback === "boolean") {
@@ -72,9 +72,7 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
       }
     }
 
-    const needsConfigMod = typeof supportsPictureInPicture === "boolean";
-
-    if (needsConfigMod) {
+    if (typeof supportsPictureInPicture === "boolean") {
       const activity = AndroidConfig.Manifest.getMainActivityOrThrow(config.modResults);
 
       if (supportsPictureInPicture) {
@@ -88,11 +86,10 @@ const withExpoLibVlcPlayer: ConfigPlugin<WithExpoLibVlcPlayerProps> = (
   });
 
   withInfoPlist(config, (config) => {
-    const needsConfigMod =
+    if (
       typeof supportsBackgroundPlayback === "boolean" ||
-      typeof supportsPictureInPicture === "boolean";
-
-    if (needsConfigMod) {
+      typeof supportsPictureInPicture === "boolean"
+    ) {
       const backgroundModes = config.modResults.UIBackgroundModes ?? [];
       const filteredModes = backgroundModes.filter((mode) => mode !== AUDIO_BACKGROUND_MODE);
 

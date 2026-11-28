@@ -456,7 +456,7 @@ describe("LibVlcPlayerView", () => {
             });
           }
           props.onFirstPlay?.(createFirstPlayEvent(1, 1));
-          }).not.toThrow();
+        }).not.toThrow();
       });
     });
   });

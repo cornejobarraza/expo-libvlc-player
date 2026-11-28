@@ -5,8 +5,8 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 data class Tracks(
-  @Field var audio: Int? = null,
-  @Field var video: Int? = null,
-  @Field var subtitle: Int? = null,
+  @Field val audio: Int? = null,
+  @Field val video: Int? = null,
+  @Field val subtitle: Int? = null,
 ) : Record,
   Serializable

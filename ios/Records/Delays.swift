@@ -1,11 +1,8 @@
 import ExpoModulesCore
 
 struct Delays: Record {
-  @Field
-  var audio: Int? = nil
-
-  @Field
-  var subtitle: Int? = nil
+  @Field var audio: Int? = nil
+  @Field var subtitle: Int? = nil
 }
 
 extension Delays: Equatable {

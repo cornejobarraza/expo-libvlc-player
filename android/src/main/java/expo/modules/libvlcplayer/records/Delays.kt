@@ -5,7 +5,7 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 data class Delays(
-  @Field var audio: Long? = null,
-  @Field var subtitle: Long? = null,
+  @Field val audio: Long? = null,
+  @Field val subtitle: Long? = null,
 ) : Record,
   Serializable

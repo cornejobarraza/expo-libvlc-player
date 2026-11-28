@@ -84,13 +84,31 @@ class PictureInPictureManager(
     enterPictureInPicture(activity)
   }
 
+  fun autoEnterPictureInPicture() {
+    val canAutoEnter =
+      Build.VERSION.SDK_INT < Build.VERSION_CODES.S &&
+        pictureInPicture &&
+        mediaPlayer?.isPlaying() == true &&
+        !isInPictureInPictureMode
+
+    if (canAutoEnter) {
+      activity?.let { activity -> enterPictureInPicture(activity) }
+    }
+  }
+
   fun refreshPipView(view: LibVlcPlayerView) {
-    if (pipView == null && view.pictureInPicture && view.mediaPlayer?.isPlaying() == true) {
+    if (pipView != view && canClaimPipView(view)) {
       addPipView(view)
     } else {
       updatePipParams()
     }
   }
+
+  private fun canClaimPipView(view: LibVlcPlayerView): Boolean =
+    view.pictureInPicture &&
+      view.mediaPlayer?.isPlaying() == true &&
+      mediaPlayer?.isPlaying() != true &&
+      !isInPictureInPictureMode
 
   @RequiresApi(Build.VERSION_CODES.O)
   private fun getRemoteActions(): Map<MediaAction, RemoteAction> =

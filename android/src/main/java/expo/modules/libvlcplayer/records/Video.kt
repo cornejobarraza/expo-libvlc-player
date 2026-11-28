@@ -5,9 +5,9 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 class Video(
-  @Field var width: Int = 0,
-  @Field var height: Int = 0,
-  @Field var frameRate: Double = 0.0,
-  @Field var bitrate: Int = 0,
+  @Field val width: Int = 0,
+  @Field val height: Int = 0,
+  @Field val frameRate: Double = 0.0,
+  @Field val bitrate: Int = 0,
 ) : Record,
   Serializable

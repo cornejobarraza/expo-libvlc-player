@@ -21,6 +21,8 @@ class LibVlcPlayerModule : Module() {
         MediaPlayerManager.pictureInPictureManager.isPictureInPictureSupported()
       }
 
+      AsyncFunction("triggerNetworkAlert") {}
+
       OnCreate {
         MediaPlayerManager.onModuleCreate(appContext)
       }
@@ -35,6 +37,10 @@ class LibVlcPlayerModule : Module() {
 
       OnActivityEntersBackground {
         MediaPlayerManager.onModuleBackground()
+      }
+
+      OnUserLeavesActivity {
+        MediaPlayerManager.onModuleUserLeave()
       }
 
       View(LibVlcPlayerView::class) {
@@ -109,19 +115,19 @@ class LibVlcPlayerModule : Module() {
           view.mute = mute
         }
 
-        Prop(
-          "audioMixingMode",
-          AudioMixingMode.AUTO,
-        ) { view: LibVlcPlayerView, audioMixingMode: AudioMixingMode ->
-          view.audioMixingMode = audioMixingMode
-        }
-
         Prop("repeat", false) { view: LibVlcPlayerView, repeat: Boolean ->
           view.repeat = repeat
         }
 
         Prop("autoplay", true) { view: LibVlcPlayerView, autoplay: Boolean ->
           view.autoplay = autoplay
+        }
+
+        Prop(
+          "audioMixingMode",
+          AudioMixingMode.AUTO,
+        ) { view: LibVlcPlayerView, audioMixingMode: AudioMixingMode ->
+          view.audioMixingMode = audioMixingMode
         }
 
         Prop("keepScreenAwake", true) { view: LibVlcPlayerView, keepScreenAwake: Boolean ->
@@ -195,6 +201,8 @@ class LibVlcPlayerModule : Module() {
         AsyncFunction("startPictureInPicture") { view: LibVlcPlayerView ->
           view.startPictureInPicture()
         }
+
+        AsyncFunction("stopPictureInPicture") {}
       }
     }
 }

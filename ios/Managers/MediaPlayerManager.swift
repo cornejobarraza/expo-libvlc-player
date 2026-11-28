@@ -8,6 +8,7 @@ class MediaPlayerManager {
   let audioSessionManager = AudioSessionManager()
   let keepAwakeManager = KeepAwakeManager()
   let mediaPlaybackManager = MediaPlaybackManager()
+  let pictureInPictureManager = PictureInPictureManager()
 
   let expoViews = NSHashTable<LibVlcPlayerView>.weakObjects()
 
@@ -39,7 +40,7 @@ class MediaPlayerManager {
     for view in expoViews.allObjects {
       view.onBackground()
 
-      if !view.isPlaybackView, !view.pictureInPicture {
+      if !view.isPlaybackView, !view.isPipView {
         view.pause()
       }
     }

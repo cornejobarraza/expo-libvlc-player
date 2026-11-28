@@ -3,10 +3,10 @@ import ExpoModulesCore
 enum AudioMixingMode: String, Enumerable {
   case mixWithOthers
   case duckOthers
-  case doNotMix
   case auto
+  case doNotMix
 
-  func priority() -> Int {
+  var priority: Int {
     switch self {
     case .doNotMix:
       3

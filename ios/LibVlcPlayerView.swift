@@ -142,7 +142,7 @@ class LibVlcPlayerView: ExpoView {
     mute ? MediaPlayerConstants.minPlayerVolume : volume
   }
 
-  var Repeat: Bool = false
+  var `repeat`: Bool = false
 
   var autoplay: Bool = true
 
@@ -168,6 +168,10 @@ class LibVlcPlayerView: ExpoView {
 
   var isPlaybackView: Bool {
     canPlayInBackground && MediaPlayerManager.shared.mediaPlaybackManager.isPlaybackView(self)
+  }
+
+  var isPipView: Bool {
+    MediaPlayerManager.shared.pictureInPictureManager.isPipView(self)
   }
 
   var playInBackground: Bool = false {
@@ -199,7 +203,7 @@ class LibVlcPlayerView: ExpoView {
     setIfChanged(\.time, props.time)
     setIfChanged(\.volume, props.volume)
     setIfChanged(\.mute, props.mute)
-    setIfChanged(\.Repeat, props.repeat)
+    setIfChanged(\.repeat, props.repeat)
     setIfChanged(\.autoplay, props.autoplay)
     setIfChanged(\.audioMixingMode, props.audioMixingMode)
     setIfChanged(\.keepScreenAwake, props.keepScreenAwake)
@@ -216,6 +220,7 @@ class LibVlcPlayerView: ExpoView {
     player.stopPictureInPicture()
     player.destroyPlayer()
     MediaPlayerManager.shared.mediaPlaybackManager.removePlaybackView(ObjectIdentifier(self))
+    MediaPlayerManager.shared.pictureInPictureManager.removePipView(ObjectIdentifier(self))
   }
 
   func getMediaMetadata() -> Metadata {
@@ -227,6 +232,7 @@ class LibVlcPlayerView: ExpoView {
   }
 
   func onStartPictureInPicture() {
+    MediaPlayerManager.shared.pictureInPictureManager.addPipView(self)
     onPictureInPictureStart()
   }
 

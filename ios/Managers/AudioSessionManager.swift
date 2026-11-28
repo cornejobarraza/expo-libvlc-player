@@ -9,7 +9,7 @@ class AudioSessionManager {
   func setAppropriateAudioSession() {
     let playingViews = expoViews.allObjects.filter { view in view.mediaPlayer?.isPlaying == true }
     let audioMixingMode = playingViews.map(\.audioMixingMode)
-      .max { lhs, rhs in lhs.priority() < rhs.priority() }
+      .max { lhs, rhs in lhs.priority < rhs.priority }
     let anyPlayingView = playingViews
       .contains { view in (view.mediaPlayer?.audio?.volume ?? 0) > 0 }
     let isNowPlayingEligible = MediaPlayerManager.shared.mediaPlaybackManager.isNowPlayingEligible

@@ -98,9 +98,7 @@ class MediaPlayer(
 
   @Suppress("OPT_IN_USAGE")
   private fun createPlayer() {
-    if (view.pictureInPicture) {
-      MediaPlayerManager.pictureInPictureManager.addPipView(view)
-    } else {
+    if (!view.pictureInPicture) {
       MediaPlayerManager.pictureInPictureManager.removePipView(view)
     }
 
@@ -377,8 +375,8 @@ class MediaPlayer(
 
         MediaPlayerManager.mediaPlaybackManager.updatePlaybackPosition(
           view,
-          initialTime.toLong().takeIf { time -> time > 0 },
-          view.rate.toFloat(),
+          time = initialTime.toLong().takeIf { time -> time > 0 },
+          rate = view.rate.toFloat(),
         )
 
         shouldInitTime = false

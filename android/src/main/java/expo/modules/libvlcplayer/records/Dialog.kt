@@ -5,11 +5,11 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 class Dialog(
-  @Field var type: String = "",
-  @Field var title: String = "",
-  @Field var text: String = "",
-  @Field var cancelText: String? = null,
-  @Field var action1Text: String? = null,
-  @Field var action2Text: String? = null,
+  @Field val type: String = "",
+  @Field val title: String = "",
+  @Field val text: String = "",
+  @Field val cancelText: String? = null,
+  @Field val action1Text: String? = null,
+  @Field val action2Text: String? = null,
 ) : Record,
   Serializable

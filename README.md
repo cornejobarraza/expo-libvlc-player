@@ -212,6 +212,12 @@ The `LibVlcPlayerModule` exposes the following functions:
 type Source = string | number | null;
 ```
 
+#### `Asset`
+
+```ts
+type Asset = NonNullable<Source>;
+```
+
 #### `Metadata`
 
 ```ts
@@ -219,14 +225,8 @@ interface Metadata {
   title?: string | null;
   artist?: string | null;
   album?: string | null;
-  artworkURL?: Source;
+  artworkURL?: Asset | null;
 }
-```
-
-#### `Asset`
-
-```ts
-type Asset = NonNullable<Source>;
 ```
 
 #### `SlaveType`

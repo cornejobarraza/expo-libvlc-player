@@ -9,8 +9,9 @@ describe("plugin entry", () => {
 
   it("returns the plugin tuple with the given props", () => {
     const props = {
-      localNetworkPermission: "Custom message",
+      supportsBackgroundPlayback: true,
       supportsPictureInPicture: true,
+      localNetworkPermission: "Custom message",
     };
 
     expect(withExpoLibVlcPlayerEntry(props)).toEqual([PLUGIN_NAME, props]);

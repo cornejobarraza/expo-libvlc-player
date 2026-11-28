@@ -5,8 +5,8 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 data class Slave(
-  @Field var source: String = "",
-  @Field var type: String = "",
-  @Field var selected: Boolean? = false,
+  @Field val source: String = "",
+  @Field val type: String = "",
+  @Field val selected: Boolean? = false,
 ) : Record,
   Serializable

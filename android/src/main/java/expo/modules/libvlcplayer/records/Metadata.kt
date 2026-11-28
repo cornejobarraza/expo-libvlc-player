@@ -5,9 +5,9 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 data class Metadata(
-  @Field var title: String? = null,
-  @Field var artist: String? = null,
-  @Field var album: String? = null,
-  @Field var artworkURL: String? = null,
+  @Field val title: String? = null,
+  @Field val artist: String? = null,
+  @Field val album: String? = null,
+  @Field val artworkURL: String? = null,
 ) : Record,
   Serializable

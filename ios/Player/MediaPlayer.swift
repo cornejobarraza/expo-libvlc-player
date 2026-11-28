@@ -59,9 +59,14 @@ class MediaPlayer: NSObject {
   }
 
   private func createPlayer() {
-    let drawable = view.pictureInPicture
-      ? picture!
-      : video
+    let drawable: MediaPlayerDrawable
+
+    if view.pictureInPicture {
+      drawable = picture
+    } else {
+      MediaPlayerManager.shared.pictureInPictureManager.removePipView(viewID)
+      drawable = video
+    }
 
     library = VLCLibrary(options: view.options)
     mediaPlayer = VLCMediaPlayer(library: library!)
@@ -405,7 +410,7 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
     case .playing,
          .paused,
          .stopped:
-      let willRepeat = newState == .stopped && view.Repeat && !userStop
+      let willRepeat = newState == .stopped && view.repeat && !userStop
 
       if newState == .playing {
         view.onPlaying()
@@ -474,6 +479,7 @@ extension MediaPlayer: VLCMediaPlayerDelegate {
 
       MediaPlayerManager.shared.audioSessionManager.setAppropriateAudioSession()
       MediaPlayerManager.shared.keepAwakeManager.toggleKeepAwake(view)
+      MediaPlayerManager.shared.pictureInPictureManager.refreshPipView(view)
       picture.updatePipState()
     case .error:
       view.onEncounteredError(["message": "Player encountered an error"])

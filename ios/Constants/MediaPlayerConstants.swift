@@ -25,6 +25,7 @@ enum MediaPlayerConstants {
   static let defaultPlayerTime: Int = 0
   static let minPlayerVolume: Int = 0
   static let maxPlayerVolume: Int = 100
+  static let seekStep: TimeInterval = 10.0
   static let frameRatePrecision: Double = 1_000_000.0
   static let bitsPerKilobit: Int = 1_000
 
@@ -34,7 +35,6 @@ enum MediaPlayerConstants {
 
   static let artworkTimeout: TimeInterval = 8.0
   static let mediaArtworkSchemes: Set<String> = ["http", "https", "file"]
-  static let seekStep: TimeInterval = 10.0
 
   static let expDelayMultiplier: Double = 2.0
   static let retryDelayMs: Double = 150.0

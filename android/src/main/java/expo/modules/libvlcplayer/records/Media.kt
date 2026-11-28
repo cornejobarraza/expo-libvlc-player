@@ -5,8 +5,8 @@ import expo.modules.kotlin.records.Record
 import java.io.Serializable
 
 class Media(
-  @Field var length: Int = 0,
-  @Field var seekable: Boolean = false,
-  @Field var pausable: Boolean = false,
+  @Field val length: Int = 0,
+  @Field val seekable: Boolean = false,
+  @Field val pausable: Boolean = false,
 ) : Record,
   Serializable

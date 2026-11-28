@@ -16,8 +16,8 @@ jobs:
         run: brew install ktlint swiftformat
       - name: Lint all
         run: |
-          npx tsc
           npx tsc -p tsconfig.eslint.json
           npx eslint
+          npx jest
           ktlint android/
           swiftformat --lint ios/

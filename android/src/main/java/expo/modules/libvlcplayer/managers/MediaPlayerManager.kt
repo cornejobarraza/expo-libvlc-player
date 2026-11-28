@@ -49,4 +49,8 @@ object MediaPlayerManager {
       }
     }
   }
+
+  fun onModuleUserLeave() {
+    pictureInPictureManager.autoEnterPictureInPicture()
+  }
 }
