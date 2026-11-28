@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## 58.0.27 - 2026-11-28
+
+### 🐛 Bug fixes
+
+- Fixed automatic Picture-in-Picture (PiP) on Android
+
 ## 58.0.26 - 2026-11-27
 
 ### 🐛 Bug fixes
